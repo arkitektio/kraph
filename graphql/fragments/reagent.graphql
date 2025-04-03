@@ -1,0 +1,14 @@
+fragment Reagent on Reagent {
+  id
+  category {
+    id
+    label
+  }
+  externalId
+  label
+}
+
+fragment ListReagent on Reagent {
+  id
+  label
+}

@@ -1,0 +1,39 @@
+fragment Graph on Graph {
+  id
+  name
+  description
+  structureCategories {
+    ...ListStructureCategory
+  }
+  entityCategories {
+    ...ListEntityCategory
+  }
+  metricCategories {
+    ...ListMetricCategory
+  }
+  protocolEventCategories {
+    ...ListProtocolEventCategory
+  }
+  naturalEventCategories {
+    ...ListNaturalEventCategory
+  }
+  relationCategories {
+    ...ListRelationCategory
+  }
+  measurementCategories {
+    ...ListMeasurementCategory
+  }
+  graphQueries(pagination: { limit: 0 }) {
+    ...GraphQuery
+  }
+  latestNodes(pagination: { limit: 2 }) {
+    ...Node
+  }
+}
+
+fragment ListGraph on Graph {
+  id
+  name
+  description
+  pinned
+}

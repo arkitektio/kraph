@@ -1,0 +1,13 @@
+fragment NodeQuery on NodeQuery {
+  id
+  name
+  pinned
+}
+
+fragment ListNodeQuery on NodeQuery {
+  id
+  name
+  query
+  description
+  pinned
+}

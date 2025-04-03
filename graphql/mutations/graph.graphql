@@ -1,0 +1,21 @@
+mutation CreateGraph($input: GraphInput!) {
+  createGraph(input: $input) {
+    ...Graph
+  }
+}
+
+mutation PinGraph($input: PinGraphInput!) {
+  pinGraph(input: $input) {
+    ...Graph
+  }
+}
+
+mutation DeleteGraph($input: DeleteGraphInput!) {
+  deleteGraph(input: $input)
+}
+
+mutation UpdateGraph($input: UpdateGraphInput!) {
+  updateGraph(input: $input) {
+    ...Graph
+  }
+}

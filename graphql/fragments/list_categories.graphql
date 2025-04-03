@@ -1,0 +1,71 @@
+fragment BaseListCategory on BaseCategory {
+  id
+  description
+  store {
+    presignedUrl
+  }
+  tags {
+    id
+    value
+  }
+}
+
+fragment BaseListNodeCategory on NodeCategory {
+  id
+  positionX
+  positionY
+  width
+  height
+}
+
+fragment BaseListEdgeCategory on EdgeCategory {
+  id
+}
+
+fragment ListMeasurementCategory on MeasurementCategory {
+  ...BaseListCategory
+  ...BaseListEdgeCategory
+  sourceDefinition {
+    tagFilters
+    categoryFilters
+  }
+  targetDefinition {
+    tagFilters
+    categoryFilters
+  }
+  label
+}
+
+fragment ListRelationCategory on RelationCategory {
+  ...BaseListCategory
+  ...BaseListEdgeCategory
+  sourceDefinition {
+    tagFilters
+    categoryFilters
+  }
+  targetDefinition {
+    tagFilters
+    categoryFilters
+  }
+  label
+}
+
+fragment ListStructureCategory on StructureCategory {
+  ...BaseListCategory
+  ...BaseListNodeCategory
+  identifier
+}
+
+fragment ListReagentCategory on ReagentCategory {
+  ...BaseListCategory
+  ...BaseNodeCategory
+  instanceKind
+  label
+}
+
+fragment ListMetricCategory on MetricCategory {
+  ...BaseListCategory
+  ...BaseNodeCategory
+  label
+  metricKind
+}

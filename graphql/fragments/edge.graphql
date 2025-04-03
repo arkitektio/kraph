@@ -1,0 +1,33 @@
+fragment BaseEdge on Edge {
+  id
+  leftId
+  rightId
+}
+
+fragment Measurement on Measurement {
+  validFrom
+  validTo
+  category {
+    id
+    label
+  }
+}
+
+fragment Relation on Relation {
+  category {
+    id
+    label
+  }
+}
+
+fragment Participant on Participant {
+  role 
+  quantity
+}
+
+fragment Edge on Edge {
+  ...BaseEdge
+  ...Measurement
+  ...Relation
+  ...Participant
+}

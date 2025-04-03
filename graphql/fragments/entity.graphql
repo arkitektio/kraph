@@ -1,0 +1,17 @@
+fragment Entity on Entity {
+  id
+  category {
+    id
+    label
+  }
+  label
+}
+
+fragment ListEntity on Entity {
+  id
+  label
+  category {
+    id
+    label
+  }
+}

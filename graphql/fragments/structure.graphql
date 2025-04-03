@@ -1,0 +1,30 @@
+fragment Structure on Structure {
+  id
+  object
+  identifier
+}
+
+fragment ListStructure on Structure {
+  id
+  category {
+    identifier
+    id
+  }
+}
+
+fragment InformedStructure on Structure {
+  id
+  category {
+    id
+    identifier
+  }
+  graph {
+    id
+    name
+  }
+  bestView {
+    ...Table
+    ...Pairs
+    ...Path
+  }
+}
