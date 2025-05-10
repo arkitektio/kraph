@@ -1,5 +1,5 @@
 """
-This modules provides the datalayer. 
+This modules provides the datalayer.
 
 Example:
 
@@ -28,7 +28,7 @@ Example:
 
     ```
 
- 
+
 """
 
 import contextvars
@@ -37,7 +37,7 @@ from koil.composition import KoiledModel
 from .vars import current_datalayer
 
 
-class KraphDataLayer(KoiledModel):
+class DataLayer(KoiledModel):
     """Implements a S3 DataLayer
 
     This will be used to upload and download files from S3.

@@ -37,7 +37,4 @@ fragment DetailNode on Node {
     id
     name
   }
-  bestView {
-    ...Table
-  }
 }

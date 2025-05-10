@@ -103,7 +103,6 @@ def validate_structure_category_definition(cls, value):
         if isinstance(i, str):
             if i.startswith("@") and "/" in i:
                 categoryFilters.append(i)
-            
             if i.startswith("class:"):
                 categoryFilters.append(i[len("class:") :])
             elif i.startswith("tag:"):
@@ -143,6 +142,29 @@ def validate_structure_category_definition(cls, value):
 
 
 
+def assert_is_reagent_or_id(value):
+    from kraph.api.schema import Reagent
+
+    if isinstance(value, str):
+        return value
+    elif getattr(value, "typename", None) == "Reagent":
+        return getattr(value, "id")
+    else:
+        raise ValueError(
+            f"Value {value} is not a string or a Reagent. You need to specify a single value for {value} (pass quantity as node mapping instead)"
+        )
+        
+def assert_is_entity_or_id(value):
+    from kraph.api.schema import Entity
+
+    if isinstance(value, str):
+        return value
+    elif getattr(value, "typename", None) == "Entity":
+        return getattr(value, "id")
+    else:
+        raise ValueError(
+            f"Value {value} is not a string or a Entity. You need to specify a single value for {value} (pass quantity as node mapping instead)"
+        )
 
 
 
@@ -394,9 +416,6 @@ class RelationCategoryTrait(BaseModel):
 
 
 class MeasurementCategoryTrait(BaseModel):
-
-    def __str__(self):
-        return get_attributes_or_error(self, "age_name")
     
     
     def __ror__(self, other):
@@ -424,9 +443,6 @@ class MeasurementCategoryTrait(BaseModel):
 
 
 class ReagentCategoryTrait(BaseModel):
-
-    def __str__(self):
-        return get_attributes_or_error(self, "age_name")
     
     
     def __call__(self, *args, external_id=None, **kwargs):
@@ -443,8 +459,6 @@ class ReagentCategoryTrait(BaseModel):
 
 class StructureCategoryTrait(BaseModel):
 
-    def __str__(self):
-        return get_attributes_or_error(self, "age_name")
      
 
     def __or__(self, other):
@@ -468,8 +482,6 @@ class StructureCategoryTrait(BaseModel):
 class EntityCategoryTrait(BaseModel):
     """Allows for the creation of a generic categoryss"""
 
-    def __str__(self):
-        return get_attributes_or_error(self, "age_name")
     
     def __or__(self, other):
         raise NotImplementedError("You cannot relate structure categories directly. Use an entitiy instead E.g. by calling the category")
@@ -489,8 +501,6 @@ class EntityCategoryTrait(BaseModel):
 class NaturalEventCategoryTrait(BaseModel):
     """Allows for the creation of a generic category"""
 
-    def __str__(self):
-        return get_attributes_or_error(self, "age_name")
     
     def __or__(self, other):
         raise NotImplementedError("You cannot relate structure categories directly. Use an entitiy instead E.g. by calling the category")
@@ -510,15 +520,12 @@ class NaturalEventCategoryTrait(BaseModel):
 class ProtocolEventCategoryTrait(BaseModel):
     """Allows for the creation of a generic category"""
 
-    def __str__(self):
-        return get_attributes_or_error(self, "age_name")
-    
     def __or__(self, other):
         raise NotImplementedError("You cannot relate structure categories directly. Use an entitiy instead E.g. by calling the category")
 
 
     def __call__(self, external_id=None, **kwargs):
-        from kraph.api.schema import record_protocol_event, EntityRoleDefinition, ReagentRoleDefinition, NodeMapping, VariableMapping, VariableDefinition
+        from kraph.api.schema import record_protocol_event, EntityRoleDefinition, ReagentRoleDefinition, NodeMapping, VariableMappingInput, VariableDefinition, Reagent
 
         """Creates an entity with a name
 
@@ -537,15 +544,13 @@ class ProtocolEventCategoryTrait(BaseModel):
         entity_targets: list[NodeMapping] = kwargs.get("entity_targets", [])
         reagent_sources: list[NodeMapping] = kwargs.get("reagent_sources", [])
         reagent_targets: list[NodeMapping] = kwargs.get("reagent_targets", [])
-        variable_mappings: list[VariableMapping] = kwargs.get("variable_mappings", [])
+        variable_mappings: list[VariableMappingInput] = kwargs.get("variable_mappings", [])
         
         validated_entity_sources = []
         validated_entity_targets = []
         validated_reagent_sources = []
         validated_reagent_targets = []
         validated_variable_mappings = []
-        
-        print(kwargs)
         
         
         for i in reagent_source_roles:
@@ -555,7 +560,7 @@ class ProtocolEventCategoryTrait(BaseModel):
                 
                 elif i.role in kwargs:
                     passed_value = kwargs.pop(i.role)
-                    print(passed_value, i.role)
+                    assert_is_reagent_or_id(passed_value)
                     validated_reagent_sources.append(NodeMapping(key=i.role, node=passed_value))
                 
                 else:
@@ -577,9 +582,10 @@ class ProtocolEventCategoryTrait(BaseModel):
                         assert i.allow_multiple, f"Entity source role {i.role} does not allow multiple values. You need to specify a single value for {i.role}"
                         
                         for passed_v in passed_value:
-                            validated_entity_sources.append(NodeMapping(key=i.role, node=passed_v))
+                           assert_is_entity_or_id(passed_v)
+                           validated_entity_sources.append(NodeMapping(key=i.role, node=passed_v))
                     else:
-                        print(passed_value, i.role)
+                        assert_is_entity_or_id(passed_value)
                         validated_entity_sources.append(NodeMapping(key=i.role, node=passed_value))
                 else:
                     if i.optional:
@@ -605,6 +611,7 @@ class ProtocolEventCategoryTrait(BaseModel):
                 
                 elif i.role in kwargs:
                     passed_value =  kwargs.pop(i.role)
+                    assert_is_reagent_or_id(passed_value)
                     validated_reagent_targets.append(NodeMapping(key=i.role, node=passed_value))
                 
                 else:
@@ -627,8 +634,10 @@ class ProtocolEventCategoryTrait(BaseModel):
                         assert i.allow_multiple, f"Entity target role {i.role} does not allow multiple values. You need to specify a single value for {i.role}"
                         
                         for passed_v in passed_value:
+                            assert_is_entity_or_id(passed_v)
                             validated_entity_targets.append(NodeMapping(key=i.role, node=passed_v))
                     else:
+                        assert_is_entity_or_id(passed_value)
                         validated_entity_targets.append(NodeMapping(key=i.role, node=passed_value))
                 else:
                     if i.optional:
@@ -650,7 +659,7 @@ class ProtocolEventCategoryTrait(BaseModel):
             if i.param not in [x.key for x in variable_mappings]:
                 if i.param in kwargs:
                     passed_value = kwargs.pop(i.param)
-                    validated_variable_mappings.append(VariableMapping(key=i.param, value=passed_value))
+                    validated_variable_mappings.append(VariableMappingInput(key=i.param, value=passed_value))
                 else:
                     if i.optional:
                         continue
@@ -660,7 +669,7 @@ class ProtocolEventCategoryTrait(BaseModel):
             else:
                 passed_values = [x.key for x in variable_mappings]
                 assert len(passed_values) == 1, f"Variable mapping {i.param} found multiple times in source. You need to specify a single value for {i.param} (pass quantity as node mapping instead)"
-                assert isinstance(passed_values, NodeMapping), f"Variable mapping {i.param} is not a node mapping. You need to specify a single value for {i.param} (pass quantity as node mapping instead)"
+                assert isinstance(passed_values, VariableMappingInput), f"Variable mapping {i.param} is not a node mapping. You need to specify a single value for {i.param} (pass quantity as node mapping instead)"
                 validated_variable_mappings.append(passed_values[0])
                 
                 
@@ -680,9 +689,6 @@ class ProtocolEventCategoryTrait(BaseModel):
 class MetricCategoryTrait(BaseModel):
     """Allows for the creation of a generic category"""
 
-    def __str__(self):
-        return get_attributes_or_error(self, "age_name")
-    
     def __or__(self, other):
         raise NotImplementedError("You cannot relate structure categories directly. Use an entitiy instead E.g. by calling the category")
 

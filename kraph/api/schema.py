@@ -1,40 +1,42 @@
 from kraph.traits import (
-    StructureCategoryTrait,
-    GraphTrait,
-    EntityCategoryTrait,
-    MetricTrait,
     ReagentRoleDefinitionInputTrait,
-    RelationCategoryInputTrait,
-    EntityRoleDefinitionInputTrait,
-    MeasurementCategoryTrait,
-    MeasurementCategoryInputTrait,
-    MetricCategoryInputTrait,
-    EntityTrait,
-    NaturalEventCategoryTrait,
     MetricCategoryTrait,
-    StructureTrait,
-    ReagentCategoryTrait,
-    ProtocolEventCategoryTrait,
+    MetricTrait,
+    MeasurementCategoryTrait,
     HasPresignedDownloadAccessor,
+    GraphTrait,
+    StructureCategoryTrait,
+    ReagentCategoryTrait,
+    MeasurementCategoryInputTrait,
+    EntityTrait,
+    EntityCategoryTrait,
     RelationCategoryTrait,
+    MetricCategoryInputTrait,
+    RelationCategoryInputTrait,
+    StructureTrait,
+    NaturalEventCategoryTrait,
+    ProtocolEventCategoryTrait,
+    EntityRoleDefinitionInputTrait,
 )
-from typing import Tuple, Union, Optional, Any, Annotated, Literal, Iterable, List
+from rath.scalars import ID
 from kraph.scalars import (
     StructureString,
-    NodeID,
     RemoteUpload,
+    NodeID,
     StructureIdentifier,
     Cypher,
 )
+from typing import Union, Iterable, Literal, Any, List, Tuple, Annotated, Optional
 from pydantic import Field, ConfigDict, BaseModel
-from kraph.funcs import aexecute, execute
-from datetime import datetime
-from rath.scalars import ID
-from kraph.rath import KraphRath
 from enum import Enum
+from kraph.funcs import execute, aexecute
+from kraph.rath import KraphRath
+from datetime import datetime
 
 
 class ViewKind(str, Enum):
+    """No documentation"""
+
     PATH = "PATH"
     PAIRS = "PAIRS"
     TABLE = "TABLE"
@@ -45,12 +47,16 @@ class ViewKind(str, Enum):
 
 
 class ColumnKind(str, Enum):
+    """No documentation"""
+
     NODE = "NODE"
     VALUE = "VALUE"
     EDGE = "EDGE"
 
 
 class MetricKind(str, Enum):
+    """No documentation"""
+
     INT = "INT"
     FLOAT = "FLOAT"
     DATETIME = "DATETIME"
@@ -65,6 +71,8 @@ class MetricKind(str, Enum):
 
 
 class InstanceKind(str, Enum):
+    """No documentation"""
+
     LOT = "LOT"
     SAMPLE = "SAMPLE"
     ENTITY = "ENTITY"
@@ -72,6 +80,8 @@ class InstanceKind(str, Enum):
 
 
 class NodeQueryFilter(BaseModel):
+    """No documentation"""
+
     ids: Optional[Tuple[ID, ...]] = None
     "Filter by list of IDs"
     search: Optional[str] = None
@@ -79,20 +89,26 @@ class NodeQueryFilter(BaseModel):
     id: Optional[ID] = None
     and_: Optional["NodeQueryFilter"] = Field(alias="AND", default=None)
     or_: Optional["NodeQueryFilter"] = Field(alias="OR", default=None)
+    not_: Optional["NodeQueryFilter"] = Field(alias="NOT", default=None)
+    distinct: Optional[bool] = Field(alias="DISTINCT", default=None)
     model_config = ConfigDict(
         frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
     )
 
 
 class OffsetPaginationInput(BaseModel):
+    """No documentation"""
+
     offset: int
-    limit: int
+    limit: Optional[int] = None
     model_config = ConfigDict(
         frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
     )
 
 
 class GraphQueryFilter(BaseModel):
+    """No documentation"""
+
     ids: Optional[Tuple[ID, ...]] = None
     "Filter by list of IDs"
     search: Optional[str] = None
@@ -100,12 +116,16 @@ class GraphQueryFilter(BaseModel):
     id: Optional[ID] = None
     and_: Optional["GraphQueryFilter"] = Field(alias="AND", default=None)
     or_: Optional["GraphQueryFilter"] = Field(alias="OR", default=None)
+    not_: Optional["GraphQueryFilter"] = Field(alias="NOT", default=None)
+    distinct: Optional[bool] = Field(alias="DISTINCT", default=None)
     model_config = ConfigDict(
         frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
     )
 
 
 class StructureCategoryFilter(BaseModel):
+    """No documentation"""
+
     ids: Optional[Tuple[ID, ...]] = None
     id: Optional[ID] = None
     search: Optional[str] = None
@@ -114,12 +134,16 @@ class StructureCategoryFilter(BaseModel):
     pinned: Optional[bool] = None
     and_: Optional["StructureCategoryFilter"] = Field(alias="AND", default=None)
     or_: Optional["StructureCategoryFilter"] = Field(alias="OR", default=None)
+    not_: Optional["StructureCategoryFilter"] = Field(alias="NOT", default=None)
+    distinct: Optional[bool] = Field(alias="DISTINCT", default=None)
     model_config = ConfigDict(
         frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
     )
 
 
 class ProtocolEventCategoryFilter(BaseModel):
+    """No documentation"""
+
     ids: Optional[Tuple[ID, ...]] = None
     id: Optional[ID] = None
     search: Optional[str] = None
@@ -127,12 +151,16 @@ class ProtocolEventCategoryFilter(BaseModel):
     pinned: Optional[bool] = None
     and_: Optional["ProtocolEventCategoryFilter"] = Field(alias="AND", default=None)
     or_: Optional["ProtocolEventCategoryFilter"] = Field(alias="OR", default=None)
+    not_: Optional["ProtocolEventCategoryFilter"] = Field(alias="NOT", default=None)
+    distinct: Optional[bool] = Field(alias="DISTINCT", default=None)
     model_config = ConfigDict(
         frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
     )
 
 
 class NaturalEventCategoryFilter(BaseModel):
+    """No documentation"""
+
     ids: Optional[Tuple[ID, ...]] = None
     id: Optional[ID] = None
     search: Optional[str] = None
@@ -140,12 +168,16 @@ class NaturalEventCategoryFilter(BaseModel):
     pinned: Optional[bool] = None
     and_: Optional["NaturalEventCategoryFilter"] = Field(alias="AND", default=None)
     or_: Optional["NaturalEventCategoryFilter"] = Field(alias="OR", default=None)
+    not_: Optional["NaturalEventCategoryFilter"] = Field(alias="NOT", default=None)
+    distinct: Optional[bool] = Field(alias="DISTINCT", default=None)
     model_config = ConfigDict(
         frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
     )
 
 
 class EntityCategoryFilter(BaseModel):
+    """No documentation"""
+
     ids: Optional[Tuple[ID, ...]] = None
     id: Optional[ID] = None
     search: Optional[str] = None
@@ -155,12 +187,16 @@ class EntityCategoryFilter(BaseModel):
     tags: Optional[Tuple[str, ...]] = None
     and_: Optional["EntityCategoryFilter"] = Field(alias="AND", default=None)
     or_: Optional["EntityCategoryFilter"] = Field(alias="OR", default=None)
+    not_: Optional["EntityCategoryFilter"] = Field(alias="NOT", default=None)
+    distinct: Optional[bool] = Field(alias="DISTINCT", default=None)
     model_config = ConfigDict(
         frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
     )
 
 
 class ReagentCategoryFilter(BaseModel):
+    """No documentation"""
+
     ids: Optional[Tuple[ID, ...]] = None
     id: Optional[ID] = None
     search: Optional[str] = None
@@ -169,24 +205,32 @@ class ReagentCategoryFilter(BaseModel):
     pinned: Optional[bool] = None
     and_: Optional["ReagentCategoryFilter"] = Field(alias="AND", default=None)
     or_: Optional["ReagentCategoryFilter"] = Field(alias="OR", default=None)
+    not_: Optional["ReagentCategoryFilter"] = Field(alias="NOT", default=None)
+    distinct: Optional[bool] = Field(alias="DISTINCT", default=None)
     model_config = ConfigDict(
         frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
     )
 
 
 class MeasurementCategoryFilter(BaseModel):
+    """No documentation"""
+
     ids: Optional[Tuple[ID, ...]] = None
     id: Optional[ID] = None
     search: Optional[str] = None
     graph: Optional[ID] = None
     and_: Optional["MeasurementCategoryFilter"] = Field(alias="AND", default=None)
     or_: Optional["MeasurementCategoryFilter"] = Field(alias="OR", default=None)
+    not_: Optional["MeasurementCategoryFilter"] = Field(alias="NOT", default=None)
+    distinct: Optional[bool] = Field(alias="DISTINCT", default=None)
     model_config = ConfigDict(
         frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
     )
 
 
 class RelationCategoryFilter(BaseModel):
+    """No documentation"""
+
     ids: Optional[Tuple[ID, ...]] = None
     id: Optional[ID] = None
     search: Optional[str] = None
@@ -195,6 +239,8 @@ class RelationCategoryFilter(BaseModel):
     pinned: Optional[bool] = None
     and_: Optional["RelationCategoryFilter"] = Field(alias="AND", default=None)
     or_: Optional["RelationCategoryFilter"] = Field(alias="OR", default=None)
+    not_: Optional["RelationCategoryFilter"] = Field(alias="NOT", default=None)
+    distinct: Optional[bool] = Field(alias="DISTINCT", default=None)
     model_config = ConfigDict(
         frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
     )
@@ -227,6 +273,8 @@ class EntityFilter(BaseModel):
 
 
 class GraphPaginationInput(BaseModel):
+    """No documentation"""
+
     limit: Optional[int] = None
     offset: Optional[int] = None
     model_config = ConfigDict(
@@ -235,6 +283,8 @@ class GraphPaginationInput(BaseModel):
 
 
 class GraphFilter(BaseModel):
+    """No documentation"""
+
     ids: Optional[Tuple[ID, ...]] = None
     "Filter by list of IDs"
     search: Optional[str] = None
@@ -243,6 +293,8 @@ class GraphFilter(BaseModel):
     pinned: Optional[bool] = None
     and_: Optional["GraphFilter"] = Field(alias="AND", default=None)
     or_: Optional["GraphFilter"] = Field(alias="OR", default=None)
+    not_: Optional["GraphFilter"] = Field(alias="NOT", default=None)
+    distinct: Optional[bool] = Field(alias="DISTINCT", default=None)
     model_config = ConfigDict(
         frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
     )
@@ -319,6 +371,8 @@ class GraphInput(BaseModel):
     "An optional description of the ontology"
     image: Optional[ID] = None
     "An optional ID reference to an associated image"
+    pin: Optional[bool] = None
+    "Whether this ontology should be pinned or not"
     model_config = ConfigDict(
         frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
     )
@@ -339,6 +393,8 @@ class UpdateGraphInput(BaseModel):
     "New ID reference to an associated image"
     nodes: Optional[Tuple["GraphNodeInput", ...]] = None
     "New nodes for the ontology"
+    pin: Optional[bool] = None
+    "Whether this ontology should be pinned or not"
     model_config = ConfigDict(
         frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
     )
@@ -751,6 +807,8 @@ class EntityRoleDefinitionInput(EntityRoleDefinitionInputTrait, BaseModel):
 
 
 class PlateChildInput(BaseModel):
+    """No documentation"""
+
     id: Optional[ID] = None
     type: Optional[str] = None
     text: Optional[str] = None
@@ -916,6 +974,22 @@ class VariableDefinitionInput(BaseModel):
     "A detailed description of the role"
     label: Optional[str] = None
     "The label/name of the role"
+    options: Optional[Tuple["OptionInput", ...]] = None
+    "A list of options for this port (if only a few values are allowed)"
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class OptionInput(BaseModel):
+    """No documentation"""
+
+    label: str
+    "The label of the option"
+    value: Any
+    "The value of the option. This can be a string, number, or boolean"
+    description: Optional[str] = None
+    "A detailed description of the option"
     model_config = ConfigDict(
         frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
     )
@@ -1020,6 +1094,8 @@ class DeleteScatterPlotInput(BaseModel):
 
 
 class RecordNaturalEventInput(BaseModel):
+    """No documentation"""
+
     category: ID
     entity_sources: Optional[Tuple["NodeMapping", ...]] = Field(
         alias="entitySources", default=None
@@ -1039,6 +1115,8 @@ class RecordNaturalEventInput(BaseModel):
 
 
 class NodeMapping(BaseModel):
+    """No documentation"""
+
     key: str
     node: ID
     quantity: Optional[float] = None
@@ -1048,6 +1126,8 @@ class NodeMapping(BaseModel):
 
 
 class RecordProtocolEventInput(BaseModel):
+    """No documentation"""
+
     category: ID
     external_id: Optional[str] = Field(alias="externalId", default=None)
     entity_sources: Optional[Tuple[NodeMapping, ...]] = Field(
@@ -1062,7 +1142,7 @@ class RecordProtocolEventInput(BaseModel):
     reagent_targets: Optional[Tuple[NodeMapping, ...]] = Field(
         alias="reagentTargets", default=None
     )
-    variables: Optional[Tuple["VariableMapping", ...]] = None
+    variables: Optional[Tuple["VariableMappingInput", ...]] = None
     valid_from: Optional[datetime] = Field(alias="validFrom", default=None)
     valid_to: Optional[datetime] = Field(alias="validTo", default=None)
     model_config = ConfigDict(
@@ -1070,7 +1150,9 @@ class RecordProtocolEventInput(BaseModel):
     )
 
 
-class VariableMapping(BaseModel):
+class VariableMappingInput(BaseModel):
+    """No documentation"""
+
     key: str
     value: Any
     model_config = ConfigDict(
@@ -1099,6 +1181,8 @@ class ToldYouSoInput(BaseModel):
 
 
 class ContextInput(BaseModel):
+    """No documentation"""
+
     assignation_id: Optional[ID] = Field(alias="assignationId", default=None)
     assignee_id: Optional[ID] = Field(alias="assigneeId", default=None)
     template_id: Optional[ID] = Field(alias="templateId", default=None)
@@ -1110,6 +1194,8 @@ class ContextInput(BaseModel):
 
 
 class MeasurementInput(BaseModel):
+    """No documentation"""
+
     category: ID
     structure: NodeID
     entity: NodeID
@@ -1139,6 +1225,8 @@ class RelationInput(BaseModel):
 
 
 class MetricInput(BaseModel):
+    """No documentation"""
+
     structure: NodeID
     category: ID
     value: Any
@@ -1151,6 +1239,8 @@ class MetricInput(BaseModel):
 
 
 class StructureInput(BaseModel):
+    """No documentation"""
+
     structure: StructureString
     graph: ID
     context: Optional[ContextInput] = None
@@ -1175,6 +1265,8 @@ class CreateModelInput(BaseModel):
 
 
 class RequestMediaUploadInput(BaseModel):
+    """No documentation"""
+
     key: str
     datalayer: str
     model_config = ConfigDict(
@@ -1229,12 +1321,16 @@ class GraphQueryInput(BaseModel):
     "The columns (if ViewKind is Table)"
     relevant_for: Optional[Tuple[ID, ...]] = Field(alias="relevantFor", default=None)
     "A list of categories where this query is releveant and should be shown"
+    pin: Optional[bool] = None
+    "Whether to pin this expression for the current user"
     model_config = ConfigDict(
         frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
     )
 
 
 class ColumnInput(BaseModel):
+    """No documentation"""
+
     name: str
     kind: ColumnKind
     label: Optional[str] = None
@@ -1250,8 +1346,10 @@ class ColumnInput(BaseModel):
 
 
 class PinGraphQueryInput(BaseModel):
+    """No documentation"""
+
     id: ID
-    pinned: bool
+    pin: bool
     model_config = ConfigDict(
         frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
     )
@@ -1276,129 +1374,179 @@ class NodeQueryInput(BaseModel):
     "The node to test against"
     relevant_for: Optional[Tuple[ID, ...]] = Field(alias="relevantFor", default=None)
     "The list of categories this expression is relevant for"
+    pin: Optional[bool] = None
+    "Whether to pin this expression for the current user"
     model_config = ConfigDict(
         frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
     )
 
 
 class PinNodeQueryInput(BaseModel):
+    """No documentation"""
+
     id: ID
-    pinned: bool
+    pin: bool
     model_config = ConfigDict(
         frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
     )
 
 
 class PairsPairsLeftBase(BaseModel):
+    """No documentation"""
+
     id: NodeID
     "The unique identifier of the entity within its graph"
     model_config = ConfigDict(frozen=True)
 
 
 class PairsPairsLeftBaseEntity(PairsPairsLeftBase, EntityTrait, BaseModel):
+    """A Entity is a recorded data point in a graph. It can measure a property of an entity through a direct measurement edge, that connects the entity to the structure. It of course can relate to other structures through relation edges."""
+
     typename: Literal["Entity"] = Field(
         alias="__typename", default="Entity", exclude=True
     )
 
 
 class PairsPairsLeftBaseStructure(PairsPairsLeftBase, StructureTrait, BaseModel):
+    """A Structure is a recorded data point in a graph. It can measure a property of an entity through a direct measurement edge, that connects the entity to the structure. It of course can relate to other structures through relation edges."""
+
     typename: Literal["Structure"] = Field(
         alias="__typename", default="Structure", exclude=True
     )
 
 
 class PairsPairsLeftBaseMetric(PairsPairsLeftBase, MetricTrait, BaseModel):
+    """A Metric is a recorded data point in a graph. It always describes a structure and through the structure it can bring meaning to the measured entity. It can measure a property of an entity through a direct measurement edge, that connects the entity to the structure. It of course can relate to other structures through relation edges."""
+
     typename: Literal["Metric"] = Field(
         alias="__typename", default="Metric", exclude=True
     )
 
 
 class PairsPairsLeftBaseProtocolEvent(PairsPairsLeftBase, BaseModel):
+    """A Metric is a recorded data point in a graph. It always describes a structure and through the structure it can bring meaning to the measured entity. It can measure a property of an entity through a direct measurement edge, that connects the entity to the structure. It of course can relate to other structures through relation edges."""
+
     typename: Literal["ProtocolEvent"] = Field(
         alias="__typename", default="ProtocolEvent", exclude=True
     )
 
 
 class PairsPairsLeftBaseNaturalEvent(PairsPairsLeftBase, BaseModel):
+    """A Metric is a recorded data point in a graph. It always describes a structure and through the structure it can bring meaning to the measured entity. It can measure a property of an entity through a direct measurement edge, that connects the entity to the structure. It of course can relate to other structures through relation edges."""
+
     typename: Literal["NaturalEvent"] = Field(
         alias="__typename", default="NaturalEvent", exclude=True
     )
 
 
 class PairsPairsLeftBaseReagent(PairsPairsLeftBase, BaseModel):
+    """A Entity is a recorded data point in a graph. It can measure a property of an entity through a direct measurement edge, that connects the entity to the structure. It of course can relate to other structures through relation edges."""
+
     typename: Literal["Reagent"] = Field(
         alias="__typename", default="Reagent", exclude=True
     )
 
 
+class PairsPairsLeftBaseCatchAll(PairsPairsLeftBase, BaseModel):
+    """Catch all class for PairsPairsLeftBase"""
+
+    typename: str = Field(alias="__typename", exclude=True)
+
+
 class PairsPairsRightBase(BaseModel):
+    """No documentation"""
+
     id: NodeID
     "The unique identifier of the entity within its graph"
     model_config = ConfigDict(frozen=True)
 
 
 class PairsPairsRightBaseEntity(PairsPairsRightBase, EntityTrait, BaseModel):
+    """A Entity is a recorded data point in a graph. It can measure a property of an entity through a direct measurement edge, that connects the entity to the structure. It of course can relate to other structures through relation edges."""
+
     typename: Literal["Entity"] = Field(
         alias="__typename", default="Entity", exclude=True
     )
 
 
 class PairsPairsRightBaseStructure(PairsPairsRightBase, StructureTrait, BaseModel):
+    """A Structure is a recorded data point in a graph. It can measure a property of an entity through a direct measurement edge, that connects the entity to the structure. It of course can relate to other structures through relation edges."""
+
     typename: Literal["Structure"] = Field(
         alias="__typename", default="Structure", exclude=True
     )
 
 
 class PairsPairsRightBaseMetric(PairsPairsRightBase, MetricTrait, BaseModel):
+    """A Metric is a recorded data point in a graph. It always describes a structure and through the structure it can bring meaning to the measured entity. It can measure a property of an entity through a direct measurement edge, that connects the entity to the structure. It of course can relate to other structures through relation edges."""
+
     typename: Literal["Metric"] = Field(
         alias="__typename", default="Metric", exclude=True
     )
 
 
 class PairsPairsRightBaseProtocolEvent(PairsPairsRightBase, BaseModel):
+    """A Metric is a recorded data point in a graph. It always describes a structure and through the structure it can bring meaning to the measured entity. It can measure a property of an entity through a direct measurement edge, that connects the entity to the structure. It of course can relate to other structures through relation edges."""
+
     typename: Literal["ProtocolEvent"] = Field(
         alias="__typename", default="ProtocolEvent", exclude=True
     )
 
 
 class PairsPairsRightBaseNaturalEvent(PairsPairsRightBase, BaseModel):
+    """A Metric is a recorded data point in a graph. It always describes a structure and through the structure it can bring meaning to the measured entity. It can measure a property of an entity through a direct measurement edge, that connects the entity to the structure. It of course can relate to other structures through relation edges."""
+
     typename: Literal["NaturalEvent"] = Field(
         alias="__typename", default="NaturalEvent", exclude=True
     )
 
 
 class PairsPairsRightBaseReagent(PairsPairsRightBase, BaseModel):
+    """A Entity is a recorded data point in a graph. It can measure a property of an entity through a direct measurement edge, that connects the entity to the structure. It of course can relate to other structures through relation edges."""
+
     typename: Literal["Reagent"] = Field(
         alias="__typename", default="Reagent", exclude=True
     )
+
+
+class PairsPairsRightBaseCatchAll(PairsPairsRightBase, BaseModel):
+    """Catch all class for PairsPairsRightBase"""
+
+    typename: str = Field(alias="__typename", exclude=True)
 
 
 class PairsPairs(BaseModel):
     """A paired structure two entities and the relation between them."""
 
     typename: Literal["Pair"] = Field(alias="__typename", default="Pair", exclude=True)
-    left: Annotated[
-        Union[
-            PairsPairsLeftBaseEntity,
-            PairsPairsLeftBaseStructure,
-            PairsPairsLeftBaseMetric,
-            PairsPairsLeftBaseProtocolEvent,
-            PairsPairsLeftBaseNaturalEvent,
-            PairsPairsLeftBaseReagent,
+    left: Union[
+        Annotated[
+            Union[
+                PairsPairsLeftBaseEntity,
+                PairsPairsLeftBaseStructure,
+                PairsPairsLeftBaseMetric,
+                PairsPairsLeftBaseProtocolEvent,
+                PairsPairsLeftBaseNaturalEvent,
+                PairsPairsLeftBaseReagent,
+            ],
+            Field(discriminator="typename"),
         ],
-        Field(discriminator="typename"),
+        PairsPairsLeftBaseCatchAll,
     ]
     "The left entity."
-    right: Annotated[
-        Union[
-            PairsPairsRightBaseEntity,
-            PairsPairsRightBaseStructure,
-            PairsPairsRightBaseMetric,
-            PairsPairsRightBaseProtocolEvent,
-            PairsPairsRightBaseNaturalEvent,
-            PairsPairsRightBaseReagent,
+    right: Union[
+        Annotated[
+            Union[
+                PairsPairsRightBaseEntity,
+                PairsPairsRightBaseStructure,
+                PairsPairsRightBaseMetric,
+                PairsPairsRightBaseProtocolEvent,
+                PairsPairsRightBaseNaturalEvent,
+                PairsPairsRightBaseReagent,
+            ],
+            Field(discriminator="typename"),
         ],
-        Field(discriminator="typename"),
+        PairsPairsRightBaseCatchAll,
     ]
     "The right entity."
     model_config = ConfigDict(frozen=True)
@@ -1434,55 +1582,74 @@ class Column(BaseModel):
 
 
 class BaseNodeBase(BaseModel):
+    """No documentation"""
+
     id: NodeID
     "The unique identifier of the entity within its graph"
     label: str
 
 
 class BaseNodeCatch(BaseNodeBase):
+    """Catch all class for BaseNodeBase"""
+
     typename: str = Field(alias="__typename", exclude=True)
+    "No documentation"
     id: NodeID
     "The unique identifier of the entity within its graph"
     label: str
 
 
 class BaseNodeEntity(BaseNodeBase, EntityTrait, BaseModel):
+    """A Entity is a recorded data point in a graph. It can measure a property of an entity through a direct measurement edge, that connects the entity to the structure. It of course can relate to other structures through relation edges."""
+
     typename: Literal["Entity"] = Field(
         alias="__typename", default="Entity", exclude=True
     )
 
 
 class BaseNodeStructure(BaseNodeBase, StructureTrait, BaseModel):
+    """A Structure is a recorded data point in a graph. It can measure a property of an entity through a direct measurement edge, that connects the entity to the structure. It of course can relate to other structures through relation edges."""
+
     typename: Literal["Structure"] = Field(
         alias="__typename", default="Structure", exclude=True
     )
 
 
 class BaseNodeMetric(BaseNodeBase, MetricTrait, BaseModel):
+    """A Metric is a recorded data point in a graph. It always describes a structure and through the structure it can bring meaning to the measured entity. It can measure a property of an entity through a direct measurement edge, that connects the entity to the structure. It of course can relate to other structures through relation edges."""
+
     typename: Literal["Metric"] = Field(
         alias="__typename", default="Metric", exclude=True
     )
 
 
 class BaseNodeProtocolEvent(BaseNodeBase, BaseModel):
+    """A Metric is a recorded data point in a graph. It always describes a structure and through the structure it can bring meaning to the measured entity. It can measure a property of an entity through a direct measurement edge, that connects the entity to the structure. It of course can relate to other structures through relation edges."""
+
     typename: Literal["ProtocolEvent"] = Field(
         alias="__typename", default="ProtocolEvent", exclude=True
     )
 
 
 class BaseNodeNaturalEvent(BaseNodeBase, BaseModel):
+    """A Metric is a recorded data point in a graph. It always describes a structure and through the structure it can bring meaning to the measured entity. It can measure a property of an entity through a direct measurement edge, that connects the entity to the structure. It of course can relate to other structures through relation edges."""
+
     typename: Literal["NaturalEvent"] = Field(
         alias="__typename", default="NaturalEvent", exclude=True
     )
 
 
 class BaseNodeReagent(BaseNodeBase, BaseModel):
+    """A Entity is a recorded data point in a graph. It can measure a property of an entity through a direct measurement edge, that connects the entity to the structure. It of course can relate to other structures through relation edges."""
+
     typename: Literal["Reagent"] = Field(
         alias="__typename", default="Reagent", exclude=True
     )
 
 
 class NaturalEventCategory(NaturalEventCategoryTrait, BaseModel):
+    """No documentation"""
+
     typename: Literal["NaturalEventCategory"] = Field(
         alias="__typename", default="NaturalEventCategory", exclude=True
     )
@@ -1511,6 +1678,8 @@ class NaturalEvent(BaseModel):
 
 
 class ProtocolEventCategory(ProtocolEventCategoryTrait, BaseModel):
+    """No documentation"""
+
     typename: Literal["ProtocolEventCategory"] = Field(
         alias="__typename", default="ProtocolEventCategory", exclude=True
     )
@@ -1611,6 +1780,8 @@ class ListScatterPlot(BaseModel):
 
 
 class MetricCategory(MetricCategoryTrait, BaseModel):
+    """No documentation"""
+
     typename: Literal["MetricCategory"] = Field(
         alias="__typename", default="MetricCategory", exclude=True
     )
@@ -1677,6 +1848,8 @@ class ListNodeQuery(BaseModel):
 
 
 class ReagentCategory(ReagentCategoryTrait, BaseModel):
+    """No documentation"""
+
     typename: Literal["ReagentCategory"] = Field(
         alias="__typename", default="ReagentCategory", exclude=True
     )
@@ -1716,6 +1889,8 @@ class ListReagent(BaseModel):
 
 
 class EntityCategory(EntityCategoryTrait, BaseModel):
+    """No documentation"""
+
     typename: Literal["EntityCategory"] = Field(
         alias="__typename", default="EntityCategory", exclude=True
     )
@@ -1741,6 +1916,8 @@ class Entity(EntityTrait, BaseModel):
 
 
 class ListEntityCategory(EntityCategoryTrait, BaseModel):
+    """No documentation"""
+
     typename: Literal["EntityCategory"] = Field(
         alias="__typename", default="EntityCategory", exclude=True
     )
@@ -1766,6 +1943,8 @@ class ListEntity(EntityTrait, BaseModel):
 
 
 class BaseEdgeBase(BaseModel):
+    """No documentation"""
+
     id: NodeID
     "The unique identifier of the entity within its graph"
     left_id: str = Field(alias="leftId")
@@ -1773,7 +1952,10 @@ class BaseEdgeBase(BaseModel):
 
 
 class BaseEdgeCatch(BaseEdgeBase):
+    """Catch all class for BaseEdgeBase"""
+
     typename: str = Field(alias="__typename", exclude=True)
+    "No documentation"
     id: NodeID
     "The unique identifier of the entity within its graph"
     left_id: str = Field(alias="leftId")
@@ -1781,24 +1963,45 @@ class BaseEdgeCatch(BaseEdgeBase):
 
 
 class BaseEdgeMeasurement(BaseEdgeBase, BaseModel):
+    """A measurement is an edge from a structure to an entity. Importantly Measurement are always directed from the structure to the entity, and never the other way around."""
+
     typename: Literal["Measurement"] = Field(
         alias="__typename", default="Measurement", exclude=True
     )
 
 
 class BaseEdgeRelation(BaseEdgeBase, BaseModel):
+    """A relation is an edge between two entities. It is a directed edge, that connects two entities and established a relationship
+    that is not a measurement between them. I.e. when they are an subjective assertion about the entities.
+
+
+
+    """
+
     typename: Literal["Relation"] = Field(
         alias="__typename", default="Relation", exclude=True
     )
 
 
 class BaseEdgeParticipant(BaseEdgeBase, BaseModel):
+    """A participant edge maps bioentitiy to an event (valid from is not necessary)"""
+
     typename: Literal["Participant"] = Field(
         alias="__typename", default="Participant", exclude=True
     )
 
 
+class BaseEdgeDescription(BaseEdgeBase, BaseModel):
+    """A participant edge maps bioentitiy to an event (valid from is not necessary)"""
+
+    typename: Literal["Description"] = Field(
+        alias="__typename", default="Description", exclude=True
+    )
+
+
 class MeasurementCategory(MeasurementCategoryTrait, BaseModel):
+    """No documentation"""
+
     typename: Literal["MeasurementCategory"] = Field(
         alias="__typename", default="MeasurementCategory", exclude=True
     )
@@ -1824,6 +2027,8 @@ class Measurement(BaseModel):
 
 
 class RelationCategory(RelationCategoryTrait, BaseModel):
+    """No documentation"""
+
     typename: Literal["RelationCategory"] = Field(
         alias="__typename", default="RelationCategory", exclude=True
     )
@@ -1857,7 +2062,7 @@ class Participant(BaseModel):
     )
     role: str
     "Timestamp from when this entity is valid"
-    quantity: float
+    quantity: Optional[float] = Field(default=None)
     "Timestamp from when this entity is valid"
     model_config = ConfigDict(frozen=True)
 
@@ -1878,6 +2083,8 @@ class Structure(StructureTrait, BaseModel):
 
 
 class ListStructureCategory(StructureCategoryTrait, BaseModel):
+    """No documentation"""
+
     typename: Literal["StructureCategory"] = Field(
         alias="__typename", default="StructureCategory", exclude=True
     )
@@ -1901,11 +2108,52 @@ class ListStructure(StructureTrait, BaseModel):
     model_config = ConfigDict(frozen=True)
 
 
+class InformedStructureCategory(StructureCategoryTrait, BaseModel):
+    """No documentation"""
+
+    typename: Literal["StructureCategory"] = Field(
+        alias="__typename", default="StructureCategory", exclude=True
+    )
+    id: ID
+    "The unique identifier of the expression within its graph"
+    identifier: str
+    "The structure that this class represents"
+    model_config = ConfigDict(frozen=True)
+
+
+class InformedStructureGraph(GraphTrait, BaseModel):
+    """A graph, that contains entities and relations."""
+
+    typename: Literal["Graph"] = Field(
+        alias="__typename", default="Graph", exclude=True
+    )
+    id: ID
+    name: str
+    model_config = ConfigDict(frozen=True)
+
+
+class InformedStructure(StructureTrait, BaseModel):
+    """A Structure is a recorded data point in a graph. It can measure a property of an entity through a direct measurement edge, that connects the entity to the structure. It of course can relate to other structures through relation edges."""
+
+    typename: Literal["Structure"] = Field(
+        alias="__typename", default="Structure", exclude=True
+    )
+    id: NodeID
+    "The unique identifier of the entity within its graph"
+    category: InformedStructureCategory
+    "Protocol steps where this entity was the target"
+    graph: InformedStructureGraph
+    "The unique identifier of the entity within its graph"
+    model_config = ConfigDict(frozen=True)
+
+
 class EntityCategoryDefinition(BaseModel):
+    """No documentation"""
+
     typename: Literal["EntityCategoryDefinition"] = Field(
         alias="__typename", default="EntityCategoryDefinition", exclude=True
     )
-    tag_filters: Optional[Tuple[ID, ...]] = Field(default=None, alias="tagFilters")
+    tag_filters: Optional[Tuple[str, ...]] = Field(default=None, alias="tagFilters")
     category_filters: Optional[Tuple[ID, ...]] = Field(
         default=None, alias="categoryFilters"
     )
@@ -1913,10 +2161,12 @@ class EntityCategoryDefinition(BaseModel):
 
 
 class ReagentCategoryDefinition(BaseModel):
+    """No documentation"""
+
     typename: Literal["ReagentCategoryDefinition"] = Field(
         alias="__typename", default="ReagentCategoryDefinition", exclude=True
     )
-    tag_filters: Optional[Tuple[ID, ...]] = Field(default=None, alias="tagFilters")
+    tag_filters: Optional[Tuple[str, ...]] = Field(default=None, alias="tagFilters")
     category_filters: Optional[Tuple[ID, ...]] = Field(
         default=None, alias="categoryFilters"
     )
@@ -1924,6 +2174,8 @@ class ReagentCategoryDefinition(BaseModel):
 
 
 class VariableDefinition(BaseModel):
+    """No documentation"""
+
     typename: Literal["VariableDefinition"] = Field(
         alias="__typename", default="VariableDefinition", exclude=True
     )
@@ -1935,6 +2187,8 @@ class VariableDefinition(BaseModel):
 
 
 class BaseListCategoryStore(HasPresignedDownloadAccessor, BaseModel):
+    """No documentation"""
+
     typename: Literal["MediaStore"] = Field(
         alias="__typename", default="MediaStore", exclude=True
     )
@@ -1952,6 +2206,8 @@ class BaseListCategoryTags(BaseModel):
 
 
 class BaseListCategoryBase(BaseModel):
+    """No documentation"""
+
     id: ID
     "The unique identifier of the expression within its graph"
     description: Optional[str] = Field(default=None)
@@ -1963,7 +2219,10 @@ class BaseListCategoryBase(BaseModel):
 
 
 class BaseListCategoryCatch(BaseListCategoryBase):
+    """Catch all class for BaseListCategoryBase"""
+
     typename: str = Field(alias="__typename", exclude=True)
+    "No documentation"
     id: ID
     "The unique identifier of the expression within its graph"
     description: Optional[str] = Field(default=None)
@@ -1977,6 +2236,8 @@ class BaseListCategoryCatch(BaseListCategoryBase):
 class BaseListCategoryMetricCategory(
     BaseListCategoryBase, MetricCategoryTrait, BaseModel
 ):
+    """No documentation"""
+
     typename: Literal["MetricCategory"] = Field(
         alias="__typename", default="MetricCategory", exclude=True
     )
@@ -1985,6 +2246,8 @@ class BaseListCategoryMetricCategory(
 class BaseListCategoryStructureCategory(
     BaseListCategoryBase, StructureCategoryTrait, BaseModel
 ):
+    """No documentation"""
+
     typename: Literal["StructureCategory"] = Field(
         alias="__typename", default="StructureCategory", exclude=True
     )
@@ -1993,6 +2256,8 @@ class BaseListCategoryStructureCategory(
 class BaseListCategoryProtocolEventCategory(
     BaseListCategoryBase, ProtocolEventCategoryTrait, BaseModel
 ):
+    """No documentation"""
+
     typename: Literal["ProtocolEventCategory"] = Field(
         alias="__typename", default="ProtocolEventCategory", exclude=True
     )
@@ -2001,6 +2266,8 @@ class BaseListCategoryProtocolEventCategory(
 class BaseListCategoryEntityCategory(
     BaseListCategoryBase, EntityCategoryTrait, BaseModel
 ):
+    """No documentation"""
+
     typename: Literal["EntityCategory"] = Field(
         alias="__typename", default="EntityCategory", exclude=True
     )
@@ -2009,6 +2276,8 @@ class BaseListCategoryEntityCategory(
 class BaseListCategoryReagentCategory(
     BaseListCategoryBase, ReagentCategoryTrait, BaseModel
 ):
+    """No documentation"""
+
     typename: Literal["ReagentCategory"] = Field(
         alias="__typename", default="ReagentCategory", exclude=True
     )
@@ -2017,6 +2286,8 @@ class BaseListCategoryReagentCategory(
 class BaseListCategoryNaturalEventCategory(
     BaseListCategoryBase, NaturalEventCategoryTrait, BaseModel
 ):
+    """No documentation"""
+
     typename: Literal["NaturalEventCategory"] = Field(
         alias="__typename", default="NaturalEventCategory", exclude=True
     )
@@ -2025,6 +2296,8 @@ class BaseListCategoryNaturalEventCategory(
 class BaseListCategoryMeasurementCategory(
     BaseListCategoryBase, MeasurementCategoryTrait, BaseModel
 ):
+    """No documentation"""
+
     typename: Literal["MeasurementCategory"] = Field(
         alias="__typename", default="MeasurementCategory", exclude=True
     )
@@ -2033,12 +2306,16 @@ class BaseListCategoryMeasurementCategory(
 class BaseListCategoryRelationCategory(
     BaseListCategoryBase, RelationCategoryTrait, BaseModel
 ):
+    """No documentation"""
+
     typename: Literal["RelationCategory"] = Field(
         alias="__typename", default="RelationCategory", exclude=True
     )
 
 
 class BaseListNodeCategoryBase(BaseModel):
+    """No documentation"""
+
     id: ID
     "The unique identifier of the expression within its graph"
     position_x: Optional[float] = Field(default=None, alias="positionX")
@@ -2052,7 +2329,10 @@ class BaseListNodeCategoryBase(BaseModel):
 
 
 class BaseListNodeCategoryCatch(BaseListNodeCategoryBase):
+    """Catch all class for BaseListNodeCategoryBase"""
+
     typename: str = Field(alias="__typename", exclude=True)
+    "No documentation"
     id: ID
     "The unique identifier of the expression within its graph"
     position_x: Optional[float] = Field(default=None, alias="positionX")
@@ -2068,6 +2348,8 @@ class BaseListNodeCategoryCatch(BaseListNodeCategoryBase):
 class BaseListNodeCategoryMetricCategory(
     BaseListNodeCategoryBase, MetricCategoryTrait, BaseModel
 ):
+    """No documentation"""
+
     typename: Literal["MetricCategory"] = Field(
         alias="__typename", default="MetricCategory", exclude=True
     )
@@ -2076,6 +2358,8 @@ class BaseListNodeCategoryMetricCategory(
 class BaseListNodeCategoryStructureCategory(
     BaseListNodeCategoryBase, StructureCategoryTrait, BaseModel
 ):
+    """No documentation"""
+
     typename: Literal["StructureCategory"] = Field(
         alias="__typename", default="StructureCategory", exclude=True
     )
@@ -2084,6 +2368,8 @@ class BaseListNodeCategoryStructureCategory(
 class BaseListNodeCategoryProtocolEventCategory(
     BaseListNodeCategoryBase, ProtocolEventCategoryTrait, BaseModel
 ):
+    """No documentation"""
+
     typename: Literal["ProtocolEventCategory"] = Field(
         alias="__typename", default="ProtocolEventCategory", exclude=True
     )
@@ -2092,6 +2378,8 @@ class BaseListNodeCategoryProtocolEventCategory(
 class BaseListNodeCategoryEntityCategory(
     BaseListNodeCategoryBase, EntityCategoryTrait, BaseModel
 ):
+    """No documentation"""
+
     typename: Literal["EntityCategory"] = Field(
         alias="__typename", default="EntityCategory", exclude=True
     )
@@ -2100,6 +2388,8 @@ class BaseListNodeCategoryEntityCategory(
 class BaseListNodeCategoryReagentCategory(
     BaseListNodeCategoryBase, ReagentCategoryTrait, BaseModel
 ):
+    """No documentation"""
+
     typename: Literal["ReagentCategory"] = Field(
         alias="__typename", default="ReagentCategory", exclude=True
     )
@@ -2108,18 +2398,25 @@ class BaseListNodeCategoryReagentCategory(
 class BaseListNodeCategoryNaturalEventCategory(
     BaseListNodeCategoryBase, NaturalEventCategoryTrait, BaseModel
 ):
+    """No documentation"""
+
     typename: Literal["NaturalEventCategory"] = Field(
         alias="__typename", default="NaturalEventCategory", exclude=True
     )
 
 
 class BaseListEdgeCategoryBase(BaseModel):
+    """No documentation"""
+
     id: ID
     "The unique identifier of the expression within its graph"
 
 
 class BaseListEdgeCategoryCatch(BaseListEdgeCategoryBase):
+    """Catch all class for BaseListEdgeCategoryBase"""
+
     typename: str = Field(alias="__typename", exclude=True)
+    "No documentation"
     id: ID
     "The unique identifier of the expression within its graph"
 
@@ -2127,6 +2424,8 @@ class BaseListEdgeCategoryCatch(BaseListEdgeCategoryBase):
 class BaseListEdgeCategoryMeasurementCategory(
     BaseListEdgeCategoryBase, MeasurementCategoryTrait, BaseModel
 ):
+    """No documentation"""
+
     typename: Literal["MeasurementCategory"] = Field(
         alias="__typename", default="MeasurementCategory", exclude=True
     )
@@ -2135,6 +2434,8 @@ class BaseListEdgeCategoryMeasurementCategory(
 class BaseListEdgeCategoryRelationCategory(
     BaseListEdgeCategoryBase, RelationCategoryTrait, BaseModel
 ):
+    """No documentation"""
+
     typename: Literal["RelationCategory"] = Field(
         alias="__typename", default="RelationCategory", exclude=True
     )
@@ -2152,6 +2453,8 @@ class BaseCategoryGraph(GraphTrait, BaseModel):
 
 
 class BaseCategoryBase(BaseModel):
+    """No documentation"""
+
     id: ID
     "The unique identifier of the expression within its graph"
     graph: BaseCategoryGraph
@@ -2159,7 +2462,10 @@ class BaseCategoryBase(BaseModel):
 
 
 class BaseCategoryCatch(BaseCategoryBase):
+    """Catch all class for BaseCategoryBase"""
+
     typename: str = Field(alias="__typename", exclude=True)
+    "No documentation"
     id: ID
     "The unique identifier of the expression within its graph"
     graph: BaseCategoryGraph
@@ -2167,6 +2473,8 @@ class BaseCategoryCatch(BaseCategoryBase):
 
 
 class BaseCategoryMetricCategory(BaseCategoryBase, MetricCategoryTrait, BaseModel):
+    """No documentation"""
+
     typename: Literal["MetricCategory"] = Field(
         alias="__typename", default="MetricCategory", exclude=True
     )
@@ -2175,6 +2483,8 @@ class BaseCategoryMetricCategory(BaseCategoryBase, MetricCategoryTrait, BaseMode
 class BaseCategoryStructureCategory(
     BaseCategoryBase, StructureCategoryTrait, BaseModel
 ):
+    """No documentation"""
+
     typename: Literal["StructureCategory"] = Field(
         alias="__typename", default="StructureCategory", exclude=True
     )
@@ -2183,18 +2493,24 @@ class BaseCategoryStructureCategory(
 class BaseCategoryProtocolEventCategory(
     BaseCategoryBase, ProtocolEventCategoryTrait, BaseModel
 ):
+    """No documentation"""
+
     typename: Literal["ProtocolEventCategory"] = Field(
         alias="__typename", default="ProtocolEventCategory", exclude=True
     )
 
 
 class BaseCategoryEntityCategory(BaseCategoryBase, EntityCategoryTrait, BaseModel):
+    """No documentation"""
+
     typename: Literal["EntityCategory"] = Field(
         alias="__typename", default="EntityCategory", exclude=True
     )
 
 
 class BaseCategoryReagentCategory(BaseCategoryBase, ReagentCategoryTrait, BaseModel):
+    """No documentation"""
+
     typename: Literal["ReagentCategory"] = Field(
         alias="__typename", default="ReagentCategory", exclude=True
     )
@@ -2203,6 +2519,8 @@ class BaseCategoryReagentCategory(BaseCategoryBase, ReagentCategoryTrait, BaseMo
 class BaseCategoryNaturalEventCategory(
     BaseCategoryBase, NaturalEventCategoryTrait, BaseModel
 ):
+    """No documentation"""
+
     typename: Literal["NaturalEventCategory"] = Field(
         alias="__typename", default="NaturalEventCategory", exclude=True
     )
@@ -2211,18 +2529,24 @@ class BaseCategoryNaturalEventCategory(
 class BaseCategoryMeasurementCategory(
     BaseCategoryBase, MeasurementCategoryTrait, BaseModel
 ):
+    """No documentation"""
+
     typename: Literal["MeasurementCategory"] = Field(
         alias="__typename", default="MeasurementCategory", exclude=True
     )
 
 
 class BaseCategoryRelationCategory(BaseCategoryBase, RelationCategoryTrait, BaseModel):
+    """No documentation"""
+
     typename: Literal["RelationCategory"] = Field(
         alias="__typename", default="RelationCategory", exclude=True
     )
 
 
 class BaseNodeCategoryBase(BaseModel):
+    """No documentation"""
+
     id: ID
     "The unique identifier of the expression within its graph"
     position_x: Optional[float] = Field(default=None, alias="positionX")
@@ -2236,7 +2560,10 @@ class BaseNodeCategoryBase(BaseModel):
 
 
 class BaseNodeCategoryCatch(BaseNodeCategoryBase):
+    """Catch all class for BaseNodeCategoryBase"""
+
     typename: str = Field(alias="__typename", exclude=True)
+    "No documentation"
     id: ID
     "The unique identifier of the expression within its graph"
     position_x: Optional[float] = Field(default=None, alias="positionX")
@@ -2252,6 +2579,8 @@ class BaseNodeCategoryCatch(BaseNodeCategoryBase):
 class BaseNodeCategoryMetricCategory(
     BaseNodeCategoryBase, MetricCategoryTrait, BaseModel
 ):
+    """No documentation"""
+
     typename: Literal["MetricCategory"] = Field(
         alias="__typename", default="MetricCategory", exclude=True
     )
@@ -2260,6 +2589,8 @@ class BaseNodeCategoryMetricCategory(
 class BaseNodeCategoryStructureCategory(
     BaseNodeCategoryBase, StructureCategoryTrait, BaseModel
 ):
+    """No documentation"""
+
     typename: Literal["StructureCategory"] = Field(
         alias="__typename", default="StructureCategory", exclude=True
     )
@@ -2268,6 +2599,8 @@ class BaseNodeCategoryStructureCategory(
 class BaseNodeCategoryProtocolEventCategory(
     BaseNodeCategoryBase, ProtocolEventCategoryTrait, BaseModel
 ):
+    """No documentation"""
+
     typename: Literal["ProtocolEventCategory"] = Field(
         alias="__typename", default="ProtocolEventCategory", exclude=True
     )
@@ -2276,6 +2609,8 @@ class BaseNodeCategoryProtocolEventCategory(
 class BaseNodeCategoryEntityCategory(
     BaseNodeCategoryBase, EntityCategoryTrait, BaseModel
 ):
+    """No documentation"""
+
     typename: Literal["EntityCategory"] = Field(
         alias="__typename", default="EntityCategory", exclude=True
     )
@@ -2284,6 +2619,8 @@ class BaseNodeCategoryEntityCategory(
 class BaseNodeCategoryReagentCategory(
     BaseNodeCategoryBase, ReagentCategoryTrait, BaseModel
 ):
+    """No documentation"""
+
     typename: Literal["ReagentCategory"] = Field(
         alias="__typename", default="ReagentCategory", exclude=True
     )
@@ -2292,18 +2629,25 @@ class BaseNodeCategoryReagentCategory(
 class BaseNodeCategoryNaturalEventCategory(
     BaseNodeCategoryBase, NaturalEventCategoryTrait, BaseModel
 ):
+    """No documentation"""
+
     typename: Literal["NaturalEventCategory"] = Field(
         alias="__typename", default="NaturalEventCategory", exclude=True
     )
 
 
 class BaseEdgeCategoryBase(BaseModel):
+    """No documentation"""
+
     id: ID
     "The unique identifier of the expression within its graph"
 
 
 class BaseEdgeCategoryCatch(BaseEdgeCategoryBase):
+    """Catch all class for BaseEdgeCategoryBase"""
+
     typename: str = Field(alias="__typename", exclude=True)
+    "No documentation"
     id: ID
     "The unique identifier of the expression within its graph"
 
@@ -2311,6 +2655,8 @@ class BaseEdgeCategoryCatch(BaseEdgeCategoryBase):
 class BaseEdgeCategoryMeasurementCategory(
     BaseEdgeCategoryBase, MeasurementCategoryTrait, BaseModel
 ):
+    """No documentation"""
+
     typename: Literal["MeasurementCategory"] = Field(
         alias="__typename", default="MeasurementCategory", exclude=True
     )
@@ -2319,12 +2665,16 @@ class BaseEdgeCategoryMeasurementCategory(
 class BaseEdgeCategoryRelationCategory(
     BaseEdgeCategoryBase, RelationCategoryTrait, BaseModel
 ):
+    """No documentation"""
+
     typename: Literal["RelationCategory"] = Field(
         alias="__typename", default="RelationCategory", exclude=True
     )
 
 
 class MediaStore(HasPresignedDownloadAccessor, BaseModel):
+    """No documentation"""
+
     typename: Literal["MediaStore"] = Field(
         alias="__typename", default="MediaStore", exclude=True
     )
@@ -2360,76 +2710,115 @@ class Table(BaseModel):
 
 
 class EdgeBase(BaseModel):
-    pass
+    """No documentation"""
 
 
 class EdgeCatch(EdgeBase):
+    """Catch all class for EdgeBase"""
+
     typename: str = Field(alias="__typename", exclude=True)
+    "No documentation"
 
 
 class EdgeMeasurement(BaseEdgeMeasurement, Measurement, EdgeBase, BaseModel):
+    """A measurement is an edge from a structure to an entity. Importantly Measurement are always directed from the structure to the entity, and never the other way around."""
+
     typename: Literal["Measurement"] = Field(
         alias="__typename", default="Measurement", exclude=True
     )
 
 
 class EdgeRelation(BaseEdgeRelation, Relation, EdgeBase, BaseModel):
+    """A relation is an edge between two entities. It is a directed edge, that connects two entities and established a relationship
+    that is not a measurement between them. I.e. when they are an subjective assertion about the entities.
+
+
+
+    """
+
     typename: Literal["Relation"] = Field(
         alias="__typename", default="Relation", exclude=True
     )
 
 
 class EdgeParticipant(BaseEdgeParticipant, Participant, EdgeBase, BaseModel):
+    """A participant edge maps bioentitiy to an event (valid from is not necessary)"""
+
     typename: Literal["Participant"] = Field(
         alias="__typename", default="Participant", exclude=True
     )
 
 
+class EdgeDescription(BaseEdgeDescription, EdgeBase, BaseModel):
+    """A participant edge maps bioentitiy to an event (valid from is not necessary)"""
+
+    typename: Literal["Description"] = Field(
+        alias="__typename", default="Description", exclude=True
+    )
+
+
 class NodeBase(BaseModel):
-    pass
+    """No documentation"""
 
 
 class NodeCatch(NodeBase):
+    """Catch all class for NodeBase"""
+
     typename: str = Field(alias="__typename", exclude=True)
+    "No documentation"
 
 
 class NodeEntity(BaseNodeEntity, Entity, NodeBase, EntityTrait, BaseModel):
+    """A Entity is a recorded data point in a graph. It can measure a property of an entity through a direct measurement edge, that connects the entity to the structure. It of course can relate to other structures through relation edges."""
+
     typename: Literal["Entity"] = Field(
         alias="__typename", default="Entity", exclude=True
     )
 
 
 class NodeStructure(BaseNodeStructure, Structure, NodeBase, StructureTrait, BaseModel):
+    """A Structure is a recorded data point in a graph. It can measure a property of an entity through a direct measurement edge, that connects the entity to the structure. It of course can relate to other structures through relation edges."""
+
     typename: Literal["Structure"] = Field(
         alias="__typename", default="Structure", exclude=True
     )
 
 
 class NodeMetric(BaseNodeMetric, Metric, NodeBase, MetricTrait, BaseModel):
+    """A Metric is a recorded data point in a graph. It always describes a structure and through the structure it can bring meaning to the measured entity. It can measure a property of an entity through a direct measurement edge, that connects the entity to the structure. It of course can relate to other structures through relation edges."""
+
     typename: Literal["Metric"] = Field(
         alias="__typename", default="Metric", exclude=True
     )
 
 
 class NodeProtocolEvent(BaseNodeProtocolEvent, NodeBase, BaseModel):
+    """A Metric is a recorded data point in a graph. It always describes a structure and through the structure it can bring meaning to the measured entity. It can measure a property of an entity through a direct measurement edge, that connects the entity to the structure. It of course can relate to other structures through relation edges."""
+
     typename: Literal["ProtocolEvent"] = Field(
         alias="__typename", default="ProtocolEvent", exclude=True
     )
 
 
 class NodeNaturalEvent(BaseNodeNaturalEvent, NodeBase, BaseModel):
+    """A Metric is a recorded data point in a graph. It always describes a structure and through the structure it can bring meaning to the measured entity. It can measure a property of an entity through a direct measurement edge, that connects the entity to the structure. It of course can relate to other structures through relation edges."""
+
     typename: Literal["NaturalEvent"] = Field(
         alias="__typename", default="NaturalEvent", exclude=True
     )
 
 
 class NodeReagent(BaseNodeReagent, Reagent, NodeBase, BaseModel):
+    """A Entity is a recorded data point in a graph. It can measure a property of an entity through a direct measurement edge, that connects the entity to the structure. It of course can relate to other structures through relation edges."""
+
     typename: Literal["Reagent"] = Field(
         alias="__typename", default="Reagent", exclude=True
     )
 
 
 class EntityRoleDefinition(BaseModel):
+    """No documentation"""
+
     typename: Literal["EntityRoleDefinition"] = Field(
         alias="__typename", default="EntityRoleDefinition", exclude=True
     )
@@ -2441,6 +2830,8 @@ class EntityRoleDefinition(BaseModel):
 
 
 class ReagentRoleDefinition(BaseModel):
+    """No documentation"""
+
     typename: Literal["ReagentRoleDefinition"] = Field(
         alias="__typename", default="ReagentRoleDefinition", exclude=True
     )
@@ -2457,6 +2848,8 @@ class ListStructureCategory(
     StructureCategoryTrait,
     BaseModel,
 ):
+    """No documentation"""
+
     typename: Literal["StructureCategory"] = Field(
         alias="__typename", default="StructureCategory", exclude=True
     )
@@ -2466,10 +2859,12 @@ class ListStructureCategory(
 
 
 class ListMeasurementCategorySourcedefinition(BaseModel):
+    """No documentation"""
+
     typename: Literal["StructureCategoryDefinition"] = Field(
         alias="__typename", default="StructureCategoryDefinition", exclude=True
     )
-    tag_filters: Optional[Tuple[ID, ...]] = Field(default=None, alias="tagFilters")
+    tag_filters: Optional[Tuple[str, ...]] = Field(default=None, alias="tagFilters")
     category_filters: Optional[Tuple[ID, ...]] = Field(
         default=None, alias="categoryFilters"
     )
@@ -2477,10 +2872,12 @@ class ListMeasurementCategorySourcedefinition(BaseModel):
 
 
 class ListMeasurementCategoryTargetdefinition(BaseModel):
+    """No documentation"""
+
     typename: Literal["EntityCategoryDefinition"] = Field(
         alias="__typename", default="EntityCategoryDefinition", exclude=True
     )
-    tag_filters: Optional[Tuple[ID, ...]] = Field(default=None, alias="tagFilters")
+    tag_filters: Optional[Tuple[str, ...]] = Field(default=None, alias="tagFilters")
     category_filters: Optional[Tuple[ID, ...]] = Field(
         default=None, alias="categoryFilters"
     )
@@ -2493,6 +2890,8 @@ class ListMeasurementCategory(
     MeasurementCategoryTrait,
     BaseModel,
 ):
+    """No documentation"""
+
     typename: Literal["MeasurementCategory"] = Field(
         alias="__typename", default="MeasurementCategory", exclude=True
     )
@@ -2509,10 +2908,12 @@ class ListMeasurementCategory(
 
 
 class ListRelationCategorySourcedefinition(BaseModel):
+    """No documentation"""
+
     typename: Literal["EntityCategoryDefinition"] = Field(
         alias="__typename", default="EntityCategoryDefinition", exclude=True
     )
-    tag_filters: Optional[Tuple[ID, ...]] = Field(default=None, alias="tagFilters")
+    tag_filters: Optional[Tuple[str, ...]] = Field(default=None, alias="tagFilters")
     category_filters: Optional[Tuple[ID, ...]] = Field(
         default=None, alias="categoryFilters"
     )
@@ -2520,10 +2921,12 @@ class ListRelationCategorySourcedefinition(BaseModel):
 
 
 class ListRelationCategoryTargetdefinition(BaseModel):
+    """No documentation"""
+
     typename: Literal["EntityCategoryDefinition"] = Field(
         alias="__typename", default="EntityCategoryDefinition", exclude=True
     )
-    tag_filters: Optional[Tuple[ID, ...]] = Field(default=None, alias="tagFilters")
+    tag_filters: Optional[Tuple[str, ...]] = Field(default=None, alias="tagFilters")
     category_filters: Optional[Tuple[ID, ...]] = Field(
         default=None, alias="categoryFilters"
     )
@@ -2536,6 +2939,8 @@ class ListRelationCategory(
     RelationCategoryTrait,
     BaseModel,
 ):
+    """No documentation"""
+
     typename: Literal["RelationCategory"] = Field(
         alias="__typename", default="RelationCategory", exclude=True
     )
@@ -2557,6 +2962,8 @@ class ListEntityCategory(
     EntityCategoryTrait,
     BaseModel,
 ):
+    """No documentation"""
+
     typename: Literal["EntityCategory"] = Field(
         alias="__typename", default="EntityCategory", exclude=True
     )
@@ -2573,6 +2980,8 @@ class ListReagentCategory(
     ReagentCategoryTrait,
     BaseModel,
 ):
+    """No documentation"""
+
     typename: Literal["ReagentCategory"] = Field(
         alias="__typename", default="ReagentCategory", exclude=True
     )
@@ -2589,6 +2998,8 @@ class ListMetricCategory(
     MetricCategoryTrait,
     BaseModel,
 ):
+    """No documentation"""
+
     typename: Literal["MetricCategory"] = Field(
         alias="__typename", default="MetricCategory", exclude=True
     )
@@ -2605,6 +3016,8 @@ class StructureCategory(
     StructureCategoryTrait,
     BaseModel,
 ):
+    """No documentation"""
+
     typename: Literal["StructureCategory"] = Field(
         alias="__typename", default="StructureCategory", exclude=True
     )
@@ -2619,6 +3032,8 @@ class MetricCategory(
     MetricCategoryTrait,
     BaseModel,
 ):
+    """No documentation"""
+
     typename: Literal["MetricCategory"] = Field(
         alias="__typename", default="MetricCategory", exclude=True
     )
@@ -2633,6 +3048,8 @@ class ReagentCategory(
     ReagentCategoryTrait,
     BaseModel,
 ):
+    """No documentation"""
+
     typename: Literal["ReagentCategory"] = Field(
         alias="__typename", default="ReagentCategory", exclude=True
     )
@@ -2640,10 +3057,12 @@ class ReagentCategory(
 
 
 class MeasurementCategorySourcedefinition(BaseModel):
+    """No documentation"""
+
     typename: Literal["StructureCategoryDefinition"] = Field(
         alias="__typename", default="StructureCategoryDefinition", exclude=True
     )
-    tag_filters: Optional[Tuple[ID, ...]] = Field(default=None, alias="tagFilters")
+    tag_filters: Optional[Tuple[str, ...]] = Field(default=None, alias="tagFilters")
     category_filters: Optional[Tuple[ID, ...]] = Field(
         default=None, alias="categoryFilters"
     )
@@ -2651,10 +3070,12 @@ class MeasurementCategorySourcedefinition(BaseModel):
 
 
 class MeasurementCategoryTargetdefinition(BaseModel):
+    """No documentation"""
+
     typename: Literal["EntityCategoryDefinition"] = Field(
         alias="__typename", default="EntityCategoryDefinition", exclude=True
     )
-    tag_filters: Optional[Tuple[ID, ...]] = Field(default=None, alias="tagFilters")
+    tag_filters: Optional[Tuple[str, ...]] = Field(default=None, alias="tagFilters")
     category_filters: Optional[Tuple[ID, ...]] = Field(
         default=None, alias="categoryFilters"
     )
@@ -2667,6 +3088,8 @@ class MeasurementCategory(
     MeasurementCategoryTrait,
     BaseModel,
 ):
+    """No documentation"""
+
     typename: Literal["MeasurementCategory"] = Field(
         alias="__typename", default="MeasurementCategory", exclude=True
     )
@@ -2681,10 +3104,12 @@ class MeasurementCategory(
 
 
 class RelationCategorySourcedefinition(BaseModel):
+    """No documentation"""
+
     typename: Literal["EntityCategoryDefinition"] = Field(
         alias="__typename", default="EntityCategoryDefinition", exclude=True
     )
-    tag_filters: Optional[Tuple[ID, ...]] = Field(default=None, alias="tagFilters")
+    tag_filters: Optional[Tuple[str, ...]] = Field(default=None, alias="tagFilters")
     category_filters: Optional[Tuple[ID, ...]] = Field(
         default=None, alias="categoryFilters"
     )
@@ -2692,10 +3117,12 @@ class RelationCategorySourcedefinition(BaseModel):
 
 
 class RelationCategoryTargetdefinition(BaseModel):
+    """No documentation"""
+
     typename: Literal["EntityCategoryDefinition"] = Field(
         alias="__typename", default="EntityCategoryDefinition", exclude=True
     )
-    tag_filters: Optional[Tuple[ID, ...]] = Field(default=None, alias="tagFilters")
+    tag_filters: Optional[Tuple[str, ...]] = Field(default=None, alias="tagFilters")
     category_filters: Optional[Tuple[ID, ...]] = Field(
         default=None, alias="categoryFilters"
     )
@@ -2708,6 +3135,8 @@ class RelationCategory(
     RelationCategoryTrait,
     BaseModel,
 ):
+    """No documentation"""
+
     typename: Literal["RelationCategory"] = Field(
         alias="__typename", default="RelationCategory", exclude=True
     )
@@ -2748,144 +3177,211 @@ class DetailNodeGraph(GraphTrait, BaseModel):
 
 
 class DetailNodeBase(BaseModel):
+    """No documentation"""
+
     graph: DetailNodeGraph
     "The unique identifier of the entity within its graph"
-    best_view: Table = Field(default=None, alias="bestView")
-    "The best view of the node given the current context"
 
 
 class DetailNodeCatch(DetailNodeBase):
+    """Catch all class for DetailNodeBase"""
+
     typename: str = Field(alias="__typename", exclude=True)
+    "No documentation"
     graph: DetailNodeGraph
     "The unique identifier of the entity within its graph"
-    best_view: Table = Field(default=None, alias="bestView")
-    "The best view of the node given the current context"
 
 
 class DetailNodeEntity(NodeEntity, DetailNodeBase, EntityTrait, BaseModel):
+    """A Entity is a recorded data point in a graph. It can measure a property of an entity through a direct measurement edge, that connects the entity to the structure. It of course can relate to other structures through relation edges."""
+
     typename: Literal["Entity"] = Field(
         alias="__typename", default="Entity", exclude=True
     )
 
 
 class DetailNodeStructure(NodeStructure, DetailNodeBase, StructureTrait, BaseModel):
+    """A Structure is a recorded data point in a graph. It can measure a property of an entity through a direct measurement edge, that connects the entity to the structure. It of course can relate to other structures through relation edges."""
+
     typename: Literal["Structure"] = Field(
         alias="__typename", default="Structure", exclude=True
     )
 
 
 class DetailNodeMetric(NodeMetric, DetailNodeBase, MetricTrait, BaseModel):
+    """A Metric is a recorded data point in a graph. It always describes a structure and through the structure it can bring meaning to the measured entity. It can measure a property of an entity through a direct measurement edge, that connects the entity to the structure. It of course can relate to other structures through relation edges."""
+
     typename: Literal["Metric"] = Field(
         alias="__typename", default="Metric", exclude=True
     )
 
 
 class DetailNodeProtocolEvent(NodeProtocolEvent, DetailNodeBase, BaseModel):
+    """A Metric is a recorded data point in a graph. It always describes a structure and through the structure it can bring meaning to the measured entity. It can measure a property of an entity through a direct measurement edge, that connects the entity to the structure. It of course can relate to other structures through relation edges."""
+
     typename: Literal["ProtocolEvent"] = Field(
         alias="__typename", default="ProtocolEvent", exclude=True
     )
 
 
 class DetailNodeNaturalEvent(NodeNaturalEvent, DetailNodeBase, BaseModel):
+    """A Metric is a recorded data point in a graph. It always describes a structure and through the structure it can bring meaning to the measured entity. It can measure a property of an entity through a direct measurement edge, that connects the entity to the structure. It of course can relate to other structures through relation edges."""
+
     typename: Literal["NaturalEvent"] = Field(
         alias="__typename", default="NaturalEvent", exclude=True
     )
 
 
 class DetailNodeReagent(NodeReagent, DetailNodeBase, BaseModel):
+    """A Entity is a recorded data point in a graph. It can measure a property of an entity through a direct measurement edge, that connects the entity to the structure. It of course can relate to other structures through relation edges."""
+
     typename: Literal["Reagent"] = Field(
         alias="__typename", default="Reagent", exclude=True
     )
 
 
 class PathNodesBase(BaseModel):
-    pass
+    """No documentation"""
+
     model_config = ConfigDict(frozen=True)
 
 
 class PathNodesBaseEntity(NodeEntity, PathNodesBase, EntityTrait, BaseModel):
+    """A Entity is a recorded data point in a graph. It can measure a property of an entity through a direct measurement edge, that connects the entity to the structure. It of course can relate to other structures through relation edges."""
+
     typename: Literal["Entity"] = Field(
         alias="__typename", default="Entity", exclude=True
     )
 
 
 class PathNodesBaseStructure(NodeStructure, PathNodesBase, StructureTrait, BaseModel):
+    """A Structure is a recorded data point in a graph. It can measure a property of an entity through a direct measurement edge, that connects the entity to the structure. It of course can relate to other structures through relation edges."""
+
     typename: Literal["Structure"] = Field(
         alias="__typename", default="Structure", exclude=True
     )
 
 
 class PathNodesBaseMetric(NodeMetric, PathNodesBase, MetricTrait, BaseModel):
+    """A Metric is a recorded data point in a graph. It always describes a structure and through the structure it can bring meaning to the measured entity. It can measure a property of an entity through a direct measurement edge, that connects the entity to the structure. It of course can relate to other structures through relation edges."""
+
     typename: Literal["Metric"] = Field(
         alias="__typename", default="Metric", exclude=True
     )
 
 
 class PathNodesBaseProtocolEvent(NodeProtocolEvent, PathNodesBase, BaseModel):
+    """A Metric is a recorded data point in a graph. It always describes a structure and through the structure it can bring meaning to the measured entity. It can measure a property of an entity through a direct measurement edge, that connects the entity to the structure. It of course can relate to other structures through relation edges."""
+
     typename: Literal["ProtocolEvent"] = Field(
         alias="__typename", default="ProtocolEvent", exclude=True
     )
 
 
 class PathNodesBaseNaturalEvent(NodeNaturalEvent, PathNodesBase, BaseModel):
+    """A Metric is a recorded data point in a graph. It always describes a structure and through the structure it can bring meaning to the measured entity. It can measure a property of an entity through a direct measurement edge, that connects the entity to the structure. It of course can relate to other structures through relation edges."""
+
     typename: Literal["NaturalEvent"] = Field(
         alias="__typename", default="NaturalEvent", exclude=True
     )
 
 
 class PathNodesBaseReagent(NodeReagent, PathNodesBase, BaseModel):
+    """A Entity is a recorded data point in a graph. It can measure a property of an entity through a direct measurement edge, that connects the entity to the structure. It of course can relate to other structures through relation edges."""
+
     typename: Literal["Reagent"] = Field(
         alias="__typename", default="Reagent", exclude=True
     )
 
 
+class PathNodesBaseCatchAll(PathNodesBase, BaseModel):
+    """Catch all class for PathNodesBase"""
+
+    typename: str = Field(alias="__typename", exclude=True)
+
+
 class PathEdgesBase(BaseModel):
-    pass
+    """No documentation"""
+
     model_config = ConfigDict(frozen=True)
 
 
 class PathEdgesBaseMeasurement(EdgeMeasurement, PathEdgesBase, BaseModel):
+    """A measurement is an edge from a structure to an entity. Importantly Measurement are always directed from the structure to the entity, and never the other way around."""
+
     typename: Literal["Measurement"] = Field(
         alias="__typename", default="Measurement", exclude=True
     )
 
 
 class PathEdgesBaseRelation(EdgeRelation, PathEdgesBase, BaseModel):
+    """A relation is an edge between two entities. It is a directed edge, that connects two entities and established a relationship
+    that is not a measurement between them. I.e. when they are an subjective assertion about the entities.
+
+
+
+    """
+
     typename: Literal["Relation"] = Field(
         alias="__typename", default="Relation", exclude=True
     )
 
 
 class PathEdgesBaseParticipant(EdgeParticipant, PathEdgesBase, BaseModel):
+    """A participant edge maps bioentitiy to an event (valid from is not necessary)"""
+
     typename: Literal["Participant"] = Field(
         alias="__typename", default="Participant", exclude=True
     )
 
 
+class PathEdgesBaseDescription(EdgeDescription, PathEdgesBase, BaseModel):
+    """A participant edge maps bioentitiy to an event (valid from is not necessary)"""
+
+    typename: Literal["Description"] = Field(
+        alias="__typename", default="Description", exclude=True
+    )
+
+
+class PathEdgesBaseCatchAll(PathEdgesBase, BaseModel):
+    """Catch all class for PathEdgesBase"""
+
+    typename: str = Field(alias="__typename", exclude=True)
+
+
 class Path(BaseModel):
+    """No documentation"""
+
     typename: Literal["Path"] = Field(alias="__typename", default="Path", exclude=True)
     nodes: Tuple[
-        Annotated[
-            Union[
-                PathNodesBaseEntity,
-                PathNodesBaseStructure,
-                PathNodesBaseMetric,
-                PathNodesBaseProtocolEvent,
-                PathNodesBaseNaturalEvent,
-                PathNodesBaseReagent,
+        Union[
+            Annotated[
+                Union[
+                    PathNodesBaseEntity,
+                    PathNodesBaseStructure,
+                    PathNodesBaseMetric,
+                    PathNodesBaseProtocolEvent,
+                    PathNodesBaseNaturalEvent,
+                    PathNodesBaseReagent,
+                ],
+                Field(discriminator="typename"),
             ],
-            Field(discriminator="typename"),
+            PathNodesBaseCatchAll,
         ],
         ...,
     ]
     edges: Tuple[
-        Annotated[
-            Union[
-                PathEdgesBaseMeasurement,
-                PathEdgesBaseRelation,
-                PathEdgesBaseParticipant,
+        Union[
+            Annotated[
+                Union[
+                    PathEdgesBaseMeasurement,
+                    PathEdgesBaseRelation,
+                    PathEdgesBaseParticipant,
+                    PathEdgesBaseDescription,
+                ],
+                Field(discriminator="typename"),
             ],
-            Field(discriminator="typename"),
+            PathEdgesBaseCatchAll,
         ],
         ...,
     ]
@@ -2893,6 +3389,8 @@ class Path(BaseModel):
 
 
 class NaturalEventCategoryStore(HasPresignedDownloadAccessor, BaseModel):
+    """No documentation"""
+
     typename: Literal["MediaStore"] = Field(
         alias="__typename", default="MediaStore", exclude=True
     )
@@ -2906,6 +3404,8 @@ class NaturalEventCategory(
     NaturalEventCategoryTrait,
     BaseModel,
 ):
+    """No documentation"""
+
     typename: Literal["NaturalEventCategory"] = Field(
         alias="__typename", default="NaturalEventCategory", exclude=True
     )
@@ -2940,6 +3440,8 @@ class ListNaturalEventCategory(
     NaturalEventCategoryTrait,
     BaseModel,
 ):
+    """No documentation"""
+
     typename: Literal["NaturalEventCategory"] = Field(
         alias="__typename", default="NaturalEventCategory", exclude=True
     )
@@ -2957,6 +3459,8 @@ class ListNaturalEventCategory(
 
 
 class ProtocolEventCategoryStore(HasPresignedDownloadAccessor, BaseModel):
+    """No documentation"""
+
     typename: Literal["MediaStore"] = Field(
         alias="__typename", default="MediaStore", exclude=True
     )
@@ -2970,6 +3474,8 @@ class ProtocolEventCategory(
     ProtocolEventCategoryTrait,
     BaseModel,
 ):
+    """No documentation"""
+
     typename: Literal["ProtocolEventCategory"] = Field(
         alias="__typename", default="ProtocolEventCategory", exclude=True
     )
@@ -3015,6 +3521,8 @@ class ListProtocolEventCategory(
     ProtocolEventCategoryTrait,
     BaseModel,
 ):
+    """No documentation"""
+
     typename: Literal["ProtocolEventCategory"] = Field(
         alias="__typename", default="ProtocolEventCategory", exclude=True
     )
@@ -3067,55 +3575,17 @@ class GraphQuery(BaseModel):
     model_config = ConfigDict(frozen=True)
 
 
-class InformedStructureCategory(StructureCategoryTrait, BaseModel):
-    typename: Literal["StructureCategory"] = Field(
-        alias="__typename", default="StructureCategory", exclude=True
-    )
-    id: ID
-    "The unique identifier of the expression within its graph"
-    identifier: str
-    "The structure that this class represents"
-    model_config = ConfigDict(frozen=True)
-
-
-class InformedStructureGraph(GraphTrait, BaseModel):
-    """A graph, that contains entities and relations."""
-
-    typename: Literal["Graph"] = Field(
-        alias="__typename", default="Graph", exclude=True
-    )
-    id: ID
-    name: str
-    model_config = ConfigDict(frozen=True)
-
-
-class InformedStructure(StructureTrait, BaseModel):
-    """A Structure is a recorded data point in a graph. It can measure a property of an entity through a direct measurement edge, that connects the entity to the structure. It of course can relate to other structures through relation edges."""
-
-    typename: Literal["Structure"] = Field(
-        alias="__typename", default="Structure", exclude=True
-    )
-    id: NodeID
-    "The unique identifier of the entity within its graph"
-    category: InformedStructureCategory
-    "Protocol steps where this entity was the target"
-    graph: InformedStructureGraph
-    "The unique identifier of the entity within its graph"
-    best_view: Optional[Union[Table, Pairs, Path]] = Field(
-        default=None, alias="bestView"
-    )
-    "The best view of the node given the current context"
-    model_config = ConfigDict(frozen=True)
-
-
 class GraphLatestnodesBase(BaseModel):
-    pass
+    """No documentation"""
+
     model_config = ConfigDict(frozen=True)
 
 
 class GraphLatestnodesBaseEntity(
     NodeEntity, GraphLatestnodesBase, EntityTrait, BaseModel
 ):
+    """A Entity is a recorded data point in a graph. It can measure a property of an entity through a direct measurement edge, that connects the entity to the structure. It of course can relate to other structures through relation edges."""
+
     typename: Literal["Entity"] = Field(
         alias="__typename", default="Entity", exclude=True
     )
@@ -3124,6 +3594,8 @@ class GraphLatestnodesBaseEntity(
 class GraphLatestnodesBaseStructure(
     NodeStructure, GraphLatestnodesBase, StructureTrait, BaseModel
 ):
+    """A Structure is a recorded data point in a graph. It can measure a property of an entity through a direct measurement edge, that connects the entity to the structure. It of course can relate to other structures through relation edges."""
+
     typename: Literal["Structure"] = Field(
         alias="__typename", default="Structure", exclude=True
     )
@@ -3132,6 +3604,8 @@ class GraphLatestnodesBaseStructure(
 class GraphLatestnodesBaseMetric(
     NodeMetric, GraphLatestnodesBase, MetricTrait, BaseModel
 ):
+    """A Metric is a recorded data point in a graph. It always describes a structure and through the structure it can bring meaning to the measured entity. It can measure a property of an entity through a direct measurement edge, that connects the entity to the structure. It of course can relate to other structures through relation edges."""
+
     typename: Literal["Metric"] = Field(
         alias="__typename", default="Metric", exclude=True
     )
@@ -3140,6 +3614,8 @@ class GraphLatestnodesBaseMetric(
 class GraphLatestnodesBaseProtocolEvent(
     NodeProtocolEvent, GraphLatestnodesBase, BaseModel
 ):
+    """A Metric is a recorded data point in a graph. It always describes a structure and through the structure it can bring meaning to the measured entity. It can measure a property of an entity through a direct measurement edge, that connects the entity to the structure. It of course can relate to other structures through relation edges."""
+
     typename: Literal["ProtocolEvent"] = Field(
         alias="__typename", default="ProtocolEvent", exclude=True
     )
@@ -3148,15 +3624,25 @@ class GraphLatestnodesBaseProtocolEvent(
 class GraphLatestnodesBaseNaturalEvent(
     NodeNaturalEvent, GraphLatestnodesBase, BaseModel
 ):
+    """A Metric is a recorded data point in a graph. It always describes a structure and through the structure it can bring meaning to the measured entity. It can measure a property of an entity through a direct measurement edge, that connects the entity to the structure. It of course can relate to other structures through relation edges."""
+
     typename: Literal["NaturalEvent"] = Field(
         alias="__typename", default="NaturalEvent", exclude=True
     )
 
 
 class GraphLatestnodesBaseReagent(NodeReagent, GraphLatestnodesBase, BaseModel):
+    """A Entity is a recorded data point in a graph. It can measure a property of an entity through a direct measurement edge, that connects the entity to the structure. It of course can relate to other structures through relation edges."""
+
     typename: Literal["Reagent"] = Field(
         alias="__typename", default="Reagent", exclude=True
     )
+
+
+class GraphLatestnodesBaseCatchAll(GraphLatestnodesBase, BaseModel):
+    """Catch all class for GraphLatestnodesBase"""
+
+    typename: str = Field(alias="__typename", exclude=True)
 
 
 class Graph(GraphTrait, BaseModel):
@@ -3195,16 +3681,19 @@ class Graph(GraphTrait, BaseModel):
     graph_queries: Tuple[GraphQuery, ...] = Field(alias="graphQueries")
     "The list of metric expressions defined in this ontology"
     latest_nodes: Tuple[
-        Annotated[
-            Union[
-                GraphLatestnodesBaseEntity,
-                GraphLatestnodesBaseStructure,
-                GraphLatestnodesBaseMetric,
-                GraphLatestnodesBaseProtocolEvent,
-                GraphLatestnodesBaseNaturalEvent,
-                GraphLatestnodesBaseReagent,
+        Union[
+            Annotated[
+                Union[
+                    GraphLatestnodesBaseEntity,
+                    GraphLatestnodesBaseStructure,
+                    GraphLatestnodesBaseMetric,
+                    GraphLatestnodesBaseProtocolEvent,
+                    GraphLatestnodesBaseNaturalEvent,
+                    GraphLatestnodesBaseReagent,
+                ],
+                Field(discriminator="typename"),
             ],
-            Field(discriminator="typename"),
+            GraphLatestnodesBaseCatchAll,
         ],
         ...,
     ] = Field(alias="latestNodes")
@@ -3212,6 +3701,8 @@ class Graph(GraphTrait, BaseModel):
 
 
 class EntityCategoryStore(HasPresignedDownloadAccessor, BaseModel):
+    """No documentation"""
+
     typename: Literal["MediaStore"] = Field(
         alias="__typename", default="MediaStore", exclude=True
     )
@@ -3225,6 +3716,8 @@ class EntityCategory(
     EntityCategoryTrait,
     BaseModel,
 ):
+    """No documentation"""
+
     typename: Literal["EntityCategory"] = Field(
         alias="__typename", default="EntityCategory", exclude=True
     )
@@ -3243,16 +3736,21 @@ class EntityCategory(
 
 
 class NodeCategoryBase(BaseModel):
-    pass
+    """No documentation"""
 
 
 class NodeCategoryCatch(NodeCategoryBase):
+    """Catch all class for NodeCategoryBase"""
+
     typename: str = Field(alias="__typename", exclude=True)
+    "No documentation"
 
 
 class NodeCategoryMetricCategory(
     MetricCategory, NodeCategoryBase, MetricCategoryTrait, BaseModel
 ):
+    """No documentation"""
+
     typename: Literal["MetricCategory"] = Field(
         alias="__typename", default="MetricCategory", exclude=True
     )
@@ -3261,6 +3759,8 @@ class NodeCategoryMetricCategory(
 class NodeCategoryStructureCategory(
     StructureCategory, NodeCategoryBase, StructureCategoryTrait, BaseModel
 ):
+    """No documentation"""
+
     typename: Literal["StructureCategory"] = Field(
         alias="__typename", default="StructureCategory", exclude=True
     )
@@ -3269,6 +3769,8 @@ class NodeCategoryStructureCategory(
 class NodeCategoryProtocolEventCategory(
     ProtocolEventCategory, NodeCategoryBase, ProtocolEventCategoryTrait, BaseModel
 ):
+    """No documentation"""
+
     typename: Literal["ProtocolEventCategory"] = Field(
         alias="__typename", default="ProtocolEventCategory", exclude=True
     )
@@ -3277,6 +3779,8 @@ class NodeCategoryProtocolEventCategory(
 class NodeCategoryEntityCategory(
     EntityCategory, NodeCategoryBase, EntityCategoryTrait, BaseModel
 ):
+    """No documentation"""
+
     typename: Literal["EntityCategory"] = Field(
         alias="__typename", default="EntityCategory", exclude=True
     )
@@ -3285,6 +3789,8 @@ class NodeCategoryEntityCategory(
 class NodeCategoryReagentCategory(
     ReagentCategory, NodeCategoryBase, ReagentCategoryTrait, BaseModel
 ):
+    """No documentation"""
+
     typename: Literal["ReagentCategory"] = Field(
         alias="__typename", default="ReagentCategory", exclude=True
     )
@@ -3293,401 +3799,609 @@ class NodeCategoryReagentCategory(
 class NodeCategoryNaturalEventCategory(
     NaturalEventCategory, NodeCategoryBase, NaturalEventCategoryTrait, BaseModel
 ):
+    """No documentation"""
+
     typename: Literal["NaturalEventCategory"] = Field(
         alias="__typename", default="NaturalEventCategory", exclude=True
     )
 
 
 class RecordNaturalEventMutation(BaseModel):
+    """No documentation found for this operation."""
+
     record_natural_event: NaturalEvent = Field(alias="recordNaturalEvent")
     "Record a new natural event"
 
     class Arguments(BaseModel):
+        """Arguments for RecordNaturalEvent"""
+
         input: RecordNaturalEventInput
 
     class Meta:
+        """Meta class for RecordNaturalEvent"""
+
         document = "fragment NaturalEvent on NaturalEvent {\n  id\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nmutation RecordNaturalEvent($input: RecordNaturalEventInput!) {\n  recordNaturalEvent(input: $input) {\n    ...NaturalEvent\n    __typename\n  }\n}"
 
 
 class CreateNaturalEventCategoryMutation(BaseModel):
+    """No documentation found for this operation."""
+
     create_natural_event_category: NaturalEventCategory = Field(
         alias="createNaturalEventCategory"
     )
     "Create a new natural event category"
 
     class Arguments(BaseModel):
+        """Arguments for CreateNaturalEventCategory"""
+
         input: NaturalEventCategoryInput
 
     class Meta:
-        document = "fragment EntityCategoryDefinition on EntityCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment EntityRoleDefinition on EntityRoleDefinition {\n  role\n  categoryDefinition {\n    ...EntityCategoryDefinition\n    __typename\n  }\n  optional\n  allowMultiple\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment NaturalEventCategory on NaturalEventCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  plateChildren\n  label\n  ageName\n  label\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  __typename\n}\n\nmutation CreateNaturalEventCategory($input: NaturalEventCategoryInput!) {\n  createNaturalEventCategory(input: $input) {\n    ...NaturalEventCategory\n    __typename\n  }\n}"
+        """Meta class for CreateNaturalEventCategory"""
+
+        document = "fragment EntityCategoryDefinition on EntityCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment EntityRoleDefinition on EntityRoleDefinition {\n  role\n  categoryDefinition {\n    ...EntityCategoryDefinition\n    __typename\n  }\n  optional\n  allowMultiple\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment NaturalEventCategory on NaturalEventCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  plateChildren\n  label\n  ageName\n  label\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  __typename\n}\n\nmutation CreateNaturalEventCategory($input: NaturalEventCategoryInput!) {\n  createNaturalEventCategory(input: $input) {\n    ...NaturalEventCategory\n    __typename\n  }\n}"
 
 
 class UpdateNaturalEventCategoryMutation(BaseModel):
+    """No documentation found for this operation."""
+
     update_natural_event_category: NaturalEventCategory = Field(
         alias="updateNaturalEventCategory"
     )
     "Update an existing natural event category"
 
     class Arguments(BaseModel):
+        """Arguments for UpdateNaturalEventCategory"""
+
         input: UpdateNaturalEventCategoryInput
 
     class Meta:
-        document = "fragment EntityCategoryDefinition on EntityCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment EntityRoleDefinition on EntityRoleDefinition {\n  role\n  categoryDefinition {\n    ...EntityCategoryDefinition\n    __typename\n  }\n  optional\n  allowMultiple\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment NaturalEventCategory on NaturalEventCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  plateChildren\n  label\n  ageName\n  label\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  __typename\n}\n\nmutation UpdateNaturalEventCategory($input: UpdateNaturalEventCategoryInput!) {\n  updateNaturalEventCategory(input: $input) {\n    ...NaturalEventCategory\n    __typename\n  }\n}"
+        """Meta class for UpdateNaturalEventCategory"""
+
+        document = "fragment EntityCategoryDefinition on EntityCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment EntityRoleDefinition on EntityRoleDefinition {\n  role\n  categoryDefinition {\n    ...EntityCategoryDefinition\n    __typename\n  }\n  optional\n  allowMultiple\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment NaturalEventCategory on NaturalEventCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  plateChildren\n  label\n  ageName\n  label\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  __typename\n}\n\nmutation UpdateNaturalEventCategory($input: UpdateNaturalEventCategoryInput!) {\n  updateNaturalEventCategory(input: $input) {\n    ...NaturalEventCategory\n    __typename\n  }\n}"
 
 
 class CreateStructureCategoryMutation(BaseModel):
+    """No documentation found for this operation."""
+
     create_structure_category: StructureCategory = Field(
         alias="createStructureCategory"
     )
     "Create a new expression"
 
     class Arguments(BaseModel):
+        """Arguments for CreateStructureCategory"""
+
         input: StructureCategoryInput
 
     class Meta:
-        document = "fragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment StructureCategory on StructureCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  identifier\n  __typename\n}\n\nmutation CreateStructureCategory($input: StructureCategoryInput!) {\n  createStructureCategory(input: $input) {\n    ...StructureCategory\n    __typename\n  }\n}"
+        """Meta class for CreateStructureCategory"""
+
+        document = "fragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment StructureCategory on StructureCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  identifier\n  __typename\n}\n\nmutation CreateStructureCategory($input: StructureCategoryInput!) {\n  createStructureCategory(input: $input) {\n    ...StructureCategory\n    __typename\n  }\n}"
 
 
 class UpdateStructureCategoryMutation(BaseModel):
+    """No documentation found for this operation."""
+
     update_structure_category: StructureCategory = Field(
         alias="updateStructureCategory"
     )
     "Update an existing expression"
 
     class Arguments(BaseModel):
+        """Arguments for UpdateStructureCategory"""
+
         input: UpdateStructureCategoryInput
 
     class Meta:
-        document = "fragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment StructureCategory on StructureCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  identifier\n  __typename\n}\n\nmutation UpdateStructureCategory($input: UpdateStructureCategoryInput!) {\n  updateStructureCategory(input: $input) {\n    ...StructureCategory\n    __typename\n  }\n}"
+        """Meta class for UpdateStructureCategory"""
+
+        document = "fragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment StructureCategory on StructureCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  identifier\n  __typename\n}\n\nmutation UpdateStructureCategory($input: UpdateStructureCategoryInput!) {\n  updateStructureCategory(input: $input) {\n    ...StructureCategory\n    __typename\n  }\n}"
 
 
 class CreateModelMutation(BaseModel):
+    """No documentation found for this operation."""
+
     create_model: Model = Field(alias="createModel")
     "Create a new model"
 
     class Arguments(BaseModel):
+        """Arguments for CreateModel"""
+
         input: CreateModelInput
 
     class Meta:
+        """Meta class for CreateModel"""
+
         document = "fragment MediaStore on MediaStore {\n  id\n  presignedUrl\n  key\n  __typename\n}\n\nfragment Model on Model {\n  id\n  name\n  store {\n    ...MediaStore\n    __typename\n  }\n  __typename\n}\n\nmutation CreateModel($input: CreateModelInput!) {\n  createModel(input: $input) {\n    ...Model\n    __typename\n  }\n}"
 
 
 class CreateGraphQueryMutation(BaseModel):
+    """No documentation found for this operation."""
+
     create_graph_query: GraphQuery = Field(alias="createGraphQuery")
     "Create a new graph query"
 
     class Arguments(BaseModel):
+        """Arguments for CreateGraphQuery"""
+
         input: GraphQueryInput
 
     class Meta:
-        document = "fragment Participant on Participant {\n  role\n  quantity\n  __typename\n}\n\nfragment Relation on Relation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment Measurement on Measurement {\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Reagent on Reagent {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  externalId\n  label\n  __typename\n}\n\nfragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nfragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}\n\nfragment BaseEdge on Edge {\n  id\n  leftId\n  rightId\n  __typename\n}\n\nfragment BaseNode on Node {\n  id\n  label\n  __typename\n}\n\nfragment Node on Node {\n  ...BaseNode\n  ...Entity\n  ...Structure\n  ...Metric\n  ...Reagent\n  __typename\n}\n\nfragment Edge on Edge {\n  ...BaseEdge\n  ...Measurement\n  ...Relation\n  ...Participant\n  __typename\n}\n\nfragment Column on Column {\n  name\n  kind\n  valueKind\n  label\n  description\n  category\n  searchable\n  idfor\n  preferhidden\n  __typename\n}\n\nfragment Table on Table {\n  graph {\n    ageName\n    __typename\n  }\n  rows\n  columns {\n    ...Column\n    __typename\n  }\n  __typename\n}\n\nfragment ListScatterPlot on ScatterPlot {\n  id\n  name\n  xColumn\n  yColumn\n  __typename\n}\n\nfragment Pairs on Pairs {\n  pairs {\n    left {\n      id\n      __typename\n    }\n    right {\n      id\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nfragment Path on Path {\n  nodes {\n    ...Node\n    __typename\n  }\n  edges {\n    ...Edge\n    __typename\n  }\n  __typename\n}\n\nfragment GraphQuery on GraphQuery {\n  id\n  query\n  name\n  graph {\n    id\n    name\n    __typename\n  }\n  scatterPlots(pagination: {limit: 1}) {\n    ...ListScatterPlot\n    __typename\n  }\n  render {\n    ...Path\n    ...Pairs\n    ...Table\n    __typename\n  }\n  pinned\n  __typename\n}\n\nmutation CreateGraphQuery($input: GraphQueryInput!) {\n  createGraphQuery(input: $input) {\n    ...GraphQuery\n    __typename\n  }\n}"
+        """Meta class for CreateGraphQuery"""
+
+        document = "fragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nfragment BaseNode on Node {\n  id\n  label\n  __typename\n}\n\nfragment Relation on Relation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment BaseEdge on Edge {\n  id\n  leftId\n  rightId\n  __typename\n}\n\nfragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}\n\nfragment Measurement on Measurement {\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Reagent on Reagent {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  externalId\n  label\n  __typename\n}\n\nfragment Participant on Participant {\n  role\n  quantity\n  __typename\n}\n\nfragment Edge on Edge {\n  ...BaseEdge\n  ...Measurement\n  ...Relation\n  ...Participant\n  __typename\n}\n\nfragment Column on Column {\n  name\n  kind\n  valueKind\n  label\n  description\n  category\n  searchable\n  idfor\n  preferhidden\n  __typename\n}\n\nfragment Node on Node {\n  ...BaseNode\n  ...Entity\n  ...Structure\n  ...Metric\n  ...Reagent\n  __typename\n}\n\nfragment Table on Table {\n  graph {\n    ageName\n    __typename\n  }\n  rows\n  columns {\n    ...Column\n    __typename\n  }\n  __typename\n}\n\nfragment Pairs on Pairs {\n  pairs {\n    left {\n      id\n      __typename\n    }\n    right {\n      id\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nfragment ListScatterPlot on ScatterPlot {\n  id\n  name\n  xColumn\n  yColumn\n  __typename\n}\n\nfragment Path on Path {\n  nodes {\n    ...Node\n    __typename\n  }\n  edges {\n    ...Edge\n    __typename\n  }\n  __typename\n}\n\nfragment GraphQuery on GraphQuery {\n  id\n  query\n  name\n  graph {\n    id\n    name\n    __typename\n  }\n  scatterPlots(pagination: {limit: 1}) {\n    ...ListScatterPlot\n    __typename\n  }\n  render {\n    ...Path\n    ...Pairs\n    ...Table\n    __typename\n  }\n  pinned\n  __typename\n}\n\nmutation CreateGraphQuery($input: GraphQueryInput!) {\n  createGraphQuery(input: $input) {\n    ...GraphQuery\n    __typename\n  }\n}"
 
 
 class PinGraphQueryMutation(BaseModel):
+    """No documentation found for this operation."""
+
     pin_graph_query: GraphQuery = Field(alias="pinGraphQuery")
     "Pin or unpin a graph query"
 
     class Arguments(BaseModel):
+        """Arguments for PinGraphQuery"""
+
         input: PinGraphQueryInput
 
     class Meta:
-        document = "fragment Participant on Participant {\n  role\n  quantity\n  __typename\n}\n\nfragment Relation on Relation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment Measurement on Measurement {\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Reagent on Reagent {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  externalId\n  label\n  __typename\n}\n\nfragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nfragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}\n\nfragment BaseEdge on Edge {\n  id\n  leftId\n  rightId\n  __typename\n}\n\nfragment BaseNode on Node {\n  id\n  label\n  __typename\n}\n\nfragment Node on Node {\n  ...BaseNode\n  ...Entity\n  ...Structure\n  ...Metric\n  ...Reagent\n  __typename\n}\n\nfragment Edge on Edge {\n  ...BaseEdge\n  ...Measurement\n  ...Relation\n  ...Participant\n  __typename\n}\n\nfragment Column on Column {\n  name\n  kind\n  valueKind\n  label\n  description\n  category\n  searchable\n  idfor\n  preferhidden\n  __typename\n}\n\nfragment Table on Table {\n  graph {\n    ageName\n    __typename\n  }\n  rows\n  columns {\n    ...Column\n    __typename\n  }\n  __typename\n}\n\nfragment ListScatterPlot on ScatterPlot {\n  id\n  name\n  xColumn\n  yColumn\n  __typename\n}\n\nfragment Pairs on Pairs {\n  pairs {\n    left {\n      id\n      __typename\n    }\n    right {\n      id\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nfragment Path on Path {\n  nodes {\n    ...Node\n    __typename\n  }\n  edges {\n    ...Edge\n    __typename\n  }\n  __typename\n}\n\nfragment GraphQuery on GraphQuery {\n  id\n  query\n  name\n  graph {\n    id\n    name\n    __typename\n  }\n  scatterPlots(pagination: {limit: 1}) {\n    ...ListScatterPlot\n    __typename\n  }\n  render {\n    ...Path\n    ...Pairs\n    ...Table\n    __typename\n  }\n  pinned\n  __typename\n}\n\nmutation PinGraphQuery($input: PinGraphQueryInput!) {\n  pinGraphQuery(input: $input) {\n    ...GraphQuery\n    __typename\n  }\n}"
+        """Meta class for PinGraphQuery"""
+
+        document = "fragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nfragment BaseNode on Node {\n  id\n  label\n  __typename\n}\n\nfragment Relation on Relation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment BaseEdge on Edge {\n  id\n  leftId\n  rightId\n  __typename\n}\n\nfragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}\n\nfragment Measurement on Measurement {\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Reagent on Reagent {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  externalId\n  label\n  __typename\n}\n\nfragment Participant on Participant {\n  role\n  quantity\n  __typename\n}\n\nfragment Edge on Edge {\n  ...BaseEdge\n  ...Measurement\n  ...Relation\n  ...Participant\n  __typename\n}\n\nfragment Column on Column {\n  name\n  kind\n  valueKind\n  label\n  description\n  category\n  searchable\n  idfor\n  preferhidden\n  __typename\n}\n\nfragment Node on Node {\n  ...BaseNode\n  ...Entity\n  ...Structure\n  ...Metric\n  ...Reagent\n  __typename\n}\n\nfragment Table on Table {\n  graph {\n    ageName\n    __typename\n  }\n  rows\n  columns {\n    ...Column\n    __typename\n  }\n  __typename\n}\n\nfragment Pairs on Pairs {\n  pairs {\n    left {\n      id\n      __typename\n    }\n    right {\n      id\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nfragment ListScatterPlot on ScatterPlot {\n  id\n  name\n  xColumn\n  yColumn\n  __typename\n}\n\nfragment Path on Path {\n  nodes {\n    ...Node\n    __typename\n  }\n  edges {\n    ...Edge\n    __typename\n  }\n  __typename\n}\n\nfragment GraphQuery on GraphQuery {\n  id\n  query\n  name\n  graph {\n    id\n    name\n    __typename\n  }\n  scatterPlots(pagination: {limit: 1}) {\n    ...ListScatterPlot\n    __typename\n  }\n  render {\n    ...Path\n    ...Pairs\n    ...Table\n    __typename\n  }\n  pinned\n  __typename\n}\n\nmutation PinGraphQuery($input: PinGraphQueryInput!) {\n  pinGraphQuery(input: $input) {\n    ...GraphQuery\n    __typename\n  }\n}"
 
 
 class CreateToldyousoMutation(BaseModel):
+    """No documentation found for this operation."""
+
     create_toldyouso: Structure = Field(alias="createToldyouso")
     "Create a new 'told you so' supporting structure"
 
     class Arguments(BaseModel):
+        """Arguments for CreateToldyouso"""
+
         input: ToldYouSoInput
 
     class Meta:
+        """Meta class for CreateToldyouso"""
+
         document = "fragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}\n\nmutation CreateToldyouso($input: ToldYouSoInput!) {\n  createToldyouso(input: $input) {\n    ...Structure\n    __typename\n  }\n}"
 
 
 class CreateGraphMutation(BaseModel):
+    """No documentation found for this operation."""
+
     create_graph: Graph = Field(alias="createGraph")
     "Create a new graph"
 
     class Arguments(BaseModel):
+        """Arguments for CreateGraph"""
+
         input: GraphInput
 
     class Meta:
-        document = "fragment Participant on Participant {\n  role\n  quantity\n  __typename\n}\n\nfragment Relation on Relation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment BaseEdge on Edge {\n  id\n  leftId\n  rightId\n  __typename\n}\n\nfragment Measurement on Measurement {\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Edge on Edge {\n  ...BaseEdge\n  ...Measurement\n  ...Relation\n  ...Participant\n  __typename\n}\n\nfragment Column on Column {\n  name\n  kind\n  valueKind\n  label\n  description\n  category\n  searchable\n  idfor\n  preferhidden\n  __typename\n}\n\nfragment EntityCategoryDefinition on EntityCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment ReagentCategoryDefinition on ReagentCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment Table on Table {\n  graph {\n    ageName\n    __typename\n  }\n  rows\n  columns {\n    ...Column\n    __typename\n  }\n  __typename\n}\n\nfragment Pairs on Pairs {\n  pairs {\n    left {\n      id\n      __typename\n    }\n    right {\n      id\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nfragment Path on Path {\n  nodes {\n    ...Node\n    __typename\n  }\n  edges {\n    ...Edge\n    __typename\n  }\n  __typename\n}\n\nfragment ListScatterPlot on ScatterPlot {\n  id\n  name\n  xColumn\n  yColumn\n  __typename\n}\n\nfragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}\n\nfragment Reagent on Reagent {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  externalId\n  label\n  __typename\n}\n\nfragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nfragment BaseListNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment BaseNode on Node {\n  id\n  label\n  __typename\n}\n\nfragment BaseListEdgeCategory on EdgeCategory {\n  id\n  __typename\n}\n\nfragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment EntityRoleDefinition on EntityRoleDefinition {\n  role\n  categoryDefinition {\n    ...EntityCategoryDefinition\n    __typename\n  }\n  optional\n  allowMultiple\n  __typename\n}\n\nfragment ReagentRoleDefinition on ReagentRoleDefinition {\n  role\n  categoryDefinition {\n    ...ReagentCategoryDefinition\n    __typename\n  }\n  needsQuantity\n  optional\n  __typename\n}\n\nfragment BaseListCategory on BaseCategory {\n  id\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  tags {\n    id\n    value\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment ListNaturalEventCategory on NaturalEventCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  label\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment Node on Node {\n  ...BaseNode\n  ...Entity\n  ...Structure\n  ...Metric\n  ...Reagent\n  __typename\n}\n\nfragment ListMeasurementCategory on MeasurementCategory {\n  ...BaseListCategory\n  ...BaseListEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment GraphQuery on GraphQuery {\n  id\n  query\n  name\n  graph {\n    id\n    name\n    __typename\n  }\n  scatterPlots(pagination: {limit: 1}) {\n    ...ListScatterPlot\n    __typename\n  }\n  render {\n    ...Path\n    ...Pairs\n    ...Table\n    __typename\n  }\n  pinned\n  __typename\n}\n\nfragment ListProtocolEventCategory on ProtocolEventCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  label\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  sourceReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  targetReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment ListEntityCategory on EntityCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  instanceKind\n  label\n  __typename\n}\n\nfragment ListMetricCategory on MetricCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  label\n  metricKind\n  __typename\n}\n\nfragment ListStructureCategory on StructureCategory {\n  ...BaseListCategory\n  ...BaseListNodeCategory\n  identifier\n  __typename\n}\n\nfragment ListRelationCategory on RelationCategory {\n  ...BaseListCategory\n  ...BaseListEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment Graph on Graph {\n  id\n  name\n  description\n  structureCategories {\n    ...ListStructureCategory\n    __typename\n  }\n  entityCategories {\n    ...ListEntityCategory\n    __typename\n  }\n  metricCategories {\n    ...ListMetricCategory\n    __typename\n  }\n  protocolEventCategories {\n    ...ListProtocolEventCategory\n    __typename\n  }\n  naturalEventCategories {\n    ...ListNaturalEventCategory\n    __typename\n  }\n  relationCategories {\n    ...ListRelationCategory\n    __typename\n  }\n  measurementCategories {\n    ...ListMeasurementCategory\n    __typename\n  }\n  graphQueries(pagination: {limit: 0}) {\n    ...GraphQuery\n    __typename\n  }\n  latestNodes(pagination: {limit: 2}) {\n    ...Node\n    __typename\n  }\n  __typename\n}\n\nmutation CreateGraph($input: GraphInput!) {\n  createGraph(input: $input) {\n    ...Graph\n    __typename\n  }\n}"
+        """Meta class for CreateGraph"""
+
+        document = "fragment Relation on Relation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment BaseEdge on Edge {\n  id\n  leftId\n  rightId\n  __typename\n}\n\nfragment Participant on Participant {\n  role\n  quantity\n  __typename\n}\n\nfragment Measurement on Measurement {\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment EntityCategoryDefinition on EntityCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment Column on Column {\n  name\n  kind\n  valueKind\n  label\n  description\n  category\n  searchable\n  idfor\n  preferhidden\n  __typename\n}\n\nfragment Edge on Edge {\n  ...BaseEdge\n  ...Measurement\n  ...Relation\n  ...Participant\n  __typename\n}\n\nfragment ReagentCategoryDefinition on ReagentCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment Pairs on Pairs {\n  pairs {\n    left {\n      id\n      __typename\n    }\n    right {\n      id\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nfragment Table on Table {\n  graph {\n    ageName\n    __typename\n  }\n  rows\n  columns {\n    ...Column\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNode on Node {\n  id\n  label\n  __typename\n}\n\nfragment ListScatterPlot on ScatterPlot {\n  id\n  name\n  xColumn\n  yColumn\n  __typename\n}\n\nfragment ReagentRoleDefinition on ReagentRoleDefinition {\n  role\n  categoryDefinition {\n    ...ReagentCategoryDefinition\n    __typename\n  }\n  needsQuantity\n  optional\n  __typename\n}\n\nfragment BaseListCategory on BaseCategory {\n  id\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  tags {\n    id\n    value\n    __typename\n  }\n  __typename\n}\n\nfragment Path on Path {\n  nodes {\n    ...Node\n    __typename\n  }\n  edges {\n    ...Edge\n    __typename\n  }\n  __typename\n}\n\nfragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nfragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment BaseListNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment EntityRoleDefinition on EntityRoleDefinition {\n  role\n  categoryDefinition {\n    ...EntityCategoryDefinition\n    __typename\n  }\n  optional\n  allowMultiple\n  __typename\n}\n\nfragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}\n\nfragment Reagent on Reagent {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  externalId\n  label\n  __typename\n}\n\nfragment BaseListEdgeCategory on EdgeCategory {\n  id\n  __typename\n}\n\nfragment ListNaturalEventCategory on NaturalEventCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  label\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment ListStructureCategory on StructureCategory {\n  ...BaseListCategory\n  ...BaseListNodeCategory\n  identifier\n  __typename\n}\n\nfragment ListMetricCategory on MetricCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  label\n  metricKind\n  __typename\n}\n\nfragment Node on Node {\n  ...BaseNode\n  ...Entity\n  ...Structure\n  ...Metric\n  ...Reagent\n  __typename\n}\n\nfragment GraphQuery on GraphQuery {\n  id\n  query\n  name\n  graph {\n    id\n    name\n    __typename\n  }\n  scatterPlots(pagination: {limit: 1}) {\n    ...ListScatterPlot\n    __typename\n  }\n  render {\n    ...Path\n    ...Pairs\n    ...Table\n    __typename\n  }\n  pinned\n  __typename\n}\n\nfragment ListProtocolEventCategory on ProtocolEventCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  label\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  sourceReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  targetReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment ListRelationCategory on RelationCategory {\n  ...BaseListCategory\n  ...BaseListEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment ListEntityCategory on EntityCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  instanceKind\n  label\n  __typename\n}\n\nfragment ListMeasurementCategory on MeasurementCategory {\n  ...BaseListCategory\n  ...BaseListEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment Graph on Graph {\n  id\n  name\n  description\n  structureCategories {\n    ...ListStructureCategory\n    __typename\n  }\n  entityCategories {\n    ...ListEntityCategory\n    __typename\n  }\n  metricCategories {\n    ...ListMetricCategory\n    __typename\n  }\n  protocolEventCategories {\n    ...ListProtocolEventCategory\n    __typename\n  }\n  naturalEventCategories {\n    ...ListNaturalEventCategory\n    __typename\n  }\n  relationCategories {\n    ...ListRelationCategory\n    __typename\n  }\n  measurementCategories {\n    ...ListMeasurementCategory\n    __typename\n  }\n  graphQueries(pagination: {limit: 0}) {\n    ...GraphQuery\n    __typename\n  }\n  latestNodes(pagination: {limit: 2}) {\n    ...Node\n    __typename\n  }\n  __typename\n}\n\nmutation CreateGraph($input: GraphInput!) {\n  createGraph(input: $input) {\n    ...Graph\n    __typename\n  }\n}"
 
 
 class PinGraphMutation(BaseModel):
+    """No documentation found for this operation."""
+
     pin_graph: Graph = Field(alias="pinGraph")
     "Pin or unpin a graph"
 
     class Arguments(BaseModel):
+        """Arguments for PinGraph"""
+
         input: PinGraphInput
 
     class Meta:
-        document = "fragment Participant on Participant {\n  role\n  quantity\n  __typename\n}\n\nfragment Relation on Relation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment BaseEdge on Edge {\n  id\n  leftId\n  rightId\n  __typename\n}\n\nfragment Measurement on Measurement {\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Edge on Edge {\n  ...BaseEdge\n  ...Measurement\n  ...Relation\n  ...Participant\n  __typename\n}\n\nfragment Column on Column {\n  name\n  kind\n  valueKind\n  label\n  description\n  category\n  searchable\n  idfor\n  preferhidden\n  __typename\n}\n\nfragment EntityCategoryDefinition on EntityCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment ReagentCategoryDefinition on ReagentCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment Table on Table {\n  graph {\n    ageName\n    __typename\n  }\n  rows\n  columns {\n    ...Column\n    __typename\n  }\n  __typename\n}\n\nfragment Pairs on Pairs {\n  pairs {\n    left {\n      id\n      __typename\n    }\n    right {\n      id\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nfragment Path on Path {\n  nodes {\n    ...Node\n    __typename\n  }\n  edges {\n    ...Edge\n    __typename\n  }\n  __typename\n}\n\nfragment ListScatterPlot on ScatterPlot {\n  id\n  name\n  xColumn\n  yColumn\n  __typename\n}\n\nfragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}\n\nfragment Reagent on Reagent {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  externalId\n  label\n  __typename\n}\n\nfragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nfragment BaseListNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment BaseNode on Node {\n  id\n  label\n  __typename\n}\n\nfragment BaseListEdgeCategory on EdgeCategory {\n  id\n  __typename\n}\n\nfragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment EntityRoleDefinition on EntityRoleDefinition {\n  role\n  categoryDefinition {\n    ...EntityCategoryDefinition\n    __typename\n  }\n  optional\n  allowMultiple\n  __typename\n}\n\nfragment ReagentRoleDefinition on ReagentRoleDefinition {\n  role\n  categoryDefinition {\n    ...ReagentCategoryDefinition\n    __typename\n  }\n  needsQuantity\n  optional\n  __typename\n}\n\nfragment BaseListCategory on BaseCategory {\n  id\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  tags {\n    id\n    value\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment ListNaturalEventCategory on NaturalEventCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  label\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment Node on Node {\n  ...BaseNode\n  ...Entity\n  ...Structure\n  ...Metric\n  ...Reagent\n  __typename\n}\n\nfragment ListMeasurementCategory on MeasurementCategory {\n  ...BaseListCategory\n  ...BaseListEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment GraphQuery on GraphQuery {\n  id\n  query\n  name\n  graph {\n    id\n    name\n    __typename\n  }\n  scatterPlots(pagination: {limit: 1}) {\n    ...ListScatterPlot\n    __typename\n  }\n  render {\n    ...Path\n    ...Pairs\n    ...Table\n    __typename\n  }\n  pinned\n  __typename\n}\n\nfragment ListProtocolEventCategory on ProtocolEventCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  label\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  sourceReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  targetReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment ListEntityCategory on EntityCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  instanceKind\n  label\n  __typename\n}\n\nfragment ListMetricCategory on MetricCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  label\n  metricKind\n  __typename\n}\n\nfragment ListStructureCategory on StructureCategory {\n  ...BaseListCategory\n  ...BaseListNodeCategory\n  identifier\n  __typename\n}\n\nfragment ListRelationCategory on RelationCategory {\n  ...BaseListCategory\n  ...BaseListEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment Graph on Graph {\n  id\n  name\n  description\n  structureCategories {\n    ...ListStructureCategory\n    __typename\n  }\n  entityCategories {\n    ...ListEntityCategory\n    __typename\n  }\n  metricCategories {\n    ...ListMetricCategory\n    __typename\n  }\n  protocolEventCategories {\n    ...ListProtocolEventCategory\n    __typename\n  }\n  naturalEventCategories {\n    ...ListNaturalEventCategory\n    __typename\n  }\n  relationCategories {\n    ...ListRelationCategory\n    __typename\n  }\n  measurementCategories {\n    ...ListMeasurementCategory\n    __typename\n  }\n  graphQueries(pagination: {limit: 0}) {\n    ...GraphQuery\n    __typename\n  }\n  latestNodes(pagination: {limit: 2}) {\n    ...Node\n    __typename\n  }\n  __typename\n}\n\nmutation PinGraph($input: PinGraphInput!) {\n  pinGraph(input: $input) {\n    ...Graph\n    __typename\n  }\n}"
+        """Meta class for PinGraph"""
+
+        document = "fragment Relation on Relation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment BaseEdge on Edge {\n  id\n  leftId\n  rightId\n  __typename\n}\n\nfragment Participant on Participant {\n  role\n  quantity\n  __typename\n}\n\nfragment Measurement on Measurement {\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment EntityCategoryDefinition on EntityCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment Column on Column {\n  name\n  kind\n  valueKind\n  label\n  description\n  category\n  searchable\n  idfor\n  preferhidden\n  __typename\n}\n\nfragment Edge on Edge {\n  ...BaseEdge\n  ...Measurement\n  ...Relation\n  ...Participant\n  __typename\n}\n\nfragment ReagentCategoryDefinition on ReagentCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment Pairs on Pairs {\n  pairs {\n    left {\n      id\n      __typename\n    }\n    right {\n      id\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nfragment Table on Table {\n  graph {\n    ageName\n    __typename\n  }\n  rows\n  columns {\n    ...Column\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNode on Node {\n  id\n  label\n  __typename\n}\n\nfragment ListScatterPlot on ScatterPlot {\n  id\n  name\n  xColumn\n  yColumn\n  __typename\n}\n\nfragment ReagentRoleDefinition on ReagentRoleDefinition {\n  role\n  categoryDefinition {\n    ...ReagentCategoryDefinition\n    __typename\n  }\n  needsQuantity\n  optional\n  __typename\n}\n\nfragment BaseListCategory on BaseCategory {\n  id\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  tags {\n    id\n    value\n    __typename\n  }\n  __typename\n}\n\nfragment Path on Path {\n  nodes {\n    ...Node\n    __typename\n  }\n  edges {\n    ...Edge\n    __typename\n  }\n  __typename\n}\n\nfragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nfragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment BaseListNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment EntityRoleDefinition on EntityRoleDefinition {\n  role\n  categoryDefinition {\n    ...EntityCategoryDefinition\n    __typename\n  }\n  optional\n  allowMultiple\n  __typename\n}\n\nfragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}\n\nfragment Reagent on Reagent {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  externalId\n  label\n  __typename\n}\n\nfragment BaseListEdgeCategory on EdgeCategory {\n  id\n  __typename\n}\n\nfragment ListNaturalEventCategory on NaturalEventCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  label\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment ListStructureCategory on StructureCategory {\n  ...BaseListCategory\n  ...BaseListNodeCategory\n  identifier\n  __typename\n}\n\nfragment ListMetricCategory on MetricCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  label\n  metricKind\n  __typename\n}\n\nfragment Node on Node {\n  ...BaseNode\n  ...Entity\n  ...Structure\n  ...Metric\n  ...Reagent\n  __typename\n}\n\nfragment GraphQuery on GraphQuery {\n  id\n  query\n  name\n  graph {\n    id\n    name\n    __typename\n  }\n  scatterPlots(pagination: {limit: 1}) {\n    ...ListScatterPlot\n    __typename\n  }\n  render {\n    ...Path\n    ...Pairs\n    ...Table\n    __typename\n  }\n  pinned\n  __typename\n}\n\nfragment ListProtocolEventCategory on ProtocolEventCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  label\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  sourceReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  targetReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment ListRelationCategory on RelationCategory {\n  ...BaseListCategory\n  ...BaseListEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment ListEntityCategory on EntityCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  instanceKind\n  label\n  __typename\n}\n\nfragment ListMeasurementCategory on MeasurementCategory {\n  ...BaseListCategory\n  ...BaseListEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment Graph on Graph {\n  id\n  name\n  description\n  structureCategories {\n    ...ListStructureCategory\n    __typename\n  }\n  entityCategories {\n    ...ListEntityCategory\n    __typename\n  }\n  metricCategories {\n    ...ListMetricCategory\n    __typename\n  }\n  protocolEventCategories {\n    ...ListProtocolEventCategory\n    __typename\n  }\n  naturalEventCategories {\n    ...ListNaturalEventCategory\n    __typename\n  }\n  relationCategories {\n    ...ListRelationCategory\n    __typename\n  }\n  measurementCategories {\n    ...ListMeasurementCategory\n    __typename\n  }\n  graphQueries(pagination: {limit: 0}) {\n    ...GraphQuery\n    __typename\n  }\n  latestNodes(pagination: {limit: 2}) {\n    ...Node\n    __typename\n  }\n  __typename\n}\n\nmutation PinGraph($input: PinGraphInput!) {\n  pinGraph(input: $input) {\n    ...Graph\n    __typename\n  }\n}"
 
 
 class DeleteGraphMutation(BaseModel):
+    """No documentation found for this operation."""
+
     delete_graph: ID = Field(alias="deleteGraph")
     "Delete an existing graph"
 
     class Arguments(BaseModel):
+        """Arguments for DeleteGraph"""
+
         input: DeleteGraphInput
 
     class Meta:
+        """Meta class for DeleteGraph"""
+
         document = "mutation DeleteGraph($input: DeleteGraphInput!) {\n  deleteGraph(input: $input)\n}"
 
 
 class UpdateGraphMutation(BaseModel):
+    """No documentation found for this operation."""
+
     update_graph: Graph = Field(alias="updateGraph")
     "Update an existing graph"
 
     class Arguments(BaseModel):
+        """Arguments for UpdateGraph"""
+
         input: UpdateGraphInput
 
     class Meta:
-        document = "fragment Participant on Participant {\n  role\n  quantity\n  __typename\n}\n\nfragment Relation on Relation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment BaseEdge on Edge {\n  id\n  leftId\n  rightId\n  __typename\n}\n\nfragment Measurement on Measurement {\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Edge on Edge {\n  ...BaseEdge\n  ...Measurement\n  ...Relation\n  ...Participant\n  __typename\n}\n\nfragment Column on Column {\n  name\n  kind\n  valueKind\n  label\n  description\n  category\n  searchable\n  idfor\n  preferhidden\n  __typename\n}\n\nfragment EntityCategoryDefinition on EntityCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment ReagentCategoryDefinition on ReagentCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment Table on Table {\n  graph {\n    ageName\n    __typename\n  }\n  rows\n  columns {\n    ...Column\n    __typename\n  }\n  __typename\n}\n\nfragment Pairs on Pairs {\n  pairs {\n    left {\n      id\n      __typename\n    }\n    right {\n      id\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nfragment Path on Path {\n  nodes {\n    ...Node\n    __typename\n  }\n  edges {\n    ...Edge\n    __typename\n  }\n  __typename\n}\n\nfragment ListScatterPlot on ScatterPlot {\n  id\n  name\n  xColumn\n  yColumn\n  __typename\n}\n\nfragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}\n\nfragment Reagent on Reagent {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  externalId\n  label\n  __typename\n}\n\nfragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nfragment BaseListNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment BaseNode on Node {\n  id\n  label\n  __typename\n}\n\nfragment BaseListEdgeCategory on EdgeCategory {\n  id\n  __typename\n}\n\nfragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment EntityRoleDefinition on EntityRoleDefinition {\n  role\n  categoryDefinition {\n    ...EntityCategoryDefinition\n    __typename\n  }\n  optional\n  allowMultiple\n  __typename\n}\n\nfragment ReagentRoleDefinition on ReagentRoleDefinition {\n  role\n  categoryDefinition {\n    ...ReagentCategoryDefinition\n    __typename\n  }\n  needsQuantity\n  optional\n  __typename\n}\n\nfragment BaseListCategory on BaseCategory {\n  id\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  tags {\n    id\n    value\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment ListNaturalEventCategory on NaturalEventCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  label\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment Node on Node {\n  ...BaseNode\n  ...Entity\n  ...Structure\n  ...Metric\n  ...Reagent\n  __typename\n}\n\nfragment ListMeasurementCategory on MeasurementCategory {\n  ...BaseListCategory\n  ...BaseListEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment GraphQuery on GraphQuery {\n  id\n  query\n  name\n  graph {\n    id\n    name\n    __typename\n  }\n  scatterPlots(pagination: {limit: 1}) {\n    ...ListScatterPlot\n    __typename\n  }\n  render {\n    ...Path\n    ...Pairs\n    ...Table\n    __typename\n  }\n  pinned\n  __typename\n}\n\nfragment ListProtocolEventCategory on ProtocolEventCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  label\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  sourceReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  targetReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment ListEntityCategory on EntityCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  instanceKind\n  label\n  __typename\n}\n\nfragment ListMetricCategory on MetricCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  label\n  metricKind\n  __typename\n}\n\nfragment ListStructureCategory on StructureCategory {\n  ...BaseListCategory\n  ...BaseListNodeCategory\n  identifier\n  __typename\n}\n\nfragment ListRelationCategory on RelationCategory {\n  ...BaseListCategory\n  ...BaseListEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment Graph on Graph {\n  id\n  name\n  description\n  structureCategories {\n    ...ListStructureCategory\n    __typename\n  }\n  entityCategories {\n    ...ListEntityCategory\n    __typename\n  }\n  metricCategories {\n    ...ListMetricCategory\n    __typename\n  }\n  protocolEventCategories {\n    ...ListProtocolEventCategory\n    __typename\n  }\n  naturalEventCategories {\n    ...ListNaturalEventCategory\n    __typename\n  }\n  relationCategories {\n    ...ListRelationCategory\n    __typename\n  }\n  measurementCategories {\n    ...ListMeasurementCategory\n    __typename\n  }\n  graphQueries(pagination: {limit: 0}) {\n    ...GraphQuery\n    __typename\n  }\n  latestNodes(pagination: {limit: 2}) {\n    ...Node\n    __typename\n  }\n  __typename\n}\n\nmutation UpdateGraph($input: UpdateGraphInput!) {\n  updateGraph(input: $input) {\n    ...Graph\n    __typename\n  }\n}"
+        """Meta class for UpdateGraph"""
+
+        document = "fragment Relation on Relation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment BaseEdge on Edge {\n  id\n  leftId\n  rightId\n  __typename\n}\n\nfragment Participant on Participant {\n  role\n  quantity\n  __typename\n}\n\nfragment Measurement on Measurement {\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment EntityCategoryDefinition on EntityCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment Column on Column {\n  name\n  kind\n  valueKind\n  label\n  description\n  category\n  searchable\n  idfor\n  preferhidden\n  __typename\n}\n\nfragment Edge on Edge {\n  ...BaseEdge\n  ...Measurement\n  ...Relation\n  ...Participant\n  __typename\n}\n\nfragment ReagentCategoryDefinition on ReagentCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment Pairs on Pairs {\n  pairs {\n    left {\n      id\n      __typename\n    }\n    right {\n      id\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nfragment Table on Table {\n  graph {\n    ageName\n    __typename\n  }\n  rows\n  columns {\n    ...Column\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNode on Node {\n  id\n  label\n  __typename\n}\n\nfragment ListScatterPlot on ScatterPlot {\n  id\n  name\n  xColumn\n  yColumn\n  __typename\n}\n\nfragment ReagentRoleDefinition on ReagentRoleDefinition {\n  role\n  categoryDefinition {\n    ...ReagentCategoryDefinition\n    __typename\n  }\n  needsQuantity\n  optional\n  __typename\n}\n\nfragment BaseListCategory on BaseCategory {\n  id\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  tags {\n    id\n    value\n    __typename\n  }\n  __typename\n}\n\nfragment Path on Path {\n  nodes {\n    ...Node\n    __typename\n  }\n  edges {\n    ...Edge\n    __typename\n  }\n  __typename\n}\n\nfragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nfragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment BaseListNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment EntityRoleDefinition on EntityRoleDefinition {\n  role\n  categoryDefinition {\n    ...EntityCategoryDefinition\n    __typename\n  }\n  optional\n  allowMultiple\n  __typename\n}\n\nfragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}\n\nfragment Reagent on Reagent {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  externalId\n  label\n  __typename\n}\n\nfragment BaseListEdgeCategory on EdgeCategory {\n  id\n  __typename\n}\n\nfragment ListNaturalEventCategory on NaturalEventCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  label\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment ListStructureCategory on StructureCategory {\n  ...BaseListCategory\n  ...BaseListNodeCategory\n  identifier\n  __typename\n}\n\nfragment ListMetricCategory on MetricCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  label\n  metricKind\n  __typename\n}\n\nfragment Node on Node {\n  ...BaseNode\n  ...Entity\n  ...Structure\n  ...Metric\n  ...Reagent\n  __typename\n}\n\nfragment GraphQuery on GraphQuery {\n  id\n  query\n  name\n  graph {\n    id\n    name\n    __typename\n  }\n  scatterPlots(pagination: {limit: 1}) {\n    ...ListScatterPlot\n    __typename\n  }\n  render {\n    ...Path\n    ...Pairs\n    ...Table\n    __typename\n  }\n  pinned\n  __typename\n}\n\nfragment ListProtocolEventCategory on ProtocolEventCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  label\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  sourceReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  targetReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment ListRelationCategory on RelationCategory {\n  ...BaseListCategory\n  ...BaseListEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment ListEntityCategory on EntityCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  instanceKind\n  label\n  __typename\n}\n\nfragment ListMeasurementCategory on MeasurementCategory {\n  ...BaseListCategory\n  ...BaseListEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment Graph on Graph {\n  id\n  name\n  description\n  structureCategories {\n    ...ListStructureCategory\n    __typename\n  }\n  entityCategories {\n    ...ListEntityCategory\n    __typename\n  }\n  metricCategories {\n    ...ListMetricCategory\n    __typename\n  }\n  protocolEventCategories {\n    ...ListProtocolEventCategory\n    __typename\n  }\n  naturalEventCategories {\n    ...ListNaturalEventCategory\n    __typename\n  }\n  relationCategories {\n    ...ListRelationCategory\n    __typename\n  }\n  measurementCategories {\n    ...ListMeasurementCategory\n    __typename\n  }\n  graphQueries(pagination: {limit: 0}) {\n    ...GraphQuery\n    __typename\n  }\n  latestNodes(pagination: {limit: 2}) {\n    ...Node\n    __typename\n  }\n  __typename\n}\n\nmutation UpdateGraph($input: UpdateGraphInput!) {\n  updateGraph(input: $input) {\n    ...Graph\n    __typename\n  }\n}"
 
 
 class RequestUploadMutation(BaseModel):
+    """No documentation found for this operation."""
+
     request_upload: PresignedPostCredentials = Field(alias="requestUpload")
     "Request a new file upload"
 
     class Arguments(BaseModel):
+        """Arguments for RequestUpload"""
+
         input: RequestMediaUploadInput
 
     class Meta:
+        """Meta class for RequestUpload"""
+
         document = "fragment PresignedPostCredentials on PresignedPostCredentials {\n  key\n  xAmzCredential\n  xAmzAlgorithm\n  xAmzDate\n  xAmzSignature\n  policy\n  datalayer\n  bucket\n  store\n  __typename\n}\n\nmutation RequestUpload($input: RequestMediaUploadInput!) {\n  requestUpload(input: $input) {\n    ...PresignedPostCredentials\n    __typename\n  }\n}"
 
 
 class CreateProtocolEventCategoryMutation(BaseModel):
+    """No documentation found for this operation."""
+
     create_protocol_event_category: ProtocolEventCategory = Field(
         alias="createProtocolEventCategory"
     )
     "Create a new protocol event category"
 
     class Arguments(BaseModel):
+        """Arguments for CreateProtocolEventCategory"""
+
         input: ProtocolEventCategoryInput
 
     class Meta:
-        document = "fragment EntityCategoryDefinition on EntityCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment ReagentCategoryDefinition on ReagentCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment EntityRoleDefinition on EntityRoleDefinition {\n  role\n  categoryDefinition {\n    ...EntityCategoryDefinition\n    __typename\n  }\n  optional\n  allowMultiple\n  __typename\n}\n\nfragment ReagentRoleDefinition on ReagentRoleDefinition {\n  role\n  categoryDefinition {\n    ...ReagentCategoryDefinition\n    __typename\n  }\n  needsQuantity\n  optional\n  __typename\n}\n\nfragment VariableDefinition on VariableDefinition {\n  param\n  valueKind\n  default\n  optional\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment ProtocolEventCategory on ProtocolEventCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  plateChildren\n  label\n  ageName\n  label\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  sourceReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  targetReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  variableDefinitions {\n    ...VariableDefinition\n    __typename\n  }\n  __typename\n}\n\nmutation CreateProtocolEventCategory($input: ProtocolEventCategoryInput!) {\n  createProtocolEventCategory(input: $input) {\n    ...ProtocolEventCategory\n    __typename\n  }\n}"
+        """Meta class for CreateProtocolEventCategory"""
+
+        document = "fragment EntityCategoryDefinition on EntityCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment ReagentCategoryDefinition on ReagentCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment VariableDefinition on VariableDefinition {\n  param\n  valueKind\n  default\n  optional\n  __typename\n}\n\nfragment EntityRoleDefinition on EntityRoleDefinition {\n  role\n  categoryDefinition {\n    ...EntityCategoryDefinition\n    __typename\n  }\n  optional\n  allowMultiple\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment ReagentRoleDefinition on ReagentRoleDefinition {\n  role\n  categoryDefinition {\n    ...ReagentCategoryDefinition\n    __typename\n  }\n  needsQuantity\n  optional\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment ProtocolEventCategory on ProtocolEventCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  plateChildren\n  label\n  ageName\n  label\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  sourceReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  targetReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  variableDefinitions {\n    ...VariableDefinition\n    __typename\n  }\n  __typename\n}\n\nmutation CreateProtocolEventCategory($input: ProtocolEventCategoryInput!) {\n  createProtocolEventCategory(input: $input) {\n    ...ProtocolEventCategory\n    __typename\n  }\n}"
 
 
 class UpdateProtocolEventCategoryMutation(BaseModel):
+    """No documentation found for this operation."""
+
     update_protocol_event_category: ProtocolEventCategory = Field(
         alias="updateProtocolEventCategory"
     )
     "Update an existing protocol event category"
 
     class Arguments(BaseModel):
+        """Arguments for UpdateProtocolEventCategory"""
+
         input: UpdateProtocolEventCategoryInput
 
     class Meta:
-        document = "fragment EntityCategoryDefinition on EntityCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment ReagentCategoryDefinition on ReagentCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment EntityRoleDefinition on EntityRoleDefinition {\n  role\n  categoryDefinition {\n    ...EntityCategoryDefinition\n    __typename\n  }\n  optional\n  allowMultiple\n  __typename\n}\n\nfragment ReagentRoleDefinition on ReagentRoleDefinition {\n  role\n  categoryDefinition {\n    ...ReagentCategoryDefinition\n    __typename\n  }\n  needsQuantity\n  optional\n  __typename\n}\n\nfragment VariableDefinition on VariableDefinition {\n  param\n  valueKind\n  default\n  optional\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment ProtocolEventCategory on ProtocolEventCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  plateChildren\n  label\n  ageName\n  label\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  sourceReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  targetReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  variableDefinitions {\n    ...VariableDefinition\n    __typename\n  }\n  __typename\n}\n\nmutation UpdateProtocolEventCategory($input: UpdateProtocolEventCategoryInput!) {\n  updateProtocolEventCategory(input: $input) {\n    ...ProtocolEventCategory\n    __typename\n  }\n}"
+        """Meta class for UpdateProtocolEventCategory"""
+
+        document = "fragment EntityCategoryDefinition on EntityCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment ReagentCategoryDefinition on ReagentCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment VariableDefinition on VariableDefinition {\n  param\n  valueKind\n  default\n  optional\n  __typename\n}\n\nfragment EntityRoleDefinition on EntityRoleDefinition {\n  role\n  categoryDefinition {\n    ...EntityCategoryDefinition\n    __typename\n  }\n  optional\n  allowMultiple\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment ReagentRoleDefinition on ReagentRoleDefinition {\n  role\n  categoryDefinition {\n    ...ReagentCategoryDefinition\n    __typename\n  }\n  needsQuantity\n  optional\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment ProtocolEventCategory on ProtocolEventCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  plateChildren\n  label\n  ageName\n  label\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  sourceReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  targetReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  variableDefinitions {\n    ...VariableDefinition\n    __typename\n  }\n  __typename\n}\n\nmutation UpdateProtocolEventCategory($input: UpdateProtocolEventCategoryInput!) {\n  updateProtocolEventCategory(input: $input) {\n    ...ProtocolEventCategory\n    __typename\n  }\n}"
 
 
 class CreateScatterPlotMutation(BaseModel):
+    """No documentation found for this operation."""
+
     create_scatter_plot: ScatterPlot = Field(alias="createScatterPlot")
     "Create a new scatter plot"
 
     class Arguments(BaseModel):
+        """Arguments for CreateScatterPlot"""
+
         input: ScatterPlotInput
 
     class Meta:
+        """Meta class for CreateScatterPlot"""
+
         document = "fragment ScatterPlot on ScatterPlot {\n  id\n  name\n  description\n  xColumn\n  yColumn\n  __typename\n}\n\nmutation CreateScatterPlot($input: ScatterPlotInput!) {\n  createScatterPlot(input: $input) {\n    ...ScatterPlot\n    __typename\n  }\n}"
 
 
 class DeleteScatterPlotMutation(BaseModel):
+    """No documentation found for this operation."""
+
     delete_scatter_plot: ID = Field(alias="deleteScatterPlot")
     "Delete an existing scatter plot"
 
     class Arguments(BaseModel):
+        """Arguments for DeleteScatterPlot"""
+
         input: DeleteScatterPlotInput
 
     class Meta:
+        """Meta class for DeleteScatterPlot"""
+
         document = "mutation DeleteScatterPlot($input: DeleteScatterPlotInput!) {\n  deleteScatterPlot(input: $input)\n}"
 
 
 class CreateMetricMutation(BaseModel):
+    """No documentation found for this operation."""
+
     create_metric: Metric = Field(alias="createMetric")
     "Create a new metric for an entity"
 
     class Arguments(BaseModel):
+        """Arguments for CreateMetric"""
+
         input: MetricInput
 
     class Meta:
+        """Meta class for CreateMetric"""
+
         document = "fragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nmutation CreateMetric($input: MetricInput!) {\n  createMetric(input: $input) {\n    ...Metric\n    __typename\n  }\n}"
 
 
 class CreateNodeQueryMutation(BaseModel):
+    """No documentation found for this operation."""
+
     create_node_query: NodeQuery = Field(alias="createNodeQuery")
     "Create a new node query"
 
     class Arguments(BaseModel):
+        """Arguments for CreateNodeQuery"""
+
         input: NodeQueryInput
 
     class Meta:
+        """Meta class for CreateNodeQuery"""
+
         document = "fragment NodeQuery on NodeQuery {\n  id\n  name\n  pinned\n  __typename\n}\n\nmutation CreateNodeQuery($input: NodeQueryInput!) {\n  createNodeQuery(input: $input) {\n    ...NodeQuery\n    __typename\n  }\n}"
 
 
 class PinNodeQueryMutation(BaseModel):
+    """No documentation found for this operation."""
+
     pin_node_query: NodeQuery = Field(alias="pinNodeQuery")
     "Pin or unpin a node query"
 
     class Arguments(BaseModel):
+        """Arguments for PinNodeQuery"""
+
         input: PinNodeQueryInput
 
     class Meta:
+        """Meta class for PinNodeQuery"""
+
         document = "fragment NodeQuery on NodeQuery {\n  id\n  name\n  pinned\n  __typename\n}\n\nmutation PinNodeQuery($input: PinNodeQueryInput!) {\n  pinNodeQuery(input: $input) {\n    ...NodeQuery\n    __typename\n  }\n}"
 
 
 class CreateEntityCategoryMutation(BaseModel):
+    """No documentation found for this operation."""
+
     create_entity_category: EntityCategory = Field(alias="createEntityCategory")
     "Create a new expression"
 
     class Arguments(BaseModel):
+        """Arguments for CreateEntityCategory"""
+
         input: EntityCategoryInput
 
     class Meta:
-        document = "fragment Participant on Participant {\n  role\n  quantity\n  __typename\n}\n\nfragment Relation on Relation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}\n\nfragment Reagent on Reagent {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  externalId\n  label\n  __typename\n}\n\nfragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nfragment BaseEdge on Edge {\n  id\n  leftId\n  rightId\n  __typename\n}\n\nfragment BaseNode on Node {\n  id\n  label\n  __typename\n}\n\nfragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment Measurement on Measurement {\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Node on Node {\n  ...BaseNode\n  ...Entity\n  ...Structure\n  ...Metric\n  ...Reagent\n  __typename\n}\n\nfragment Edge on Edge {\n  ...BaseEdge\n  ...Measurement\n  ...Relation\n  ...Participant\n  __typename\n}\n\nfragment Column on Column {\n  name\n  kind\n  valueKind\n  label\n  description\n  category\n  searchable\n  idfor\n  preferhidden\n  __typename\n}\n\nfragment Table on Table {\n  graph {\n    ageName\n    __typename\n  }\n  rows\n  columns {\n    ...Column\n    __typename\n  }\n  __typename\n}\n\nfragment ListScatterPlot on ScatterPlot {\n  id\n  name\n  xColumn\n  yColumn\n  __typename\n}\n\nfragment Pairs on Pairs {\n  pairs {\n    left {\n      id\n      __typename\n    }\n    right {\n      id\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nfragment Path on Path {\n  nodes {\n    ...Node\n    __typename\n  }\n  edges {\n    ...Edge\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment GraphQuery on GraphQuery {\n  id\n  query\n  name\n  graph {\n    id\n    name\n    __typename\n  }\n  scatterPlots(pagination: {limit: 1}) {\n    ...ListScatterPlot\n    __typename\n  }\n  render {\n    ...Path\n    ...Pairs\n    ...Table\n    __typename\n  }\n  pinned\n  __typename\n}\n\nfragment EntityCategory on EntityCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  instanceKind\n  ageName\n  label\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  bestQuery {\n    ...GraphQuery\n    __typename\n  }\n  __typename\n}\n\nmutation CreateEntityCategory($input: EntityCategoryInput!) {\n  createEntityCategory(input: $input) {\n    ...EntityCategory\n    __typename\n  }\n}"
+        """Meta class for CreateEntityCategory"""
+
+        document = "fragment Relation on Relation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNode on Node {\n  id\n  label\n  __typename\n}\n\nfragment BaseEdge on Edge {\n  id\n  leftId\n  rightId\n  __typename\n}\n\nfragment Participant on Participant {\n  role\n  quantity\n  __typename\n}\n\nfragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nfragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}\n\nfragment Measurement on Measurement {\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Reagent on Reagent {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  externalId\n  label\n  __typename\n}\n\nfragment Edge on Edge {\n  ...BaseEdge\n  ...Measurement\n  ...Relation\n  ...Participant\n  __typename\n}\n\nfragment Column on Column {\n  name\n  kind\n  valueKind\n  label\n  description\n  category\n  searchable\n  idfor\n  preferhidden\n  __typename\n}\n\nfragment Node on Node {\n  ...BaseNode\n  ...Entity\n  ...Structure\n  ...Metric\n  ...Reagent\n  __typename\n}\n\nfragment Table on Table {\n  graph {\n    ageName\n    __typename\n  }\n  rows\n  columns {\n    ...Column\n    __typename\n  }\n  __typename\n}\n\nfragment Pairs on Pairs {\n  pairs {\n    left {\n      id\n      __typename\n    }\n    right {\n      id\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nfragment ListScatterPlot on ScatterPlot {\n  id\n  name\n  xColumn\n  yColumn\n  __typename\n}\n\nfragment Path on Path {\n  nodes {\n    ...Node\n    __typename\n  }\n  edges {\n    ...Edge\n    __typename\n  }\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment GraphQuery on GraphQuery {\n  id\n  query\n  name\n  graph {\n    id\n    name\n    __typename\n  }\n  scatterPlots(pagination: {limit: 1}) {\n    ...ListScatterPlot\n    __typename\n  }\n  render {\n    ...Path\n    ...Pairs\n    ...Table\n    __typename\n  }\n  pinned\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment EntityCategory on EntityCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  instanceKind\n  ageName\n  label\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  bestQuery {\n    ...GraphQuery\n    __typename\n  }\n  __typename\n}\n\nmutation CreateEntityCategory($input: EntityCategoryInput!) {\n  createEntityCategory(input: $input) {\n    ...EntityCategory\n    __typename\n  }\n}"
 
 
 class UpdateEntityCategoryMutation(BaseModel):
+    """No documentation found for this operation."""
+
     update_entity_category: EntityCategory = Field(alias="updateEntityCategory")
     "Update an existing expression"
 
     class Arguments(BaseModel):
+        """Arguments for UpdateEntityCategory"""
+
         input: UpdateEntityCategoryInput
 
     class Meta:
-        document = "fragment Participant on Participant {\n  role\n  quantity\n  __typename\n}\n\nfragment Relation on Relation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}\n\nfragment Reagent on Reagent {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  externalId\n  label\n  __typename\n}\n\nfragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nfragment BaseEdge on Edge {\n  id\n  leftId\n  rightId\n  __typename\n}\n\nfragment BaseNode on Node {\n  id\n  label\n  __typename\n}\n\nfragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment Measurement on Measurement {\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Node on Node {\n  ...BaseNode\n  ...Entity\n  ...Structure\n  ...Metric\n  ...Reagent\n  __typename\n}\n\nfragment Edge on Edge {\n  ...BaseEdge\n  ...Measurement\n  ...Relation\n  ...Participant\n  __typename\n}\n\nfragment Column on Column {\n  name\n  kind\n  valueKind\n  label\n  description\n  category\n  searchable\n  idfor\n  preferhidden\n  __typename\n}\n\nfragment Table on Table {\n  graph {\n    ageName\n    __typename\n  }\n  rows\n  columns {\n    ...Column\n    __typename\n  }\n  __typename\n}\n\nfragment ListScatterPlot on ScatterPlot {\n  id\n  name\n  xColumn\n  yColumn\n  __typename\n}\n\nfragment Pairs on Pairs {\n  pairs {\n    left {\n      id\n      __typename\n    }\n    right {\n      id\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nfragment Path on Path {\n  nodes {\n    ...Node\n    __typename\n  }\n  edges {\n    ...Edge\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment GraphQuery on GraphQuery {\n  id\n  query\n  name\n  graph {\n    id\n    name\n    __typename\n  }\n  scatterPlots(pagination: {limit: 1}) {\n    ...ListScatterPlot\n    __typename\n  }\n  render {\n    ...Path\n    ...Pairs\n    ...Table\n    __typename\n  }\n  pinned\n  __typename\n}\n\nfragment EntityCategory on EntityCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  instanceKind\n  ageName\n  label\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  bestQuery {\n    ...GraphQuery\n    __typename\n  }\n  __typename\n}\n\nmutation UpdateEntityCategory($input: UpdateEntityCategoryInput!) {\n  updateEntityCategory(input: $input) {\n    ...EntityCategory\n    __typename\n  }\n}"
+        """Meta class for UpdateEntityCategory"""
+
+        document = "fragment Relation on Relation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNode on Node {\n  id\n  label\n  __typename\n}\n\nfragment BaseEdge on Edge {\n  id\n  leftId\n  rightId\n  __typename\n}\n\nfragment Participant on Participant {\n  role\n  quantity\n  __typename\n}\n\nfragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nfragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}\n\nfragment Measurement on Measurement {\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Reagent on Reagent {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  externalId\n  label\n  __typename\n}\n\nfragment Edge on Edge {\n  ...BaseEdge\n  ...Measurement\n  ...Relation\n  ...Participant\n  __typename\n}\n\nfragment Column on Column {\n  name\n  kind\n  valueKind\n  label\n  description\n  category\n  searchable\n  idfor\n  preferhidden\n  __typename\n}\n\nfragment Node on Node {\n  ...BaseNode\n  ...Entity\n  ...Structure\n  ...Metric\n  ...Reagent\n  __typename\n}\n\nfragment Table on Table {\n  graph {\n    ageName\n    __typename\n  }\n  rows\n  columns {\n    ...Column\n    __typename\n  }\n  __typename\n}\n\nfragment Pairs on Pairs {\n  pairs {\n    left {\n      id\n      __typename\n    }\n    right {\n      id\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nfragment ListScatterPlot on ScatterPlot {\n  id\n  name\n  xColumn\n  yColumn\n  __typename\n}\n\nfragment Path on Path {\n  nodes {\n    ...Node\n    __typename\n  }\n  edges {\n    ...Edge\n    __typename\n  }\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment GraphQuery on GraphQuery {\n  id\n  query\n  name\n  graph {\n    id\n    name\n    __typename\n  }\n  scatterPlots(pagination: {limit: 1}) {\n    ...ListScatterPlot\n    __typename\n  }\n  render {\n    ...Path\n    ...Pairs\n    ...Table\n    __typename\n  }\n  pinned\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment EntityCategory on EntityCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  instanceKind\n  ageName\n  label\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  bestQuery {\n    ...GraphQuery\n    __typename\n  }\n  __typename\n}\n\nmutation UpdateEntityCategory($input: UpdateEntityCategoryInput!) {\n  updateEntityCategory(input: $input) {\n    ...EntityCategory\n    __typename\n  }\n}"
 
 
 class CreateReagentMutation(BaseModel):
+    """No documentation found for this operation."""
+
     create_reagent: Reagent = Field(alias="createReagent")
     "Create a new entity"
 
     class Arguments(BaseModel):
+        """Arguments for CreateReagent"""
+
         input: ReagentInput
 
     class Meta:
+        """Meta class for CreateReagent"""
+
         document = "fragment Reagent on Reagent {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  externalId\n  label\n  __typename\n}\n\nmutation CreateReagent($input: ReagentInput!) {\n  createReagent(input: $input) {\n    ...Reagent\n    __typename\n  }\n}"
 
 
 class CreateEntityMutation(BaseModel):
+    """No documentation found for this operation."""
+
     create_entity: Entity = Field(alias="createEntity")
     "Create a new entity"
 
     class Arguments(BaseModel):
+        """Arguments for CreateEntity"""
+
         input: EntityInput
 
     class Meta:
+        """Meta class for CreateEntity"""
+
         document = "fragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}\n\nmutation CreateEntity($input: EntityInput!) {\n  createEntity(input: $input) {\n    ...Entity\n    __typename\n  }\n}"
 
 
 class RecordProtocolEventMutation(BaseModel):
+    """No documentation found for this operation."""
+
     record_protocol_event: ProtocolEvent = Field(alias="recordProtocolEvent")
     "Record a new protocol event"
 
     class Arguments(BaseModel):
+        """Arguments for RecordProtocolEvent"""
+
         input: RecordProtocolEventInput
 
     class Meta:
+        """Meta class for RecordProtocolEvent"""
+
         document = "fragment ProtocolEvent on ProtocolEvent {\n  id\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nmutation RecordProtocolEvent($input: RecordProtocolEventInput!) {\n  recordProtocolEvent(input: $input) {\n    ...ProtocolEvent\n    __typename\n  }\n}"
 
 
 class CreateStructureMutation(BaseModel):
+    """No documentation found for this operation."""
+
     create_structure: Structure = Field(alias="createStructure")
     "Create a new structure"
 
     class Arguments(BaseModel):
+        """Arguments for CreateStructure"""
+
         input: StructureInput
 
     class Meta:
+        """Meta class for CreateStructure"""
+
         document = "fragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}\n\nmutation CreateStructure($input: StructureInput!) {\n  createStructure(input: $input) {\n    ...Structure\n    __typename\n  }\n}"
 
 
 class CreateMeasurementCategoryMutation(BaseModel):
+    """No documentation found for this operation."""
+
     create_measurement_category: MeasurementCategory = Field(
         alias="createMeasurementCategory"
     )
     "Create a new expression"
 
     class Arguments(BaseModel):
+        """Arguments for CreateMeasurementCategory"""
+
         input: MeasurementCategoryInput
 
     class Meta:
+        """Meta class for CreateMeasurementCategory"""
+
         document = "fragment BaseEdgeCategory on EdgeCategory {\n  id\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment MeasurementCategory on MeasurementCategory {\n  ...BaseCategory\n  ...BaseEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  __typename\n}\n\nmutation CreateMeasurementCategory($input: MeasurementCategoryInput!) {\n  createMeasurementCategory(input: $input) {\n    ...MeasurementCategory\n    __typename\n  }\n}"
 
 
 class CreateMetricCategoryMutation(BaseModel):
+    """No documentation found for this operation."""
+
     create_metric_category: MetricCategory = Field(alias="createMetricCategory")
     "Create a new expression"
 
     class Arguments(BaseModel):
+        """Arguments for CreateMetricCategory"""
+
         input: MetricCategoryInput
 
     class Meta:
-        document = "fragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment MetricCategory on MetricCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  metricKind\n  __typename\n}\n\nmutation CreateMetricCategory($input: MetricCategoryInput!) {\n  createMetricCategory(input: $input) {\n    ...MetricCategory\n    __typename\n  }\n}"
+        """Meta class for CreateMetricCategory"""
+
+        document = "fragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment MetricCategory on MetricCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  metricKind\n  __typename\n}\n\nmutation CreateMetricCategory($input: MetricCategoryInput!) {\n  createMetricCategory(input: $input) {\n    ...MetricCategory\n    __typename\n  }\n}"
 
 
 class CreateReagentCategoryMutation(BaseModel):
+    """No documentation found for this operation."""
+
     create_reagent_category: ReagentCategory = Field(alias="createReagentCategory")
     "Create a new expression"
 
     class Arguments(BaseModel):
+        """Arguments for CreateReagentCategory"""
+
         input: ReagentCategoryInput
 
     class Meta:
-        document = "fragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment ReagentCategory on ReagentCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  __typename\n}\n\nmutation CreateReagentCategory($input: ReagentCategoryInput!) {\n  createReagentCategory(input: $input) {\n    ...ReagentCategory\n    __typename\n  }\n}"
+        """Meta class for CreateReagentCategory"""
+
+        document = "fragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment ReagentCategory on ReagentCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  __typename\n}\n\nmutation CreateReagentCategory($input: ReagentCategoryInput!) {\n  createReagentCategory(input: $input) {\n    ...ReagentCategory\n    __typename\n  }\n}"
 
 
 class CreateRelationCategoryMutation(BaseModel):
+    """No documentation found for this operation."""
+
     create_relation_category: RelationCategory = Field(alias="createRelationCategory")
     "Create a new expression"
 
     class Arguments(BaseModel):
+        """Arguments for CreateRelationCategory"""
+
         input: RelationCategoryInput
 
     class Meta:
+        """Meta class for CreateRelationCategory"""
+
         document = "fragment BaseEdgeCategory on EdgeCategory {\n  id\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment RelationCategory on RelationCategory {\n  ...BaseCategory\n  ...BaseEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  __typename\n}\n\nmutation CreateRelationCategory($input: RelationCategoryInput!) {\n  createRelationCategory(input: $input) {\n    ...RelationCategory\n    __typename\n  }\n}"
 
 
 class CreateMeasurementMutation(BaseModel):
+    """No documentation found for this operation."""
+
     create_measurement: Measurement = Field(alias="createMeasurement")
     "Create a new measurement edge"
 
     class Arguments(BaseModel):
+        """Arguments for CreateMeasurement"""
+
         input: MeasurementInput
 
     class Meta:
+        """Meta class for CreateMeasurement"""
+
         document = "fragment Measurement on Measurement {\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nmutation CreateMeasurement($input: MeasurementInput!) {\n  createMeasurement(input: $input) {\n    ...Measurement\n    __typename\n  }\n}"
 
 
 class CreateRelationMutation(BaseModel):
+    """No documentation found for this operation."""
+
     create_relation: Relation = Field(alias="createRelation")
     "Create a new relation between entities"
 
     class Arguments(BaseModel):
+        """Arguments for CreateRelation"""
+
         input: RelationInput
 
     class Meta:
+        """Meta class for CreateRelation"""
+
         document = "fragment Relation on Relation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nmutation CreateRelation($input: RelationInput!) {\n  createRelation(input: $input) {\n    ...Relation\n    __typename\n  }\n}"
 
 
 class GetProtocolEventCategoryQuery(BaseModel):
+    """No documentation found for this operation."""
+
     protocol_event_category: ProtocolEventCategory = Field(
         alias="protocolEventCategory"
     )
 
     class Arguments(BaseModel):
+        """Arguments for GetProtocolEventCategory"""
+
         id: ID
 
     class Meta:
-        document = "fragment EntityCategoryDefinition on EntityCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment ReagentCategoryDefinition on ReagentCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment EntityRoleDefinition on EntityRoleDefinition {\n  role\n  categoryDefinition {\n    ...EntityCategoryDefinition\n    __typename\n  }\n  optional\n  allowMultiple\n  __typename\n}\n\nfragment ReagentRoleDefinition on ReagentRoleDefinition {\n  role\n  categoryDefinition {\n    ...ReagentCategoryDefinition\n    __typename\n  }\n  needsQuantity\n  optional\n  __typename\n}\n\nfragment VariableDefinition on VariableDefinition {\n  param\n  valueKind\n  default\n  optional\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment ProtocolEventCategory on ProtocolEventCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  plateChildren\n  label\n  ageName\n  label\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  sourceReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  targetReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  variableDefinitions {\n    ...VariableDefinition\n    __typename\n  }\n  __typename\n}\n\nquery GetProtocolEventCategory($id: ID!) {\n  protocolEventCategory(id: $id) {\n    ...ProtocolEventCategory\n    __typename\n  }\n}"
+        """Meta class for GetProtocolEventCategory"""
+
+        document = "fragment EntityCategoryDefinition on EntityCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment ReagentCategoryDefinition on ReagentCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment VariableDefinition on VariableDefinition {\n  param\n  valueKind\n  default\n  optional\n  __typename\n}\n\nfragment EntityRoleDefinition on EntityRoleDefinition {\n  role\n  categoryDefinition {\n    ...EntityCategoryDefinition\n    __typename\n  }\n  optional\n  allowMultiple\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment ReagentRoleDefinition on ReagentRoleDefinition {\n  role\n  categoryDefinition {\n    ...ReagentCategoryDefinition\n    __typename\n  }\n  needsQuantity\n  optional\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment ProtocolEventCategory on ProtocolEventCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  plateChildren\n  label\n  ageName\n  label\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  sourceReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  targetReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  variableDefinitions {\n    ...VariableDefinition\n    __typename\n  }\n  __typename\n}\n\nquery GetProtocolEventCategory($id: ID!) {\n  protocolEventCategory(id: $id) {\n    ...ProtocolEventCategory\n    __typename\n  }\n}"
 
 
 class SearchProtocolEventCategoriesQueryOptions(ProtocolEventCategoryTrait, BaseModel):
+    """No documentation"""
+
     typename: Literal["ProtocolEventCategory"] = Field(
         alias="__typename", default="ProtocolEventCategory", exclude=True
     )
@@ -3699,38 +4413,56 @@ class SearchProtocolEventCategoriesQueryOptions(ProtocolEventCategoryTrait, Base
 
 
 class SearchProtocolEventCategoriesQuery(BaseModel):
+    """No documentation found for this operation."""
+
     options: Tuple[SearchProtocolEventCategoriesQueryOptions, ...]
     "List of all protocol event categories"
 
     class Arguments(BaseModel):
+        """Arguments for SearchProtocolEventCategories"""
+
         search: Optional[str] = Field(default=None)
         values: Optional[List[ID]] = Field(default=None)
 
     class Meta:
+        """Meta class for SearchProtocolEventCategories"""
+
         document = "query SearchProtocolEventCategories($search: String, $values: [ID!]) {\n  options: protocolEventCategories(\n    filters: {search: $search, ids: $values}\n    pagination: {limit: 10}\n  ) {\n    value: id\n    label: label\n    __typename\n  }\n}"
 
 
 class ListProtocolEventCategoriesQuery(BaseModel):
+    """No documentation found for this operation."""
+
     protocol_event_categories: Tuple[ProtocolEventCategory, ...] = Field(
         alias="protocolEventCategories"
     )
     "List of all protocol event categories"
 
     class Arguments(BaseModel):
+        """Arguments for ListProtocolEventCategories"""
+
         filters: Optional[ProtocolEventCategoryFilter] = Field(default=None)
         pagination: Optional[OffsetPaginationInput] = Field(default=None)
 
     class Meta:
-        document = "fragment EntityCategoryDefinition on EntityCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment ReagentCategoryDefinition on ReagentCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment EntityRoleDefinition on EntityRoleDefinition {\n  role\n  categoryDefinition {\n    ...EntityCategoryDefinition\n    __typename\n  }\n  optional\n  allowMultiple\n  __typename\n}\n\nfragment ReagentRoleDefinition on ReagentRoleDefinition {\n  role\n  categoryDefinition {\n    ...ReagentCategoryDefinition\n    __typename\n  }\n  needsQuantity\n  optional\n  __typename\n}\n\nfragment VariableDefinition on VariableDefinition {\n  param\n  valueKind\n  default\n  optional\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment ProtocolEventCategory on ProtocolEventCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  plateChildren\n  label\n  ageName\n  label\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  sourceReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  targetReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  variableDefinitions {\n    ...VariableDefinition\n    __typename\n  }\n  __typename\n}\n\nquery ListProtocolEventCategories($filters: ProtocolEventCategoryFilter, $pagination: OffsetPaginationInput) {\n  protocolEventCategories(filters: $filters, pagination: $pagination) {\n    ...ProtocolEventCategory\n    __typename\n  }\n}"
+        """Meta class for ListProtocolEventCategories"""
+
+        document = "fragment EntityCategoryDefinition on EntityCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment ReagentCategoryDefinition on ReagentCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment VariableDefinition on VariableDefinition {\n  param\n  valueKind\n  default\n  optional\n  __typename\n}\n\nfragment EntityRoleDefinition on EntityRoleDefinition {\n  role\n  categoryDefinition {\n    ...EntityCategoryDefinition\n    __typename\n  }\n  optional\n  allowMultiple\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment ReagentRoleDefinition on ReagentRoleDefinition {\n  role\n  categoryDefinition {\n    ...ReagentCategoryDefinition\n    __typename\n  }\n  needsQuantity\n  optional\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment ProtocolEventCategory on ProtocolEventCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  plateChildren\n  label\n  ageName\n  label\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  sourceReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  targetReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  variableDefinitions {\n    ...VariableDefinition\n    __typename\n  }\n  __typename\n}\n\nquery ListProtocolEventCategories($filters: ProtocolEventCategoryFilter, $pagination: OffsetPaginationInput) {\n  protocolEventCategories(filters: $filters, pagination: $pagination) {\n    ...ProtocolEventCategory\n    __typename\n  }\n}"
 
 
 class GetNaturalEventQuery(BaseModel):
+    """No documentation found for this operation."""
+
     natural_event: NaturalEvent = Field(alias="naturalEvent")
 
     class Arguments(BaseModel):
+        """Arguments for GetNaturalEvent"""
+
         id: ID
 
     class Meta:
+        """Meta class for GetNaturalEvent"""
+
         document = "fragment NaturalEvent on NaturalEvent {\n  id\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nquery GetNaturalEvent($id: ID!) {\n  naturalEvent(id: $id) {\n    ...NaturalEvent\n    __typename\n  }\n}"
 
 
@@ -3747,23 +4479,35 @@ class SearchNaturalEventsQueryOptions(BaseModel):
 
 
 class SearchNaturalEventsQuery(BaseModel):
+    """No documentation found for this operation."""
+
     options: Tuple[SearchNaturalEventsQueryOptions, ...]
 
     class Arguments(BaseModel):
+        """Arguments for SearchNaturalEvents"""
+
         search: Optional[str] = Field(default=None)
         values: Optional[List[ID]] = Field(default=None)
 
     class Meta:
+        """Meta class for SearchNaturalEvents"""
+
         document = "query SearchNaturalEvents($search: String, $values: [ID!]) {\n  options: naturalEvents(\n    filters: {search: $search, ids: $values}\n    pagination: {limit: 10}\n  ) {\n    value: id\n    label: label\n    __typename\n  }\n}"
 
 
 class GetParticipantQuery(BaseModel):
+    """No documentation found for this operation."""
+
     participant: Participant
 
     class Arguments(BaseModel):
+        """Arguments for GetParticipant"""
+
         id: ID
 
     class Meta:
+        """Meta class for GetParticipant"""
+
         document = "fragment Participant on Participant {\n  role\n  quantity\n  __typename\n}\n\nquery GetParticipant($id: ID!) {\n  participant(id: $id) {\n    ...Participant\n    __typename\n  }\n}"
 
 
@@ -3780,27 +4524,41 @@ class SearchParticipantsQueryOptions(BaseModel):
 
 
 class SearchParticipantsQuery(BaseModel):
+    """No documentation found for this operation."""
+
     options: Tuple[SearchParticipantsQueryOptions, ...]
 
     class Arguments(BaseModel):
+        """Arguments for SearchParticipants"""
+
         search: Optional[str] = Field(default=None)
         values: Optional[List[ID]] = Field(default=None)
 
     class Meta:
+        """Meta class for SearchParticipants"""
+
         document = "query SearchParticipants($search: String, $values: [ID!]) {\n  options: participants(\n    filters: {search: $search, ids: $values}\n    pagination: {limit: 10}\n  ) {\n    value: id\n    label: label\n    __typename\n  }\n}"
 
 
 class GetRelationCategoryQuery(BaseModel):
+    """No documentation found for this operation."""
+
     relation_category: RelationCategory = Field(alias="relationCategory")
 
     class Arguments(BaseModel):
+        """Arguments for GetRelationCategory"""
+
         id: ID
 
     class Meta:
+        """Meta class for GetRelationCategory"""
+
         document = "fragment BaseEdgeCategory on EdgeCategory {\n  id\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment RelationCategory on RelationCategory {\n  ...BaseCategory\n  ...BaseEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  __typename\n}\n\nquery GetRelationCategory($id: ID!) {\n  relationCategory(id: $id) {\n    ...RelationCategory\n    __typename\n  }\n}"
 
 
 class SearchRelationCategoryQueryOptions(RelationCategoryTrait, BaseModel):
+    """No documentation"""
+
     typename: Literal["RelationCategory"] = Field(
         alias="__typename", default="RelationCategory", exclude=True
     )
@@ -3812,42 +4570,62 @@ class SearchRelationCategoryQueryOptions(RelationCategoryTrait, BaseModel):
 
 
 class SearchRelationCategoryQuery(BaseModel):
+    """No documentation found for this operation."""
+
     options: Tuple[SearchRelationCategoryQueryOptions, ...]
     "List of all relation categories"
 
     class Arguments(BaseModel):
+        """Arguments for SearchRelationCategory"""
+
         search: Optional[str] = Field(default=None)
         values: Optional[List[ID]] = Field(default=None)
 
     class Meta:
+        """Meta class for SearchRelationCategory"""
+
         document = "query SearchRelationCategory($search: String, $values: [ID!]) {\n  options: relationCategories(\n    filters: {search: $search, ids: $values}\n    pagination: {limit: 10}\n  ) {\n    value: id\n    label: label\n    __typename\n  }\n}"
 
 
 class ListRelationCategoryQuery(BaseModel):
+    """No documentation found for this operation."""
+
     relation_categories: Tuple[RelationCategory, ...] = Field(
         alias="relationCategories"
     )
     "List of all relation categories"
 
     class Arguments(BaseModel):
+        """Arguments for ListRelationCategory"""
+
         filters: Optional[RelationCategoryFilter] = Field(default=None)
         pagination: Optional[OffsetPaginationInput] = Field(default=None)
 
     class Meta:
+        """Meta class for ListRelationCategory"""
+
         document = "fragment BaseEdgeCategory on EdgeCategory {\n  id\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment RelationCategory on RelationCategory {\n  ...BaseCategory\n  ...BaseEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  __typename\n}\n\nquery ListRelationCategory($filters: RelationCategoryFilter, $pagination: OffsetPaginationInput) {\n  relationCategories(filters: $filters, pagination: $pagination) {\n    ...RelationCategory\n    __typename\n  }\n}"
 
 
 class GetNaturalEventCategoryQuery(BaseModel):
+    """No documentation found for this operation."""
+
     natural_event_category: NaturalEventCategory = Field(alias="naturalEventCategory")
 
     class Arguments(BaseModel):
+        """Arguments for GetNaturalEventCategory"""
+
         id: ID
 
     class Meta:
-        document = "fragment EntityCategoryDefinition on EntityCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment EntityRoleDefinition on EntityRoleDefinition {\n  role\n  categoryDefinition {\n    ...EntityCategoryDefinition\n    __typename\n  }\n  optional\n  allowMultiple\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment NaturalEventCategory on NaturalEventCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  plateChildren\n  label\n  ageName\n  label\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  __typename\n}\n\nquery GetNaturalEventCategory($id: ID!) {\n  naturalEventCategory(id: $id) {\n    ...NaturalEventCategory\n    __typename\n  }\n}"
+        """Meta class for GetNaturalEventCategory"""
+
+        document = "fragment EntityCategoryDefinition on EntityCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment EntityRoleDefinition on EntityRoleDefinition {\n  role\n  categoryDefinition {\n    ...EntityCategoryDefinition\n    __typename\n  }\n  optional\n  allowMultiple\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment NaturalEventCategory on NaturalEventCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  plateChildren\n  label\n  ageName\n  label\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  __typename\n}\n\nquery GetNaturalEventCategory($id: ID!) {\n  naturalEventCategory(id: $id) {\n    ...NaturalEventCategory\n    __typename\n  }\n}"
 
 
 class SearchNaturalEventCategoriesQueryOptions(NaturalEventCategoryTrait, BaseModel):
+    """No documentation"""
+
     typename: Literal["NaturalEventCategory"] = Field(
         alias="__typename", default="NaturalEventCategory", exclude=True
     )
@@ -3859,42 +4637,62 @@ class SearchNaturalEventCategoriesQueryOptions(NaturalEventCategoryTrait, BaseMo
 
 
 class SearchNaturalEventCategoriesQuery(BaseModel):
+    """No documentation found for this operation."""
+
     options: Tuple[SearchNaturalEventCategoriesQueryOptions, ...]
     "List of all natural event categories"
 
     class Arguments(BaseModel):
+        """Arguments for SearchNaturalEventCategories"""
+
         search: Optional[str] = Field(default=None)
         values: Optional[List[ID]] = Field(default=None)
 
     class Meta:
+        """Meta class for SearchNaturalEventCategories"""
+
         document = "query SearchNaturalEventCategories($search: String, $values: [ID!]) {\n  options: naturalEventCategories(\n    filters: {search: $search, ids: $values}\n    pagination: {limit: 10}\n  ) {\n    value: id\n    label: label\n    __typename\n  }\n}"
 
 
 class ListNaturalEventCategoriesQuery(BaseModel):
+    """No documentation found for this operation."""
+
     natural_event_categories: Tuple[NaturalEventCategory, ...] = Field(
         alias="naturalEventCategories"
     )
     "List of all natural event categories"
 
     class Arguments(BaseModel):
+        """Arguments for ListNaturalEventCategories"""
+
         filters: Optional[NaturalEventCategoryFilter] = Field(default=None)
         pagination: Optional[OffsetPaginationInput] = Field(default=None)
 
     class Meta:
-        document = "fragment EntityCategoryDefinition on EntityCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment EntityRoleDefinition on EntityRoleDefinition {\n  role\n  categoryDefinition {\n    ...EntityCategoryDefinition\n    __typename\n  }\n  optional\n  allowMultiple\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment NaturalEventCategory on NaturalEventCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  plateChildren\n  label\n  ageName\n  label\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  __typename\n}\n\nquery ListNaturalEventCategories($filters: NaturalEventCategoryFilter, $pagination: OffsetPaginationInput) {\n  naturalEventCategories(filters: $filters, pagination: $pagination) {\n    ...NaturalEventCategory\n    __typename\n  }\n}"
+        """Meta class for ListNaturalEventCategories"""
+
+        document = "fragment EntityCategoryDefinition on EntityCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment EntityRoleDefinition on EntityRoleDefinition {\n  role\n  categoryDefinition {\n    ...EntityCategoryDefinition\n    __typename\n  }\n  optional\n  allowMultiple\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment NaturalEventCategory on NaturalEventCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  plateChildren\n  label\n  ageName\n  label\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  __typename\n}\n\nquery ListNaturalEventCategories($filters: NaturalEventCategoryFilter, $pagination: OffsetPaginationInput) {\n  naturalEventCategories(filters: $filters, pagination: $pagination) {\n    ...NaturalEventCategory\n    __typename\n  }\n}"
 
 
 class GetMetricCategoryQuery(BaseModel):
+    """No documentation found for this operation."""
+
     metric_category: MetricCategory = Field(alias="metricCategory")
 
     class Arguments(BaseModel):
+        """Arguments for GetMetricCategory"""
+
         id: ID
 
     class Meta:
-        document = "fragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment MetricCategory on MetricCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  metricKind\n  __typename\n}\n\nquery GetMetricCategory($id: ID!) {\n  metricCategory(id: $id) {\n    ...MetricCategory\n    __typename\n  }\n}"
+        """Meta class for GetMetricCategory"""
+
+        document = "fragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment MetricCategory on MetricCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  metricKind\n  __typename\n}\n\nquery GetMetricCategory($id: ID!) {\n  metricCategory(id: $id) {\n    ...MetricCategory\n    __typename\n  }\n}"
 
 
 class SearchMetricCategoryQueryOptions(MetricCategoryTrait, BaseModel):
+    """No documentation"""
+
     typename: Literal["MetricCategory"] = Field(
         alias="__typename", default="MetricCategory", exclude=True
     )
@@ -3906,28 +4704,42 @@ class SearchMetricCategoryQueryOptions(MetricCategoryTrait, BaseModel):
 
 
 class SearchMetricCategoryQuery(BaseModel):
+    """No documentation found for this operation."""
+
     options: Tuple[SearchMetricCategoryQueryOptions, ...]
     "List of all metric categories"
 
     class Arguments(BaseModel):
+        """Arguments for SearchMetricCategory"""
+
         search: Optional[str] = Field(default=None)
         values: Optional[List[ID]] = Field(default=None)
 
     class Meta:
+        """Meta class for SearchMetricCategory"""
+
         document = "query SearchMetricCategory($search: String, $values: [ID!]) {\n  options: metricCategories(\n    filters: {search: $search, ids: $values}\n    pagination: {limit: 10}\n  ) {\n    value: id\n    label: label\n    __typename\n  }\n}"
 
 
 class GetStructureCategoryQuery(BaseModel):
+    """No documentation found for this operation."""
+
     structure_category: StructureCategory = Field(alias="structureCategory")
 
     class Arguments(BaseModel):
+        """Arguments for GetStructureCategory"""
+
         id: ID
 
     class Meta:
-        document = "fragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment StructureCategory on StructureCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  identifier\n  __typename\n}\n\nquery GetStructureCategory($id: ID!) {\n  structureCategory(id: $id) {\n    ...StructureCategory\n    __typename\n  }\n}"
+        """Meta class for GetStructureCategory"""
+
+        document = "fragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment StructureCategory on StructureCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  identifier\n  __typename\n}\n\nquery GetStructureCategory($id: ID!) {\n  structureCategory(id: $id) {\n    ...StructureCategory\n    __typename\n  }\n}"
 
 
 class SearchStructureCategoryQueryOptions(StructureCategoryTrait, BaseModel):
+    """No documentation"""
+
     typename: Literal["StructureCategory"] = Field(
         alias="__typename", default="StructureCategory", exclude=True
     )
@@ -3939,38 +4751,56 @@ class SearchStructureCategoryQueryOptions(StructureCategoryTrait, BaseModel):
 
 
 class SearchStructureCategoryQuery(BaseModel):
+    """No documentation found for this operation."""
+
     options: Tuple[SearchStructureCategoryQueryOptions, ...]
     "List of all structure categories"
 
     class Arguments(BaseModel):
+        """Arguments for SearchStructureCategory"""
+
         search: Optional[str] = Field(default=None)
         values: Optional[List[ID]] = Field(default=None)
 
     class Meta:
+        """Meta class for SearchStructureCategory"""
+
         document = "query SearchStructureCategory($search: String, $values: [ID!]) {\n  options: structureCategories(\n    filters: {search: $search, ids: $values}\n    pagination: {limit: 10}\n  ) {\n    value: id\n    label: identifier\n    __typename\n  }\n}"
 
 
 class ListStructureCategoryQuery(BaseModel):
+    """No documentation found for this operation."""
+
     structure_categories: Tuple[StructureCategory, ...] = Field(
         alias="structureCategories"
     )
     "List of all structure categories"
 
     class Arguments(BaseModel):
+        """Arguments for ListStructureCategory"""
+
         filters: Optional[StructureCategoryFilter] = Field(default=None)
         pagination: Optional[OffsetPaginationInput] = Field(default=None)
 
     class Meta:
-        document = "fragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment StructureCategory on StructureCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  identifier\n  __typename\n}\n\nquery ListStructureCategory($filters: StructureCategoryFilter, $pagination: OffsetPaginationInput) {\n  structureCategories(filters: $filters, pagination: $pagination) {\n    ...StructureCategory\n    __typename\n  }\n}"
+        """Meta class for ListStructureCategory"""
+
+        document = "fragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment StructureCategory on StructureCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  identifier\n  __typename\n}\n\nquery ListStructureCategory($filters: StructureCategoryFilter, $pagination: OffsetPaginationInput) {\n  structureCategories(filters: $filters, pagination: $pagination) {\n    ...StructureCategory\n    __typename\n  }\n}"
 
 
 class GetModelQuery(BaseModel):
+    """No documentation found for this operation."""
+
     model: Model
 
     class Arguments(BaseModel):
+        """Arguments for GetModel"""
+
         id: ID
 
     class Meta:
+        """Meta class for GetModel"""
+
         document = "fragment MediaStore on MediaStore {\n  id\n  presignedUrl\n  key\n  __typename\n}\n\nfragment Model on Model {\n  id\n  name\n  store {\n    ...MediaStore\n    __typename\n  }\n  __typename\n}\n\nquery GetModel($id: ID!) {\n  model(id: $id) {\n    ...Model\n    __typename\n  }\n}"
 
 
@@ -3988,25 +4818,37 @@ class SearchModelsQueryOptions(BaseModel):
 
 
 class SearchModelsQuery(BaseModel):
+    """No documentation found for this operation."""
+
     options: Tuple[SearchModelsQueryOptions, ...]
     "List of all deep learning models (e.g. neural networks)"
 
     class Arguments(BaseModel):
+        """Arguments for SearchModels"""
+
         search: Optional[str] = Field(default=None)
         values: Optional[List[ID]] = Field(default=None)
 
     class Meta:
+        """Meta class for SearchModels"""
+
         document = "query SearchModels($search: String, $values: [ID!]) {\n  options: models(\n    filters: {search: $search, ids: $values}\n    pagination: {limit: 10}\n  ) {\n    value: id\n    label: name\n    __typename\n  }\n}"
 
 
 class GetGraphQueryQuery(BaseModel):
+    """No documentation found for this operation."""
+
     graph_query: GraphQuery = Field(alias="graphQuery")
 
     class Arguments(BaseModel):
+        """Arguments for GetGraphQuery"""
+
         id: ID
 
     class Meta:
-        document = "fragment Participant on Participant {\n  role\n  quantity\n  __typename\n}\n\nfragment Relation on Relation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment Measurement on Measurement {\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Reagent on Reagent {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  externalId\n  label\n  __typename\n}\n\nfragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nfragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}\n\nfragment BaseEdge on Edge {\n  id\n  leftId\n  rightId\n  __typename\n}\n\nfragment BaseNode on Node {\n  id\n  label\n  __typename\n}\n\nfragment Node on Node {\n  ...BaseNode\n  ...Entity\n  ...Structure\n  ...Metric\n  ...Reagent\n  __typename\n}\n\nfragment Edge on Edge {\n  ...BaseEdge\n  ...Measurement\n  ...Relation\n  ...Participant\n  __typename\n}\n\nfragment Column on Column {\n  name\n  kind\n  valueKind\n  label\n  description\n  category\n  searchable\n  idfor\n  preferhidden\n  __typename\n}\n\nfragment Table on Table {\n  graph {\n    ageName\n    __typename\n  }\n  rows\n  columns {\n    ...Column\n    __typename\n  }\n  __typename\n}\n\nfragment ListScatterPlot on ScatterPlot {\n  id\n  name\n  xColumn\n  yColumn\n  __typename\n}\n\nfragment Pairs on Pairs {\n  pairs {\n    left {\n      id\n      __typename\n    }\n    right {\n      id\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nfragment Path on Path {\n  nodes {\n    ...Node\n    __typename\n  }\n  edges {\n    ...Edge\n    __typename\n  }\n  __typename\n}\n\nfragment GraphQuery on GraphQuery {\n  id\n  query\n  name\n  graph {\n    id\n    name\n    __typename\n  }\n  scatterPlots(pagination: {limit: 1}) {\n    ...ListScatterPlot\n    __typename\n  }\n  render {\n    ...Path\n    ...Pairs\n    ...Table\n    __typename\n  }\n  pinned\n  __typename\n}\n\nquery GetGraphQuery($id: ID!) {\n  graphQuery(id: $id) {\n    ...GraphQuery\n    __typename\n  }\n}"
+        """Meta class for GetGraphQuery"""
+
+        document = "fragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nfragment BaseNode on Node {\n  id\n  label\n  __typename\n}\n\nfragment Relation on Relation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment BaseEdge on Edge {\n  id\n  leftId\n  rightId\n  __typename\n}\n\nfragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}\n\nfragment Measurement on Measurement {\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Reagent on Reagent {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  externalId\n  label\n  __typename\n}\n\nfragment Participant on Participant {\n  role\n  quantity\n  __typename\n}\n\nfragment Edge on Edge {\n  ...BaseEdge\n  ...Measurement\n  ...Relation\n  ...Participant\n  __typename\n}\n\nfragment Column on Column {\n  name\n  kind\n  valueKind\n  label\n  description\n  category\n  searchable\n  idfor\n  preferhidden\n  __typename\n}\n\nfragment Node on Node {\n  ...BaseNode\n  ...Entity\n  ...Structure\n  ...Metric\n  ...Reagent\n  __typename\n}\n\nfragment Table on Table {\n  graph {\n    ageName\n    __typename\n  }\n  rows\n  columns {\n    ...Column\n    __typename\n  }\n  __typename\n}\n\nfragment Pairs on Pairs {\n  pairs {\n    left {\n      id\n      __typename\n    }\n    right {\n      id\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nfragment ListScatterPlot on ScatterPlot {\n  id\n  name\n  xColumn\n  yColumn\n  __typename\n}\n\nfragment Path on Path {\n  nodes {\n    ...Node\n    __typename\n  }\n  edges {\n    ...Edge\n    __typename\n  }\n  __typename\n}\n\nfragment GraphQuery on GraphQuery {\n  id\n  query\n  name\n  graph {\n    id\n    name\n    __typename\n  }\n  scatterPlots(pagination: {limit: 1}) {\n    ...ListScatterPlot\n    __typename\n  }\n  render {\n    ...Path\n    ...Pairs\n    ...Table\n    __typename\n  }\n  pinned\n  __typename\n}\n\nquery GetGraphQuery($id: ID!) {\n  graphQuery(id: $id) {\n    ...GraphQuery\n    __typename\n  }\n}"
 
 
 class SearchGraphQueriesQueryOptions(BaseModel):
@@ -4021,52 +4863,78 @@ class SearchGraphQueriesQueryOptions(BaseModel):
 
 
 class SearchGraphQueriesQuery(BaseModel):
+    """No documentation found for this operation."""
+
     options: Tuple[SearchGraphQueriesQueryOptions, ...]
     "List of all graph queries"
 
     class Arguments(BaseModel):
+        """Arguments for SearchGraphQueries"""
+
         search: Optional[str] = Field(default=None)
         values: Optional[List[ID]] = Field(default=None)
 
     class Meta:
+        """Meta class for SearchGraphQueries"""
+
         document = "query SearchGraphQueries($search: String, $values: [ID!]) {\n  options: graphQueries(\n    filters: {search: $search, ids: $values}\n    pagination: {limit: 10}\n  ) {\n    value: id\n    label: name\n    __typename\n  }\n}"
 
 
 class ListGraphQueriesQuery(BaseModel):
+    """No documentation found for this operation."""
+
     graph_queries: Tuple[ListGraphQuery, ...] = Field(alias="graphQueries")
     "List of all graph queries"
 
     class Arguments(BaseModel):
+        """Arguments for ListGraphQueries"""
+
         filters: Optional[GraphQueryFilter] = Field(default=None)
         pagination: Optional[OffsetPaginationInput] = Field(default=None)
 
     class Meta:
+        """Meta class for ListGraphQueries"""
+
         document = "fragment ListGraphQuery on GraphQuery {\n  id\n  name\n  query\n  description\n  pinned\n  __typename\n}\n\nquery ListGraphQueries($filters: GraphQueryFilter, $pagination: OffsetPaginationInput) {\n  graphQueries(filters: $filters, pagination: $pagination) {\n    ...ListGraphQuery\n    __typename\n  }\n}"
 
 
 class ListPrerenderedGraphQueriesQuery(BaseModel):
+    """No documentation found for this operation."""
+
     graph_queries: Tuple[GraphQuery, ...] = Field(alias="graphQueries")
     "List of all graph queries"
 
     class Arguments(BaseModel):
+        """Arguments for ListPrerenderedGraphQueries"""
+
         filters: Optional[GraphQueryFilter] = Field(default=None)
         pagination: Optional[OffsetPaginationInput] = Field(default=None)
 
     class Meta:
-        document = "fragment Participant on Participant {\n  role\n  quantity\n  __typename\n}\n\nfragment Relation on Relation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment Measurement on Measurement {\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Reagent on Reagent {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  externalId\n  label\n  __typename\n}\n\nfragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nfragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}\n\nfragment BaseEdge on Edge {\n  id\n  leftId\n  rightId\n  __typename\n}\n\nfragment BaseNode on Node {\n  id\n  label\n  __typename\n}\n\nfragment Node on Node {\n  ...BaseNode\n  ...Entity\n  ...Structure\n  ...Metric\n  ...Reagent\n  __typename\n}\n\nfragment Edge on Edge {\n  ...BaseEdge\n  ...Measurement\n  ...Relation\n  ...Participant\n  __typename\n}\n\nfragment Column on Column {\n  name\n  kind\n  valueKind\n  label\n  description\n  category\n  searchable\n  idfor\n  preferhidden\n  __typename\n}\n\nfragment Table on Table {\n  graph {\n    ageName\n    __typename\n  }\n  rows\n  columns {\n    ...Column\n    __typename\n  }\n  __typename\n}\n\nfragment ListScatterPlot on ScatterPlot {\n  id\n  name\n  xColumn\n  yColumn\n  __typename\n}\n\nfragment Pairs on Pairs {\n  pairs {\n    left {\n      id\n      __typename\n    }\n    right {\n      id\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nfragment Path on Path {\n  nodes {\n    ...Node\n    __typename\n  }\n  edges {\n    ...Edge\n    __typename\n  }\n  __typename\n}\n\nfragment GraphQuery on GraphQuery {\n  id\n  query\n  name\n  graph {\n    id\n    name\n    __typename\n  }\n  scatterPlots(pagination: {limit: 1}) {\n    ...ListScatterPlot\n    __typename\n  }\n  render {\n    ...Path\n    ...Pairs\n    ...Table\n    __typename\n  }\n  pinned\n  __typename\n}\n\nquery ListPrerenderedGraphQueries($filters: GraphQueryFilter, $pagination: OffsetPaginationInput) {\n  graphQueries(filters: $filters, pagination: $pagination) {\n    ...GraphQuery\n    __typename\n  }\n}"
+        """Meta class for ListPrerenderedGraphQueries"""
+
+        document = "fragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nfragment BaseNode on Node {\n  id\n  label\n  __typename\n}\n\nfragment Relation on Relation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment BaseEdge on Edge {\n  id\n  leftId\n  rightId\n  __typename\n}\n\nfragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}\n\nfragment Measurement on Measurement {\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Reagent on Reagent {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  externalId\n  label\n  __typename\n}\n\nfragment Participant on Participant {\n  role\n  quantity\n  __typename\n}\n\nfragment Edge on Edge {\n  ...BaseEdge\n  ...Measurement\n  ...Relation\n  ...Participant\n  __typename\n}\n\nfragment Column on Column {\n  name\n  kind\n  valueKind\n  label\n  description\n  category\n  searchable\n  idfor\n  preferhidden\n  __typename\n}\n\nfragment Node on Node {\n  ...BaseNode\n  ...Entity\n  ...Structure\n  ...Metric\n  ...Reagent\n  __typename\n}\n\nfragment Table on Table {\n  graph {\n    ageName\n    __typename\n  }\n  rows\n  columns {\n    ...Column\n    __typename\n  }\n  __typename\n}\n\nfragment Pairs on Pairs {\n  pairs {\n    left {\n      id\n      __typename\n    }\n    right {\n      id\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nfragment ListScatterPlot on ScatterPlot {\n  id\n  name\n  xColumn\n  yColumn\n  __typename\n}\n\nfragment Path on Path {\n  nodes {\n    ...Node\n    __typename\n  }\n  edges {\n    ...Edge\n    __typename\n  }\n  __typename\n}\n\nfragment GraphQuery on GraphQuery {\n  id\n  query\n  name\n  graph {\n    id\n    name\n    __typename\n  }\n  scatterPlots(pagination: {limit: 1}) {\n    ...ListScatterPlot\n    __typename\n  }\n  render {\n    ...Path\n    ...Pairs\n    ...Table\n    __typename\n  }\n  pinned\n  __typename\n}\n\nquery ListPrerenderedGraphQueries($filters: GraphQueryFilter, $pagination: OffsetPaginationInput) {\n  graphQueries(filters: $filters, pagination: $pagination) {\n    ...GraphQuery\n    __typename\n  }\n}"
 
 
 class GetReagentCategoryQuery(BaseModel):
+    """No documentation found for this operation."""
+
     reagent_category: ReagentCategory = Field(alias="reagentCategory")
 
     class Arguments(BaseModel):
+        """Arguments for GetReagentCategory"""
+
         id: ID
 
     class Meta:
-        document = "fragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment ReagentCategory on ReagentCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  __typename\n}\n\nquery GetReagentCategory($id: ID!) {\n  reagentCategory(id: $id) {\n    ...ReagentCategory\n    __typename\n  }\n}"
+        """Meta class for GetReagentCategory"""
+
+        document = "fragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment ReagentCategory on ReagentCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  __typename\n}\n\nquery GetReagentCategory($id: ID!) {\n  reagentCategory(id: $id) {\n    ...ReagentCategory\n    __typename\n  }\n}"
 
 
 class SearchReagentCategoryQueryOptions(ReagentCategoryTrait, BaseModel):
+    """No documentation"""
+
     typename: Literal["ReagentCategory"] = Field(
         alias="__typename", default="ReagentCategory", exclude=True
     )
@@ -4078,39 +4946,57 @@ class SearchReagentCategoryQueryOptions(ReagentCategoryTrait, BaseModel):
 
 
 class SearchReagentCategoryQuery(BaseModel):
+    """No documentation found for this operation."""
+
     options: Tuple[SearchReagentCategoryQueryOptions, ...]
     "List of all reagent categories"
 
     class Arguments(BaseModel):
+        """Arguments for SearchReagentCategory"""
+
         search: Optional[str] = Field(default=None)
         values: Optional[List[ID]] = Field(default=None)
 
     class Meta:
+        """Meta class for SearchReagentCategory"""
+
         document = "query SearchReagentCategory($search: String, $values: [ID!]) {\n  options: reagentCategories(\n    filters: {search: $search, ids: $values}\n    pagination: {limit: 10}\n  ) {\n    value: id\n    label: label\n    __typename\n  }\n}"
 
 
 class ListReagentCategoryQuery(BaseModel):
+    """No documentation found for this operation."""
+
     reagent_categories: Tuple[ListReagentCategory, ...] = Field(
         alias="reagentCategories"
     )
     "List of all reagent categories"
 
     class Arguments(BaseModel):
+        """Arguments for ListReagentCategory"""
+
         filters: Optional[ReagentCategoryFilter] = Field(default=None)
         pagination: Optional[OffsetPaginationInput] = Field(default=None)
 
     class Meta:
+        """Meta class for ListReagentCategory"""
+
         document = "fragment BaseListCategory on BaseCategory {\n  id\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  tags {\n    id\n    value\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment ListReagentCategory on ReagentCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  instanceKind\n  label\n  __typename\n}\n\nquery ListReagentCategory($filters: ReagentCategoryFilter, $pagination: OffsetPaginationInput) {\n  reagentCategories(filters: $filters, pagination: $pagination) {\n    ...ListReagentCategory\n    __typename\n  }\n}"
 
 
 class GetGraphQuery(BaseModel):
+    """No documentation found for this operation."""
+
     graph: Graph
 
     class Arguments(BaseModel):
+        """Arguments for GetGraph"""
+
         id: ID
 
     class Meta:
-        document = "fragment Participant on Participant {\n  role\n  quantity\n  __typename\n}\n\nfragment Relation on Relation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment BaseEdge on Edge {\n  id\n  leftId\n  rightId\n  __typename\n}\n\nfragment Measurement on Measurement {\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Edge on Edge {\n  ...BaseEdge\n  ...Measurement\n  ...Relation\n  ...Participant\n  __typename\n}\n\nfragment Column on Column {\n  name\n  kind\n  valueKind\n  label\n  description\n  category\n  searchable\n  idfor\n  preferhidden\n  __typename\n}\n\nfragment EntityCategoryDefinition on EntityCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment ReagentCategoryDefinition on ReagentCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment Table on Table {\n  graph {\n    ageName\n    __typename\n  }\n  rows\n  columns {\n    ...Column\n    __typename\n  }\n  __typename\n}\n\nfragment Pairs on Pairs {\n  pairs {\n    left {\n      id\n      __typename\n    }\n    right {\n      id\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nfragment Path on Path {\n  nodes {\n    ...Node\n    __typename\n  }\n  edges {\n    ...Edge\n    __typename\n  }\n  __typename\n}\n\nfragment ListScatterPlot on ScatterPlot {\n  id\n  name\n  xColumn\n  yColumn\n  __typename\n}\n\nfragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}\n\nfragment Reagent on Reagent {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  externalId\n  label\n  __typename\n}\n\nfragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nfragment BaseListNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment BaseNode on Node {\n  id\n  label\n  __typename\n}\n\nfragment BaseListEdgeCategory on EdgeCategory {\n  id\n  __typename\n}\n\nfragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment EntityRoleDefinition on EntityRoleDefinition {\n  role\n  categoryDefinition {\n    ...EntityCategoryDefinition\n    __typename\n  }\n  optional\n  allowMultiple\n  __typename\n}\n\nfragment ReagentRoleDefinition on ReagentRoleDefinition {\n  role\n  categoryDefinition {\n    ...ReagentCategoryDefinition\n    __typename\n  }\n  needsQuantity\n  optional\n  __typename\n}\n\nfragment BaseListCategory on BaseCategory {\n  id\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  tags {\n    id\n    value\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment ListNaturalEventCategory on NaturalEventCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  label\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment Node on Node {\n  ...BaseNode\n  ...Entity\n  ...Structure\n  ...Metric\n  ...Reagent\n  __typename\n}\n\nfragment ListMeasurementCategory on MeasurementCategory {\n  ...BaseListCategory\n  ...BaseListEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment GraphQuery on GraphQuery {\n  id\n  query\n  name\n  graph {\n    id\n    name\n    __typename\n  }\n  scatterPlots(pagination: {limit: 1}) {\n    ...ListScatterPlot\n    __typename\n  }\n  render {\n    ...Path\n    ...Pairs\n    ...Table\n    __typename\n  }\n  pinned\n  __typename\n}\n\nfragment ListProtocolEventCategory on ProtocolEventCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  label\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  sourceReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  targetReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment ListEntityCategory on EntityCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  instanceKind\n  label\n  __typename\n}\n\nfragment ListMetricCategory on MetricCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  label\n  metricKind\n  __typename\n}\n\nfragment ListStructureCategory on StructureCategory {\n  ...BaseListCategory\n  ...BaseListNodeCategory\n  identifier\n  __typename\n}\n\nfragment ListRelationCategory on RelationCategory {\n  ...BaseListCategory\n  ...BaseListEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment Graph on Graph {\n  id\n  name\n  description\n  structureCategories {\n    ...ListStructureCategory\n    __typename\n  }\n  entityCategories {\n    ...ListEntityCategory\n    __typename\n  }\n  metricCategories {\n    ...ListMetricCategory\n    __typename\n  }\n  protocolEventCategories {\n    ...ListProtocolEventCategory\n    __typename\n  }\n  naturalEventCategories {\n    ...ListNaturalEventCategory\n    __typename\n  }\n  relationCategories {\n    ...ListRelationCategory\n    __typename\n  }\n  measurementCategories {\n    ...ListMeasurementCategory\n    __typename\n  }\n  graphQueries(pagination: {limit: 0}) {\n    ...GraphQuery\n    __typename\n  }\n  latestNodes(pagination: {limit: 2}) {\n    ...Node\n    __typename\n  }\n  __typename\n}\n\nquery GetGraph($id: ID!) {\n  graph(id: $id) {\n    ...Graph\n    __typename\n  }\n}"
+        """Meta class for GetGraph"""
+
+        document = "fragment Relation on Relation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment BaseEdge on Edge {\n  id\n  leftId\n  rightId\n  __typename\n}\n\nfragment Participant on Participant {\n  role\n  quantity\n  __typename\n}\n\nfragment Measurement on Measurement {\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment EntityCategoryDefinition on EntityCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment Column on Column {\n  name\n  kind\n  valueKind\n  label\n  description\n  category\n  searchable\n  idfor\n  preferhidden\n  __typename\n}\n\nfragment Edge on Edge {\n  ...BaseEdge\n  ...Measurement\n  ...Relation\n  ...Participant\n  __typename\n}\n\nfragment ReagentCategoryDefinition on ReagentCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment Pairs on Pairs {\n  pairs {\n    left {\n      id\n      __typename\n    }\n    right {\n      id\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nfragment Table on Table {\n  graph {\n    ageName\n    __typename\n  }\n  rows\n  columns {\n    ...Column\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNode on Node {\n  id\n  label\n  __typename\n}\n\nfragment ListScatterPlot on ScatterPlot {\n  id\n  name\n  xColumn\n  yColumn\n  __typename\n}\n\nfragment ReagentRoleDefinition on ReagentRoleDefinition {\n  role\n  categoryDefinition {\n    ...ReagentCategoryDefinition\n    __typename\n  }\n  needsQuantity\n  optional\n  __typename\n}\n\nfragment BaseListCategory on BaseCategory {\n  id\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  tags {\n    id\n    value\n    __typename\n  }\n  __typename\n}\n\nfragment Path on Path {\n  nodes {\n    ...Node\n    __typename\n  }\n  edges {\n    ...Edge\n    __typename\n  }\n  __typename\n}\n\nfragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nfragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment BaseListNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment EntityRoleDefinition on EntityRoleDefinition {\n  role\n  categoryDefinition {\n    ...EntityCategoryDefinition\n    __typename\n  }\n  optional\n  allowMultiple\n  __typename\n}\n\nfragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}\n\nfragment Reagent on Reagent {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  externalId\n  label\n  __typename\n}\n\nfragment BaseListEdgeCategory on EdgeCategory {\n  id\n  __typename\n}\n\nfragment ListNaturalEventCategory on NaturalEventCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  label\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment ListStructureCategory on StructureCategory {\n  ...BaseListCategory\n  ...BaseListNodeCategory\n  identifier\n  __typename\n}\n\nfragment ListMetricCategory on MetricCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  label\n  metricKind\n  __typename\n}\n\nfragment Node on Node {\n  ...BaseNode\n  ...Entity\n  ...Structure\n  ...Metric\n  ...Reagent\n  __typename\n}\n\nfragment GraphQuery on GraphQuery {\n  id\n  query\n  name\n  graph {\n    id\n    name\n    __typename\n  }\n  scatterPlots(pagination: {limit: 1}) {\n    ...ListScatterPlot\n    __typename\n  }\n  render {\n    ...Path\n    ...Pairs\n    ...Table\n    __typename\n  }\n  pinned\n  __typename\n}\n\nfragment ListProtocolEventCategory on ProtocolEventCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  label\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  sourceReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  targetReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment ListRelationCategory on RelationCategory {\n  ...BaseListCategory\n  ...BaseListEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment ListEntityCategory on EntityCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  instanceKind\n  label\n  __typename\n}\n\nfragment ListMeasurementCategory on MeasurementCategory {\n  ...BaseListCategory\n  ...BaseListEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment Graph on Graph {\n  id\n  name\n  description\n  structureCategories {\n    ...ListStructureCategory\n    __typename\n  }\n  entityCategories {\n    ...ListEntityCategory\n    __typename\n  }\n  metricCategories {\n    ...ListMetricCategory\n    __typename\n  }\n  protocolEventCategories {\n    ...ListProtocolEventCategory\n    __typename\n  }\n  naturalEventCategories {\n    ...ListNaturalEventCategory\n    __typename\n  }\n  relationCategories {\n    ...ListRelationCategory\n    __typename\n  }\n  measurementCategories {\n    ...ListMeasurementCategory\n    __typename\n  }\n  graphQueries(pagination: {limit: 0}) {\n    ...GraphQuery\n    __typename\n  }\n  latestNodes(pagination: {limit: 2}) {\n    ...Node\n    __typename\n  }\n  __typename\n}\n\nquery GetGraph($id: ID!) {\n  graph(id: $id) {\n    ...Graph\n    __typename\n  }\n}"
 
 
 class SearchGraphsQueryOptions(GraphTrait, BaseModel):
@@ -4125,36 +5011,54 @@ class SearchGraphsQueryOptions(GraphTrait, BaseModel):
 
 
 class SearchGraphsQuery(BaseModel):
+    """No documentation found for this operation."""
+
     options: Tuple[SearchGraphsQueryOptions, ...]
     "List of all knowledge graphs"
 
     class Arguments(BaseModel):
+        """Arguments for SearchGraphs"""
+
         search: Optional[str] = Field(default=None)
         values: Optional[List[ID]] = Field(default=None)
 
     class Meta:
+        """Meta class for SearchGraphs"""
+
         document = "query SearchGraphs($search: String, $values: [ID!]) {\n  options: graphs(\n    filters: {search: $search, ids: $values}\n    pagination: {limit: 10}\n  ) {\n    value: id\n    label: name\n    __typename\n  }\n}"
 
 
 class ListGraphsQuery(BaseModel):
+    """No documentation found for this operation."""
+
     graphs: Tuple[ListGraph, ...]
     "List of all knowledge graphs"
 
     class Arguments(BaseModel):
+        """Arguments for ListGraphs"""
+
         filters: Optional[GraphFilter] = Field(default=None)
         pagination: Optional[OffsetPaginationInput] = Field(default=None)
 
     class Meta:
+        """Meta class for ListGraphs"""
+
         document = "fragment ListGraph on Graph {\n  id\n  name\n  description\n  pinned\n  __typename\n}\n\nquery ListGraphs($filters: GraphFilter, $pagination: OffsetPaginationInput) {\n  graphs(filters: $filters, pagination: $pagination) {\n    ...ListGraph\n    __typename\n  }\n}"
 
 
 class GetMetricQuery(BaseModel):
+    """No documentation found for this operation."""
+
     metric: Metric
 
     class Arguments(BaseModel):
+        """Arguments for GetMetric"""
+
         id: ID
 
     class Meta:
+        """Meta class for GetMetric"""
+
         document = "fragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nquery GetMetric($id: ID!) {\n  metric(id: $id) {\n    ...Metric\n    __typename\n  }\n}"
 
 
@@ -4171,47 +5075,71 @@ class SearchMetricsQueryOptions(MetricTrait, BaseModel):
 
 
 class SearchMetricsQuery(BaseModel):
+    """No documentation found for this operation."""
+
     options: Tuple[SearchMetricsQueryOptions, ...]
 
     class Arguments(BaseModel):
+        """Arguments for SearchMetrics"""
+
         search: Optional[str] = Field(default=None)
         values: Optional[List[ID]] = Field(default=None)
 
     class Meta:
+        """Meta class for SearchMetrics"""
+
         document = "query SearchMetrics($search: String, $values: [ID!]) {\n  options: metrics(\n    filters: {search: $search, ids: $values}\n    pagination: {limit: 10}\n  ) {\n    value: id\n    label: label\n    __typename\n  }\n}"
 
 
 class ListMetricsQuery(BaseModel):
+    """No documentation found for this operation."""
+
     metrics: Tuple[ListMetric, ...]
 
     class Arguments(BaseModel):
+        """Arguments for ListMetrics"""
+
         filters: Optional[MetricFilter] = Field(default=None)
         pagination: Optional[GraphPaginationInput] = Field(default=None)
 
     class Meta:
+        """Meta class for ListMetrics"""
+
         document = "fragment ListMetric on Metric {\n  id\n  value\n  label\n  __typename\n}\n\nquery ListMetrics($filters: MetricFilter, $pagination: GraphPaginationInput) {\n  metrics(filters: $filters, pagination: $pagination) {\n    ...ListMetric\n    __typename\n  }\n}"
 
 
 class GetNodeQueryQuery(BaseModel):
+    """No documentation found for this operation."""
+
     node_query: NodeQuery = Field(alias="nodeQuery")
 
     class Arguments(BaseModel):
+        """Arguments for GetNodeQuery"""
+
         id: ID
 
     class Meta:
+        """Meta class for GetNodeQuery"""
+
         document = "fragment NodeQuery on NodeQuery {\n  id\n  name\n  pinned\n  __typename\n}\n\nquery GetNodeQuery($id: ID!) {\n  nodeQuery(id: $id) {\n    ...NodeQuery\n    __typename\n  }\n}"
 
 
 class RenderNodeQueryQuery(BaseModel):
+    """No documentation found for this operation."""
+
     render_node_query: Union[Path, Table, Pairs] = Field(alias="renderNodeQuery")
     "Render a node query"
 
     class Arguments(BaseModel):
+        """Arguments for RenderNodeQuery"""
+
         id: ID
         node_id: ID = Field(alias="nodeId")
 
     class Meta:
-        document = "fragment Participant on Participant {\n  role\n  quantity\n  __typename\n}\n\nfragment Relation on Relation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment Measurement on Measurement {\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Reagent on Reagent {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  externalId\n  label\n  __typename\n}\n\nfragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nfragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}\n\nfragment BaseEdge on Edge {\n  id\n  leftId\n  rightId\n  __typename\n}\n\nfragment BaseNode on Node {\n  id\n  label\n  __typename\n}\n\nfragment Node on Node {\n  ...BaseNode\n  ...Entity\n  ...Structure\n  ...Metric\n  ...Reagent\n  __typename\n}\n\nfragment Edge on Edge {\n  ...BaseEdge\n  ...Measurement\n  ...Relation\n  ...Participant\n  __typename\n}\n\nfragment Column on Column {\n  name\n  kind\n  valueKind\n  label\n  description\n  category\n  searchable\n  idfor\n  preferhidden\n  __typename\n}\n\nfragment Table on Table {\n  graph {\n    ageName\n    __typename\n  }\n  rows\n  columns {\n    ...Column\n    __typename\n  }\n  __typename\n}\n\nfragment Path on Path {\n  nodes {\n    ...Node\n    __typename\n  }\n  edges {\n    ...Edge\n    __typename\n  }\n  __typename\n}\n\nfragment Pairs on Pairs {\n  pairs {\n    left {\n      id\n      __typename\n    }\n    right {\n      id\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nquery RenderNodeQuery($id: ID!, $nodeId: ID!) {\n  renderNodeQuery(id: $id, nodeId: $nodeId) {\n    ...Path\n    ...Table\n    ...Pairs\n    __typename\n  }\n}"
+        """Meta class for RenderNodeQuery"""
+
+        document = "fragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nfragment BaseNode on Node {\n  id\n  label\n  __typename\n}\n\nfragment Relation on Relation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment BaseEdge on Edge {\n  id\n  leftId\n  rightId\n  __typename\n}\n\nfragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}\n\nfragment Measurement on Measurement {\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Reagent on Reagent {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  externalId\n  label\n  __typename\n}\n\nfragment Participant on Participant {\n  role\n  quantity\n  __typename\n}\n\nfragment Edge on Edge {\n  ...BaseEdge\n  ...Measurement\n  ...Relation\n  ...Participant\n  __typename\n}\n\nfragment Column on Column {\n  name\n  kind\n  valueKind\n  label\n  description\n  category\n  searchable\n  idfor\n  preferhidden\n  __typename\n}\n\nfragment Node on Node {\n  ...BaseNode\n  ...Entity\n  ...Structure\n  ...Metric\n  ...Reagent\n  __typename\n}\n\nfragment Pairs on Pairs {\n  pairs {\n    left {\n      id\n      __typename\n    }\n    right {\n      id\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nfragment Table on Table {\n  graph {\n    ageName\n    __typename\n  }\n  rows\n  columns {\n    ...Column\n    __typename\n  }\n  __typename\n}\n\nfragment Path on Path {\n  nodes {\n    ...Node\n    __typename\n  }\n  edges {\n    ...Edge\n    __typename\n  }\n  __typename\n}\n\nquery RenderNodeQuery($id: ID!, $nodeId: ID!) {\n  renderNodeQuery(id: $id, nodeId: $nodeId) {\n    ...Path\n    ...Table\n    ...Pairs\n    __typename\n  }\n}"
 
 
 class SearchNodeQueriesQueryOptions(BaseModel):
@@ -4226,31 +5154,44 @@ class SearchNodeQueriesQueryOptions(BaseModel):
 
 
 class SearchNodeQueriesQuery(BaseModel):
+    """No documentation found for this operation."""
+
     options: Tuple[SearchNodeQueriesQueryOptions, ...]
     "List of all node queries"
 
     class Arguments(BaseModel):
+        """Arguments for SearchNodeQueries"""
+
         search: Optional[str] = Field(default=None)
         values: Optional[List[ID]] = Field(default=None)
 
     class Meta:
+        """Meta class for SearchNodeQueries"""
+
         document = "query SearchNodeQueries($search: String, $values: [ID!]) {\n  options: nodeQueries(\n    filters: {search: $search, ids: $values}\n    pagination: {limit: 10}\n  ) {\n    value: id\n    label: name\n    __typename\n  }\n}"
 
 
 class ListNodeQueriesQuery(BaseModel):
+    """No documentation found for this operation."""
+
     node_queries: Tuple[ListNodeQuery, ...] = Field(alias="nodeQueries")
     "List of all node queries"
 
     class Arguments(BaseModel):
+        """Arguments for ListNodeQueries"""
+
         filters: Optional[NodeQueryFilter] = Field(default=None)
         pagination: Optional[OffsetPaginationInput] = Field(default=None)
 
     class Meta:
+        """Meta class for ListNodeQueries"""
+
         document = "fragment ListNodeQuery on NodeQuery {\n  id\n  name\n  query\n  description\n  pinned\n  __typename\n}\n\nquery ListNodeQueries($filters: NodeQueryFilter, $pagination: OffsetPaginationInput) {\n  nodeQueries(filters: $filters, pagination: $pagination) {\n    ...ListNodeQuery\n    __typename\n  }\n}"
 
 
 class NodeCategoriesQueryNodecategoriesBase(BaseModel):
-    pass
+    """No documentation"""
+
     model_config = ConfigDict(frozen=True)
 
 
@@ -4260,6 +5201,8 @@ class NodeCategoriesQueryNodecategoriesBaseMetricCategory(
     MetricCategoryTrait,
     BaseModel,
 ):
+    """No documentation"""
+
     typename: Literal["MetricCategory"] = Field(
         alias="__typename", default="MetricCategory", exclude=True
     )
@@ -4271,6 +5214,8 @@ class NodeCategoriesQueryNodecategoriesBaseStructureCategory(
     StructureCategoryTrait,
     BaseModel,
 ):
+    """No documentation"""
+
     typename: Literal["StructureCategory"] = Field(
         alias="__typename", default="StructureCategory", exclude=True
     )
@@ -4282,6 +5227,8 @@ class NodeCategoriesQueryNodecategoriesBaseProtocolEventCategory(
     ProtocolEventCategoryTrait,
     BaseModel,
 ):
+    """No documentation"""
+
     typename: Literal["ProtocolEventCategory"] = Field(
         alias="__typename", default="ProtocolEventCategory", exclude=True
     )
@@ -4293,6 +5240,8 @@ class NodeCategoriesQueryNodecategoriesBaseEntityCategory(
     EntityCategoryTrait,
     BaseModel,
 ):
+    """No documentation"""
+
     typename: Literal["EntityCategory"] = Field(
         alias="__typename", default="EntityCategory", exclude=True
     )
@@ -4304,6 +5253,8 @@ class NodeCategoriesQueryNodecategoriesBaseReagentCategory(
     ReagentCategoryTrait,
     BaseModel,
 ):
+    """No documentation"""
+
     typename: Literal["ReagentCategory"] = Field(
         alias="__typename", default="ReagentCategory", exclude=True
     )
@@ -4315,45 +5266,70 @@ class NodeCategoriesQueryNodecategoriesBaseNaturalEventCategory(
     NaturalEventCategoryTrait,
     BaseModel,
 ):
+    """No documentation"""
+
     typename: Literal["NaturalEventCategory"] = Field(
         alias="__typename", default="NaturalEventCategory", exclude=True
     )
 
 
+class NodeCategoriesQueryNodecategoriesBaseCatchAll(
+    NodeCategoriesQueryNodecategoriesBase, BaseModel
+):
+    """Catch all class for NodeCategoriesQueryNodecategoriesBase"""
+
+    typename: str = Field(alias="__typename", exclude=True)
+
+
 class NodeCategoriesQuery(BaseModel):
+    """No documentation found for this operation."""
+
     node_categories: Tuple[
-        Annotated[
-            Union[
-                NodeCategoriesQueryNodecategoriesBaseMetricCategory,
-                NodeCategoriesQueryNodecategoriesBaseStructureCategory,
-                NodeCategoriesQueryNodecategoriesBaseProtocolEventCategory,
-                NodeCategoriesQueryNodecategoriesBaseEntityCategory,
-                NodeCategoriesQueryNodecategoriesBaseReagentCategory,
-                NodeCategoriesQueryNodecategoriesBaseNaturalEventCategory,
+        Union[
+            Annotated[
+                Union[
+                    NodeCategoriesQueryNodecategoriesBaseMetricCategory,
+                    NodeCategoriesQueryNodecategoriesBaseStructureCategory,
+                    NodeCategoriesQueryNodecategoriesBaseProtocolEventCategory,
+                    NodeCategoriesQueryNodecategoriesBaseEntityCategory,
+                    NodeCategoriesQueryNodecategoriesBaseReagentCategory,
+                    NodeCategoriesQueryNodecategoriesBaseNaturalEventCategory,
+                ],
+                Field(discriminator="typename"),
             ],
-            Field(discriminator="typename"),
+            NodeCategoriesQueryNodecategoriesBaseCatchAll,
         ],
         ...,
     ] = Field(alias="nodeCategories")
 
     class Arguments(BaseModel):
-        pass
+        """Arguments for NodeCategories"""
 
     class Meta:
-        document = "fragment Participant on Participant {\n  role\n  quantity\n  __typename\n}\n\nfragment Relation on Relation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}\n\nfragment Reagent on Reagent {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  externalId\n  label\n  __typename\n}\n\nfragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nfragment BaseEdge on Edge {\n  id\n  leftId\n  rightId\n  __typename\n}\n\nfragment BaseNode on Node {\n  id\n  label\n  __typename\n}\n\nfragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment Measurement on Measurement {\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Node on Node {\n  ...BaseNode\n  ...Entity\n  ...Structure\n  ...Metric\n  ...Reagent\n  __typename\n}\n\nfragment Edge on Edge {\n  ...BaseEdge\n  ...Measurement\n  ...Relation\n  ...Participant\n  __typename\n}\n\nfragment Column on Column {\n  name\n  kind\n  valueKind\n  label\n  description\n  category\n  searchable\n  idfor\n  preferhidden\n  __typename\n}\n\nfragment Table on Table {\n  graph {\n    ageName\n    __typename\n  }\n  rows\n  columns {\n    ...Column\n    __typename\n  }\n  __typename\n}\n\nfragment Pairs on Pairs {\n  pairs {\n    left {\n      id\n      __typename\n    }\n    right {\n      id\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nfragment Path on Path {\n  nodes {\n    ...Node\n    __typename\n  }\n  edges {\n    ...Edge\n    __typename\n  }\n  __typename\n}\n\nfragment ListScatterPlot on ScatterPlot {\n  id\n  name\n  xColumn\n  yColumn\n  __typename\n}\n\nfragment EntityCategoryDefinition on EntityCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment ReagentCategoryDefinition on ReagentCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment GraphQuery on GraphQuery {\n  id\n  query\n  name\n  graph {\n    id\n    name\n    __typename\n  }\n  scatterPlots(pagination: {limit: 1}) {\n    ...ListScatterPlot\n    __typename\n  }\n  render {\n    ...Path\n    ...Pairs\n    ...Table\n    __typename\n  }\n  pinned\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment EntityRoleDefinition on EntityRoleDefinition {\n  role\n  categoryDefinition {\n    ...EntityCategoryDefinition\n    __typename\n  }\n  optional\n  allowMultiple\n  __typename\n}\n\nfragment ReagentRoleDefinition on ReagentRoleDefinition {\n  role\n  categoryDefinition {\n    ...ReagentCategoryDefinition\n    __typename\n  }\n  needsQuantity\n  optional\n  __typename\n}\n\nfragment VariableDefinition on VariableDefinition {\n  param\n  valueKind\n  default\n  optional\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment MetricCategory on MetricCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  metricKind\n  __typename\n}\n\nfragment NaturalEventCategory on NaturalEventCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  plateChildren\n  label\n  ageName\n  label\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment ReagentCategory on ReagentCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  __typename\n}\n\nfragment StructureCategory on StructureCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  identifier\n  __typename\n}\n\nfragment EntityCategory on EntityCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  instanceKind\n  ageName\n  label\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  bestQuery {\n    ...GraphQuery\n    __typename\n  }\n  __typename\n}\n\nfragment ProtocolEventCategory on ProtocolEventCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  plateChildren\n  label\n  ageName\n  label\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  sourceReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  targetReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  variableDefinitions {\n    ...VariableDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment NodeCategory on NodeCategory {\n  ...StructureCategory\n  ...EntityCategory\n  ...ProtocolEventCategory\n  ...NaturalEventCategory\n  ...MetricCategory\n  ...ReagentCategory\n  __typename\n}\n\nquery NodeCategories {\n  nodeCategories {\n    ...NodeCategory\n    __typename\n  }\n}"
+        """Meta class for NodeCategories"""
+
+        document = "fragment Relation on Relation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNode on Node {\n  id\n  label\n  __typename\n}\n\nfragment BaseEdge on Edge {\n  id\n  leftId\n  rightId\n  __typename\n}\n\nfragment Participant on Participant {\n  role\n  quantity\n  __typename\n}\n\nfragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nfragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}\n\nfragment Measurement on Measurement {\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Reagent on Reagent {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  externalId\n  label\n  __typename\n}\n\nfragment Node on Node {\n  ...BaseNode\n  ...Entity\n  ...Structure\n  ...Metric\n  ...Reagent\n  __typename\n}\n\nfragment Column on Column {\n  name\n  kind\n  valueKind\n  label\n  description\n  category\n  searchable\n  idfor\n  preferhidden\n  __typename\n}\n\nfragment Edge on Edge {\n  ...BaseEdge\n  ...Measurement\n  ...Relation\n  ...Participant\n  __typename\n}\n\nfragment EntityCategoryDefinition on EntityCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment Pairs on Pairs {\n  pairs {\n    left {\n      id\n      __typename\n    }\n    right {\n      id\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nfragment Table on Table {\n  graph {\n    ageName\n    __typename\n  }\n  rows\n  columns {\n    ...Column\n    __typename\n  }\n  __typename\n}\n\nfragment ListScatterPlot on ScatterPlot {\n  id\n  name\n  xColumn\n  yColumn\n  __typename\n}\n\nfragment Path on Path {\n  nodes {\n    ...Node\n    __typename\n  }\n  edges {\n    ...Edge\n    __typename\n  }\n  __typename\n}\n\nfragment ReagentCategoryDefinition on ReagentCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment VariableDefinition on VariableDefinition {\n  param\n  valueKind\n  default\n  optional\n  __typename\n}\n\nfragment EntityRoleDefinition on EntityRoleDefinition {\n  role\n  categoryDefinition {\n    ...EntityCategoryDefinition\n    __typename\n  }\n  optional\n  allowMultiple\n  __typename\n}\n\nfragment GraphQuery on GraphQuery {\n  id\n  query\n  name\n  graph {\n    id\n    name\n    __typename\n  }\n  scatterPlots(pagination: {limit: 1}) {\n    ...ListScatterPlot\n    __typename\n  }\n  render {\n    ...Path\n    ...Pairs\n    ...Table\n    __typename\n  }\n  pinned\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment ReagentRoleDefinition on ReagentRoleDefinition {\n  role\n  categoryDefinition {\n    ...ReagentCategoryDefinition\n    __typename\n  }\n  needsQuantity\n  optional\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment EntityCategory on EntityCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  instanceKind\n  ageName\n  label\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  bestQuery {\n    ...GraphQuery\n    __typename\n  }\n  __typename\n}\n\nfragment MetricCategory on MetricCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  metricKind\n  __typename\n}\n\nfragment StructureCategory on StructureCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  identifier\n  __typename\n}\n\nfragment ReagentCategory on ReagentCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  __typename\n}\n\nfragment ProtocolEventCategory on ProtocolEventCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  plateChildren\n  label\n  ageName\n  label\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  sourceReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  targetReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  variableDefinitions {\n    ...VariableDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment NaturalEventCategory on NaturalEventCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  plateChildren\n  label\n  ageName\n  label\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment NodeCategory on NodeCategory {\n  ...StructureCategory\n  ...EntityCategory\n  ...ProtocolEventCategory\n  ...NaturalEventCategory\n  ...MetricCategory\n  ...ReagentCategory\n  __typename\n}\n\nquery NodeCategories {\n  nodeCategories {\n    ...NodeCategory\n    __typename\n  }\n}"
 
 
 class GetMeasurmentCategoryQuery(BaseModel):
+    """No documentation found for this operation."""
+
     measurement_category: MeasurementCategory = Field(alias="measurementCategory")
 
     class Arguments(BaseModel):
+        """Arguments for GetMeasurmentCategory"""
+
         id: ID
 
     class Meta:
+        """Meta class for GetMeasurmentCategory"""
+
         document = "fragment BaseEdgeCategory on EdgeCategory {\n  id\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment MeasurementCategory on MeasurementCategory {\n  ...BaseCategory\n  ...BaseEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  __typename\n}\n\nquery GetMeasurmentCategory($id: ID!) {\n  measurementCategory(id: $id) {\n    ...MeasurementCategory\n    __typename\n  }\n}"
 
 
 class SearchMeasurmentCategoryQueryOptions(MeasurementCategoryTrait, BaseModel):
+    """No documentation"""
+
     typename: Literal["MeasurementCategory"] = Field(
         alias="__typename", default="MeasurementCategory", exclude=True
     )
@@ -4365,42 +5341,62 @@ class SearchMeasurmentCategoryQueryOptions(MeasurementCategoryTrait, BaseModel):
 
 
 class SearchMeasurmentCategoryQuery(BaseModel):
+    """No documentation found for this operation."""
+
     options: Tuple[SearchMeasurmentCategoryQueryOptions, ...]
     "List of all measurement categories"
 
     class Arguments(BaseModel):
+        """Arguments for SearchMeasurmentCategory"""
+
         search: Optional[str] = Field(default=None)
         values: Optional[List[ID]] = Field(default=None)
 
     class Meta:
+        """Meta class for SearchMeasurmentCategory"""
+
         document = "query SearchMeasurmentCategory($search: String, $values: [ID!]) {\n  options: measurementCategories(\n    filters: {search: $search, ids: $values}\n    pagination: {limit: 10}\n  ) {\n    value: id\n    label: label\n    __typename\n  }\n}"
 
 
 class ListMeasurmentCategoryQuery(BaseModel):
+    """No documentation found for this operation."""
+
     measurement_categories: Tuple[ListMeasurementCategory, ...] = Field(
         alias="measurementCategories"
     )
     "List of all measurement categories"
 
     class Arguments(BaseModel):
+        """Arguments for ListMeasurmentCategory"""
+
         filters: Optional[MeasurementCategoryFilter] = Field(default=None)
         pagination: Optional[OffsetPaginationInput] = Field(default=None)
 
     class Meta:
-        document = "fragment BaseListCategory on BaseCategory {\n  id\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  tags {\n    id\n    value\n    __typename\n  }\n  __typename\n}\n\nfragment BaseListEdgeCategory on EdgeCategory {\n  id\n  __typename\n}\n\nfragment ListMeasurementCategory on MeasurementCategory {\n  ...BaseListCategory\n  ...BaseListEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  label\n  __typename\n}\n\nquery ListMeasurmentCategory($filters: MeasurementCategoryFilter, $pagination: OffsetPaginationInput) {\n  measurementCategories(filters: $filters, pagination: $pagination) {\n    ...ListMeasurementCategory\n    __typename\n  }\n}"
+        """Meta class for ListMeasurmentCategory"""
+
+        document = "fragment BaseListEdgeCategory on EdgeCategory {\n  id\n  __typename\n}\n\nfragment BaseListCategory on BaseCategory {\n  id\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  tags {\n    id\n    value\n    __typename\n  }\n  __typename\n}\n\nfragment ListMeasurementCategory on MeasurementCategory {\n  ...BaseListCategory\n  ...BaseListEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  label\n  __typename\n}\n\nquery ListMeasurmentCategory($filters: MeasurementCategoryFilter, $pagination: OffsetPaginationInput) {\n  measurementCategories(filters: $filters, pagination: $pagination) {\n    ...ListMeasurementCategory\n    __typename\n  }\n}"
 
 
 class GetEntityCategoryQuery(BaseModel):
+    """No documentation found for this operation."""
+
     entity_category: EntityCategory = Field(alias="entityCategory")
 
     class Arguments(BaseModel):
+        """Arguments for GetEntityCategory"""
+
         id: ID
 
     class Meta:
-        document = "fragment Participant on Participant {\n  role\n  quantity\n  __typename\n}\n\nfragment Relation on Relation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}\n\nfragment Reagent on Reagent {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  externalId\n  label\n  __typename\n}\n\nfragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nfragment BaseEdge on Edge {\n  id\n  leftId\n  rightId\n  __typename\n}\n\nfragment BaseNode on Node {\n  id\n  label\n  __typename\n}\n\nfragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment Measurement on Measurement {\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Node on Node {\n  ...BaseNode\n  ...Entity\n  ...Structure\n  ...Metric\n  ...Reagent\n  __typename\n}\n\nfragment Edge on Edge {\n  ...BaseEdge\n  ...Measurement\n  ...Relation\n  ...Participant\n  __typename\n}\n\nfragment Column on Column {\n  name\n  kind\n  valueKind\n  label\n  description\n  category\n  searchable\n  idfor\n  preferhidden\n  __typename\n}\n\nfragment Table on Table {\n  graph {\n    ageName\n    __typename\n  }\n  rows\n  columns {\n    ...Column\n    __typename\n  }\n  __typename\n}\n\nfragment ListScatterPlot on ScatterPlot {\n  id\n  name\n  xColumn\n  yColumn\n  __typename\n}\n\nfragment Pairs on Pairs {\n  pairs {\n    left {\n      id\n      __typename\n    }\n    right {\n      id\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nfragment Path on Path {\n  nodes {\n    ...Node\n    __typename\n  }\n  edges {\n    ...Edge\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment GraphQuery on GraphQuery {\n  id\n  query\n  name\n  graph {\n    id\n    name\n    __typename\n  }\n  scatterPlots(pagination: {limit: 1}) {\n    ...ListScatterPlot\n    __typename\n  }\n  render {\n    ...Path\n    ...Pairs\n    ...Table\n    __typename\n  }\n  pinned\n  __typename\n}\n\nfragment EntityCategory on EntityCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  instanceKind\n  ageName\n  label\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  bestQuery {\n    ...GraphQuery\n    __typename\n  }\n  __typename\n}\n\nquery GetEntityCategory($id: ID!) {\n  entityCategory(id: $id) {\n    ...EntityCategory\n    __typename\n  }\n}"
+        """Meta class for GetEntityCategory"""
+
+        document = "fragment Relation on Relation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNode on Node {\n  id\n  label\n  __typename\n}\n\nfragment BaseEdge on Edge {\n  id\n  leftId\n  rightId\n  __typename\n}\n\nfragment Participant on Participant {\n  role\n  quantity\n  __typename\n}\n\nfragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nfragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}\n\nfragment Measurement on Measurement {\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Reagent on Reagent {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  externalId\n  label\n  __typename\n}\n\nfragment Edge on Edge {\n  ...BaseEdge\n  ...Measurement\n  ...Relation\n  ...Participant\n  __typename\n}\n\nfragment Column on Column {\n  name\n  kind\n  valueKind\n  label\n  description\n  category\n  searchable\n  idfor\n  preferhidden\n  __typename\n}\n\nfragment Node on Node {\n  ...BaseNode\n  ...Entity\n  ...Structure\n  ...Metric\n  ...Reagent\n  __typename\n}\n\nfragment Table on Table {\n  graph {\n    ageName\n    __typename\n  }\n  rows\n  columns {\n    ...Column\n    __typename\n  }\n  __typename\n}\n\nfragment Pairs on Pairs {\n  pairs {\n    left {\n      id\n      __typename\n    }\n    right {\n      id\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nfragment ListScatterPlot on ScatterPlot {\n  id\n  name\n  xColumn\n  yColumn\n  __typename\n}\n\nfragment Path on Path {\n  nodes {\n    ...Node\n    __typename\n  }\n  edges {\n    ...Edge\n    __typename\n  }\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment GraphQuery on GraphQuery {\n  id\n  query\n  name\n  graph {\n    id\n    name\n    __typename\n  }\n  scatterPlots(pagination: {limit: 1}) {\n    ...ListScatterPlot\n    __typename\n  }\n  render {\n    ...Path\n    ...Pairs\n    ...Table\n    __typename\n  }\n  pinned\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment EntityCategory on EntityCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  instanceKind\n  ageName\n  label\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  bestQuery {\n    ...GraphQuery\n    __typename\n  }\n  __typename\n}\n\nquery GetEntityCategory($id: ID!) {\n  entityCategory(id: $id) {\n    ...EntityCategory\n    __typename\n  }\n}"
 
 
 class SearchEntityCategoryQueryOptions(EntityCategoryTrait, BaseModel):
+    """No documentation"""
+
     typename: Literal["EntityCategory"] = Field(
         alias="__typename", default="EntityCategory", exclude=True
     )
@@ -4412,30 +5408,44 @@ class SearchEntityCategoryQueryOptions(EntityCategoryTrait, BaseModel):
 
 
 class SearchEntityCategoryQuery(BaseModel):
+    """No documentation found for this operation."""
+
     options: Tuple[SearchEntityCategoryQueryOptions, ...]
     "List of all generic categories"
 
     class Arguments(BaseModel):
+        """Arguments for SearchEntityCategory"""
+
         search: Optional[str] = Field(default=None)
         values: Optional[List[ID]] = Field(default=None)
 
     class Meta:
+        """Meta class for SearchEntityCategory"""
+
         document = "query SearchEntityCategory($search: String, $values: [ID!]) {\n  options: entityCategories(\n    filters: {search: $search, ids: $values}\n    pagination: {limit: 10}\n  ) {\n    value: id\n    label: label\n    __typename\n  }\n}"
 
 
 class ListEntityCategoryQuery(BaseModel):
+    """No documentation found for this operation."""
+
     entity_categories: Tuple[ListEntityCategory, ...] = Field(alias="entityCategories")
     "List of all generic categories"
 
     class Arguments(BaseModel):
+        """Arguments for ListEntityCategory"""
+
         filters: Optional[EntityCategoryFilter] = Field(default=None)
         pagination: Optional[OffsetPaginationInput] = Field(default=None)
 
     class Meta:
+        """Meta class for ListEntityCategory"""
+
         document = "fragment BaseListCategory on BaseCategory {\n  id\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  tags {\n    id\n    value\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment ListEntityCategory on EntityCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  instanceKind\n  label\n  __typename\n}\n\nquery ListEntityCategory($filters: EntityCategoryFilter, $pagination: OffsetPaginationInput) {\n  entityCategories(filters: $filters, pagination: $pagination) {\n    ...ListEntityCategory\n    __typename\n  }\n}"
 
 
 class GlobalSearchQuery(BaseModel):
+    """No documentation found for this operation."""
+
     entity_categories: Tuple[ListEntityCategory, ...] = Field(alias="entityCategories")
     "List of all generic categories"
     relation_categories: Tuple[ListRelationCategory, ...] = Field(
@@ -4452,19 +5462,29 @@ class GlobalSearchQuery(BaseModel):
     "List of all structure categories"
 
     class Arguments(BaseModel):
+        """Arguments for GlobalSearch"""
+
         search: str
 
     class Meta:
-        document = "fragment BaseListEdgeCategory on EdgeCategory {\n  id\n  __typename\n}\n\nfragment BaseListNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment BaseListCategory on BaseCategory {\n  id\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  tags {\n    id\n    value\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment ListEntityCategory on EntityCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  instanceKind\n  label\n  __typename\n}\n\nfragment ListStructureCategory on StructureCategory {\n  ...BaseListCategory\n  ...BaseListNodeCategory\n  identifier\n  __typename\n}\n\nfragment ListMeasurementCategory on MeasurementCategory {\n  ...BaseListCategory\n  ...BaseListEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment ListRelationCategory on RelationCategory {\n  ...BaseListCategory\n  ...BaseListEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  label\n  __typename\n}\n\nquery GlobalSearch($search: String!) {\n  entityCategories(filters: {search: $search}, pagination: {limit: 10}) {\n    ...ListEntityCategory\n    __typename\n  }\n  relationCategories(filters: {search: $search}, pagination: {limit: 10}) {\n    ...ListRelationCategory\n    __typename\n  }\n  measurementCategories(filters: {search: $search}, pagination: {limit: 10}) {\n    ...ListMeasurementCategory\n    __typename\n  }\n  structureCategories(filters: {search: $search}, pagination: {limit: 10}) {\n    ...ListStructureCategory\n    __typename\n  }\n}"
+        """Meta class for GlobalSearch"""
+
+        document = "fragment BaseListCategory on BaseCategory {\n  id\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  tags {\n    id\n    value\n    __typename\n  }\n  __typename\n}\n\nfragment BaseListNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment BaseListEdgeCategory on EdgeCategory {\n  id\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment ListEntityCategory on EntityCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  instanceKind\n  label\n  __typename\n}\n\nfragment ListMeasurementCategory on MeasurementCategory {\n  ...BaseListCategory\n  ...BaseListEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment ListStructureCategory on StructureCategory {\n  ...BaseListCategory\n  ...BaseListNodeCategory\n  identifier\n  __typename\n}\n\nfragment ListRelationCategory on RelationCategory {\n  ...BaseListCategory\n  ...BaseListEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  label\n  __typename\n}\n\nquery GlobalSearch($search: String!) {\n  entityCategories(filters: {search: $search}, pagination: {limit: 10}) {\n    ...ListEntityCategory\n    __typename\n  }\n  relationCategories(filters: {search: $search}, pagination: {limit: 10}) {\n    ...ListRelationCategory\n    __typename\n  }\n  measurementCategories(filters: {search: $search}, pagination: {limit: 10}) {\n    ...ListMeasurementCategory\n    __typename\n  }\n  structureCategories(filters: {search: $search}, pagination: {limit: 10}) {\n    ...ListStructureCategory\n    __typename\n  }\n}"
 
 
 class GetReagentQuery(BaseModel):
+    """No documentation found for this operation."""
+
     reagent: Reagent
 
     class Arguments(BaseModel):
+        """Arguments for GetReagent"""
+
         id: ID
 
     class Meta:
+        """Meta class for GetReagent"""
+
         document = "fragment Reagent on Reagent {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  externalId\n  label\n  __typename\n}\n\nquery GetReagent($id: ID!) {\n  reagent(id: $id) {\n    ...Reagent\n    __typename\n  }\n}"
 
 
@@ -4481,36 +5501,73 @@ class SearchReagentsQueryOptions(EntityTrait, BaseModel):
 
 
 class SearchReagentsQuery(BaseModel):
+    """No documentation found for this operation."""
+
     options: Tuple[SearchReagentsQueryOptions, ...]
     "List of all entities in the system"
 
     class Arguments(BaseModel):
+        """Arguments for SearchReagents"""
+
         search: Optional[str] = Field(default=None)
         values: Optional[List[ID]] = Field(default=None)
 
     class Meta:
+        """Meta class for SearchReagents"""
+
         document = "query SearchReagents($search: String, $values: [ID!]) {\n  options: nodes(\n    filters: {search: $search, ids: $values}\n    pagination: {limit: 10}\n  ) {\n    value: id\n    label: label\n    __typename\n  }\n}"
 
 
 class ListReagentsQuery(BaseModel):
+    """No documentation found for this operation."""
+
     reagents: Tuple[ListReagent, ...]
 
     class Arguments(BaseModel):
+        """Arguments for ListReagents"""
+
         filters: Optional[ReagentFilter] = Field(default=None)
         pagination: Optional[GraphPaginationInput] = Field(default=None)
 
     class Meta:
+        """Meta class for ListReagents"""
+
         document = "fragment ListReagent on Reagent {\n  id\n  label\n  __typename\n}\n\nquery ListReagents($filters: ReagentFilter, $pagination: GraphPaginationInput) {\n  reagents(filters: $filters, pagination: $pagination) {\n    ...ListReagent\n    __typename\n  }\n}"
 
 
 class GetEntityQuery(BaseModel):
+    """No documentation found for this operation."""
+
     entity: Entity
 
     class Arguments(BaseModel):
+        """Arguments for GetEntity"""
+
         id: ID
 
     class Meta:
+        """Meta class for GetEntity"""
+
         document = "fragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}\n\nquery GetEntity($id: ID!) {\n  entity(id: $id) {\n    ...Entity\n    __typename\n  }\n}"
+
+
+class GetEntityForCategoryAndExternalIDQuery(BaseModel):
+    """No documentation found for this operation."""
+
+    get_entity_by_category_and_external_id: Entity = Field(
+        alias="getEntityByCategoryAndExternalId"
+    )
+
+    class Arguments(BaseModel):
+        """Arguments for GetEntityForCategoryAndExternalID"""
+
+        category: ID
+        external_id: str = Field(alias="externalId")
+
+    class Meta:
+        """Meta class for GetEntityForCategoryAndExternalID"""
+
+        document = "fragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}\n\nquery GetEntityForCategoryAndExternalID($category: ID!, $externalId: String!) {\n  getEntityByCategoryAndExternalId(category: $category, externalId: $externalId) {\n    ...Entity\n    __typename\n  }\n}"
 
 
 class SearchEntitiesQueryOptions(EntityTrait, BaseModel):
@@ -4526,35 +5583,53 @@ class SearchEntitiesQueryOptions(EntityTrait, BaseModel):
 
 
 class SearchEntitiesQuery(BaseModel):
+    """No documentation found for this operation."""
+
     options: Tuple[SearchEntitiesQueryOptions, ...]
     "List of all entities in the system"
 
     class Arguments(BaseModel):
+        """Arguments for SearchEntities"""
+
         search: Optional[str] = Field(default=None)
         values: Optional[List[ID]] = Field(default=None)
 
     class Meta:
+        """Meta class for SearchEntities"""
+
         document = "query SearchEntities($search: String, $values: [ID!]) {\n  options: nodes(\n    filters: {search: $search, ids: $values}\n    pagination: {limit: 10}\n  ) {\n    value: id\n    label: label\n    __typename\n  }\n}"
 
 
 class ListEntitiesQuery(BaseModel):
+    """No documentation found for this operation."""
+
     entities: Tuple[ListEntity, ...]
 
     class Arguments(BaseModel):
+        """Arguments for ListEntities"""
+
         filters: Optional[EntityFilter] = Field(default=None)
         pagination: Optional[GraphPaginationInput] = Field(default=None)
 
     class Meta:
+        """Meta class for ListEntities"""
+
         document = "fragment ListEntity on Entity {\n  id\n  label\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nquery ListEntities($filters: EntityFilter, $pagination: GraphPaginationInput) {\n  entities(filters: $filters, pagination: $pagination) {\n    ...ListEntity\n    __typename\n  }\n}"
 
 
 class GetProtocolEventQuery(BaseModel):
+    """No documentation found for this operation."""
+
     protocol_event: ProtocolEvent = Field(alias="protocolEvent")
 
     class Arguments(BaseModel):
+        """Arguments for GetProtocolEvent"""
+
         id: ID
 
     class Meta:
+        """Meta class for GetProtocolEvent"""
+
         document = "fragment ProtocolEvent on ProtocolEvent {\n  id\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nquery GetProtocolEvent($id: ID!) {\n  protocolEvent(id: $id) {\n    ...ProtocolEvent\n    __typename\n  }\n}"
 
 
@@ -4571,23 +5646,35 @@ class SearchProtocolEventsQueryOptions(BaseModel):
 
 
 class SearchProtocolEventsQuery(BaseModel):
+    """No documentation found for this operation."""
+
     options: Tuple[SearchProtocolEventsQueryOptions, ...]
 
     class Arguments(BaseModel):
+        """Arguments for SearchProtocolEvents"""
+
         search: Optional[str] = Field(default=None)
         values: Optional[List[ID]] = Field(default=None)
 
     class Meta:
+        """Meta class for SearchProtocolEvents"""
+
         document = "query SearchProtocolEvents($search: String, $values: [ID!]) {\n  options: protocolEvents(\n    filters: {search: $search, ids: $values}\n    pagination: {limit: 10}\n  ) {\n    value: id\n    label: label\n    __typename\n  }\n}"
 
 
 class GetStructureQuery(BaseModel):
+    """No documentation found for this operation."""
+
     structure: Structure
 
     class Arguments(BaseModel):
+        """Arguments for GetStructure"""
+
         id: ID
 
     class Meta:
+        """Meta class for GetStructure"""
+
         document = "fragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}\n\nquery GetStructure($id: ID!) {\n  structure(id: $id) {\n    ...Structure\n    __typename\n  }\n}"
 
 
@@ -4604,46 +5691,70 @@ class SearchStructuresQueryOptions(StructureTrait, BaseModel):
 
 
 class SearchStructuresQuery(BaseModel):
+    """No documentation found for this operation."""
+
     options: Tuple[SearchStructuresQueryOptions, ...]
 
     class Arguments(BaseModel):
+        """Arguments for SearchStructures"""
+
         search: Optional[str] = Field(default=None)
         values: Optional[List[ID]] = Field(default=None)
 
     class Meta:
+        """Meta class for SearchStructures"""
+
         document = "query SearchStructures($search: String, $values: [ID!]) {\n  options: structures(\n    filters: {search: $search, ids: $values}\n    pagination: {limit: 10}\n  ) {\n    value: id\n    label: label\n    __typename\n  }\n}"
 
 
 class GetInformedStructureQuery(BaseModel):
+    """No documentation found for this operation."""
+
     structure_by_identifier: InformedStructure = Field(alias="structureByIdentifier")
 
     class Arguments(BaseModel):
+        """Arguments for GetInformedStructure"""
+
         graph: ID
         identifier: StructureIdentifier
         object: ID
 
     class Meta:
-        document = "fragment Participant on Participant {\n  role\n  quantity\n  __typename\n}\n\nfragment Relation on Relation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment Measurement on Measurement {\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Reagent on Reagent {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  externalId\n  label\n  __typename\n}\n\nfragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nfragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}\n\nfragment BaseEdge on Edge {\n  id\n  leftId\n  rightId\n  __typename\n}\n\nfragment BaseNode on Node {\n  id\n  label\n  __typename\n}\n\nfragment Node on Node {\n  ...BaseNode\n  ...Entity\n  ...Structure\n  ...Metric\n  ...Reagent\n  __typename\n}\n\nfragment Edge on Edge {\n  ...BaseEdge\n  ...Measurement\n  ...Relation\n  ...Participant\n  __typename\n}\n\nfragment Column on Column {\n  name\n  kind\n  valueKind\n  label\n  description\n  category\n  searchable\n  idfor\n  preferhidden\n  __typename\n}\n\nfragment Table on Table {\n  graph {\n    ageName\n    __typename\n  }\n  rows\n  columns {\n    ...Column\n    __typename\n  }\n  __typename\n}\n\nfragment Path on Path {\n  nodes {\n    ...Node\n    __typename\n  }\n  edges {\n    ...Edge\n    __typename\n  }\n  __typename\n}\n\nfragment Pairs on Pairs {\n  pairs {\n    left {\n      id\n      __typename\n    }\n    right {\n      id\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nfragment InformedStructure on Structure {\n  id\n  category {\n    id\n    identifier\n    __typename\n  }\n  graph {\n    id\n    name\n    __typename\n  }\n  bestView {\n    ...Table\n    ...Pairs\n    ...Path\n    __typename\n  }\n  __typename\n}\n\nquery GetInformedStructure($graph: ID!, $identifier: StructureIdentifier!, $object: ID!) {\n  structureByIdentifier(graph: $graph, identifier: $identifier, object: $object) {\n    ...InformedStructure\n    __typename\n  }\n}"
+        """Meta class for GetInformedStructure"""
+
+        document = "fragment InformedStructure on Structure {\n  id\n  category {\n    id\n    identifier\n    __typename\n  }\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nquery GetInformedStructure($graph: ID!, $identifier: StructureIdentifier!, $object: ID!) {\n  structureByIdentifier(graph: $graph, identifier: $identifier, object: $object) {\n    ...InformedStructure\n    __typename\n  }\n}"
 
 
 class ListStructuresQuery(BaseModel):
+    """No documentation found for this operation."""
+
     structures: Tuple[ListStructure, ...]
 
     class Arguments(BaseModel):
+        """Arguments for ListStructures"""
+
         filters: Optional[StructureFilter] = Field(default=None)
         pagination: Optional[GraphPaginationInput] = Field(default=None)
 
     class Meta:
+        """Meta class for ListStructures"""
+
         document = "fragment ListStructure on Structure {\n  id\n  category {\n    identifier\n    id\n    __typename\n  }\n  __typename\n}\n\nquery ListStructures($filters: StructureFilter, $pagination: GraphPaginationInput) {\n  structures(filters: $filters, pagination: $pagination) {\n    ...ListStructure\n    __typename\n  }\n}"
 
 
 class GetMeasurementQuery(BaseModel):
+    """No documentation found for this operation."""
+
     measurement: Measurement
 
     class Arguments(BaseModel):
+        """Arguments for GetMeasurement"""
+
         id: ID
 
     class Meta:
+        """Meta class for GetMeasurement"""
+
         document = "fragment Measurement on Measurement {\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nquery GetMeasurement($id: ID!) {\n  measurement(id: $id) {\n    ...Measurement\n    __typename\n  }\n}"
 
 
@@ -4660,13 +5771,19 @@ class SearchMeasurementsQueryOptions(BaseModel):
 
 
 class SearchMeasurementsQuery(BaseModel):
+    """No documentation found for this operation."""
+
     options: Tuple[SearchMeasurementsQueryOptions, ...]
 
     class Arguments(BaseModel):
+        """Arguments for SearchMeasurements"""
+
         search: Optional[str] = Field(default=None)
         values: Optional[List[ID]] = Field(default=None)
 
     class Meta:
+        """Meta class for SearchMeasurements"""
+
         document = "query SearchMeasurements($search: String, $values: [ID!]) {\n  options: measurements(\n    filters: {search: $search, ids: $values}\n    pagination: {limit: 10}\n  ) {\n    value: id\n    label: label\n    __typename\n  }\n}"
 
 
@@ -4680,25 +5797,34 @@ class SearchTagsQueryOptions(BaseModel):
 
 
 class SearchTagsQuery(BaseModel):
+    """No documentation found for this operation."""
+
     options: Tuple[SearchTagsQueryOptions, ...]
     "List of all tags in the system"
 
     class Arguments(BaseModel):
+        """Arguments for SearchTags"""
+
         search: Optional[str] = Field(default=None)
         values: Optional[List[str]] = Field(default=None)
 
     class Meta:
+        """Meta class for SearchTags"""
+
         document = "query SearchTags($search: String, $values: [String!]) {\n  options: tags(\n    filters: {search: $search, values: $values}\n    pagination: {limit: 10}\n  ) {\n    value: value\n    label: value\n    __typename\n  }\n}"
 
 
 class GetNodeQueryNodeBase(BaseModel):
-    pass
+    """No documentation"""
+
     model_config = ConfigDict(frozen=True)
 
 
 class GetNodeQueryNodeBaseEntity(
     DetailNodeEntity, GetNodeQueryNodeBase, EntityTrait, BaseModel
 ):
+    """A Entity is a recorded data point in a graph. It can measure a property of an entity through a direct measurement edge, that connects the entity to the structure. It of course can relate to other structures through relation edges."""
+
     typename: Literal["Entity"] = Field(
         alias="__typename", default="Entity", exclude=True
     )
@@ -4707,6 +5833,8 @@ class GetNodeQueryNodeBaseEntity(
 class GetNodeQueryNodeBaseStructure(
     DetailNodeStructure, GetNodeQueryNodeBase, StructureTrait, BaseModel
 ):
+    """A Structure is a recorded data point in a graph. It can measure a property of an entity through a direct measurement edge, that connects the entity to the structure. It of course can relate to other structures through relation edges."""
+
     typename: Literal["Structure"] = Field(
         alias="__typename", default="Structure", exclude=True
     )
@@ -4715,6 +5843,8 @@ class GetNodeQueryNodeBaseStructure(
 class GetNodeQueryNodeBaseMetric(
     DetailNodeMetric, GetNodeQueryNodeBase, MetricTrait, BaseModel
 ):
+    """A Metric is a recorded data point in a graph. It always describes a structure and through the structure it can bring meaning to the measured entity. It can measure a property of an entity through a direct measurement edge, that connects the entity to the structure. It of course can relate to other structures through relation edges."""
+
     typename: Literal["Metric"] = Field(
         alias="__typename", default="Metric", exclude=True
     )
@@ -4723,6 +5853,8 @@ class GetNodeQueryNodeBaseMetric(
 class GetNodeQueryNodeBaseProtocolEvent(
     DetailNodeProtocolEvent, GetNodeQueryNodeBase, BaseModel
 ):
+    """A Metric is a recorded data point in a graph. It always describes a structure and through the structure it can bring meaning to the measured entity. It can measure a property of an entity through a direct measurement edge, that connects the entity to the structure. It of course can relate to other structures through relation edges."""
+
     typename: Literal["ProtocolEvent"] = Field(
         alias="__typename", default="ProtocolEvent", exclude=True
     )
@@ -4731,35 +5863,54 @@ class GetNodeQueryNodeBaseProtocolEvent(
 class GetNodeQueryNodeBaseNaturalEvent(
     DetailNodeNaturalEvent, GetNodeQueryNodeBase, BaseModel
 ):
+    """A Metric is a recorded data point in a graph. It always describes a structure and through the structure it can bring meaning to the measured entity. It can measure a property of an entity through a direct measurement edge, that connects the entity to the structure. It of course can relate to other structures through relation edges."""
+
     typename: Literal["NaturalEvent"] = Field(
         alias="__typename", default="NaturalEvent", exclude=True
     )
 
 
 class GetNodeQueryNodeBaseReagent(DetailNodeReagent, GetNodeQueryNodeBase, BaseModel):
+    """A Entity is a recorded data point in a graph. It can measure a property of an entity through a direct measurement edge, that connects the entity to the structure. It of course can relate to other structures through relation edges."""
+
     typename: Literal["Reagent"] = Field(
         alias="__typename", default="Reagent", exclude=True
     )
 
 
+class GetNodeQueryNodeBaseCatchAll(GetNodeQueryNodeBase, BaseModel):
+    """Catch all class for GetNodeQueryNodeBase"""
+
+    typename: str = Field(alias="__typename", exclude=True)
+
+
 class GetNodeQuery(BaseModel):
-    node: Annotated[
-        Union[
-            GetNodeQueryNodeBaseEntity,
-            GetNodeQueryNodeBaseStructure,
-            GetNodeQueryNodeBaseMetric,
-            GetNodeQueryNodeBaseProtocolEvent,
-            GetNodeQueryNodeBaseNaturalEvent,
-            GetNodeQueryNodeBaseReagent,
+    """No documentation found for this operation."""
+
+    node: Union[
+        Annotated[
+            Union[
+                GetNodeQueryNodeBaseEntity,
+                GetNodeQueryNodeBaseStructure,
+                GetNodeQueryNodeBaseMetric,
+                GetNodeQueryNodeBaseProtocolEvent,
+                GetNodeQueryNodeBaseNaturalEvent,
+                GetNodeQueryNodeBaseReagent,
+            ],
+            Field(discriminator="typename"),
         ],
-        Field(discriminator="typename"),
+        GetNodeQueryNodeBaseCatchAll,
     ]
 
     class Arguments(BaseModel):
+        """Arguments for GetNode"""
+
         id: ID
 
     class Meta:
-        document = "fragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment Reagent on Reagent {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  externalId\n  label\n  __typename\n}\n\nfragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nfragment Column on Column {\n  name\n  kind\n  valueKind\n  label\n  description\n  category\n  searchable\n  idfor\n  preferhidden\n  __typename\n}\n\nfragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}\n\nfragment BaseNode on Node {\n  id\n  label\n  __typename\n}\n\nfragment Node on Node {\n  ...BaseNode\n  ...Entity\n  ...Structure\n  ...Metric\n  ...Reagent\n  __typename\n}\n\nfragment Table on Table {\n  graph {\n    ageName\n    __typename\n  }\n  rows\n  columns {\n    ...Column\n    __typename\n  }\n  __typename\n}\n\nfragment DetailNode on Node {\n  ...Node\n  graph {\n    id\n    name\n    __typename\n  }\n  bestView {\n    ...Table\n    __typename\n  }\n  __typename\n}\n\nquery GetNode($id: ID!) {\n  node(id: $id) {\n    ...DetailNode\n    __typename\n  }\n}"
+        """Meta class for GetNode"""
+
+        document = "fragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nfragment BaseNode on Node {\n  id\n  label\n  __typename\n}\n\nfragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}\n\nfragment Reagent on Reagent {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  externalId\n  label\n  __typename\n}\n\nfragment Node on Node {\n  ...BaseNode\n  ...Entity\n  ...Structure\n  ...Metric\n  ...Reagent\n  __typename\n}\n\nfragment DetailNode on Node {\n  ...Node\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nquery GetNode($id: ID!) {\n  node(id: $id) {\n    ...DetailNode\n    __typename\n  }\n}"
 
 
 class SearchNodesQueryOptions(EntityTrait, BaseModel):
@@ -4775,24 +5926,36 @@ class SearchNodesQueryOptions(EntityTrait, BaseModel):
 
 
 class SearchNodesQuery(BaseModel):
+    """No documentation found for this operation."""
+
     options: Tuple[SearchNodesQueryOptions, ...]
     "List of all entities in the system"
 
     class Arguments(BaseModel):
+        """Arguments for SearchNodes"""
+
         search: Optional[str] = Field(default=None)
         values: Optional[List[ID]] = Field(default=None)
 
     class Meta:
+        """Meta class for SearchNodes"""
+
         document = "query SearchNodes($search: String, $values: [ID!]) {\n  options: nodes(\n    filters: {search: $search, ids: $values}\n    pagination: {limit: 10}\n  ) {\n    value: id\n    label: label\n    __typename\n  }\n}"
 
 
 class GetRelationQuery(BaseModel):
+    """No documentation found for this operation."""
+
     relation: Relation
 
     class Arguments(BaseModel):
+        """Arguments for GetRelation"""
+
         id: ID
 
     class Meta:
+        """Meta class for GetRelation"""
+
         document = "fragment Relation on Relation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nquery GetRelation($id: ID!) {\n  relation(id: $id) {\n    ...Relation\n    __typename\n  }\n}"
 
 
@@ -4814,13 +5977,19 @@ class SearchRelationsQueryOptions(BaseModel):
 
 
 class SearchRelationsQuery(BaseModel):
+    """No documentation found for this operation."""
+
     options: Tuple[SearchRelationsQueryOptions, ...]
 
     class Arguments(BaseModel):
+        """Arguments for SearchRelations"""
+
         search: Optional[str] = Field(default=None)
         values: Optional[List[ID]] = Field(default=None)
 
     class Meta:
+        """Meta class for SearchRelations"""
+
         document = "query SearchRelations($search: String, $values: [ID!]) {\n  options: relations(\n    filters: {search: $search, ids: $values}\n    pagination: {limit: 10}\n  ) {\n    value: id\n    label: label\n    __typename\n  }\n}"
 
 
@@ -4849,7 +6018,8 @@ async def arecord_natural_event(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        NaturalEvent"""
+        NaturalEvent
+    """
     return (
         await aexecute(
             RecordNaturalEventMutation,
@@ -4894,7 +6064,8 @@ def record_natural_event(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        NaturalEvent"""
+        NaturalEvent
+    """
     return execute(
         RecordNaturalEventMutation,
         {
@@ -4959,7 +6130,8 @@ async def acreate_natural_event_category(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        NaturalEventCategory"""
+        NaturalEventCategory
+    """
     return (
         await aexecute(
             CreateNaturalEventCategoryMutation,
@@ -5037,7 +6209,8 @@ def create_natural_event_category(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        NaturalEventCategory"""
+        NaturalEventCategory
+    """
     return execute(
         CreateNaturalEventCategoryMutation,
         {
@@ -5109,7 +6282,8 @@ async def aupdate_natural_event_category(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        NaturalEventCategory"""
+        NaturalEventCategory
+    """
     return (
         await aexecute(
             UpdateNaturalEventCategoryMutation,
@@ -5181,7 +6355,8 @@ def update_natural_event_category(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        NaturalEventCategory"""
+        NaturalEventCategory
+    """
     return execute(
         UpdateNaturalEventCategoryMutation,
         {
@@ -5239,7 +6414,8 @@ async def acreate_structure_category(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        StructureCategory"""
+        StructureCategory
+    """
     return (
         await aexecute(
             CreateStructureCategoryMutation,
@@ -5293,7 +6469,8 @@ def create_structure_category(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        StructureCategory"""
+        StructureCategory
+    """
     return execute(
         CreateStructureCategoryMutation,
         {
@@ -5341,7 +6518,8 @@ async def aupdate_structure_category(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        StructureCategory"""
+        StructureCategory
+    """
     return (
         await aexecute(
             UpdateStructureCategoryMutation,
@@ -5389,7 +6567,8 @@ def update_structure_category(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        StructureCategory"""
+        StructureCategory
+    """
     return execute(
         UpdateStructureCategoryMutation,
         {
@@ -5425,7 +6604,8 @@ async def acreate_model(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        Model"""
+        Model
+    """
     return (
         await aexecute(
             CreateModelMutation,
@@ -5452,7 +6632,8 @@ def create_model(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        Model"""
+        Model
+    """
     return execute(
         CreateModelMutation,
         {"input": {"name": name, "model": model, "view": view}},
@@ -5468,6 +6649,7 @@ async def acreate_graph_query(
     description: Optional[str] = None,
     columns: Optional[Iterable[ColumnInput]] = None,
     relevant_for: Optional[Iterable[ID]] = None,
+    pin: Optional[bool] = None,
     rath: Optional[KraphRath] = None,
 ) -> GraphQuery:
     """CreateGraphQuery
@@ -5482,10 +6664,12 @@ async def acreate_graph_query(
         kind: The kind/type of this expression
         columns: The columns (if ViewKind is Table)
         relevant_for: A list of categories where this query is releveant and should be shown
+        pin: Whether to pin this expression for the current user
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        GraphQuery"""
+        GraphQuery
+    """
     return (
         await aexecute(
             CreateGraphQueryMutation,
@@ -5498,6 +6682,7 @@ async def acreate_graph_query(
                     "kind": kind,
                     "columns": columns,
                     "relevantFor": relevant_for,
+                    "pin": pin,
                 }
             },
             rath=rath,
@@ -5513,6 +6698,7 @@ def create_graph_query(
     description: Optional[str] = None,
     columns: Optional[Iterable[ColumnInput]] = None,
     relevant_for: Optional[Iterable[ID]] = None,
+    pin: Optional[bool] = None,
     rath: Optional[KraphRath] = None,
 ) -> GraphQuery:
     """CreateGraphQuery
@@ -5527,10 +6713,12 @@ def create_graph_query(
         kind: The kind/type of this expression
         columns: The columns (if ViewKind is Table)
         relevant_for: A list of categories where this query is releveant and should be shown
+        pin: Whether to pin this expression for the current user
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        GraphQuery"""
+        GraphQuery
+    """
     return execute(
         CreateGraphQueryMutation,
         {
@@ -5542,6 +6730,7 @@ def create_graph_query(
                 "kind": kind,
                 "columns": columns,
                 "relevantFor": relevant_for,
+                "pin": pin,
             }
         },
         rath=rath,
@@ -5549,7 +6738,7 @@ def create_graph_query(
 
 
 async def apin_graph_query(
-    id: ID, pinned: bool, rath: Optional[KraphRath] = None
+    id: ID, pin: bool, rath: Optional[KraphRath] = None
 ) -> GraphQuery:
     """PinGraphQuery
 
@@ -5557,34 +6746,34 @@ async def apin_graph_query(
 
     Arguments:
         id: The `ID` scalar type represents a unique identifier, often used to refetch an object or as key for a cache. The ID type appears in a JSON response as a String; however, it is not intended to be human-readable. When expected as an input type, any string (such as `"4"`) or integer (such as `4`) input value will be accepted as an ID. (required)
-        pinned: The `Boolean` scalar type represents `true` or `false`. (required)
+        pin: The `Boolean` scalar type represents `true` or `false`. (required)
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        GraphQuery"""
+        GraphQuery
+    """
     return (
         await aexecute(
-            PinGraphQueryMutation, {"input": {"id": id, "pinned": pinned}}, rath=rath
+            PinGraphQueryMutation, {"input": {"id": id, "pin": pin}}, rath=rath
         )
     ).pin_graph_query
 
 
-def pin_graph_query(
-    id: ID, pinned: bool, rath: Optional[KraphRath] = None
-) -> GraphQuery:
+def pin_graph_query(id: ID, pin: bool, rath: Optional[KraphRath] = None) -> GraphQuery:
     """PinGraphQuery
 
     Pin or unpin a graph query
 
     Arguments:
         id: The `ID` scalar type represents a unique identifier, often used to refetch an object or as key for a cache. The ID type appears in a JSON response as a String; however, it is not intended to be human-readable. When expected as an input type, any string (such as `"4"`) or integer (such as `4`) input value will be accepted as an ID. (required)
-        pinned: The `Boolean` scalar type represents `true` or `false`. (required)
+        pin: The `Boolean` scalar type represents `true` or `false`. (required)
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        GraphQuery"""
+        GraphQuery
+    """
     return execute(
-        PinGraphQueryMutation, {"input": {"id": id, "pinned": pinned}}, rath=rath
+        PinGraphQueryMutation, {"input": {"id": id, "pin": pin}}, rath=rath
     ).pin_graph_query
 
 
@@ -5611,7 +6800,8 @@ async def acreate_toldyouso(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        Structure"""
+        Structure
+    """
     return (
         await aexecute(
             CreateToldyousoMutation,
@@ -5653,7 +6843,8 @@ def create_toldyouso(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        Structure"""
+        Structure
+    """
     return execute(
         CreateToldyousoMutation,
         {
@@ -5674,6 +6865,7 @@ async def acreate_graph(
     name: str,
     description: Optional[str] = None,
     image: Optional[ID] = None,
+    pin: Optional[bool] = None,
     rath: Optional[KraphRath] = None,
 ) -> Graph:
     """CreateGraph
@@ -5684,14 +6876,23 @@ async def acreate_graph(
         name: The name of the ontology (will be converted to snake_case)
         description: An optional description of the ontology
         image: An optional ID reference to an associated image
+        pin: Whether this ontology should be pinned or not
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        Graph"""
+        Graph
+    """
     return (
         await aexecute(
             CreateGraphMutation,
-            {"input": {"name": name, "description": description, "image": image}},
+            {
+                "input": {
+                    "name": name,
+                    "description": description,
+                    "image": image,
+                    "pin": pin,
+                }
+            },
             rath=rath,
         )
     ).create_graph
@@ -5701,6 +6902,7 @@ def create_graph(
     name: str,
     description: Optional[str] = None,
     image: Optional[ID] = None,
+    pin: Optional[bool] = None,
     rath: Optional[KraphRath] = None,
 ) -> Graph:
     """CreateGraph
@@ -5711,13 +6913,22 @@ def create_graph(
         name: The name of the ontology (will be converted to snake_case)
         description: An optional description of the ontology
         image: An optional ID reference to an associated image
+        pin: Whether this ontology should be pinned or not
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        Graph"""
+        Graph
+    """
     return execute(
         CreateGraphMutation,
-        {"input": {"name": name, "description": description, "image": image}},
+        {
+            "input": {
+                "name": name,
+                "description": description,
+                "image": image,
+                "pin": pin,
+            }
+        },
         rath=rath,
     ).create_graph
 
@@ -5733,7 +6944,8 @@ async def apin_graph(id: ID, pinned: bool, rath: Optional[KraphRath] = None) -> 
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        Graph"""
+        Graph
+    """
     return (
         await aexecute(
             PinGraphMutation, {"input": {"id": id, "pinned": pinned}}, rath=rath
@@ -5752,7 +6964,8 @@ def pin_graph(id: ID, pinned: bool, rath: Optional[KraphRath] = None) -> Graph:
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        Graph"""
+        Graph
+    """
     return execute(
         PinGraphMutation, {"input": {"id": id, "pinned": pinned}}, rath=rath
     ).pin_graph
@@ -5768,7 +6981,8 @@ async def adelete_graph(id: ID, rath: Optional[KraphRath] = None) -> ID:
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        ID"""
+        ID
+    """
     return (
         await aexecute(DeleteGraphMutation, {"input": {"id": id}}, rath=rath)
     ).delete_graph
@@ -5784,7 +6998,8 @@ def delete_graph(id: ID, rath: Optional[KraphRath] = None) -> ID:
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        ID"""
+        ID
+    """
     return execute(DeleteGraphMutation, {"input": {"id": id}}, rath=rath).delete_graph
 
 
@@ -5795,6 +7010,7 @@ async def aupdate_graph(
     description: Optional[str] = None,
     image: Optional[ID] = None,
     nodes: Optional[Iterable[GraphNodeInput]] = None,
+    pin: Optional[bool] = None,
     rath: Optional[KraphRath] = None,
 ) -> Graph:
     """UpdateGraph
@@ -5808,10 +7024,12 @@ async def aupdate_graph(
         description: New description for the ontology
         image: New ID reference to an associated image
         nodes: New nodes for the ontology
+        pin: Whether this ontology should be pinned or not
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        Graph"""
+        Graph
+    """
     return (
         await aexecute(
             UpdateGraphMutation,
@@ -5823,6 +7041,7 @@ async def aupdate_graph(
                     "description": description,
                     "image": image,
                     "nodes": nodes,
+                    "pin": pin,
                 }
             },
             rath=rath,
@@ -5837,6 +7056,7 @@ def update_graph(
     description: Optional[str] = None,
     image: Optional[ID] = None,
     nodes: Optional[Iterable[GraphNodeInput]] = None,
+    pin: Optional[bool] = None,
     rath: Optional[KraphRath] = None,
 ) -> Graph:
     """UpdateGraph
@@ -5850,10 +7070,12 @@ def update_graph(
         description: New description for the ontology
         image: New ID reference to an associated image
         nodes: New nodes for the ontology
+        pin: Whether this ontology should be pinned or not
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        Graph"""
+        Graph
+    """
     return execute(
         UpdateGraphMutation,
         {
@@ -5864,6 +7086,7 @@ def update_graph(
                 "description": description,
                 "image": image,
                 "nodes": nodes,
+                "pin": pin,
             }
         },
         rath=rath,
@@ -5883,7 +7106,8 @@ async def arequest_upload(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        PresignedPostCredentials"""
+        PresignedPostCredentials
+    """
     return (
         await aexecute(
             RequestUploadMutation,
@@ -5906,7 +7130,8 @@ def request_upload(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        PresignedPostCredentials"""
+        PresignedPostCredentials
+    """
     return execute(
         RequestUploadMutation,
         {"input": {"key": key, "datalayer": datalayer}},
@@ -5965,7 +7190,8 @@ async def acreate_protocol_event_category(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        ProtocolEventCategory"""
+        ProtocolEventCategory
+    """
     return (
         await aexecute(
             CreateProtocolEventCategoryMutation,
@@ -6049,7 +7275,8 @@ def create_protocol_event_category(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        ProtocolEventCategory"""
+        ProtocolEventCategory
+    """
     return execute(
         CreateProtocolEventCategoryMutation,
         {
@@ -6127,7 +7354,8 @@ async def aupdate_protocol_event_category(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        ProtocolEventCategory"""
+        ProtocolEventCategory
+    """
     return (
         await aexecute(
             UpdateProtocolEventCategoryMutation,
@@ -6205,7 +7433,8 @@ def update_protocol_event_category(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        ProtocolEventCategory"""
+        ProtocolEventCategory
+    """
     return execute(
         UpdateProtocolEventCategoryMutation,
         {
@@ -6269,7 +7498,8 @@ async def acreate_scatter_plot(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        ScatterPlot"""
+        ScatterPlot
+    """
     return (
         await aexecute(
             CreateScatterPlotMutation,
@@ -6329,7 +7559,8 @@ def create_scatter_plot(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        ScatterPlot"""
+        ScatterPlot
+    """
     return execute(
         CreateScatterPlotMutation,
         {
@@ -6362,7 +7593,8 @@ async def adelete_scatter_plot(id: ID, rath: Optional[KraphRath] = None) -> ID:
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        ID"""
+        ID
+    """
     return (
         await aexecute(DeleteScatterPlotMutation, {"input": {"id": id}}, rath=rath)
     ).delete_scatter_plot
@@ -6378,7 +7610,8 @@ def delete_scatter_plot(id: ID, rath: Optional[KraphRath] = None) -> ID:
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        ID"""
+        ID
+    """
     return execute(
         DeleteScatterPlotMutation, {"input": {"id": id}}, rath=rath
     ).delete_scatter_plot
@@ -6403,7 +7636,8 @@ async def acreate_metric(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        Metric"""
+        Metric
+    """
     return (
         await aexecute(
             CreateMetricMutation,
@@ -6439,7 +7673,8 @@ def create_metric(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        Metric"""
+        Metric
+    """
     return execute(
         CreateMetricMutation,
         {
@@ -6463,6 +7698,7 @@ async def acreate_node_query(
     columns: Optional[Iterable[ColumnInput]] = None,
     test_against: Optional[ID] = None,
     relevant_for: Optional[Iterable[ID]] = None,
+    pin: Optional[bool] = None,
     rath: Optional[KraphRath] = None,
 ) -> NodeQuery:
     """CreateNodeQuery
@@ -6478,10 +7714,12 @@ async def acreate_node_query(
         columns: The columns (if ViewKind is Table)
         test_against: The node to test against
         relevant_for: The list of categories this expression is relevant for
+        pin: Whether to pin this expression for the current user
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        NodeQuery"""
+        NodeQuery
+    """
     return (
         await aexecute(
             CreateNodeQueryMutation,
@@ -6495,6 +7733,7 @@ async def acreate_node_query(
                     "columns": columns,
                     "testAgainst": test_against,
                     "relevantFor": relevant_for,
+                    "pin": pin,
                 }
             },
             rath=rath,
@@ -6511,6 +7750,7 @@ def create_node_query(
     columns: Optional[Iterable[ColumnInput]] = None,
     test_against: Optional[ID] = None,
     relevant_for: Optional[Iterable[ID]] = None,
+    pin: Optional[bool] = None,
     rath: Optional[KraphRath] = None,
 ) -> NodeQuery:
     """CreateNodeQuery
@@ -6526,10 +7766,12 @@ def create_node_query(
         columns: The columns (if ViewKind is Table)
         test_against: The node to test against
         relevant_for: The list of categories this expression is relevant for
+        pin: Whether to pin this expression for the current user
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        NodeQuery"""
+        NodeQuery
+    """
     return execute(
         CreateNodeQueryMutation,
         {
@@ -6542,6 +7784,7 @@ def create_node_query(
                 "columns": columns,
                 "testAgainst": test_against,
                 "relevantFor": relevant_for,
+                "pin": pin,
             }
         },
         rath=rath,
@@ -6549,7 +7792,7 @@ def create_node_query(
 
 
 async def apin_node_query(
-    id: ID, pinned: bool, rath: Optional[KraphRath] = None
+    id: ID, pin: bool, rath: Optional[KraphRath] = None
 ) -> NodeQuery:
     """PinNodeQuery
 
@@ -6557,32 +7800,34 @@ async def apin_node_query(
 
     Arguments:
         id: The `ID` scalar type represents a unique identifier, often used to refetch an object or as key for a cache. The ID type appears in a JSON response as a String; however, it is not intended to be human-readable. When expected as an input type, any string (such as `"4"`) or integer (such as `4`) input value will be accepted as an ID. (required)
-        pinned: The `Boolean` scalar type represents `true` or `false`. (required)
+        pin: The `Boolean` scalar type represents `true` or `false`. (required)
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        NodeQuery"""
+        NodeQuery
+    """
     return (
         await aexecute(
-            PinNodeQueryMutation, {"input": {"id": id, "pinned": pinned}}, rath=rath
+            PinNodeQueryMutation, {"input": {"id": id, "pin": pin}}, rath=rath
         )
     ).pin_node_query
 
 
-def pin_node_query(id: ID, pinned: bool, rath: Optional[KraphRath] = None) -> NodeQuery:
+def pin_node_query(id: ID, pin: bool, rath: Optional[KraphRath] = None) -> NodeQuery:
     """PinNodeQuery
 
     Pin or unpin a node query
 
     Arguments:
         id: The `ID` scalar type represents a unique identifier, often used to refetch an object or as key for a cache. The ID type appears in a JSON response as a String; however, it is not intended to be human-readable. When expected as an input type, any string (such as `"4"`) or integer (such as `4`) input value will be accepted as an ID. (required)
-        pinned: The `Boolean` scalar type represents `true` or `false`. (required)
+        pin: The `Boolean` scalar type represents `true` or `false`. (required)
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        NodeQuery"""
+        NodeQuery
+    """
     return execute(
-        PinNodeQueryMutation, {"input": {"id": id, "pinned": pinned}}, rath=rath
+        PinNodeQueryMutation, {"input": {"id": id, "pin": pin}}, rath=rath
     ).pin_node_query
 
 
@@ -6625,7 +7870,8 @@ async def acreate_entity_category(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        EntityCategory"""
+        EntityCategory
+    """
     return (
         await aexecute(
             CreateEntityCategoryMutation,
@@ -6691,7 +7937,8 @@ def create_entity_category(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        EntityCategory"""
+        EntityCategory
+    """
     return execute(
         CreateEntityCategoryMutation,
         {
@@ -6751,7 +7998,8 @@ async def aupdate_entity_category(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        EntityCategory"""
+        EntityCategory
+    """
     return (
         await aexecute(
             UpdateEntityCategoryMutation,
@@ -6811,7 +8059,8 @@ def update_entity_category(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        EntityCategory"""
+        EntityCategory
+    """
     return execute(
         UpdateEntityCategoryMutation,
         {
@@ -6853,7 +8102,8 @@ async def acreate_reagent(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        Reagent"""
+        Reagent
+    """
     return (
         await aexecute(
             CreateReagentMutation,
@@ -6889,7 +8139,8 @@ def create_reagent(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        Reagent"""
+        Reagent
+    """
     return execute(
         CreateReagentMutation,
         {
@@ -6921,7 +8172,8 @@ async def acreate_entity(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        Entity"""
+        Entity
+    """
     return (
         await aexecute(
             CreateEntityMutation,
@@ -6954,7 +8206,8 @@ def create_entity(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        Entity"""
+        Entity
+    """
     return execute(
         CreateEntityMutation,
         {
@@ -6975,7 +8228,7 @@ async def arecord_protocol_event(
     entity_targets: Optional[Iterable[NodeMapping]] = None,
     reagent_sources: Optional[Iterable[NodeMapping]] = None,
     reagent_targets: Optional[Iterable[NodeMapping]] = None,
-    variables: Optional[Iterable[VariableMapping]] = None,
+    variables: Optional[Iterable[VariableMappingInput]] = None,
     valid_from: Optional[datetime] = None,
     valid_to: Optional[datetime] = None,
     rath: Optional[KraphRath] = None,
@@ -6997,7 +8250,8 @@ async def arecord_protocol_event(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        ProtocolEvent"""
+        ProtocolEvent
+    """
     return (
         await aexecute(
             RecordProtocolEventMutation,
@@ -7026,7 +8280,7 @@ def record_protocol_event(
     entity_targets: Optional[Iterable[NodeMapping]] = None,
     reagent_sources: Optional[Iterable[NodeMapping]] = None,
     reagent_targets: Optional[Iterable[NodeMapping]] = None,
-    variables: Optional[Iterable[VariableMapping]] = None,
+    variables: Optional[Iterable[VariableMappingInput]] = None,
     valid_from: Optional[datetime] = None,
     valid_to: Optional[datetime] = None,
     rath: Optional[KraphRath] = None,
@@ -7048,7 +8302,8 @@ def record_protocol_event(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        ProtocolEvent"""
+        ProtocolEvent
+    """
     return execute(
         RecordProtocolEventMutation,
         {
@@ -7085,7 +8340,8 @@ async def acreate_structure(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        Structure"""
+        Structure
+    """
     return (
         await aexecute(
             CreateStructureMutation,
@@ -7112,7 +8368,8 @@ def create_structure(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        Structure"""
+        Structure
+    """
     return execute(
         CreateStructureMutation,
         {"input": {"structure": structure, "graph": graph, "context": context}},
@@ -7155,7 +8412,8 @@ async def acreate_measurement_category(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        MeasurementCategory"""
+        MeasurementCategory
+    """
     return (
         await aexecute(
             CreateMeasurementCategoryMutation,
@@ -7215,7 +8473,8 @@ def create_measurement_category(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        MeasurementCategory"""
+        MeasurementCategory
+    """
     return execute(
         CreateMeasurementCategoryMutation,
         {
@@ -7281,7 +8540,8 @@ async def acreate_metric_category(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        MetricCategory"""
+        MetricCategory
+    """
     return (
         await aexecute(
             CreateMetricCategoryMutation,
@@ -7353,7 +8613,8 @@ def create_metric_category(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        MetricCategory"""
+        MetricCategory
+    """
     return execute(
         CreateMetricCategoryMutation,
         {
@@ -7419,7 +8680,8 @@ async def acreate_reagent_category(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        ReagentCategory"""
+        ReagentCategory
+    """
     return (
         await aexecute(
             CreateReagentCategoryMutation,
@@ -7485,7 +8747,8 @@ def create_reagent_category(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        ReagentCategory"""
+        ReagentCategory
+    """
     return execute(
         CreateReagentCategoryMutation,
         {
@@ -7545,7 +8808,8 @@ async def acreate_relation_category(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        RelationCategory"""
+        RelationCategory
+    """
     return (
         await aexecute(
             CreateRelationCategoryMutation,
@@ -7605,7 +8869,8 @@ def create_relation_category(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        RelationCategory"""
+        RelationCategory
+    """
     return execute(
         CreateRelationCategoryMutation,
         {
@@ -7651,7 +8916,8 @@ async def acreate_measurement(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        Measurement"""
+        Measurement
+    """
     return (
         await aexecute(
             CreateMeasurementMutation,
@@ -7693,7 +8959,8 @@ def create_measurement(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        Measurement"""
+        Measurement
+    """
     return execute(
         CreateMeasurementMutation,
         {
@@ -7729,7 +8996,8 @@ async def acreate_relation(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        Relation"""
+        Relation
+    """
     return (
         await aexecute(
             CreateRelationMutation,
@@ -7765,7 +9033,8 @@ def create_relation(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        Relation"""
+        Relation
+    """
     return execute(
         CreateRelationMutation,
         {
@@ -7791,7 +9060,8 @@ async def aget_protocol_event_category(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        ProtocolEventCategory"""
+        ProtocolEventCategory
+    """
     return (
         await aexecute(GetProtocolEventCategoryQuery, {"id": id}, rath=rath)
     ).protocol_event_category
@@ -7808,7 +9078,8 @@ def get_protocol_event_category(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        ProtocolEventCategory"""
+        ProtocolEventCategory
+    """
     return execute(
         GetProtocolEventCategoryQuery, {"id": id}, rath=rath
     ).protocol_event_category
@@ -7829,7 +9100,8 @@ async def asearch_protocol_event_categories(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[SearchProtocolEventCategoriesQueryProtocoleventcategories]"""
+        List[SearchProtocolEventCategoriesQueryProtocoleventcategories]
+    """
     return (
         await aexecute(
             SearchProtocolEventCategoriesQuery,
@@ -7854,7 +9126,8 @@ def search_protocol_event_categories(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[SearchProtocolEventCategoriesQueryProtocoleventcategories]"""
+        List[SearchProtocolEventCategoriesQueryProtocoleventcategories]
+    """
     return execute(
         SearchProtocolEventCategoriesQuery,
         {"search": search, "values": values},
@@ -7877,7 +9150,8 @@ async def alist_protocol_event_categories(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[ProtocolEventCategory]"""
+        List[ProtocolEventCategory]
+    """
     return (
         await aexecute(
             ListProtocolEventCategoriesQuery,
@@ -7902,7 +9176,8 @@ def list_protocol_event_categories(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[ProtocolEventCategory]"""
+        List[ProtocolEventCategory]
+    """
     return execute(
         ListProtocolEventCategoriesQuery,
         {"filters": filters, "pagination": pagination},
@@ -7919,7 +9194,8 @@ async def aget_natural_event(id: ID, rath: Optional[KraphRath] = None) -> Natura
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        NaturalEvent"""
+        NaturalEvent
+    """
     return (await aexecute(GetNaturalEventQuery, {"id": id}, rath=rath)).natural_event
 
 
@@ -7932,7 +9208,8 @@ def get_natural_event(id: ID, rath: Optional[KraphRath] = None) -> NaturalEvent:
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        NaturalEvent"""
+        NaturalEvent
+    """
     return execute(GetNaturalEventQuery, {"id": id}, rath=rath).natural_event
 
 
@@ -7950,7 +9227,8 @@ async def asearch_natural_events(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[SearchNaturalEventsQueryNaturalevents]"""
+        List[SearchNaturalEventsQueryNaturalevents]
+    """
     return (
         await aexecute(
             SearchNaturalEventsQuery, {"search": search, "values": values}, rath=rath
@@ -7972,7 +9250,8 @@ def search_natural_events(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[SearchNaturalEventsQueryNaturalevents]"""
+        List[SearchNaturalEventsQueryNaturalevents]
+    """
     return execute(
         SearchNaturalEventsQuery, {"search": search, "values": values}, rath=rath
     ).options
@@ -7987,7 +9266,8 @@ async def aget_participant(id: ID, rath: Optional[KraphRath] = None) -> Particip
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        Participant"""
+        Participant
+    """
     return (await aexecute(GetParticipantQuery, {"id": id}, rath=rath)).participant
 
 
@@ -8000,7 +9280,8 @@ def get_participant(id: ID, rath: Optional[KraphRath] = None) -> Participant:
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        Participant"""
+        Participant
+    """
     return execute(GetParticipantQuery, {"id": id}, rath=rath).participant
 
 
@@ -8018,7 +9299,8 @@ async def asearch_participants(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[SearchParticipantsQueryParticipants]"""
+        List[SearchParticipantsQueryParticipants]
+    """
     return (
         await aexecute(
             SearchParticipantsQuery, {"search": search, "values": values}, rath=rath
@@ -8040,7 +9322,8 @@ def search_participants(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[SearchParticipantsQueryParticipants]"""
+        List[SearchParticipantsQueryParticipants]
+    """
     return execute(
         SearchParticipantsQuery, {"search": search, "values": values}, rath=rath
     ).options
@@ -8057,7 +9340,8 @@ async def aget_relation_category(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        RelationCategory"""
+        RelationCategory
+    """
     return (
         await aexecute(GetRelationCategoryQuery, {"id": id}, rath=rath)
     ).relation_category
@@ -8072,7 +9356,8 @@ def get_relation_category(id: ID, rath: Optional[KraphRath] = None) -> RelationC
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        RelationCategory"""
+        RelationCategory
+    """
     return execute(GetRelationCategoryQuery, {"id": id}, rath=rath).relation_category
 
 
@@ -8091,7 +9376,8 @@ async def asearch_relation_category(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[SearchRelationCategoryQueryRelationcategories]"""
+        List[SearchRelationCategoryQueryRelationcategories]
+    """
     return (
         await aexecute(
             SearchRelationCategoryQuery, {"search": search, "values": values}, rath=rath
@@ -8114,7 +9400,8 @@ def search_relation_category(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[SearchRelationCategoryQueryRelationcategories]"""
+        List[SearchRelationCategoryQueryRelationcategories]
+    """
     return execute(
         SearchRelationCategoryQuery, {"search": search, "values": values}, rath=rath
     ).options
@@ -8135,7 +9422,8 @@ async def alist_relation_category(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[RelationCategory]"""
+        List[RelationCategory]
+    """
     return (
         await aexecute(
             ListRelationCategoryQuery,
@@ -8160,7 +9448,8 @@ def list_relation_category(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[RelationCategory]"""
+        List[RelationCategory]
+    """
     return execute(
         ListRelationCategoryQuery,
         {"filters": filters, "pagination": pagination},
@@ -8179,7 +9468,8 @@ async def aget_natural_event_category(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        NaturalEventCategory"""
+        NaturalEventCategory
+    """
     return (
         await aexecute(GetNaturalEventCategoryQuery, {"id": id}, rath=rath)
     ).natural_event_category
@@ -8196,7 +9486,8 @@ def get_natural_event_category(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        NaturalEventCategory"""
+        NaturalEventCategory
+    """
     return execute(
         GetNaturalEventCategoryQuery, {"id": id}, rath=rath
     ).natural_event_category
@@ -8217,7 +9508,8 @@ async def asearch_natural_event_categories(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[SearchNaturalEventCategoriesQueryNaturaleventcategories]"""
+        List[SearchNaturalEventCategoriesQueryNaturaleventcategories]
+    """
     return (
         await aexecute(
             SearchNaturalEventCategoriesQuery,
@@ -8242,7 +9534,8 @@ def search_natural_event_categories(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[SearchNaturalEventCategoriesQueryNaturaleventcategories]"""
+        List[SearchNaturalEventCategoriesQueryNaturaleventcategories]
+    """
     return execute(
         SearchNaturalEventCategoriesQuery,
         {"search": search, "values": values},
@@ -8265,7 +9558,8 @@ async def alist_natural_event_categories(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[NaturalEventCategory]"""
+        List[NaturalEventCategory]
+    """
     return (
         await aexecute(
             ListNaturalEventCategoriesQuery,
@@ -8290,7 +9584,8 @@ def list_natural_event_categories(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[NaturalEventCategory]"""
+        List[NaturalEventCategory]
+    """
     return execute(
         ListNaturalEventCategoriesQuery,
         {"filters": filters, "pagination": pagination},
@@ -8309,7 +9604,8 @@ async def aget_metric_category(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        MetricCategory"""
+        MetricCategory
+    """
     return (
         await aexecute(GetMetricCategoryQuery, {"id": id}, rath=rath)
     ).metric_category
@@ -8324,7 +9620,8 @@ def get_metric_category(id: ID, rath: Optional[KraphRath] = None) -> MetricCateg
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        MetricCategory"""
+        MetricCategory
+    """
     return execute(GetMetricCategoryQuery, {"id": id}, rath=rath).metric_category
 
 
@@ -8343,7 +9640,8 @@ async def asearch_metric_category(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[SearchMetricCategoryQueryMetriccategories]"""
+        List[SearchMetricCategoryQueryMetriccategories]
+    """
     return (
         await aexecute(
             SearchMetricCategoryQuery, {"search": search, "values": values}, rath=rath
@@ -8366,7 +9664,8 @@ def search_metric_category(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[SearchMetricCategoryQueryMetriccategories]"""
+        List[SearchMetricCategoryQueryMetriccategories]
+    """
     return execute(
         SearchMetricCategoryQuery, {"search": search, "values": values}, rath=rath
     ).options
@@ -8383,7 +9682,8 @@ async def aget_structure_category(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        StructureCategory"""
+        StructureCategory
+    """
     return (
         await aexecute(GetStructureCategoryQuery, {"id": id}, rath=rath)
     ).structure_category
@@ -8400,7 +9700,8 @@ def get_structure_category(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        StructureCategory"""
+        StructureCategory
+    """
     return execute(GetStructureCategoryQuery, {"id": id}, rath=rath).structure_category
 
 
@@ -8419,7 +9720,8 @@ async def asearch_structure_category(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[SearchStructureCategoryQueryStructurecategories]"""
+        List[SearchStructureCategoryQueryStructurecategories]
+    """
     return (
         await aexecute(
             SearchStructureCategoryQuery,
@@ -8444,7 +9746,8 @@ def search_structure_category(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[SearchStructureCategoryQueryStructurecategories]"""
+        List[SearchStructureCategoryQueryStructurecategories]
+    """
     return execute(
         SearchStructureCategoryQuery, {"search": search, "values": values}, rath=rath
     ).options
@@ -8465,7 +9768,8 @@ async def alist_structure_category(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[StructureCategory]"""
+        List[StructureCategory]
+    """
     return (
         await aexecute(
             ListStructureCategoryQuery,
@@ -8490,7 +9794,8 @@ def list_structure_category(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[StructureCategory]"""
+        List[StructureCategory]
+    """
     return execute(
         ListStructureCategoryQuery,
         {"filters": filters, "pagination": pagination},
@@ -8507,7 +9812,8 @@ async def aget_model(id: ID, rath: Optional[KraphRath] = None) -> Model:
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        Model"""
+        Model
+    """
     return (await aexecute(GetModelQuery, {"id": id}, rath=rath)).model
 
 
@@ -8520,7 +9826,8 @@ def get_model(id: ID, rath: Optional[KraphRath] = None) -> Model:
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        Model"""
+        Model
+    """
     return execute(GetModelQuery, {"id": id}, rath=rath).model
 
 
@@ -8539,7 +9846,8 @@ async def asearch_models(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[SearchModelsQueryModels]"""
+        List[SearchModelsQueryModels]
+    """
     return (
         await aexecute(
             SearchModelsQuery, {"search": search, "values": values}, rath=rath
@@ -8562,7 +9870,8 @@ def search_models(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[SearchModelsQueryModels]"""
+        List[SearchModelsQueryModels]
+    """
     return execute(
         SearchModelsQuery, {"search": search, "values": values}, rath=rath
     ).options
@@ -8577,7 +9886,8 @@ async def aget_graph_query(id: ID, rath: Optional[KraphRath] = None) -> GraphQue
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        GraphQuery"""
+        GraphQuery
+    """
     return (await aexecute(GetGraphQueryQuery, {"id": id}, rath=rath)).graph_query
 
 
@@ -8590,7 +9900,8 @@ def get_graph_query(id: ID, rath: Optional[KraphRath] = None) -> GraphQuery:
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        GraphQuery"""
+        GraphQuery
+    """
     return execute(GetGraphQueryQuery, {"id": id}, rath=rath).graph_query
 
 
@@ -8609,7 +9920,8 @@ async def asearch_graph_queries(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[SearchGraphQueriesQueryGraphqueries]"""
+        List[SearchGraphQueriesQueryGraphqueries]
+    """
     return (
         await aexecute(
             SearchGraphQueriesQuery, {"search": search, "values": values}, rath=rath
@@ -8632,7 +9944,8 @@ def search_graph_queries(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[SearchGraphQueriesQueryGraphqueries]"""
+        List[SearchGraphQueriesQueryGraphqueries]
+    """
     return execute(
         SearchGraphQueriesQuery, {"search": search, "values": values}, rath=rath
     ).options
@@ -8653,7 +9966,8 @@ async def alist_graph_queries(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[ListGraphQuery]"""
+        List[ListGraphQuery]
+    """
     return (
         await aexecute(
             ListGraphQueriesQuery,
@@ -8678,7 +9992,8 @@ def list_graph_queries(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[ListGraphQuery]"""
+        List[ListGraphQuery]
+    """
     return execute(
         ListGraphQueriesQuery, {"filters": filters, "pagination": pagination}, rath=rath
     ).graph_queries
@@ -8699,7 +10014,8 @@ async def alist_prerendered_graph_queries(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[GraphQuery]"""
+        List[GraphQuery]
+    """
     return (
         await aexecute(
             ListPrerenderedGraphQueriesQuery,
@@ -8724,7 +10040,8 @@ def list_prerendered_graph_queries(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[GraphQuery]"""
+        List[GraphQuery]
+    """
     return execute(
         ListPrerenderedGraphQueriesQuery,
         {"filters": filters, "pagination": pagination},
@@ -8743,7 +10060,8 @@ async def aget_reagent_category(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        ReagentCategory"""
+        ReagentCategory
+    """
     return (
         await aexecute(GetReagentCategoryQuery, {"id": id}, rath=rath)
     ).reagent_category
@@ -8758,7 +10076,8 @@ def get_reagent_category(id: ID, rath: Optional[KraphRath] = None) -> ReagentCat
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        ReagentCategory"""
+        ReagentCategory
+    """
     return execute(GetReagentCategoryQuery, {"id": id}, rath=rath).reagent_category
 
 
@@ -8777,7 +10096,8 @@ async def asearch_reagent_category(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[SearchReagentCategoryQueryReagentcategories]"""
+        List[SearchReagentCategoryQueryReagentcategories]
+    """
     return (
         await aexecute(
             SearchReagentCategoryQuery, {"search": search, "values": values}, rath=rath
@@ -8800,7 +10120,8 @@ def search_reagent_category(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[SearchReagentCategoryQueryReagentcategories]"""
+        List[SearchReagentCategoryQueryReagentcategories]
+    """
     return execute(
         SearchReagentCategoryQuery, {"search": search, "values": values}, rath=rath
     ).options
@@ -8821,7 +10142,8 @@ async def alist_reagent_category(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[ListReagentCategory]"""
+        List[ListReagentCategory]
+    """
     return (
         await aexecute(
             ListReagentCategoryQuery,
@@ -8846,7 +10168,8 @@ def list_reagent_category(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[ListReagentCategory]"""
+        List[ListReagentCategory]
+    """
     return execute(
         ListReagentCategoryQuery,
         {"filters": filters, "pagination": pagination},
@@ -8863,7 +10186,8 @@ async def aget_graph(id: ID, rath: Optional[KraphRath] = None) -> Graph:
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        Graph"""
+        Graph
+    """
     return (await aexecute(GetGraphQuery, {"id": id}, rath=rath)).graph
 
 
@@ -8876,7 +10200,8 @@ def get_graph(id: ID, rath: Optional[KraphRath] = None) -> Graph:
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        Graph"""
+        Graph
+    """
     return execute(GetGraphQuery, {"id": id}, rath=rath).graph
 
 
@@ -8895,7 +10220,8 @@ async def asearch_graphs(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[SearchGraphsQueryGraphs]"""
+        List[SearchGraphsQueryGraphs]
+    """
     return (
         await aexecute(
             SearchGraphsQuery, {"search": search, "values": values}, rath=rath
@@ -8918,7 +10244,8 @@ def search_graphs(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[SearchGraphsQueryGraphs]"""
+        List[SearchGraphsQueryGraphs]
+    """
     return execute(
         SearchGraphsQuery, {"search": search, "values": values}, rath=rath
     ).options
@@ -8939,7 +10266,8 @@ async def alist_graphs(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[ListGraph]"""
+        List[ListGraph]
+    """
     return (
         await aexecute(
             ListGraphsQuery, {"filters": filters, "pagination": pagination}, rath=rath
@@ -8962,7 +10290,8 @@ def list_graphs(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[ListGraph]"""
+        List[ListGraph]
+    """
     return execute(
         ListGraphsQuery, {"filters": filters, "pagination": pagination}, rath=rath
     ).graphs
@@ -8977,7 +10306,8 @@ async def aget_metric(id: ID, rath: Optional[KraphRath] = None) -> Metric:
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        Metric"""
+        Metric
+    """
     return (await aexecute(GetMetricQuery, {"id": id}, rath=rath)).metric
 
 
@@ -8990,7 +10320,8 @@ def get_metric(id: ID, rath: Optional[KraphRath] = None) -> Metric:
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        Metric"""
+        Metric
+    """
     return execute(GetMetricQuery, {"id": id}, rath=rath).metric
 
 
@@ -9008,7 +10339,8 @@ async def asearch_metrics(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[SearchMetricsQueryMetrics]"""
+        List[SearchMetricsQueryMetrics]
+    """
     return (
         await aexecute(
             SearchMetricsQuery, {"search": search, "values": values}, rath=rath
@@ -9030,7 +10362,8 @@ def search_metrics(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[SearchMetricsQueryMetrics]"""
+        List[SearchMetricsQueryMetrics]
+    """
     return execute(
         SearchMetricsQuery, {"search": search, "values": values}, rath=rath
     ).options
@@ -9050,7 +10383,8 @@ async def alist_metrics(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[ListMetric]"""
+        List[ListMetric]
+    """
     return (
         await aexecute(
             ListMetricsQuery, {"filters": filters, "pagination": pagination}, rath=rath
@@ -9072,7 +10406,8 @@ def list_metrics(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[ListMetric]"""
+        List[ListMetric]
+    """
     return execute(
         ListMetricsQuery, {"filters": filters, "pagination": pagination}, rath=rath
     ).metrics
@@ -9087,7 +10422,8 @@ async def aget_node_query(id: ID, rath: Optional[KraphRath] = None) -> NodeQuery
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        NodeQuery"""
+        NodeQuery
+    """
     return (await aexecute(GetNodeQueryQuery, {"id": id}, rath=rath)).node_query
 
 
@@ -9100,7 +10436,8 @@ def get_node_query(id: ID, rath: Optional[KraphRath] = None) -> NodeQuery:
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        NodeQuery"""
+        NodeQuery
+    """
     return execute(GetNodeQueryQuery, {"id": id}, rath=rath).node_query
 
 
@@ -9117,7 +10454,8 @@ async def arender_node_query(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        RenderNodeQueryQueryRendernodequery"""
+        RenderNodeQueryQueryRendernodequery
+    """
     return (
         await aexecute(RenderNodeQueryQuery, {"id": id, "nodeId": node_id}, rath=rath)
     ).render_node_query
@@ -9136,7 +10474,8 @@ def render_node_query(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        RenderNodeQueryQueryRendernodequery"""
+        RenderNodeQueryQueryRendernodequery
+    """
     return execute(
         RenderNodeQueryQuery, {"id": id, "nodeId": node_id}, rath=rath
     ).render_node_query
@@ -9157,7 +10496,8 @@ async def asearch_node_queries(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[SearchNodeQueriesQueryNodequeries]"""
+        List[SearchNodeQueriesQueryNodequeries]
+    """
     return (
         await aexecute(
             SearchNodeQueriesQuery, {"search": search, "values": values}, rath=rath
@@ -9180,7 +10520,8 @@ def search_node_queries(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[SearchNodeQueriesQueryNodequeries]"""
+        List[SearchNodeQueriesQueryNodequeries]
+    """
     return execute(
         SearchNodeQueriesQuery, {"search": search, "values": values}, rath=rath
     ).options
@@ -9201,7 +10542,8 @@ async def alist_node_queries(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[ListNodeQuery]"""
+        List[ListNodeQuery]
+    """
     return (
         await aexecute(
             ListNodeQueriesQuery,
@@ -9226,7 +10568,8 @@ def list_node_queries(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[ListNodeQuery]"""
+        List[ListNodeQuery]
+    """
     return execute(
         ListNodeQueriesQuery, {"filters": filters, "pagination": pagination}, rath=rath
     ).node_queries
@@ -9235,16 +10578,19 @@ def list_node_queries(
 async def anode_categories(
     rath: Optional[KraphRath] = None,
 ) -> Tuple[
-    Annotated[
-        Union[
-            NodeCategoriesQueryNodecategoriesBaseMetricCategory,
-            NodeCategoriesQueryNodecategoriesBaseStructureCategory,
-            NodeCategoriesQueryNodecategoriesBaseProtocolEventCategory,
-            NodeCategoriesQueryNodecategoriesBaseEntityCategory,
-            NodeCategoriesQueryNodecategoriesBaseReagentCategory,
-            NodeCategoriesQueryNodecategoriesBaseNaturalEventCategory,
+    Union[
+        Annotated[
+            Union[
+                NodeCategoriesQueryNodecategoriesBaseMetricCategory,
+                NodeCategoriesQueryNodecategoriesBaseStructureCategory,
+                NodeCategoriesQueryNodecategoriesBaseProtocolEventCategory,
+                NodeCategoriesQueryNodecategoriesBaseEntityCategory,
+                NodeCategoriesQueryNodecategoriesBaseReagentCategory,
+                NodeCategoriesQueryNodecategoriesBaseNaturalEventCategory,
+            ],
+            Field(discriminator="typename"),
         ],
-        Field(discriminator="typename"),
+        NodeCategoriesQueryNodecategoriesBaseCatchAll,
     ],
     ...,
 ]:
@@ -9255,23 +10601,27 @@ async def anode_categories(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[NodeCategory]"""
+        List[NodeCategory]
+    """
     return (await aexecute(NodeCategoriesQuery, {}, rath=rath)).node_categories
 
 
 def node_categories(
     rath: Optional[KraphRath] = None,
 ) -> Tuple[
-    Annotated[
-        Union[
-            NodeCategoriesQueryNodecategoriesBaseMetricCategory,
-            NodeCategoriesQueryNodecategoriesBaseStructureCategory,
-            NodeCategoriesQueryNodecategoriesBaseProtocolEventCategory,
-            NodeCategoriesQueryNodecategoriesBaseEntityCategory,
-            NodeCategoriesQueryNodecategoriesBaseReagentCategory,
-            NodeCategoriesQueryNodecategoriesBaseNaturalEventCategory,
+    Union[
+        Annotated[
+            Union[
+                NodeCategoriesQueryNodecategoriesBaseMetricCategory,
+                NodeCategoriesQueryNodecategoriesBaseStructureCategory,
+                NodeCategoriesQueryNodecategoriesBaseProtocolEventCategory,
+                NodeCategoriesQueryNodecategoriesBaseEntityCategory,
+                NodeCategoriesQueryNodecategoriesBaseReagentCategory,
+                NodeCategoriesQueryNodecategoriesBaseNaturalEventCategory,
+            ],
+            Field(discriminator="typename"),
         ],
-        Field(discriminator="typename"),
+        NodeCategoriesQueryNodecategoriesBaseCatchAll,
     ],
     ...,
 ]:
@@ -9282,7 +10632,8 @@ def node_categories(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[NodeCategory]"""
+        List[NodeCategory]
+    """
     return execute(NodeCategoriesQuery, {}, rath=rath).node_categories
 
 
@@ -9297,7 +10648,8 @@ async def aget_measurment_category(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        MeasurementCategory"""
+        MeasurementCategory
+    """
     return (
         await aexecute(GetMeasurmentCategoryQuery, {"id": id}, rath=rath)
     ).measurement_category
@@ -9314,7 +10666,8 @@ def get_measurment_category(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        MeasurementCategory"""
+        MeasurementCategory
+    """
     return execute(
         GetMeasurmentCategoryQuery, {"id": id}, rath=rath
     ).measurement_category
@@ -9335,7 +10688,8 @@ async def asearch_measurment_category(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[SearchMeasurmentCategoryQueryMeasurementcategories]"""
+        List[SearchMeasurmentCategoryQueryMeasurementcategories]
+    """
     return (
         await aexecute(
             SearchMeasurmentCategoryQuery,
@@ -9360,7 +10714,8 @@ def search_measurment_category(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[SearchMeasurmentCategoryQueryMeasurementcategories]"""
+        List[SearchMeasurmentCategoryQueryMeasurementcategories]
+    """
     return execute(
         SearchMeasurmentCategoryQuery, {"search": search, "values": values}, rath=rath
     ).options
@@ -9381,7 +10736,8 @@ async def alist_measurment_category(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[ListMeasurementCategory]"""
+        List[ListMeasurementCategory]
+    """
     return (
         await aexecute(
             ListMeasurmentCategoryQuery,
@@ -9406,7 +10762,8 @@ def list_measurment_category(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[ListMeasurementCategory]"""
+        List[ListMeasurementCategory]
+    """
     return execute(
         ListMeasurmentCategoryQuery,
         {"filters": filters, "pagination": pagination},
@@ -9425,7 +10782,8 @@ async def aget_entity_category(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        EntityCategory"""
+        EntityCategory
+    """
     return (
         await aexecute(GetEntityCategoryQuery, {"id": id}, rath=rath)
     ).entity_category
@@ -9440,7 +10798,8 @@ def get_entity_category(id: ID, rath: Optional[KraphRath] = None) -> EntityCateg
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        EntityCategory"""
+        EntityCategory
+    """
     return execute(GetEntityCategoryQuery, {"id": id}, rath=rath).entity_category
 
 
@@ -9459,7 +10818,8 @@ async def asearch_entity_category(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[SearchEntityCategoryQueryEntitycategories]"""
+        List[SearchEntityCategoryQueryEntitycategories]
+    """
     return (
         await aexecute(
             SearchEntityCategoryQuery, {"search": search, "values": values}, rath=rath
@@ -9482,7 +10842,8 @@ def search_entity_category(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[SearchEntityCategoryQueryEntitycategories]"""
+        List[SearchEntityCategoryQueryEntitycategories]
+    """
     return execute(
         SearchEntityCategoryQuery, {"search": search, "values": values}, rath=rath
     ).options
@@ -9503,7 +10864,8 @@ async def alist_entity_category(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[ListEntityCategory]"""
+        List[ListEntityCategory]
+    """
     return (
         await aexecute(
             ListEntityCategoryQuery,
@@ -9528,7 +10890,8 @@ def list_entity_category(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[ListEntityCategory]"""
+        List[ListEntityCategory]
+    """
     return execute(
         ListEntityCategoryQuery,
         {"filters": filters, "pagination": pagination},
@@ -9551,7 +10914,8 @@ async def aglobal_search(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        GlobalSearchQuery"""
+        GlobalSearchQuery
+    """
     return await aexecute(GlobalSearchQuery, {"search": search}, rath=rath)
 
 
@@ -9568,7 +10932,8 @@ def global_search(search: str, rath: Optional[KraphRath] = None) -> GlobalSearch
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        GlobalSearchQuery"""
+        GlobalSearchQuery
+    """
     return execute(GlobalSearchQuery, {"search": search}, rath=rath)
 
 
@@ -9581,7 +10946,8 @@ async def aget_reagent(id: ID, rath: Optional[KraphRath] = None) -> Reagent:
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        Reagent"""
+        Reagent
+    """
     return (await aexecute(GetReagentQuery, {"id": id}, rath=rath)).reagent
 
 
@@ -9594,7 +10960,8 @@ def get_reagent(id: ID, rath: Optional[KraphRath] = None) -> Reagent:
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        Reagent"""
+        Reagent
+    """
     return execute(GetReagentQuery, {"id": id}, rath=rath).reagent
 
 
@@ -9613,7 +10980,8 @@ async def asearch_reagents(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[SearchReagentsQueryNodes]"""
+        List[SearchReagentsQueryNodes]
+    """
     return (
         await aexecute(
             SearchReagentsQuery, {"search": search, "values": values}, rath=rath
@@ -9636,7 +11004,8 @@ def search_reagents(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[SearchReagentsQueryNodes]"""
+        List[SearchReagentsQueryNodes]
+    """
     return execute(
         SearchReagentsQuery, {"search": search, "values": values}, rath=rath
     ).options
@@ -9656,7 +11025,8 @@ async def alist_reagents(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[ListReagent]"""
+        List[ListReagent]
+    """
     return (
         await aexecute(
             ListReagentsQuery, {"filters": filters, "pagination": pagination}, rath=rath
@@ -9678,7 +11048,8 @@ def list_reagents(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[ListReagent]"""
+        List[ListReagent]
+    """
     return execute(
         ListReagentsQuery, {"filters": filters, "pagination": pagination}, rath=rath
     ).reagents
@@ -9693,7 +11064,8 @@ async def aget_entity(id: ID, rath: Optional[KraphRath] = None) -> Entity:
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        Entity"""
+        Entity
+    """
     return (await aexecute(GetEntityQuery, {"id": id}, rath=rath)).entity
 
 
@@ -9706,8 +11078,53 @@ def get_entity(id: ID, rath: Optional[KraphRath] = None) -> Entity:
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        Entity"""
+        Entity
+    """
     return execute(GetEntityQuery, {"id": id}, rath=rath).entity
+
+
+async def aget_entity_for_category_and_external_id(
+    category: ID, external_id: str, rath: Optional[KraphRath] = None
+) -> Entity:
+    """GetEntityForCategoryAndExternalID
+
+
+    Arguments:
+        category (ID): No description
+        external_id (str): No description
+        rath (kraph.rath.KraphRath, optional): The mikro rath client
+
+    Returns:
+        Entity
+    """
+    return (
+        await aexecute(
+            GetEntityForCategoryAndExternalIDQuery,
+            {"category": category, "externalId": external_id},
+            rath=rath,
+        )
+    ).get_entity_by_category_and_external_id
+
+
+def get_entity_for_category_and_external_id(
+    category: ID, external_id: str, rath: Optional[KraphRath] = None
+) -> Entity:
+    """GetEntityForCategoryAndExternalID
+
+
+    Arguments:
+        category (ID): No description
+        external_id (str): No description
+        rath (kraph.rath.KraphRath, optional): The mikro rath client
+
+    Returns:
+        Entity
+    """
+    return execute(
+        GetEntityForCategoryAndExternalIDQuery,
+        {"category": category, "externalId": external_id},
+        rath=rath,
+    ).get_entity_by_category_and_external_id
 
 
 async def asearch_entities(
@@ -9725,7 +11142,8 @@ async def asearch_entities(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[SearchEntitiesQueryNodes]"""
+        List[SearchEntitiesQueryNodes]
+    """
     return (
         await aexecute(
             SearchEntitiesQuery, {"search": search, "values": values}, rath=rath
@@ -9748,7 +11166,8 @@ def search_entities(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[SearchEntitiesQueryNodes]"""
+        List[SearchEntitiesQueryNodes]
+    """
     return execute(
         SearchEntitiesQuery, {"search": search, "values": values}, rath=rath
     ).options
@@ -9768,7 +11187,8 @@ async def alist_entities(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[ListEntity]"""
+        List[ListEntity]
+    """
     return (
         await aexecute(
             ListEntitiesQuery, {"filters": filters, "pagination": pagination}, rath=rath
@@ -9790,7 +11210,8 @@ def list_entities(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[ListEntity]"""
+        List[ListEntity]
+    """
     return execute(
         ListEntitiesQuery, {"filters": filters, "pagination": pagination}, rath=rath
     ).entities
@@ -9807,7 +11228,8 @@ async def aget_protocol_event(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        ProtocolEvent"""
+        ProtocolEvent
+    """
     return (await aexecute(GetProtocolEventQuery, {"id": id}, rath=rath)).protocol_event
 
 
@@ -9820,7 +11242,8 @@ def get_protocol_event(id: ID, rath: Optional[KraphRath] = None) -> ProtocolEven
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        ProtocolEvent"""
+        ProtocolEvent
+    """
     return execute(GetProtocolEventQuery, {"id": id}, rath=rath).protocol_event
 
 
@@ -9838,7 +11261,8 @@ async def asearch_protocol_events(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[SearchProtocolEventsQueryProtocolevents]"""
+        List[SearchProtocolEventsQueryProtocolevents]
+    """
     return (
         await aexecute(
             SearchProtocolEventsQuery, {"search": search, "values": values}, rath=rath
@@ -9860,7 +11284,8 @@ def search_protocol_events(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[SearchProtocolEventsQueryProtocolevents]"""
+        List[SearchProtocolEventsQueryProtocolevents]
+    """
     return execute(
         SearchProtocolEventsQuery, {"search": search, "values": values}, rath=rath
     ).options
@@ -9875,7 +11300,8 @@ async def aget_structure(id: ID, rath: Optional[KraphRath] = None) -> Structure:
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        Structure"""
+        Structure
+    """
     return (await aexecute(GetStructureQuery, {"id": id}, rath=rath)).structure
 
 
@@ -9888,7 +11314,8 @@ def get_structure(id: ID, rath: Optional[KraphRath] = None) -> Structure:
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        Structure"""
+        Structure
+    """
     return execute(GetStructureQuery, {"id": id}, rath=rath).structure
 
 
@@ -9906,7 +11333,8 @@ async def asearch_structures(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[SearchStructuresQueryStructures]"""
+        List[SearchStructuresQueryStructures]
+    """
     return (
         await aexecute(
             SearchStructuresQuery, {"search": search, "values": values}, rath=rath
@@ -9928,7 +11356,8 @@ def search_structures(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[SearchStructuresQueryStructures]"""
+        List[SearchStructuresQueryStructures]
+    """
     return execute(
         SearchStructuresQuery, {"search": search, "values": values}, rath=rath
     ).options
@@ -9950,7 +11379,8 @@ async def aget_informed_structure(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        InformedStructure"""
+        InformedStructure
+    """
     return (
         await aexecute(
             GetInformedStructureQuery,
@@ -9976,7 +11406,8 @@ def get_informed_structure(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        InformedStructure"""
+        InformedStructure
+    """
     return execute(
         GetInformedStructureQuery,
         {"graph": graph, "identifier": identifier, "object": object},
@@ -9998,7 +11429,8 @@ async def alist_structures(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[ListStructure]"""
+        List[ListStructure]
+    """
     return (
         await aexecute(
             ListStructuresQuery,
@@ -10022,7 +11454,8 @@ def list_structures(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[ListStructure]"""
+        List[ListStructure]
+    """
     return execute(
         ListStructuresQuery, {"filters": filters, "pagination": pagination}, rath=rath
     ).structures
@@ -10037,7 +11470,8 @@ async def aget_measurement(id: ID, rath: Optional[KraphRath] = None) -> Measurem
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        Measurement"""
+        Measurement
+    """
     return (await aexecute(GetMeasurementQuery, {"id": id}, rath=rath)).measurement
 
 
@@ -10050,7 +11484,8 @@ def get_measurement(id: ID, rath: Optional[KraphRath] = None) -> Measurement:
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        Measurement"""
+        Measurement
+    """
     return execute(GetMeasurementQuery, {"id": id}, rath=rath).measurement
 
 
@@ -10068,7 +11503,8 @@ async def asearch_measurements(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[SearchMeasurementsQueryMeasurements]"""
+        List[SearchMeasurementsQueryMeasurements]
+    """
     return (
         await aexecute(
             SearchMeasurementsQuery, {"search": search, "values": values}, rath=rath
@@ -10090,7 +11526,8 @@ def search_measurements(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[SearchMeasurementsQueryMeasurements]"""
+        List[SearchMeasurementsQueryMeasurements]
+    """
     return execute(
         SearchMeasurementsQuery, {"search": search, "values": values}, rath=rath
     ).options
@@ -10111,7 +11548,8 @@ async def asearch_tags(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[SearchTagsQueryTags]"""
+        List[SearchTagsQueryTags]
+    """
     return (
         await aexecute(SearchTagsQuery, {"search": search, "values": values}, rath=rath)
     ).options
@@ -10132,24 +11570,26 @@ def search_tags(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[SearchTagsQueryTags]"""
+        List[SearchTagsQueryTags]
+    """
     return execute(
         SearchTagsQuery, {"search": search, "values": values}, rath=rath
     ).options
 
 
-async def aget_node(
-    id: ID, rath: Optional[KraphRath] = None
-) -> Annotated[
-    Union[
-        GetNodeQueryNodeBaseEntity,
-        GetNodeQueryNodeBaseStructure,
-        GetNodeQueryNodeBaseMetric,
-        GetNodeQueryNodeBaseProtocolEvent,
-        GetNodeQueryNodeBaseNaturalEvent,
-        GetNodeQueryNodeBaseReagent,
+async def aget_node(id: ID, rath: Optional[KraphRath] = None) -> Union[
+    Annotated[
+        Union[
+            GetNodeQueryNodeBaseEntity,
+            GetNodeQueryNodeBaseStructure,
+            GetNodeQueryNodeBaseMetric,
+            GetNodeQueryNodeBaseProtocolEvent,
+            GetNodeQueryNodeBaseNaturalEvent,
+            GetNodeQueryNodeBaseReagent,
+        ],
+        Field(discriminator="typename"),
     ],
-    Field(discriminator="typename"),
+    GetNodeQueryNodeBaseCatchAll,
 ]:
     """GetNode
 
@@ -10159,22 +11599,24 @@ async def aget_node(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        DetailNode"""
+        DetailNode
+    """
     return (await aexecute(GetNodeQuery, {"id": id}, rath=rath)).node
 
 
-def get_node(
-    id: ID, rath: Optional[KraphRath] = None
-) -> Annotated[
-    Union[
-        GetNodeQueryNodeBaseEntity,
-        GetNodeQueryNodeBaseStructure,
-        GetNodeQueryNodeBaseMetric,
-        GetNodeQueryNodeBaseProtocolEvent,
-        GetNodeQueryNodeBaseNaturalEvent,
-        GetNodeQueryNodeBaseReagent,
+def get_node(id: ID, rath: Optional[KraphRath] = None) -> Union[
+    Annotated[
+        Union[
+            GetNodeQueryNodeBaseEntity,
+            GetNodeQueryNodeBaseStructure,
+            GetNodeQueryNodeBaseMetric,
+            GetNodeQueryNodeBaseProtocolEvent,
+            GetNodeQueryNodeBaseNaturalEvent,
+            GetNodeQueryNodeBaseReagent,
+        ],
+        Field(discriminator="typename"),
     ],
-    Field(discriminator="typename"),
+    GetNodeQueryNodeBaseCatchAll,
 ]:
     """GetNode
 
@@ -10184,7 +11626,8 @@ def get_node(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        DetailNode"""
+        DetailNode
+    """
     return execute(GetNodeQuery, {"id": id}, rath=rath).node
 
 
@@ -10203,7 +11646,8 @@ async def asearch_nodes(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[SearchNodesQueryNodes]"""
+        List[SearchNodesQueryNodes]
+    """
     return (
         await aexecute(
             SearchNodesQuery, {"search": search, "values": values}, rath=rath
@@ -10226,7 +11670,8 @@ def search_nodes(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[SearchNodesQueryNodes]"""
+        List[SearchNodesQueryNodes]
+    """
     return execute(
         SearchNodesQuery, {"search": search, "values": values}, rath=rath
     ).options
@@ -10241,7 +11686,8 @@ async def aget_relation(id: ID, rath: Optional[KraphRath] = None) -> Relation:
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        Relation"""
+        Relation
+    """
     return (await aexecute(GetRelationQuery, {"id": id}, rath=rath)).relation
 
 
@@ -10254,7 +11700,8 @@ def get_relation(id: ID, rath: Optional[KraphRath] = None) -> Relation:
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        Relation"""
+        Relation
+    """
     return execute(GetRelationQuery, {"id": id}, rath=rath).relation
 
 
@@ -10272,7 +11719,8 @@ async def asearch_relations(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[SearchRelationsQueryRelations]"""
+        List[SearchRelationsQueryRelations]
+    """
     return (
         await aexecute(
             SearchRelationsQuery, {"search": search, "values": values}, rath=rath
@@ -10294,7 +11742,8 @@ def search_relations(
         rath (kraph.rath.KraphRath, optional): The mikro rath client
 
     Returns:
-        List[SearchRelationsQueryRelations]"""
+        List[SearchRelationsQueryRelations]
+    """
     return execute(
         SearchRelationsQuery, {"search": search, "values": values}, rath=rath
     ).options
@@ -10319,3 +11768,4 @@ RelationCategoryFilter.model_rebuild()
 StructureCategoryFilter.model_rebuild()
 ToldYouSoInput.model_rebuild()
 UpdateGraphInput.model_rebuild()
+VariableDefinitionInput.model_rebuild()

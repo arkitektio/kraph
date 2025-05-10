@@ -22,9 +22,4 @@ fragment InformedStructure on Structure {
     id
     name
   }
-  bestView {
-    ...Table
-    ...Pairs
-    ...Path
-  }
 }

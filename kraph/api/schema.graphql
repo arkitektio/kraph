@@ -1,25 +1,21 @@
-"""Make string uppercase"""
-directive @upper on FIELD
-
-directive @replace(old: String!, new: String!) on FIELD
-
-"""Make get stuff uppercase"""
-directive @relation(on: String!) on FIELD
-
 """
 A Entity is a recorded data point in a graph. It can measure a property of an entity through a direct measurement edge, that connects the entity to the structure. It of course can relate to other structures through relation edges.
 """
 type Entity implements Node {
   """The unique identifier of the entity within its graph"""
   externalId: String
-  queries: [NodeQuery!]!
+
+  """The unique identifier of the entity within its graph"""
+  localId: String
+  relevantQueries: [NodeQuery!]!
+  views: [NodeQueryView!]!
 
   """The best view of the node given the current context"""
-  bestView: PathPairsTable
+  bestView: NodeQueryView
 
   """The unique identifier of the entity within its graph"""
   graph: Graph!
-  label: String!
+  label(full: Boolean = null): String!
 
   """The unique identifier of the entity within its graph"""
   id: NodeID!
@@ -119,11 +115,13 @@ input NodeQueryFilter {
   id: ID
   AND: NodeQueryFilter
   OR: NodeQueryFilter
+  NOT: NodeQueryFilter
+  DISTINCT: Boolean
 }
 
 input OffsetPaginationInput {
   offset: Int! = 0
-  limit: Int! = -1
+  limit: Int
 }
 
 """A view of a graph, that contains entities and relations."""
@@ -168,6 +166,8 @@ input ScatterPlotFilter {
   id: ID
   AND: ScatterPlotFilter
   OR: ScatterPlotFilter
+  NOT: ScatterPlotFilter
+  DISTINCT: Boolean
 }
 
 union PathPairsTable = Path | Pairs | Table
@@ -255,6 +255,8 @@ input GraphQueryFilter {
   id: ID
   AND: GraphQueryFilter
   OR: GraphQueryFilter
+  NOT: GraphQueryFilter
+  DISTINCT: Boolean
 }
 
 type MetricCategory implements NodeCategory & BaseCategory {
@@ -301,6 +303,8 @@ type MetricCategory implements NodeCategory & BaseCategory {
 
   """The sequence of the expression within its graph"""
   sequence: GraphSequence
+  relevantQueries: [GraphQuery!]!
+  relevantNodeQueries: [NodeQuery!]!
   bestQuery: GraphQuery
   pinned: Boolean!
 
@@ -364,6 +368,8 @@ interface BaseCategory {
 
   """The sequence of the expression within its graph"""
   sequence: GraphSequence
+  relevantQueries: [GraphQuery!]!
+  relevantNodeQueries: [NodeQuery!]!
   bestQuery: GraphQuery
   pinned: Boolean!
 }
@@ -409,10 +415,12 @@ input TagFilter {
   values: [String!] = null
   AND: TagFilter
   OR: TagFilter
+  NOT: TagFilter
+  DISTINCT: Boolean
 }
 
 type StructureCategoryDefinition implements CategoryDefintion {
-  tagFilters: [ID!]
+  tagFilters: [String!]
   tagExcludeFilters: [ID!]
   categoryFilters: [ID!]
   categoryExcludeFilters: [ID!]
@@ -420,7 +428,7 @@ type StructureCategoryDefinition implements CategoryDefintion {
 }
 
 interface CategoryDefintion {
-  tagFilters: [ID!]
+  tagFilters: [String!]
   tagExcludeFilters: [ID!]
   categoryFilters: [ID!]
   categoryExcludeFilters: [ID!]
@@ -470,6 +478,8 @@ type StructureCategory implements NodeCategory & BaseCategory {
 
   """The sequence of the expression within its graph"""
   sequence: GraphSequence
+  relevantQueries: [GraphQuery!]!
+  relevantNodeQueries: [NodeQuery!]!
   bestQuery: GraphQuery
   pinned: Boolean!
 
@@ -485,6 +495,8 @@ input MetricCategoryFilter {
   pinned: Boolean
   AND: MetricCategoryFilter
   OR: MetricCategoryFilter
+  NOT: MetricCategoryFilter
+  DISTINCT: Boolean
 }
 
 input StructureCategoryFilter {
@@ -496,6 +508,8 @@ input StructureCategoryFilter {
   pinned: Boolean
   AND: StructureCategoryFilter
   OR: StructureCategoryFilter
+  NOT: StructureCategoryFilter
+  DISTINCT: Boolean
 }
 
 type ProtocolEventCategory implements NodeCategory & BaseCategory {
@@ -542,6 +556,8 @@ type ProtocolEventCategory implements NodeCategory & BaseCategory {
 
   """The sequence of the expression within its graph"""
   sequence: GraphSequence
+  relevantQueries: [GraphQuery!]!
+  relevantNodeQueries: [NodeQuery!]!
   bestQuery: GraphQuery
   pinned: Boolean!
 
@@ -579,7 +595,7 @@ type EntityRoleDefinition {
 }
 
 type EntityCategoryDefinition implements CategoryDefintion {
-  tagFilters: [ID!]
+  tagFilters: [String!]
   tagExcludeFilters: [ID!]
   categoryFilters: [ID!]
   categoryExcludeFilters: [ID!]
@@ -630,6 +646,8 @@ type EntityCategory implements NodeCategory & BaseCategory {
 
   """The sequence of the expression within its graph"""
   sequence: GraphSequence
+  relevantQueries: [GraphQuery!]!
+  relevantNodeQueries: [NodeQuery!]!
   bestQuery: GraphQuery
   pinned: Boolean!
 
@@ -659,7 +677,7 @@ type ReagentRoleDefinition {
 }
 
 type ReagentCategoryDefinition implements CategoryDefintion {
-  tagFilters: [ID!]
+  tagFilters: [String!]
   tagExcludeFilters: [ID!]
   categoryFilters: [ID!]
   categoryExcludeFilters: [ID!]
@@ -710,6 +728,8 @@ type ReagentCategory implements NodeCategory & BaseCategory {
 
   """The sequence of the expression within its graph"""
   sequence: GraphSequence
+  relevantQueries: [GraphQuery!]!
+  relevantNodeQueries: [NodeQuery!]!
   bestQuery: GraphQuery
   pinned: Boolean!
 
@@ -728,6 +748,13 @@ type VariableDefinition {
   optional: Boolean!
   needsQuantity: Boolean!
   default: Any
+  options: [VariableOption!]
+}
+
+type VariableOption {
+  value: String!
+  label: String!
+  description: String
 }
 
 input ProtocolEventCategoryFilter {
@@ -738,6 +765,8 @@ input ProtocolEventCategoryFilter {
   pinned: Boolean
   AND: ProtocolEventCategoryFilter
   OR: ProtocolEventCategoryFilter
+  NOT: ProtocolEventCategoryFilter
+  DISTINCT: Boolean
 }
 
 type NaturalEventCategory implements NodeCategory & BaseCategory {
@@ -784,6 +813,8 @@ type NaturalEventCategory implements NodeCategory & BaseCategory {
 
   """The sequence of the expression within its graph"""
   sequence: GraphSequence
+  relevantQueries: [GraphQuery!]!
+  relevantNodeQueries: [NodeQuery!]!
   bestQuery: GraphQuery
   pinned: Boolean!
 
@@ -808,6 +839,8 @@ input NaturalEventCategoryFilter {
   pinned: Boolean
   AND: NaturalEventCategoryFilter
   OR: NaturalEventCategoryFilter
+  NOT: NaturalEventCategoryFilter
+  DISTINCT: Boolean
 }
 
 input EntityCategoryFilter {
@@ -820,6 +853,8 @@ input EntityCategoryFilter {
   tags: [String!]
   AND: EntityCategoryFilter
   OR: EntityCategoryFilter
+  NOT: EntityCategoryFilter
+  DISTINCT: Boolean
 }
 
 input ReagentCategoryFilter {
@@ -831,6 +866,8 @@ input ReagentCategoryFilter {
   pinned: Boolean
   AND: ReagentCategoryFilter
   OR: ReagentCategoryFilter
+  NOT: ReagentCategoryFilter
+  DISTINCT: Boolean
 }
 
 type MeasurementCategory implements EdgeCategory & BaseCategory {
@@ -863,6 +900,8 @@ type MeasurementCategory implements EdgeCategory & BaseCategory {
 
   """The sequence of the expression within its graph"""
   sequence: GraphSequence
+  relevantQueries: [GraphQuery!]!
+  relevantNodeQueries: [NodeQuery!]!
   bestQuery: GraphQuery
   pinned: Boolean!
 
@@ -886,6 +925,8 @@ input MeasurementCategoryFilter {
   graph: ID
   AND: MeasurementCategoryFilter
   OR: MeasurementCategoryFilter
+  NOT: MeasurementCategoryFilter
+  DISTINCT: Boolean
 }
 
 type RelationCategory implements EdgeCategory & BaseCategory {
@@ -918,6 +959,8 @@ type RelationCategory implements EdgeCategory & BaseCategory {
 
   """The sequence of the expression within its graph"""
   sequence: GraphSequence
+  relevantQueries: [GraphQuery!]!
+  relevantNodeQueries: [NodeQuery!]!
   bestQuery: GraphQuery
   pinned: Boolean!
 
@@ -938,6 +981,8 @@ input RelationCategoryFilter {
   pinned: Boolean
   AND: RelationCategoryFilter
   OR: RelationCategoryFilter
+  NOT: RelationCategoryFilter
+  DISTINCT: Boolean
 }
 
 input NodeCategoryFilter {
@@ -993,6 +1038,12 @@ input GraphPaginationInput {
   offset: Int = 0
 }
 
+type NodeQueryView {
+  query: NodeQuery!
+  render: PathPairsTable!
+  nodeId: String!
+}
+
 """The `NodeID` scalar type represents a graph node ID"""
 scalar NodeID
 
@@ -1045,14 +1096,18 @@ interface Edge {
 interface Node {
   """The unique identifier of the entity within its graph"""
   externalId: String
-  queries: [NodeQuery!]!
+
+  """The unique identifier of the entity within its graph"""
+  localId: String
+  relevantQueries: [NodeQuery!]!
+  views: [NodeQueryView!]!
 
   """The best view of the node given the current context"""
-  bestView: PathPairsTable
+  bestView: NodeQueryView
 
   """The unique identifier of the entity within its graph"""
   graph: Graph!
-  label: String!
+  label(full: Boolean = null): String!
 
   """The unique identifier of the entity within its graph"""
   id: NodeID!
@@ -1076,14 +1131,18 @@ A Structure is a recorded data point in a graph. It can measure a property of an
 type Structure implements Node {
   """The unique identifier of the entity within its graph"""
   externalId: String
-  queries: [NodeQuery!]!
+
+  """The unique identifier of the entity within its graph"""
+  localId: String
+  relevantQueries: [NodeQuery!]!
+  views: [NodeQueryView!]!
 
   """The best view of the node given the current context"""
-  bestView: PathPairsTable
+  bestView: NodeQueryView
 
   """The unique identifier of the entity within its graph"""
   graph: Graph!
-  label: String!
+  label(full: Boolean = null): String!
 
   """The unique identifier of the entity within its graph"""
   id: NodeID!
@@ -1109,6 +1168,9 @@ type Structure implements Node {
   """The expression that defines this entity's type"""
   object: String!
 
+  """The active measurements of this entity according to the graph"""
+  activeMeasurements: [Measurement!]!
+
   """The expression that defines this entity's type"""
   metrics: [Metric!]!
 
@@ -1122,14 +1184,18 @@ A Metric is a recorded data point in a graph. It always describes a structure an
 type Metric implements Node {
   """The unique identifier of the entity within its graph"""
   externalId: String
-  queries: [NodeQuery!]!
+
+  """The unique identifier of the entity within its graph"""
+  localId: String
+  relevantQueries: [NodeQuery!]!
+  views: [NodeQueryView!]!
 
   """The best view of the node given the current context"""
-  bestView: PathPairsTable
+  bestView: NodeQueryView
 
   """The unique identifier of the entity within its graph"""
   graph: Graph!
-  label: String!
+  label(full: Boolean = null): String!
 
   """The unique identifier of the entity within its graph"""
   id: NodeID!
@@ -1159,14 +1225,18 @@ A Metric is a recorded data point in a graph. It always describes a structure an
 type ProtocolEvent implements Node {
   """The unique identifier of the entity within its graph"""
   externalId: String
-  queries: [NodeQuery!]!
+
+  """The unique identifier of the entity within its graph"""
+  localId: String
+  relevantQueries: [NodeQuery!]!
+  views: [NodeQueryView!]!
 
   """The best view of the node given the current context"""
-  bestView: PathPairsTable
+  bestView: NodeQueryView
 
   """The unique identifier of the entity within its graph"""
   graph: Graph!
-  label: String!
+  label(full: Boolean = null): String!
 
   """The unique identifier of the entity within its graph"""
   id: NodeID!
@@ -1187,7 +1257,7 @@ type ProtocolEvent implements Node {
   category: ProtocolEventCategory!
 
   """Protocol steps where this entity was the target"""
-  variables: Any!
+  variables: [VariableMapping!]!
 
   """Protocol steps where this entity was the target"""
   validFrom: DateTime
@@ -1196,20 +1266,29 @@ type ProtocolEvent implements Node {
   validTo: DateTime
 }
 
+type VariableMapping {
+  role: String!
+  value: String!
+}
+
 """
 A Metric is a recorded data point in a graph. It always describes a structure and through the structure it can bring meaning to the measured entity. It can measure a property of an entity through a direct measurement edge, that connects the entity to the structure. It of course can relate to other structures through relation edges.
 """
 type NaturalEvent implements Node {
   """The unique identifier of the entity within its graph"""
   externalId: String
-  queries: [NodeQuery!]!
+
+  """The unique identifier of the entity within its graph"""
+  localId: String
+  relevantQueries: [NodeQuery!]!
+  views: [NodeQueryView!]!
 
   """The best view of the node given the current context"""
-  bestView: PathPairsTable
+  bestView: NodeQueryView
 
   """The unique identifier of the entity within its graph"""
   graph: Graph!
-  label: String!
+  label(full: Boolean = null): String!
 
   """The unique identifier of the entity within its graph"""
   id: NodeID!
@@ -1291,7 +1370,7 @@ type Participant implements Edge {
   left: Node!
 
   """Timestamp from when this entity is valid"""
-  quantity: Float!
+  quantity: Float
 
   """Timestamp from when this entity is valid"""
   role: String!
@@ -1303,14 +1382,18 @@ A Entity is a recorded data point in a graph. It can measure a property of an en
 type Reagent implements Node {
   """The unique identifier of the entity within its graph"""
   externalId: String
-  queries: [NodeQuery!]!
+
+  """The unique identifier of the entity within its graph"""
+  localId: String
+  relevantQueries: [NodeQuery!]!
+  views: [NodeQueryView!]!
 
   """The best view of the node given the current context"""
-  bestView: PathPairsTable
+  bestView: NodeQueryView
 
   """The unique identifier of the entity within its graph"""
   graph: Graph!
-  label: String!
+  label(full: Boolean = null): String!
 
   """The unique identifier of the entity within its graph"""
   id: NodeID!
@@ -1335,6 +1418,17 @@ type Reagent implements Node {
 
   """Subjectable to"""
   createableFrom: [ProtocolEventCategory!]!
+}
+
+"A participant edge maps bioentitiy to an event (valid from is not necessary)\n                 "
+type Description implements Edge {
+  """The unique identifier of the entity within its graph"""
+  id: NodeID!
+  label: String!
+  leftId: String!
+  rightId: String!
+  right: Node!
+  left: Node!
 }
 
 type Query {
@@ -1392,9 +1486,14 @@ type Query {
 
   """Render a node query"""
   renderNodeQuery(id: ID!, nodeId: ID!): PairsPathTable!
+  knowledgeViews(identifier: StructureIdentifier!, object: ID!): [KnowledgeView!]!
+
+  """The best view of the node given the current context"""
+  nodeView(query: ID!, nodeId: ID!): NodeQueryView!
   scatterPlot(id: ID!): ScatterPlot!
   graphSequence(id: ID!): GraphSequence!
   entityCategory(id: ID!): EntityCategory!
+  getEntityByCategoryAndExternalId(category: ID!, externalId: String!): Entity!
   metricCategory(id: ID!): MetricCategory!
   structureCategory(id: ID!): StructureCategory!
   naturalEventCategory(id: ID!): NaturalEventCategory!
@@ -1402,7 +1501,7 @@ type Query {
   reagentCategory(id: ID!): ReagentCategory!
   relationCategory(id: ID!): RelationCategory!
   measurementCategory(id: ID!): MeasurementCategory!
-  nodeCategories(input: OffsetPaginationInput = null, filters: EdgeCategoryFilter = null): [NodeCategory!]!
+  nodeCategories(input: OffsetPaginationInput = null, filters: NodeCategoryFilter = null): [NodeCategory!]!
   edgeCategories(input: OffsetPaginationInput = null, filters: NodeCategoryFilter = null): [EdgeCategory!]!
   nodeQuery(id: ID!): NodeQuery!
   graphQuery(id: ID!): GraphQuery!
@@ -1441,6 +1540,8 @@ input GraphFilter {
   pinned: Boolean = null
   AND: GraphFilter
   OR: GraphFilter
+  NOT: GraphFilter
+  DISTINCT: Boolean
 }
 
 input GraphSequenceFilter {
@@ -1452,6 +1553,8 @@ input GraphSequenceFilter {
   id: ID
   AND: GraphSequenceFilter
   OR: GraphSequenceFilter
+  NOT: GraphSequenceFilter
+  DISTINCT: Boolean
 }
 
 """
@@ -1475,6 +1578,8 @@ input ModelFilter {
   search: String
   AND: ModelFilter
   OR: ModelFilter
+  NOT: ModelFilter
+  DISTINCT: Boolean
 }
 
 """Filter for entity relations in the graph"""
@@ -1496,6 +1601,11 @@ input NodeFilter {
 }
 
 union PairsPathTable = Pairs | Path | Table
+
+type KnowledgeView {
+  structureCategory: StructureCategory!
+  structure: Structure
+}
 
 """
 The `StructureIdentifier` scalar type represents a identifier of a structure
@@ -1832,6 +1942,9 @@ input GraphInput {
 
   """An optional ID reference to an associated image"""
   image: ID = null
+
+  """Whether this ontology should be pinned or not"""
+  pin: Boolean = null
 }
 
 """Input type for updating an existing ontology"""
@@ -1853,6 +1966,9 @@ input UpdateGraphInput {
 
   """New nodes for the ontology"""
   nodes: [GraphNodeInput!] = null
+
+  """Whether this ontology should be pinned or not"""
+  pin: Boolean = null
 }
 
 """Input type for creating a new ontology node"""
@@ -2666,6 +2782,20 @@ input VariableDefinitionInput {
 
   """The label/name of the role"""
   label: String = null
+
+  """A list of options for this port (if only a few values are allowed)"""
+  options: [OptionInput!] = null
+}
+
+input OptionInput {
+  """The label of the option"""
+  label: String!
+
+  """The value of the option. This can be a string, number, or boolean"""
+  value: Any!
+
+  """A detailed description of the option"""
+  description: String = null
 }
 
 """Input for updating an existing expression"""
@@ -2799,12 +2929,12 @@ input RecordProtocolEventInput {
   entityTargets: [NodeMapping!] = null
   reagentSources: [NodeMapping!] = null
   reagentTargets: [NodeMapping!] = null
-  variables: [VariableMapping!] = null
+  variables: [VariableMappingInput!] = null
   validFrom: DateTime = null
   validTo: DateTime = null
 }
 
-input VariableMapping {
+input VariableMappingInput {
   key: String!
   value: Any!
 }
@@ -2981,6 +3111,9 @@ input GraphQueryInput {
 
   """A list of categories where this query is releveant and should be shown"""
   relevantFor: [ID!] = null
+
+  """Whether to pin this expression for the current user"""
+  pin: Boolean = null
 }
 
 """The `Cypher` scalar type represents a cypher query"""
@@ -3000,7 +3133,7 @@ input ColumnInput {
 
 input PinGraphQueryInput {
   id: ID!
-  pinned: Boolean!
+  pin: Boolean!
 }
 
 """Input for creating a new expression"""
@@ -3030,11 +3163,14 @@ input NodeQueryInput {
 
   """The list of categories this expression is relevant for"""
   relevantFor: [ID!] = null
+
+  """Whether to pin this expression for the current user"""
+  pin: Boolean = null
 }
 
 input PinNodeQueryInput {
   id: ID!
-  pinned: Boolean!
+  pin: Boolean!
 }
 
 type Subscription {
