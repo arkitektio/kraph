@@ -28,7 +28,7 @@ jobs:
         run: uv sync --all-extras --dev
 
       - name: Run tests
-        run: uv run pytest -k "not integration"
+        run: uv run pytest
 
       - name: Run semantic-release
         env:
