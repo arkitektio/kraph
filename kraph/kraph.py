@@ -6,5 +6,5 @@ from kraph.datalayer import DataLayer
 
 
 class Kraph(Composition):
-    rath: KraphRath = Field(default_factory=KraphRath)
+    rath: KraphRath
     datalayer: DataLayer

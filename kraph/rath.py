@@ -28,8 +28,6 @@ class KraphRath(rath.Rath):
         rath (_type_): _description_
     """
 
-    link: KraphLinkComposition = Field(default_factory=KraphLinkComposition)
-
     async def __aenter__(self):
         await super().__aenter__()
         current_kraph_rath.set(self)

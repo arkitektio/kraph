@@ -528,7 +528,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "rath", specifier = ">=3" },
+    { name = "rath", specifier = ">=3.2" },
     { name = "websockets", specifier = ">=15.0.1" },
 ]
 
@@ -1013,16 +1013,16 @@ wheels = [
 
 [[package]]
 name = "rath"
-version = "3.0.0"
+version = "3.2.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "graphql-core" },
     { name = "koil" },
     { name = "pydantic" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/59/cd/b749238079495a5c0a06cf5beab675aa5351548fc7d2587ca700778fa0c2/rath-3.0.0.tar.gz", hash = "sha256:6f726a190d8cfc0360b938383f6a5728b3897bebd99143c0e58fa8f219a6a04b", size = 33470 }
+sdist = { url = "https://files.pythonhosted.org/packages/25/82/9fd604db89508ef405671a8a57ff407f37ea7477dff0a8db565c2a548816/rath-3.2.0.tar.gz", hash = "sha256:0dda6f568d6908a6a865bf90328226c1586514ca62c0d4264472e0cde192653e", size = 34250 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/c7/44/ef0e3aabb2f05d73d2892f557712c1e31ec401905a234c9084580d621e6f/rath-3.0.0-py3-none-any.whl", hash = "sha256:d25618dffcbf8b0fe748272d046b06ad74b2fcb89a810e334ff1a91c21f5ba07", size = 51476 },
+    { url = "https://files.pythonhosted.org/packages/e6/fb/3c36ba8ceb044348aba82e0ddce56f4ed488c0102e061cbc6e6014ed1a81/rath-3.2.0-py3-none-any.whl", hash = "sha256:d5dea97342b19fecf1c0837c2021788500ff667c812aeb0a9842fb604c075a06", size = 53837 },
 ]
 
 [[package]]
