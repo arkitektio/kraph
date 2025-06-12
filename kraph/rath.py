@@ -1,3 +1,5 @@
+from types import TracebackType
+from typing import Optional
 from pydantic import Field
 from kraph.links.upload import UploadLink
 from rath import rath
@@ -10,7 +12,9 @@ from rath.links.dictinglink import DictingLink
 from rath.links.shrink import ShrinkingLink
 from rath.links.split import SplitLink
 
-current_kraph_rath = contextvars.ContextVar("current_kraph_rath")
+current_kraph_rath: contextvars.ContextVar[Optional["KraphRath"]] = (
+    contextvars.ContextVar("current_kraph_rath", default=None)
+)
 
 
 class KraphLinkComposition(TypedComposedLink):
@@ -33,6 +37,11 @@ class KraphRath(rath.Rath):
         current_kraph_rath.set(self)
         return self
 
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
+    async def __aexit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
+    ) -> None:
         await super().__aexit__(exc_type, exc_val, exc_tb)
         current_kraph_rath.set(None)

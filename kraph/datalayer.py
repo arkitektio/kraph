@@ -31,8 +31,7 @@ Example:
 
 """
 
-import contextvars
-
+from types import TracebackType
 from koil.composition import KoiledModel
 from .vars import current_datalayer
 
@@ -61,6 +60,11 @@ class DataLayer(KoiledModel):
         current_datalayer.set(self)
         return self
 
-    async def __aexit__(self, *args, **kwargs):
+    async def __aexit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
+    ) -> None:
         current_datalayer.set(None)
-        return self
+        return None

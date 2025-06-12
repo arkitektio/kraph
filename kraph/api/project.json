@@ -157,6 +157,10 @@
                 },
                 {
                     "type": "turms.plugins.funcs.FuncsPlugin",
+                    "coercible_scalars": {
+                        "ID": "rath.scalars.IDCoercible",
+                        "Cypher": "kraph.scalars.CypherCoercible"
+                    },
                     "expand_input_types": [
                         "input"
                     ],

@@ -309,7 +309,7 @@ wheels = [
 
 [[package]]
 name = "dokker"
-version = "2.0.0"
+version = "2.1.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aioconsole" },
@@ -318,9 +318,9 @@ dependencies = [
     { name = "koil" },
     { name = "pydantic" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/33/66/1fef6bff6256ca9535219d9a5e1a8ae3a56b8c6ccff8dc8fe3b6d9bf833b/dokker-2.0.0.tar.gz", hash = "sha256:9531a399e6f83c2eb3c12c1d2caff07dad923523c98c1cbab3f86b9825c028c9", size = 14971 }
+sdist = { url = "https://files.pythonhosted.org/packages/36/7e/ea8cfebf626d9869c5b97fbb1e56e3f203f19b5bd0cd246426d32020c684/dokker-2.1.1.tar.gz", hash = "sha256:bee9de0d2cfc8f84a162ebdd03a41432bd98b5658b879dec6328329a27fb4b5d", size = 16235 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/ad/cc/a038c50833ab5df1b99598cacd59516a1a7cf57dcdc3eaba55514e628eef/dokker-2.0.0-py3-none-any.whl", hash = "sha256:e58fb65ce897adf545cd65a8f739614047cf6acfc0903cf91ca01785a5f80cd6", size = 19946 },
+    { url = "https://files.pythonhosted.org/packages/ad/ac/39c3c5f2ff25681b76dbf7e0b5008defc36040b1567f5529e5fd67e476cc/dokker-2.1.1-py3-none-any.whl", hash = "sha256:26d010fbcde9ca071b884baa0aaa64bbe9e5d495b377abbb0459e4b57354e94c", size = 21475 },
 ]
 
 [[package]]
@@ -505,7 +505,7 @@ wheels = [
 
 [[package]]
 name = "kraph"
-version = "0.5.0"
+version = "0.1.0"
 source = { editable = "." }
 dependencies = [
     { name = "rath" },
@@ -537,7 +537,7 @@ dev = [
     { name = "aiohttp", specifier = ">=3.8.3,<4" },
     { name = "autoflake", specifier = ">=1.7.7,<2" },
     { name = "black", specifier = ">=23.1.0,<24" },
-    { name = "dokker", specifier = ">=2" },
+    { name = "dokker", specifier = ">=2.1.1" },
     { name = "pytest", specifier = ">=8.3.5" },
     { name = "pytest-aiohttp", specifier = ">=1.0.4,<2" },
     { name = "pytest-asyncio", specifier = ">=0.26.0" },

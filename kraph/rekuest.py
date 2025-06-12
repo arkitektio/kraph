@@ -3,7 +3,41 @@ from rekuest_next.structures.default import (
     id_shrink,
 )
 from rekuest_next.widgets import SearchWidget
-from kraph.api.schema import *
+from kraph.api.schema import (
+    Graph,
+    SearchEntitiesQuery,
+    aget_graph,
+    Reagent,
+    aget_reagent,
+    StructureCategory,
+    aget_structure_category,
+    EntityCategory,
+    aget_entity_category,
+    MeasurementCategory,
+    aget_measurment_category,
+    RelationCategory,
+    aget_relation_category,
+    GraphQuery,
+    aget_graph_query,
+    MetricCategory,
+    aget_metric_category,
+    Entity,
+    aget_node,
+    Structure,
+    aget_structure,
+    Metric,
+    aget_metric,
+    SearchGraphsQuery,
+    SearchReagentsQuery,
+    SearchStructureCategoryQuery,
+    SearchEntityCategoryQuery,
+    SearchMeasurmentCategoryQuery,
+    SearchRelationCategoryQuery,
+    SearchGraphQueriesQuery,
+    SearchMetricsQuery,
+    SearchStructuresQuery,
+    SearchMetricCategoryQuery,
+)
 
 structure_reg = get_default_structure_registry()
 

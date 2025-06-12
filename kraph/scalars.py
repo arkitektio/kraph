@@ -1,18 +1,11 @@
 import io
-from typing import IO, List, Union, Any, Tuple
-from graphql import (
-    DocumentNode,
-    parse,
-    OperationDefinitionNode,
-    OperationType,
-    print_ast,
-    print_source_location,
-    print_location,
-    GraphQLError,
-)
-from graphql.language.print_location import print_prefixed_lines
+from typing import IO, Any
 from pydantic import BaseModel
-from typing import Any, Callable, Generator, Type
+from typing import Callable, Generator, Type
+
+
+CypherCoercible = str
+""" A custom scalar for wrapping of every supported array like structure on"""
 
 
 class RemoteUpload:
@@ -20,13 +13,9 @@ class RemoteUpload:
     the mikro platform. This scalar enables validation of various array formats
     into a mikro api compliant xr.DataArray.."""
 
-    def __init__(self, value: IO) -> None:
+    def __init__(self, value: IO[bytes]) -> None:
         self.value = value
         self.key = str(value.name)
-
-    @classmethod
-    def __get_validators__(cls):
-        yield cls.validate
 
     @classmethod
     def validate(cls, v, *info):
@@ -35,7 +24,7 @@ class RemoteUpload:
         if isinstance(v, str):
             v = open(v, "rb")
 
-        if not isinstance(v, io.IOBase):
+        if not isinstance(v, io.FileIO) and not isinstance(v, io.BufferedReader):
             raise ValueError("This needs to be a instance of a file")
 
         return cls(v)
@@ -101,8 +90,7 @@ class StructureIdentifier(str):
     @classmethod
     def validate(cls: Type["NodeID"], v: Any, *info) -> "NodeID":
         """Validate the ID"""
-        
-        
+
         if isinstance(v, BaseModel):
             from rekuest_next.structures.default import get_default_structure_registry
 
@@ -172,9 +160,11 @@ class Cypher(str):
     def to_graph_name(self):
         return self.split(":")[0]
 
+    def __set__(self, owner, value: CypherCoercible) -> None: ...
+
     @classmethod
     def __get_validators__(
-        cls: Type["NodeID"],
+        cls: Type["Cypher"],
     ) -> Generator[Callable[..., Any], Any, Any]:
         """Get validators"""
         # one or more validators may be yielded which will be called in the
@@ -183,7 +173,7 @@ class Cypher(str):
         yield cls.validate
 
     @classmethod
-    def validate(cls: Type["NodeID"], v: Any, *info) -> "NodeID":
+    def validate(cls, v: CypherCoercible, *info) -> "Cypher":
         if isinstance(v, str):
             return cls(v)
         raise TypeError("Needs to be either str or a string")
