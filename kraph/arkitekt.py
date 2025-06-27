@@ -1,4 +1,6 @@
 import json
+from fakts_next.contrib.rath.auth import FaktsAuthLink
+from fakts_next.models import Requirement
 from kraph.contrib.fakts.datalayer import FaktsKraphDataLayer
 from kraph.kraph import Kraph
 from kraph.links.upload import UploadLink
@@ -6,19 +8,15 @@ from kraph.rath import KraphLinkComposition, KraphRath
 from rath.links.split import SplitLink
 from fakts_next.contrib.rath.aiohttp import FaktsAIOHttpLink
 from fakts_next.contrib.rath.graphql_ws import FaktsGraphQLWSLink
-from herre_next.contrib.rath.auth_link import HerreAuthLink
 from graphql import OperationType
-from herre_next import Herre
 from fakts_next import Fakts
 
-from arkitekt_next.base_models import Manifest
 
 from arkitekt_next.service_registry import (
     BaseArkitektService,
     Params,
     get_default_service_registry,
 )
-from arkitekt_next.base_models import Requirement
 import os
 
 
@@ -35,14 +33,16 @@ class KraphService(BaseArkitektService):
         return "kraph"
 
     def build_service(
-        self, fakts: Fakts, herre: Herre, params: Params, manifest: Manifest
+        self,
+        fakts: Fakts,
+        params: Params,
     ):
         datalayer = FaktsKraphDataLayer(fakts_group="datalayer", fakts=fakts)
 
         return ArkitektNextKraph(
             rath=KraphRath(
                 link=KraphLinkComposition(
-                    auth=HerreAuthLink(herre=herre),
+                    auth=FaktsAuthLink(fakts=fakts),
                     upload=UploadLink(
                         datalayer=datalayer,
                     ),
