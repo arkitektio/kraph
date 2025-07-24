@@ -1,0 +1,15 @@
+mutation CreateStructureRelationCategory(
+  $input: StructureRelationCategoryInput!
+) {
+  createStructureRelationCategory(input: $input) {
+    ...StructureRelationCategory
+  }
+}
+
+mutation UpdateStructureRelationCategory(
+  $input: UpdateStructureRelationCategoryInput!
+) {
+  updateStructureRelationCategory(input: $input) {
+    ...StructureRelationCategory
+  }
+}

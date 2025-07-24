@@ -20,8 +20,15 @@ fragment Relation on Relation {
   }
 }
 
+fragment StructureRelation on StructureRelation {
+  category {
+    id
+    label
+  }
+}
+
 fragment Participant on Participant {
-  role 
+  role
   quantity
 }
 
@@ -30,4 +37,5 @@ fragment Edge on Edge {
   ...Measurement
   ...Relation
   ...Participant
+  ...StructureRelation
 }

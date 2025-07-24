@@ -44,6 +44,19 @@ fragment RelationCategory on RelationCategory {
   }
 }
 
+fragment StructureRelationCategory on StructureRelationCategory {
+  ...BaseCategory
+  ...BaseEdgeCategory
+  sourceDefinition {
+    tagFilters
+    categoryFilters
+  }
+  targetDefinition {
+    tagFilters
+    categoryFilters
+  }
+}
+
 fragment StructureCategory on StructureCategory {
   ...BaseCategory
   ...BaseNodeCategory

@@ -50,6 +50,20 @@ fragment ListRelationCategory on RelationCategory {
   label
 }
 
+fragment ListStructureRelationCategory on StructureRelationCategory {
+  ...BaseListCategory
+  ...BaseListEdgeCategory
+  sourceDefinition {
+    tagFilters
+    categoryFilters
+  }
+  targetDefinition {
+    tagFilters
+    categoryFilters
+  }
+  label
+}
+
 fragment ListStructureCategory on StructureCategory {
   ...BaseListCategory
   ...BaseListNodeCategory

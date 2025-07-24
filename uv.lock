@@ -2,15 +2,6 @@ version = 1
 requires-python = ">=3.11, <4.0"
 
 [[package]]
-name = "aioconsole"
-version = "0.7.1"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/e5/f4/f156826819b4136b3fe9fac1b7707f6f241c871aaef13b4a16932e39156d/aioconsole-0.7.1.tar.gz", hash = "sha256:a3e52428d32623c96746ec3862d97483c61c12a2f2dfba618886b709415d4533", size = 28493 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/08/17/98008117ec3f484259f11a8a96cb5601949546a4de43102b99cffa1138e5/aioconsole-0.7.1-py3-none-any.whl", hash = "sha256:1867a7cc86897a87398e6e6fba302738548f1cf76cbc6c76e06338e091113bdc", size = 30474 },
-]
-
-[[package]]
 name = "aiohappyeyeballs"
 version = "2.6.1"
 source = { registry = "https://pypi.org/simple" }
@@ -309,18 +300,17 @@ wheels = [
 
 [[package]]
 name = "dokker"
-version = "2.1.1"
+version = "2.3.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "aioconsole" },
     { name = "aiohttp" },
     { name = "certifi" },
     { name = "koil" },
     { name = "pydantic" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/36/7e/ea8cfebf626d9869c5b97fbb1e56e3f203f19b5bd0cd246426d32020c684/dokker-2.1.1.tar.gz", hash = "sha256:bee9de0d2cfc8f84a162ebdd03a41432bd98b5658b879dec6328329a27fb4b5d", size = 16235 }
+sdist = { url = "https://files.pythonhosted.org/packages/f9/cc/396acef6a85fa9d19f3193ceed890fce08e4ecb4880c5675395fcce560b6/dokker-2.3.0.tar.gz", hash = "sha256:a08d427c9db5a5266ffa91a8f6ebcf39fbc534ea971a1da0d4f0e160cc7a2103", size = 16448 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/ad/ac/39c3c5f2ff25681b76dbf7e0b5008defc36040b1567f5529e5fd67e476cc/dokker-2.1.1-py3-none-any.whl", hash = "sha256:26d010fbcde9ca071b884baa0aaa64bbe9e5d495b377abbb0459e4b57354e94c", size = 21475 },
+    { url = "https://files.pythonhosted.org/packages/55/56/5678ae614a78b17bd736adbba4373b27cc3eb7d9fb7d98d070361f4c1d16/dokker-2.3.0-py3-none-any.whl", hash = "sha256:307ef20ebaf5a3014f32b503e629957b112b1466888bdf8ae05a39dcb523cc00", size = 21725 },
 ]
 
 [[package]]
@@ -492,15 +482,15 @@ wheels = [
 
 [[package]]
 name = "koil"
-version = "1.0.3"
+version = "2.0.4"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "janus" },
-    { name = "qtpy" },
+    { name = "pydantic" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/7c/30/46e640c066d6142ad574b08b721f80ced38556334e250da3e5bae3781d06/koil-1.0.3.tar.gz", hash = "sha256:71ed76c85a612b16b5cdee27cd1c1ab813f691628c05a44f7e5f1942845280e2", size = 20948 }
+sdist = { url = "https://files.pythonhosted.org/packages/f7/65/66a1e16e6565bcbf168d09c9275e2672c96cb0b8195dc8ba2d730c9fdd7e/koil-2.0.4.tar.gz", hash = "sha256:862a4d4e1ccccb29576f8a6a1e30c9f955b5549efb37b3747d48a0718736320a", size = 15677 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/1b/62/1231afc7444bf9231d73074a0e79794e0bc72e5d1c6d74f774016baf0d03/koil-1.0.3-py3-none-any.whl", hash = "sha256:04858f0a29ec4422c9a0bbd1ed463282f876a767696f344f79d5ce400606d246", size = 23519 },
+    { url = "https://files.pythonhosted.org/packages/42/ab/81bae99a8523476642f6bed8283d71068eec3f83d730fcab4272deb94391/koil-2.0.4-py3-none-any.whl", hash = "sha256:a1cf12471446a8f95966269bec0ba1410f350fbd4709575643328b49dfa778b6", size = 19241 },
 ]
 
 [[package]]
@@ -508,6 +498,7 @@ name = "kraph"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
+    { name = "dokker" },
     { name = "rath" },
     { name = "websockets" },
 ]
@@ -528,7 +519,8 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "rath", specifier = ">=3.2" },
+    { name = "dokker", specifier = ">=2.3" },
+    { name = "rath", specifier = ">=3.5" },
     { name = "websockets", specifier = ">=15.0.1" },
 ]
 
@@ -1000,29 +992,17 @@ wheels = [
 ]
 
 [[package]]
-name = "qtpy"
-version = "2.4.3"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "packaging" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/70/01/392eba83c8e47b946b929d7c46e0f04b35e9671f8bb6fc36b6f7945b4de8/qtpy-2.4.3.tar.gz", hash = "sha256:db744f7832e6d3da90568ba6ccbca3ee2b3b4a890c3d6fbbc63142f6e4cdf5bb", size = 66982 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/69/76/37c0ccd5ab968a6a438f9c623aeecc84c202ab2fabc6a8fd927580c15b5a/QtPy-2.4.3-py3-none-any.whl", hash = "sha256:72095afe13673e017946cc258b8d5da43314197b741ed2890e563cf384b51aa1", size = 95045 },
-]
-
-[[package]]
 name = "rath"
-version = "3.2.0"
+version = "3.6.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "graphql-core" },
     { name = "koil" },
     { name = "pydantic" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/25/82/9fd604db89508ef405671a8a57ff407f37ea7477dff0a8db565c2a548816/rath-3.2.0.tar.gz", hash = "sha256:0dda6f568d6908a6a865bf90328226c1586514ca62c0d4264472e0cde192653e", size = 34250 }
+sdist = { url = "https://files.pythonhosted.org/packages/61/8e/f9b23d737b46575a999e5d8954a433d3bebf72fa665abd84c49d1f18dad4/rath-3.6.0.tar.gz", hash = "sha256:33ac30eac0305aa826851555d90ddf55246c6da397dfe1184aafb50ff477efc9", size = 32860 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/e6/fb/3c36ba8ceb044348aba82e0ddce56f4ed488c0102e061cbc6e6014ed1a81/rath-3.2.0-py3-none-any.whl", hash = "sha256:d5dea97342b19fecf1c0837c2021788500ff667c812aeb0a9842fb604c075a06", size = 53837 },
+    { url = "https://files.pythonhosted.org/packages/2a/d9/6743cda9d1284e9abce19b5b7749ac09d0865cb6686830decf5b80a38ca3/rath-3.6.0-py3-none-any.whl", hash = "sha256:9677911c5ad99d922e915e94280d52fc8d842891fef6aff7c0ba8f04fdcb941c", size = 48373 },
 ]
 
 [[package]]

@@ -52,6 +52,9 @@ def deployed_app() -> Generator[DeployedKraph, None, None]:
     minio_watcher = setup.create_watcher("minio")
 
     with setup:
+        setup.pull()
+        setup.down()
+
         minio_url = f"http://localhost:{setup.spec.find_service('minio').get_port_for_internal(9000).published}"
         http_url = f"http://localhost:{setup.spec.find_service('kraph').get_port_for_internal(80).published}/graphql"
         ws_url = f"ws://localhost:{setup.spec.find_service('kraph').get_port_for_internal(80).published}/graphql"

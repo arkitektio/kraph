@@ -2,13 +2,19 @@ import io
 from typing import IO, Any
 from pydantic import BaseModel
 from typing import Callable, Generator, Type
+from typing import Any, IO, List, Optional, TypeAlias, cast
+from pydantic import GetCoreSchemaHandler
+from pydantic_core import CoreSchema
 
+from pydantic_core import core_schema
 
+StructureIdentifierCoercible = str
+""" A custom scalar for wrapping of every supported array like structure on"""
 CypherCoercible = str
 """ A custom scalar for wrapping of every supported array like structure on"""
 
 
-class RemoteUpload:
+class RemoteUpload(str):
     """A custom scalar for wrapping of every supported array like structure on
     the mikro platform. This scalar enables validation of various array formats
     into a mikro api compliant xr.DataArray.."""
@@ -16,6 +22,15 @@ class RemoteUpload:
     def __init__(self, value: IO[bytes]) -> None:
         self.value = value
         self.key = str(value.name)
+
+    @classmethod
+    def __get_pydantic_core_schema__(
+        cls,
+        source_type: Any,  # noqa: ANN401
+        handler: GetCoreSchemaHandler,  # noqa: ANN401
+    ) -> CoreSchema:
+        """Get the pydantic core schema for the validator function"""
+        return core_schema.no_info_before_validator_function(cls.validate, handler(object))
 
     @classmethod
     def validate(cls, v, *info):
@@ -41,14 +56,13 @@ class NodeID(str):
         return self.split(":")[0]
 
     @classmethod
-    def __get_validators__(
-        cls: Type["NodeID"],
-    ) -> Generator[Callable[..., Any], Any, Any]:
-        """Get validators"""
-        # one or more validators may be yielded which will be called in the
-        # order to validate the input, each validator will receive as an input
-        # the value returned from the previous validator
-        yield cls.validate
+    def __get_pydantic_core_schema__(
+        cls,
+        source_type: Any,  # noqa: ANN401
+        handler: GetCoreSchemaHandler,  # noqa: ANN401
+    ) -> CoreSchema:
+        """Get the pydantic core schema for the validator function"""
+        return core_schema.no_info_before_validator_function(cls.validate, handler(str))
 
     @classmethod
     def validate(cls: Type["NodeID"], v: Any, *info) -> "NodeID":
@@ -65,9 +79,7 @@ class NodeID(str):
         if isinstance(v, int):
             return cls(str(v))
 
-        raise TypeError(
-            "Needs to be either a instance of BaseModel (with an id) or a string"
-        )
+        raise TypeError("Needs to be either a instance of BaseModel (with an id) or a string")
 
 
 class StructureIdentifier(str):
@@ -78,17 +90,18 @@ class StructureIdentifier(str):
         return self.split(":")[0]
 
     @classmethod
-    def __get_validators__(
-        cls: Type["NodeID"],
-    ) -> Generator[Callable[..., Any], Any, Any]:
-        """Get validators"""
-        # one or more validators may be yielded which will be called in the
-        # order to validate the input, each validator will receive as an input
-        # the value returned from the previous validator
-        yield cls.validate
+    def __get_pydantic_core_schema__(
+        cls,
+        source_type: Any,  # noqa: ANN401
+        handler: GetCoreSchemaHandler,  # noqa: ANN401
+    ) -> CoreSchema:
+        """Get the pydantic core schema for the validator function"""
+        return core_schema.no_info_before_validator_function(cls.validate, handler(str))
 
     @classmethod
-    def validate(cls: Type["NodeID"], v: Any, *info) -> "NodeID":
+    def validate(
+        cls: Type["StructureIdentifier"], v: StructureIdentifierCoercible
+    ) -> "StructureIdentifier":
         """Validate the ID"""
 
         if isinstance(v, BaseModel):
@@ -107,9 +120,7 @@ class StructureIdentifier(str):
         if isinstance(v, int):
             return cls(str(v))
 
-        raise TypeError(
-            "Needs to be either a instance of BaseModel (with an id) or a string"
-        )
+        raise TypeError("Needs to be either a instance of BaseModel (with an id) or a string")
 
 
 class StructureString(str):
@@ -120,14 +131,13 @@ class StructureString(str):
         return self.split(":")[0]
 
     @classmethod
-    def __get_validators__(
-        cls: Type["NodeID"],
-    ) -> Generator[Callable[..., Any], Any, Any]:
-        """Get validators"""
-        # one or more validators may be yielded which will be called in the
-        # order to validate the input, each validator will receive as an input
-        # the value returned from the previous validator
-        yield cls.validate
+    def __get_pydantic_core_schema__(
+        cls,
+        source_type: Any,  # noqa: ANN401
+        handler: GetCoreSchemaHandler,  # noqa: ANN401
+    ) -> CoreSchema:
+        """Get the pydantic core schema for the validator function"""
+        return core_schema.no_info_before_validator_function(cls.validate, handler(str))
 
     @classmethod
     def validate(cls: Type["NodeID"], v: Any, *info) -> "NodeID":
@@ -148,9 +158,7 @@ class StructureString(str):
         if isinstance(v, int):
             return cls(str(v))
 
-        raise TypeError(
-            "Needs to be either a instance of BaseModel (with an id) or a string"
-        )
+        raise TypeError("Needs to be either a instance of BaseModel (with an id) or a string")
 
 
 class Cypher(str):
@@ -163,14 +171,13 @@ class Cypher(str):
     def __set__(self, owner, value: CypherCoercible) -> None: ...
 
     @classmethod
-    def __get_validators__(
-        cls: Type["Cypher"],
-    ) -> Generator[Callable[..., Any], Any, Any]:
-        """Get validators"""
-        # one or more validators may be yielded which will be called in the
-        # order to validate the input, each validator will receive as an input
-        # the value returned from the previous validator
-        yield cls.validate
+    def __get_pydantic_core_schema__(
+        cls,
+        source_type: Any,  # noqa: ANN401
+        handler: GetCoreSchemaHandler,  # noqa: ANN401
+    ) -> CoreSchema:
+        """Get the pydantic core schema for the validator function"""
+        return core_schema.no_info_before_validator_function(cls.validate, handler(str))
 
     @classmethod
     def validate(cls, v: CypherCoercible, *info) -> "Cypher":

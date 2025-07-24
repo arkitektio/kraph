@@ -108,6 +108,9 @@
                 "RelationCategory": [
                     "kraph.traits.RelationCategoryTrait"
                 ],
+                "StructureRelationCategory": [
+                    "kraph.traits.StructureRelationCategoryTrait"
+                ],
                 "EntityRoleDefinitionInput": [
                     "kraph.traits.EntityRoleDefinitionInputTrait"
                 ],
@@ -131,6 +134,9 @@
                 ],
                 "RelationCategoryInput": [
                     "kraph.traits.RelationCategoryInputTrait"
+                ],
+                "StructureRelationCategoryInput": [
+                    "kraph.traits.StructureRelationCategoryInputTrait"
                 ],
                 "MeasurementCategoryInput": [
                     "kraph.traits.MeasurementCategoryInputTrait"
@@ -159,7 +165,8 @@
                     "type": "turms.plugins.funcs.FuncsPlugin",
                     "coercible_scalars": {
                         "ID": "rath.scalars.IDCoercible",
-                        "Cypher": "kraph.scalars.CypherCoercible"
+                        "Cypher": "kraph.scalars.CypherCoercible",
+                        "StructureIdentifier": "kraph.scalars.StructureIdentifierCoercible"
                     },
                     "expand_input_types": [
                         "input"

@@ -9,22 +9,31 @@ from rath.turms.utils import NotQueriedError, get_attributes_or_error
 
 
 if TYPE_CHECKING:
-    from kraph.api.schema import Entity, MeasurementCategory, MetricCategory, RelationCategory, EntityCategory, StructureCategory, MetricKind, Structure, Metric
-
+    from kraph.api.schema import (
+        Entity,
+        MeasurementCategory,
+        MetricCategory,
+        RelationCategory,
+        EntityCategory,
+        StructureCategory,
+        MetricKind,
+        Structure,
+        Metric,
+    )
 
 
 def validate_reagent_category_definition(cls, value):
     from kraph.api.schema import CategoryDefinitionInput
-        
+
     if isinstance(value, CategoryDefinitionInput):
         return value
-    
+
     tagFilters = []
     categoryFilters = []
-    
+
     if not isinstance(value, Iterable):
         value = [value]
-        
+
     for i in value:
         if isinstance(i, str):
             if i.startswith("class:"):
@@ -38,30 +47,31 @@ def validate_reagent_category_definition(cls, value):
         elif isinstance(i, ReagentCategoryTrait):
             categoryFilters.append(i.id)
         else:
-            raise ValueError(f'Unknown filter {i}. Either specify a string with ""tag:" or "class:" or a ReagentCategoryTrait')
-    
+            raise ValueError(
+                f'Unknown filter {i}. Either specify a string with ""tag:" or "class:" or a ReagentCategoryTrait'
+            )
+
     if not categoryFilters and not tagFilters:
         raise ValueError("You must specify at least one class or tag filter")
-    
 
     return CategoryDefinitionInput(
         categoryFilters=categoryFilters,
         tagFilters=tagFilters,
     )
-    
-    
+
+
 def validate_entitiy_category_definition(cls, value):
     from kraph.api.schema import CategoryDefinitionInput
-    
+
     if isinstance(value, CategoryDefinitionInput):
         return value
-    
+
     tagFilters = []
     categoryFilters = []
-    
+
     if not isinstance(value, list) and not isinstance(value, tuple):
         value = [value]
-        
+
     for i in value:
         if isinstance(i, str):
             if i.startswith("class:"):
@@ -75,11 +85,12 @@ def validate_entitiy_category_definition(cls, value):
         elif isinstance(i, ReagentCategoryTrait):
             raise ValueError("Enitity role cannot have reagent categories")
         else:
-            raise ValueError(f'Unknown filter {i}. Either specify a string with ""tag:" or "class:" or a EntityCategoryTrait')
-    
+            raise ValueError(
+                f'Unknown filter {i}. Either specify a string with ""tag:" or "class:" or a EntityCategoryTrait'
+            )
+
     if not categoryFilters and not tagFilters:
         raise ValueError("You must specify at least one class or tag filter")
-    
 
     return CategoryDefinitionInput(
         categoryFilters=categoryFilters,
@@ -89,16 +100,16 @@ def validate_entitiy_category_definition(cls, value):
 
 def validate_structure_category_definition(cls, value):
     from kraph.api.schema import CategoryDefinitionInput, create_structure_category
-    
+
     if isinstance(value, CategoryDefinitionInput):
         return value
-    
+
     tagFilters = []
     categoryFilters = []
-    
+
     if not isinstance(value, list) and not isinstance(value, tuple):
         value = [value]
-        
+
     for i in value:
         if isinstance(i, str):
             if i.startswith("@") and "/" in i:
@@ -109,15 +120,23 @@ def validate_structure_category_definition(cls, value):
                 tagFilters.append(i[len("tag:") :])
             else:
                 raise ValueError(f"Unknown filter {i}")
-        elif isinstance(i, EntityCategoryTrait):
+        elif isinstance(i, StructureCategoryTrait):
             categoryFilters.append(i.id)
         elif isinstance(i, ReagentCategoryTrait):
             raise ValueError("Enitity role cannot have reagent categories")
+        elif isinstance(i, EntityCategoryTrait):
+            raise ValueError("Structure role cannot have entity categories")
         else:
             try:
+                # check if it is a class
+                if not isinstance(i, type):
+                    i = i.__class__
+
                 if issubclass(i, BaseModel):
-                    from rekuest_next.structures.default import get_default_structure_registry
-        
+                    from rekuest_next.structures.default import (
+                        get_default_structure_registry,
+                    )
+
                     registry = get_default_structure_registry()
                     identifier = registry.get_identifier_for_cls(i)
                     if identifier is None:
@@ -127,19 +146,14 @@ def validate_structure_category_definition(cls, value):
                     raise ValueError(f"Unknown filter {i}")
             except TypeError as e:
                 raise e
-    
+
     if not categoryFilters and not tagFilters:
         raise ValueError("You must specify at least one class or tag filter")
-    
 
     return CategoryDefinitionInput(
         categoryFilters=categoryFilters,
         tagFilters=tagFilters,
     )
-
-
-
-
 
 
 def assert_is_reagent_or_id(value):
@@ -153,7 +167,8 @@ def assert_is_reagent_or_id(value):
         raise ValueError(
             f"Value {value} is not a string or a Reagent. You need to specify a single value for {value} (pass quantity as node mapping instead)"
         )
-        
+
+
 def assert_is_entity_or_id(value):
     from kraph.api.schema import Entity
 
@@ -167,34 +182,34 @@ def assert_is_entity_or_id(value):
         )
 
 
-
-
-
-
-
-
-
 @dataclasses.dataclass
 class MetricWithValue:
     metric_category: "MetricCategory"
     value: float
-    
+
     def __ror__(self, other):
         from rekuest_next.structures.default import get_default_structure_registry
         from kraph.api.schema import create_structure, create_metric
-    
+
         if isinstance(other, BaseModel):
             registry = get_default_structure_registry()
             structure_string = registry.get_identifier_for_cls(type(other))
             id = get_attributes_or_error(other, "id")
-            return create_metric(structure=create_structure(f"{structure_string}:{id}", self.metric_category.graph.id), category=self.metric_category, value=self.value)
-        
-        if isinstance(other, StructureTrait):
-            assert other.graph.id == self.metric_category.graph.id, "Structure and metric must be in the same graph"
-            return create_metric(structure=other, category=self.metric_category, value=self.value)
-            
-        raise NotImplementedError("You can only merge a measurement with a structure")
+            return create_metric(
+                structure=create_structure(
+                    f"{structure_string}:{id}", self.metric_category.graph.id
+                ),
+                category=self.metric_category,
+                value=self.value,
+            )
 
+        if isinstance(other, StructureTrait):
+            assert other.graph.id == self.metric_category.graph.id, (
+                "Structure and metric must be in the same graph"
+            )
+            return create_metric(structure=other, category=self.metric_category, value=self.value)
+
+        raise NotImplementedError("You can only merge a measurement with a structure")
 
 
 @dataclasses.dataclass
@@ -203,30 +218,71 @@ class MeasurementWithStructureAndValidity:
     structure: "Structure"
     valid_from: Optional[datetime.datetime] = None
     valid_to: Optional[datetime.datetime] = None
-    
+
     def __or__(self, other):
         from rekuest_next.structures.default import get_default_structure_registry
         from kraph.api.schema import create_structure, create_metric, create_measurement
-        
+
         if isinstance(other, EntityTrait):
             id = get_attributes_or_error(other, "id")
-            
+
             return create_measurement(
                 self.measurement_category,
                 self.structure.id,
                 id,
                 valid_from=self.valid_from,
-                valid_to=self.valid_to, 
+                valid_to=self.valid_to,
             )
-    
+
         if isinstance(other, BaseModel):
             raise NotImplementedError("You can only merge a measurement with a structure")
-            
-        
-            
+
         raise NotImplementedError("You can only merge a measurement with a structure")
 
 
+@dataclasses.dataclass
+class IntermediateStructureRelationWithValidity:
+    structure_relation_category: "StructureRelationCategoryTrait"
+    structure: "Structure"
+    valid_from: Optional[datetime.datetime] = None
+    valid_to: Optional[datetime.datetime] = None
+
+    def __or__(self, other):
+        from rekuest_next.structures.default import get_default_structure_registry
+        from kraph.api.schema import (
+            create_structure_relation,
+            create_structure,
+        )
+
+        if isinstance(other, StructureTrait):
+            id = get_attributes_or_error(other, "id")
+
+            return create_structure_relation(
+                self.structure_relation_category,
+                self.structure.id,
+                id,
+                valid_from=self.valid_from,
+                valid_to=self.valid_to,
+            )
+
+        if isinstance(other, BaseModel):
+            from rekuest_next.structures.default import get_default_structure_registry
+
+            registry = get_default_structure_registry()
+            structure_string = registry.get_identifier_for_cls(type(other))
+            id = get_attributes_or_error(other, "id")
+
+            right_structure = create_structure(
+                f"{structure_string}:{id}", self.structure_relation_category.graph.id
+            )
+
+            return create_structure_relation(
+                self.structure.id,
+                right_structure.id,
+                self.structure_relation_category,
+            )
+
+        raise NotImplementedError("You can only merge a measurement with a structure")
 
 
 @dataclasses.dataclass
@@ -234,29 +290,33 @@ class MeasurementWithValidity:
     measurement_category: "MeasurementCategory"
     valid_from: Optional[datetime.datetime] = None
     valid_to: Optional[datetime.datetime] = None
-    
+
     def __ror__(self, other):
         from rekuest_next.structures.default import get_default_structure_registry
         from kraph.api.schema import create_structure, create_metric
-        
+
         if isinstance(other, StructureTrait):
-            return MeasurementWithStructureAndValidity(structure=other, valid_from=self.valid_from, valid_to=self.valid_to)       
-    
+            return MeasurementWithStructureAndValidity(
+                structure=other, valid_from=self.valid_from, valid_to=self.valid_to
+            )
+
         if isinstance(other, BaseModel):
             from rekuest_next.structures.default import get_default_structure_registry
+
             registry = get_default_structure_registry()
             structure_string = registry.get_identifier_for_cls(type(other))
             id = get_attributes_or_error(other, "id")
-            
-            return MeasurementWithStructureAndValidity(measurement_category=self.measurement_category, structure=create_structure(f"{structure_string}:{id}", self.measurement_category.graph.id), valid_from=self.valid_from, valid_to=self.valid_to)
-        
-            
-        
-            
+
+            return MeasurementWithStructureAndValidity(
+                measurement_category=self.measurement_category,
+                structure=create_structure(
+                    f"{structure_string}:{id}", self.measurement_category.graph.id
+                ),
+                valid_from=self.valid_from,
+                valid_to=self.valid_to,
+            )
+
         raise NotImplementedError("You can only merge a measurement with a structure")
-
-
-
 
 
 @dataclasses.dataclass
@@ -268,32 +328,82 @@ class IntermediateRelation:
         from kraph.api.schema import create_relation, EntityCategoryDefinition, Entity
 
         if isinstance(other, Entity):
-            source: EntityCategoryDefinition = get_attributes_or_error(self.category, "source_definition")
-            target: EntityCategoryDefinition = get_attributes_or_error(self.category, "target_definition")
-            
+            source: EntityCategoryDefinition = get_attributes_or_error(
+                self.category, "source_definition"
+            )
+            target: EntityCategoryDefinition = get_attributes_or_error(
+                self.category, "target_definition"
+            )
+
             if source.category_filters:
-                assert self.left.category.id in source.category_filters, f"Source {self.left.category} not in {source.category_filters}"
+                assert self.left.category.id in source.category_filters, (
+                    f"Source {self.left.category} not in {source.category_filters}"
+                )
             if source.tag_filters:
-                assert self.left.category.id in source.tag_filters, f"Source {self.left.category.id} not in {source.tag_filters}"
-                
+                assert self.left.category.id in source.tag_filters, (
+                    f"Source {self.left.category.id} not in {source.tag_filters}"
+                )
+
             if target.category_filters:
-                assert other.category.id in target.category_filters, f"Target {other.category.id} not in {target.category_filters}"
-                
+                assert other.category.id in target.category_filters, (
+                    f"Target {other.category.id} not in {target.category_filters}"
+                )
+
             if target.tag_filters:
-                assert other.category.id in target.tag_filters, f"Target {other.category.id} not in {target.tag_filters}"
-            
+                assert other.category.id in target.tag_filters, (
+                    f"Target {other.category.id} not in {target.tag_filters}"
+                )
+
             return create_relation(source=self.left, target=other, category=self.category)
-        
-        
+
         raise NotImplementedError("You can only merge a relation with an entity")
 
 
 @dataclasses.dataclass
 class RelationWithValidity:
-    relation: "RelationCategoryTrait"
-    value: float
+    kind: "RelationCategoryTrait"
+    value: float | None = None
     valid_from: Optional[datetime.datetime] = None
     valid_to: Optional[datetime.datetime] = None
+
+
+@dataclasses.dataclass
+class StructureRelationWithValidity:
+    kind: "StructureRelationCategoryTrait"
+    value: float | None = None
+    valid_from: Optional[datetime.datetime] = None
+    valid_to: Optional[datetime.datetime] = None
+
+    def __ror__(self, other):
+        from rekuest_next.structures.default import get_default_structure_registry
+        from kraph.api.schema import create_structure, create_metric
+
+        if isinstance(other, StructureTrait):
+            return IntermediateStructureRelationWithValidity(
+                structure_relation_category=self.kind,
+                structure=other,
+                valid_from=self.valid_from,
+                valid_to=self.valid_to,
+            )
+
+        if isinstance(other, BaseModel):
+            from rekuest_next.structures.default import get_default_structure_registry
+
+            registry = get_default_structure_registry()
+            structure_string = registry.get_identifier_for_cls(type(other))
+            id = get_attributes_or_error(other, "id")
+
+            return IntermediateStructureRelationWithValidity(
+                structure_relation_category=self.kind,
+                structure=create_structure(
+                    f"{structure_string}:{id}",
+                    self.kind.graph.id,
+                ),
+                valid_from=self.valid_from,
+                valid_to=self.valid_to,
+            )
+
+        raise NotImplementedError("You can only merge a measurement with a structure")
 
 
 @dataclasses.dataclass
@@ -310,17 +420,23 @@ class IntermediateDescription:
                 self.metric_with_value.metric_category,
                 self.metric_with_value.value,
             )
-            
+
         if isinstance(other, BaseModel):
             from rekuest_next.structures.default import get_default_structure_registry
+
             registry = get_default_structure_registry()
             structure_string = registry.get_identifier_for_cls(type(other))
             id = get_attributes_or_error(other, "id")
-            
-            structure = create_structure(f"{structure_string}:{id}", self.metric_with_value.metric_category.graph.id)
-            return create_metric(structure, self.metric_with_value.metric_category, self.metric_with_value.value)
-                
-            
+
+            structure = create_structure(
+                f"{structure_string}:{id}",
+                self.metric_with_value.metric_category.graph.id,
+            )
+            return create_metric(
+                structure,
+                self.metric_with_value.metric_category,
+                self.metric_with_value.value,
+            )
 
         raise NotImplementedError
 
@@ -393,21 +509,21 @@ class StructureTrait(BaseModel):
             return
 
         raise NotImplementedError
-    
-    
+
+
 class MetricTrait(BaseModel):
     def __or__(self, other):
-        raise NotImplementedError("You cannot merge metrics directly, use a relation or measurement inbetween")
+        raise NotImplementedError(
+            "You cannot merge metrics directly, use a relation or measurement inbetween"
+        )
 
         raise NotImplementedError
-    
-    
+
 
 class RelationCategoryTrait(BaseModel):
-
     def __str__(self):
         return get_attributes_or_error(self, "age_name")
-    
+
     def __or__(self, other):
         raise NotImplementedError
 
@@ -415,36 +531,46 @@ class RelationCategoryTrait(BaseModel):
         return RelationWithValidity(kind=self, valid_from=valid_from, valid_to=valid_to)
 
 
+class StructureRelationCategoryTrait(BaseModel):
+    def __str__(self):
+        return get_attributes_or_error(self, "age_name")
+
+    def __or__(self, other):
+        raise NotImplementedError
+
+    def __call__(self, valid_from=None, valid_to=None):
+        return StructureRelationWithValidity(kind=self, valid_from=valid_from, valid_to=valid_to)
+
+
 class MeasurementCategoryTrait(BaseModel):
-    
-    
     def __ror__(self, other):
         from kraph.api.schema import create_measurement
 
         if isinstance(other, StructureTrait):
-            raise ValueError(f"You cannot merge a measurement category with a structure directly, you need to first give it a validity range by Calling the class YOUR_MEASUREMENT(valid_from=..., valid_to=...)")
+            raise ValueError(
+                f"You cannot merge a measurement category with a structure directly, you need to first give it a validity range by Calling the class YOUR_MEASUREMENT(valid_from=..., valid_to=...)"
+            )
 
         if isinstance(other, BaseModel):
             from rekuest_next.structures.default import get_default_structure_registry
-            raise ValueError(f"You cannot merge a measurement category with a structure directly, you need to first give it a validity range by Calling the class YOUR_MEASUREMENT(valid_from=..., valid_to=...)")
+
+            raise ValueError(
+                f"You cannot merge a measurement category with a structure directly, you need to first give it a validity range by Calling the class YOUR_MEASUREMENT(valid_from=..., valid_to=...)"
+            )
 
         raise NotImplementedError(
             "Measurement categories cannot be merged directly, use a relation or measurement inbetween"
         )
-    
-    
+
     def __call__(self, valid_from=None, valid_to=None):
         from kraph.api.schema import MetricKind
 
-
         return MeasurementWithValidity(
-            measurement_category=self,valid_from=valid_from, valid_to=valid_to
+            measurement_category=self, valid_from=valid_from, valid_to=valid_to
         )
 
 
 class ReagentCategoryTrait(BaseModel):
-    
-    
     def __call__(self, *args, external_id=None, **kwargs):
         from kraph.api.schema import create_reagent
 
@@ -456,13 +582,11 @@ class ReagentCategoryTrait(BaseModel):
         return create_reagent(id, *args, external_id=external_id, **kwargs)
 
 
-
 class StructureCategoryTrait(BaseModel):
-
-     
-
     def __or__(self, other):
-        raise NotImplementedError("You cannot relate structure categories directly. Use a entitiy instead")
+        raise NotImplementedError(
+            "You cannot relate structure categories directly. Use a entitiy instead"
+        )
 
     def create_structure(self, identifier) -> "Entity":
         from kraph.api.schema import create_structure
@@ -478,14 +602,13 @@ class StructureCategoryTrait(BaseModel):
         return self.create_structure(*args, **kwds)
 
 
-
 class EntityCategoryTrait(BaseModel):
     """Allows for the creation of a generic categoryss"""
 
-    
     def __or__(self, other):
-        raise NotImplementedError("You cannot relate structure categories directly. Use an entitiy instead E.g. by calling the category")
-
+        raise NotImplementedError(
+            "You cannot relate structure categories directly. Use an entitiy instead E.g. by calling the category"
+        )
 
     def __call__(self, *args, **kwargs):
         from kraph.api.schema import create_entity
@@ -496,15 +619,15 @@ class EntityCategoryTrait(BaseModel):
         """
         id = get_attributes_or_error(self, "id")
         return create_entity(id, *args, **kwargs)
-    
-    
+
+
 class NaturalEventCategoryTrait(BaseModel):
     """Allows for the creation of a generic category"""
 
-    
     def __or__(self, other):
-        raise NotImplementedError("You cannot relate structure categories directly. Use an entitiy instead E.g. by calling the category")
-
+        raise NotImplementedError(
+            "You cannot relate structure categories directly. Use an entitiy instead E.g. by calling the category"
+        )
 
     def __call__(self, *args, external_id=None, **kwargs):
         from kraph.api.schema import record_natural_event
@@ -515,75 +638,102 @@ class NaturalEventCategoryTrait(BaseModel):
         """
         id = get_attributes_or_error(self, "id")
         return record_natural_event(id, *args, **kwargs)
-    
-    
+
+
 class ProtocolEventCategoryTrait(BaseModel):
     """Allows for the creation of a generic category"""
 
     def __or__(self, other):
-        raise NotImplementedError("You cannot relate structure categories directly. Use an entitiy instead E.g. by calling the category")
-
+        raise NotImplementedError(
+            "You cannot relate structure categories directly. Use an entitiy instead E.g. by calling the category"
+        )
 
     def __call__(self, external_id=None, **kwargs):
-        from kraph.api.schema import record_protocol_event, EntityRoleDefinition, ReagentRoleDefinition, NodeMapping, VariableMappingInput, VariableDefinition, Reagent
+        from kraph.api.schema import (
+            record_protocol_event,
+            EntityRoleDefinition,
+            ReagentRoleDefinition,
+            NodeMapping,
+            VariableMappingInput,
+            VariableDefinition,
+            Reagent,
+        )
 
         """Creates an entity with a name
 
 
         """
-        reagent_source_roles: list[ReagentRoleDefinition] = get_attributes_or_error(self, "source_reagent_roles")
-        reagent_target_roles: list[ReagentRoleDefinition]  = get_attributes_or_error(self, "target_reagent_roles")
-        
-        entity_source_roles: list[EntityRoleDefinition]  = get_attributes_or_error(self, "source_entity_roles")
-        entity_target_roles: list[EntityRoleDefinition]  = get_attributes_or_error(self, "target_entity_roles")
-        
-        variable_definitions: list[VariableDefinition] = get_attributes_or_error(self, "variable_definitions")
-        
-        
+        reagent_source_roles: list[ReagentRoleDefinition] = get_attributes_or_error(
+            self, "source_reagent_roles"
+        )
+        reagent_target_roles: list[ReagentRoleDefinition] = get_attributes_or_error(
+            self, "target_reagent_roles"
+        )
+
+        entity_source_roles: list[EntityRoleDefinition] = get_attributes_or_error(
+            self, "source_entity_roles"
+        )
+        entity_target_roles: list[EntityRoleDefinition] = get_attributes_or_error(
+            self, "target_entity_roles"
+        )
+
+        variable_definitions: list[VariableDefinition] = get_attributes_or_error(
+            self, "variable_definitions"
+        )
+
         entity_sources: list[NodeMapping] = kwargs.get("entity_sources", [])
         entity_targets: list[NodeMapping] = kwargs.get("entity_targets", [])
         reagent_sources: list[NodeMapping] = kwargs.get("reagent_sources", [])
         reagent_targets: list[NodeMapping] = kwargs.get("reagent_targets", [])
         variable_mappings: list[VariableMappingInput] = kwargs.get("variable_mappings", [])
-        
+
         validated_entity_sources = []
         validated_entity_targets = []
         validated_reagent_sources = []
         validated_reagent_targets = []
         validated_variable_mappings = []
-        
-        
+
         for i in reagent_source_roles:
             if i.role not in [x.key for x in reagent_sources]:
                 if i.needs_quantity:
-                    raise ValueError(f"Reagent source role {i.role} requires a quantity. You need to specify a quanitnity in a node mapping for {i.role}")
-                
+                    raise ValueError(
+                        f"Reagent source role {i.role} requires a quantity. You need to specify a quanitnity in a node mapping for {i.role}"
+                    )
+
                 elif i.role in kwargs:
                     passed_value = kwargs.pop(i.role)
                     assert_is_reagent_or_id(passed_value)
                     validated_reagent_sources.append(NodeMapping(key=i.role, node=passed_value))
-                
+
                 else:
                     if i.optional:
                         continue
-                    raise ValueError(f"Reagent source role {i.role} not found in source or keyword arguments")
-        
+                    raise ValueError(
+                        f"Reagent source role {i.role} not found in source or keyword arguments"
+                    )
+
             else:
                 passed_values = [x.key for x in reagent_sources]
-                assert len(passed_values) == 1, f"Reagent source role {i.role} found multiple times in source. You need to specify a single value for {i.role} (pass quantity as node mapping instead)"
-                assert isinstance(passed_values, NodeMapping), f"Reagent source role {i.role} is not a node mapping. You need to specify a single value for {i.role} (pass quantity as node mapping instead)"
+                assert len(passed_values) == 1, (
+                    f"Reagent source role {i.role} found multiple times in source. You need to specify a single value for {i.role} (pass quantity as node mapping instead)"
+                )
+                assert isinstance(passed_values, NodeMapping), (
+                    f"Reagent source role {i.role} is not a node mapping. You need to specify a single value for {i.role} (pass quantity as node mapping instead)"
+                )
                 validated_reagent_sources.append(passed_values[0])
-        
+
         for i in entity_source_roles:
             if i.role not in [x.key for x in entity_sources]:
                 if i.role in kwargs:
-                    passed_value =  kwargs.pop(i.role)
+                    passed_value = kwargs.pop(i.role)
                     if isinstance(passed_value, list) or isinstance(passed_value, tuple):
-                        assert i.allow_multiple, f"Entity source role {i.role} does not allow multiple values. You need to specify a single value for {i.role}"
-                        
+                        assert i.allow_multiple, (
+                            f"Entity source role {i.role} does not allow multiple values. You need to specify a single value for {i.role}"
+                        )
+
                         for passed_v in passed_value:
-                           assert_is_entity_or_id(passed_v)
-                           validated_entity_sources.append(NodeMapping(key=i.role, node=passed_v))
+                            assert_is_entity_or_id(passed_v)
+                            validated_entity_sources.append(NodeMapping(key=i.role, node=passed_v))
                     else:
                         assert_is_entity_or_id(passed_value)
                         validated_entity_sources.append(NodeMapping(key=i.role, node=passed_value))
@@ -591,48 +741,61 @@ class ProtocolEventCategoryTrait(BaseModel):
                     if i.optional:
                         continue
                     else:
-                        raise ValueError(f"Reagent source role {i.role} not found in source or keyword arguments")
-        
+                        raise ValueError(
+                            f"Reagent source role {i.role} not found in source or keyword arguments"
+                        )
+
             else:
                 passed_values = [x.key for x in reagent_sources]
                 if len(passed_values) > 1 and not i.allow_multiple:
-                    raise ValueError(f"Reagent source role {i.role} found multiple times in source. You need to specify a single value for {i.role}")
-                
+                    raise ValueError(
+                        f"Reagent source role {i.role} found multiple times in source. You need to specify a single value for {i.role}"
+                    )
+
                 for i in passed_values:
-                    assert isinstance(i, NodeMapping), f"Reagent source role {i.role} is not a node mapping. You need to specify a single value for {i.role} (pass quantity as node mapping instead)"
+                    assert isinstance(i, NodeMapping), (
+                        f"Reagent source role {i.role} is not a node mapping. You need to specify a single value for {i.role} (pass quantity as node mapping instead)"
+                    )
                     validated_entity_sources.append(i)
-                
-                
-                
+
         for i in reagent_target_roles:
             if i.role not in [x.key for x in reagent_targets]:
                 if i.needs_quantity:
-                    raise ValueError(f"Reagent target role {i.role} requires a quantity. You need to specify a quanitnity in a node mapping for {i.role}")
-                
+                    raise ValueError(
+                        f"Reagent target role {i.role} requires a quantity. You need to specify a quanitnity in a node mapping for {i.role}"
+                    )
+
                 elif i.role in kwargs:
-                    passed_value =  kwargs.pop(i.role)
+                    passed_value = kwargs.pop(i.role)
                     assert_is_reagent_or_id(passed_value)
                     validated_reagent_targets.append(NodeMapping(key=i.role, node=passed_value))
-                
+
                 else:
                     if i.optional:
                         continue
-                    raise ValueError(f"Reagent target role {i.role} not found in source or keyword arguments")
-        
+                    raise ValueError(
+                        f"Reagent target role {i.role} not found in source or keyword arguments"
+                    )
+
             else:
                 passed_values = [x.key for x in reagent_targets]
-                assert len(passed_values) == 1, f"Reagent target role {i.role} found multiple times in source. You need to specify a single value for {i.role} (pass quantity as node mapping instead)"
-                assert isinstance(passed_values, NodeMapping), f"Reagent target role {i.role} is not a node mapping. You need to specify a single value for {i.role} (pass quantity as node mapping instead)"
+                assert len(passed_values) == 1, (
+                    f"Reagent target role {i.role} found multiple times in source. You need to specify a single value for {i.role} (pass quantity as node mapping instead)"
+                )
+                assert isinstance(passed_values, NodeMapping), (
+                    f"Reagent target role {i.role} is not a node mapping. You need to specify a single value for {i.role} (pass quantity as node mapping instead)"
+                )
                 validated_reagent_targets.append(passed_values[0])
-                
-                
+
         for i in entity_target_roles:
             if i.role not in [x.key for x in entity_targets]:
                 if i.role in kwargs:
                     passed_value = kwargs.pop(i.role)
                     if isinstance(passed_value, list) or isinstance(passed_value, tuple):
-                        assert i.allow_multiple, f"Entity target role {i.role} does not allow multiple values. You need to specify a single value for {i.role}"
-                        
+                        assert i.allow_multiple, (
+                            f"Entity target role {i.role} does not allow multiple values. You need to specify a single value for {i.role}"
+                        )
+
                         for passed_v in passed_value:
                             assert_is_entity_or_id(passed_v)
                             validated_entity_targets.append(NodeMapping(key=i.role, node=passed_v))
@@ -643,36 +806,48 @@ class ProtocolEventCategoryTrait(BaseModel):
                     if i.optional:
                         continue
                     else:
-                        raise ValueError(f"Reagent target role {i.role} not found in source or keyword arguments")
-        
+                        raise ValueError(
+                            f"Reagent target role {i.role} not found in source or keyword arguments"
+                        )
+
             else:
                 passed_values = [x.key for x in entity_targets]
                 if len(passed_values) > 1 and not i.allow_multiple:
-                    raise ValueError(f"Entity target role {i.role} found multiple times in source. You need to specify a single value for {i.role}")
-                
+                    raise ValueError(
+                        f"Entity target role {i.role} found multiple times in source. You need to specify a single value for {i.role}"
+                    )
+
                 for i in passed_values:
-                    assert isinstance(i, NodeMapping), f"Entity target role {i.role} is not a node mapping. You need to specify a single value for {i.role} (pass quantity as node mapping instead)"
+                    assert isinstance(i, NodeMapping), (
+                        f"Entity target role {i.role} is not a node mapping. You need to specify a single value for {i.role} (pass quantity as node mapping instead)"
+                    )
                     validated_entity_targets.append(i)
-                
-                
+
         for i in variable_definitions:
             if i.param not in [x.key for x in variable_mappings]:
                 if i.param in kwargs:
                     passed_value = kwargs.pop(i.param)
-                    validated_variable_mappings.append(VariableMappingInput(key=i.param, value=passed_value))
+                    validated_variable_mappings.append(
+                        VariableMappingInput(key=i.param, value=passed_value)
+                    )
                 else:
                     if i.optional:
                         continue
                     else:
-                        raise ValueError(f"Variable mapping {i.param} not found in source or keyword arguments")
-        
+                        raise ValueError(
+                            f"Variable mapping {i.param} not found in source or keyword arguments"
+                        )
+
             else:
                 passed_values = [x.key for x in variable_mappings]
-                assert len(passed_values) == 1, f"Variable mapping {i.param} found multiple times in source. You need to specify a single value for {i.param} (pass quantity as node mapping instead)"
-                assert isinstance(passed_values, VariableMappingInput), f"Variable mapping {i.param} is not a node mapping. You need to specify a single value for {i.param} (pass quantity as node mapping instead)"
+                assert len(passed_values) == 1, (
+                    f"Variable mapping {i.param} found multiple times in source. You need to specify a single value for {i.param} (pass quantity as node mapping instead)"
+                )
+                assert isinstance(passed_values, VariableMappingInput), (
+                    f"Variable mapping {i.param} is not a node mapping. You need to specify a single value for {i.param} (pass quantity as node mapping instead)"
+                )
                 validated_variable_mappings.append(passed_values[0])
-                
-                
+
         return record_protocol_event(
             category=self,
             external_id=external_id,
@@ -682,16 +857,15 @@ class ProtocolEventCategoryTrait(BaseModel):
             reagent_targets=validated_reagent_targets,
             **kwargs,
         )
-        
-        
 
 
 class MetricCategoryTrait(BaseModel):
     """Allows for the creation of a generic category"""
 
     def __or__(self, other):
-        raise NotImplementedError("You cannot relate structure categories directly. Use an entitiy instead E.g. by calling the category")
-
+        raise NotImplementedError(
+            "You cannot relate structure categories directly. Use an entitiy instead E.g. by calling the category"
+        )
 
     def __call__(self, value, target=None):
         from kraph.api.schema import create_metric
@@ -704,7 +878,7 @@ class MetricCategoryTrait(BaseModel):
             kind = get_attributes_or_error(self, "category.metric_kind")
         except NotQueriedError:
             kind = None
-            
+
         if kind:
             if kind == MetricKind.FLOAT:
                 assert isinstance(value, float), "Value must be a float"
@@ -716,8 +890,7 @@ class MetricCategoryTrait(BaseModel):
                 assert isinstance(value, bool), "Value must be a bool"
             else:
                 raise NotImplementedError(f"Kind {kind} not implemented")
-            
-            
+
         if target is not None:
             assert isinstance(target, StructureTrait), "Target must be an structure"
             assert target.graph.id == self.graph.id, "Target and metric must be in the same graph"
@@ -728,11 +901,9 @@ class MetricCategoryTrait(BaseModel):
             )
 
         return MetricWithValue(
-            metric_category=self, value=value,
+            metric_category=self,
+            value=value,
         )
-
-
-
 
 
 class ExpressionTrait(BaseModel):
@@ -744,26 +915,28 @@ class ExpressionTrait(BaseModel):
 
 
 class EntityTrait(BaseModel):
-    
-    
     def __or__(self, other):
         if isinstance(other, RelationWithValidity):
             return IntermediateRelationWithValidity(left=self, relation_with_validity=other)
         if isinstance(other, EntityTrait):
-            raise NotImplementedError("Cannot merge entities directly, use a relation or measurement inbetween")
+            raise NotImplementedError(
+                "Cannot merge entities directly, use a relation or measurement inbetween"
+            )
         if isinstance(other, StructureTrait):
-            raise NotImplementedError("Cannot merge entities and structures directly, use a relation or measurement inbetween")
+            raise NotImplementedError(
+                "Cannot merge entities and structures directly, use a relation or measurement inbetween"
+            )
         if isinstance(other, RelationCategoryTrait):
             return IntermediateRelation(self, other)
         if isinstance(other, MeasurementCategoryTrait):
-            raise NotImplementedError("When merging a entity and a measurement, please instatiante the measurement with a value first")
+            raise NotImplementedError(
+                "When merging a entity and a measurement, please instatiante the measurement with a value first"
+            )
 
     def set(self, metric: "LinkedExpressionTrait", value: float, **kwargs):
         from kraph.api.schema import create_entity_metric, ExpressionKind
 
-        assert isinstance(
-            metric, LinkedExpressionTrait
-        ), "Metric must be a LinkedExpressionTrait"
+        assert isinstance(metric, LinkedExpressionTrait), "Metric must be a LinkedExpressionTrait"
         (
             get_attributes_or_error(metric, "kind") == ExpressionKind.METRIC,
             "Expression must be a METRIC",
@@ -779,7 +952,6 @@ class EntityTrait(BaseModel):
         )
 
         return create_protocol_step(input=ProtocolStepInput(entity=self, **kwargs))
-
 
 
 class OntologyTrait(BaseModel):
@@ -802,8 +974,7 @@ class GraphTrait(BaseModel):
 
     def __exit__(self, exc_type, exc_value, traceback):
         current_graph.reset(self._token)
-        
-        
+
     def create_entity_category(
         self,
         label: str,
@@ -812,10 +983,8 @@ class GraphTrait(BaseModel):
     ) -> "EntityCategory":
         from kraph.api.schema import create_entity_category
 
-        return create_entity_category(
-            graph=self, label=label, description=description, **kwargs
-        )
-        
+        return create_entity_category(graph=self, label=label, description=description, **kwargs)
+
     def create_structure_category(
         self,
         identifier: str,
@@ -827,7 +996,7 @@ class GraphTrait(BaseModel):
         return create_structure_category(
             graph=self, identifier=identifier, description=description, **kwargs
         )
-        
+
     def create_measurement_category(
         self,
         label: str,
@@ -839,7 +1008,7 @@ class GraphTrait(BaseModel):
         return create_measurement_category(
             graph=self, label=label, description=description, **kwargs
         )
-        
+
     def create_relation_category(
         self,
         label: str,
@@ -847,11 +1016,14 @@ class GraphTrait(BaseModel):
         **kwargs,
     ) -> "RelationCategory":
         from kraph.api.schema import create_relation_category, CategoryDefinitionInput
-        
+
         return create_relation_category(
-            graph=self, label=label, description=description, **kwargs,
+            graph=self,
+            label=label,
+            description=description,
+            **kwargs,
         )
-        
+
     def create_metric_category(
         self,
         label: str,
@@ -876,60 +1048,49 @@ class HasPresignedDownloadAccessor(BaseModel):
         return download_file(url, file_name=file_name or key)
 
 
-
 class EntityRoleDefinitionInputTrait(BaseModel):
-    
-    
-    
     @field_validator("category_definition", mode="before", check_fields=False)
     def validate_category_definition(cls, value):
         return validate_entitiy_category_definition(cls, value)
-    
-    
+
 
 class ReagentRoleDefinitionInputTrait(BaseModel):
-    
-    
-    
     @field_validator("category_definition", mode="before", check_fields=False)
     def validate_category_definition(cls, value):
         return validate_reagent_category_definition(cls, value)
-    
-    
-    
+
+
 class RelationCategoryInputTrait(BaseModel):
-    
-    
     @field_validator("source_definition", mode="before", check_fields=False)
     def validate_source_definition(cls, value):
         return validate_entitiy_category_definition(cls, value)
-    
-    
-     
+
     @field_validator("target_definition", mode="before", check_fields=False)
     def validate_target_definition(cls, value):
         return validate_entitiy_category_definition(cls, value)
-    
-    
+
+
+class StructureRelationCategoryInputTrait(BaseModel):
+    @field_validator("source_definition", mode="before", check_fields=False)
+    def validate_source_definition(cls, value):
+        return validate_structure_category_definition(cls, value)
+
+    @field_validator("target_definition", mode="before", check_fields=False)
+    def validate_target_definition(cls, value):
+        return validate_structure_category_definition(cls, value)
+
+
 class MeasurementCategoryInputTrait(BaseModel):
-    
-    
     @field_validator("structure_definition", mode="before", check_fields=False)
     def validate_source_definition(cls, value):
         return validate_structure_category_definition(cls, value)
-    
-    
-     
+
     @field_validator("entity_definition", mode="before", check_fields=False)
     def validate_target_definition(cls, value):
         return validate_entitiy_category_definition(cls, value)
-    
+
+
 class MetricCategoryInputTrait(BaseModel):
-    
-    
     @field_validator("structure_definition", mode="before", check_fields=False)
     def validate_source_definition(cls, value):
         return validate_structure_category_definition(cls, value)
-    
-    
-     

@@ -100,6 +100,9 @@ type Graph {
 
   """The list of relation expressions defined in this ontology"""
   relationCategories(filters: RelationCategoryFilter, pagination: OffsetPaginationInput): [RelationCategory!]!
+
+  """The list of structure relation expressions defined in this ontology"""
+  structureRelationCategories(filters: StructureRelationCategoryFilter, pagination: OffsetPaginationInput): [StructureRelationCategory!]!
   nodeCategories(filters: NodeCategoryFilter, pagination: OffsetPaginationInput): [NodeCategory!]!
   edgeCategories(filters: EdgeCategoryFilter, pagination: OffsetPaginationInput): [EdgeCategory!]!
   latestNodes(filters: EntityFilter = null, pagination: GraphPaginationInput = null): [Node!]!
@@ -189,10 +192,10 @@ type Pairs {
 """A paired structure two entities and the relation between them."""
 type Pair {
   """The left entity."""
-  left: Node!
+  source: Node!
 
   """The right entity."""
-  right: Node!
+  target: Node!
 
   """The relation between the two entities."""
   edge: Edge!
@@ -985,6 +988,64 @@ input RelationCategoryFilter {
   DISTINCT: Boolean
 }
 
+type StructureRelationCategory implements EdgeCategory & BaseCategory {
+  """The unique identifier of the expression within its graph"""
+  id: ID!
+
+  """The ontology the expression belongs to."""
+  graph: Graph!
+
+  """A description of the expression."""
+  description: String
+
+  """
+  An image or other media file that can be used to represent the expression.
+  """
+  store: MediaStore
+
+  """The unique identifier of the expression within its graph"""
+  ageName: String!
+  color: [Float!]
+
+  """The kind of expression"""
+  kind: ExpressionKind!
+
+  """The tags that are associated with the expression"""
+  tags(filters: TagFilter, pagination: OffsetPaginationInput): [Tag!]!
+
+  """The unique identifier of the expression within its graph"""
+  purl: String
+
+  """The sequence of the expression within its graph"""
+  sequence: GraphSequence
+  relevantQueries: [GraphQuery!]!
+  relevantNodeQueries: [NodeQuery!]!
+  bestQuery: GraphQuery
+  pinned: Boolean!
+
+  """The label of the expression"""
+  label: String!
+
+  """The unique identifier of the expression within its graph"""
+  sourceDefinition: StructureCategoryDefinition!
+  targetDefinition: StructureCategoryDefinition!
+}
+
+input StructureRelationCategoryFilter {
+  ids: [ID!]
+  id: ID
+  search: String
+  graph: ID
+  ontology: ID
+  pinned: Boolean
+  sourceIdentifier: String = null
+  targetIdentifier: String = null
+  AND: StructureRelationCategoryFilter
+  OR: StructureRelationCategoryFilter
+  NOT: StructureRelationCategoryFilter
+  DISTINCT: Boolean
+}
+
 input NodeCategoryFilter {
   ids: [ID!]
   id: ID
@@ -1468,6 +1529,9 @@ type Query {
   """List of all measurement categories"""
   measurementCategories(filters: MeasurementCategoryFilter, pagination: OffsetPaginationInput): [MeasurementCategory!]!
 
+  """List of all structure relation categories"""
+  structureRelationCategories(filters: StructureRelationCategoryFilter, pagination: OffsetPaginationInput): [StructureRelationCategory!]!
+
   """List of all scatter plots"""
   scatterPlots(filters: ScatterPlotFilter, pagination: OffsetPaginationInput): [ScatterPlot!]!
 
@@ -1494,6 +1558,7 @@ type Query {
   graphSequence(id: ID!): GraphSequence!
   entityCategory(id: ID!): EntityCategory!
   getEntityByCategoryAndExternalId(category: ID!, externalId: String!): Entity!
+  structureRelationCategory(id: ID!): StructureRelationCategory!
   metricCategory(id: ID!): MetricCategory!
   structureCategory(id: ID!): StructureCategory!
   naturalEventCategory(id: ID!): NaturalEventCategory!
@@ -1836,6 +1901,15 @@ type Mutation {
   deleteRelationCategory(input: DeleteRelationCategoryInput!): ID!
 
   """Create a new expression"""
+  createStructureRelationCategory(input: StructureRelationCategoryInput!): StructureRelationCategory!
+
+  """Update an existing expression"""
+  updateStructureRelationCategory(input: UpdateStructureRelationCategoryInput!): StructureRelationCategory!
+
+  """Delete an existing expression"""
+  deleteStructureRelationCategory(input: DeleteStructureRelationCategoryInput!): ID!
+
+  """Create a new expression"""
   createEntityCategory(input: EntityCategoryInput!): EntityCategory!
 
   """Update an existing expression"""
@@ -1894,6 +1968,9 @@ type Mutation {
 
   """Create a new relation between entities"""
   createRelation(input: RelationInput!): Relation!
+
+  """Create a new relation between entities"""
+  createStructureRelation(input: StructureRelationInput!): StructureRelation!
 
   """Create a new metric for an entity"""
   createMetric(input: MetricInput!): Metric!
@@ -2332,6 +2409,77 @@ input UpdateRelationCategoryInput {
 
 """Input for deleting an expression"""
 input DeleteRelationCategoryInput {
+  """The ID of the expression to delete"""
+  id: ID!
+}
+
+"""Input for creating a new expression"""
+input StructureRelationCategoryInput {
+  """
+  The ID of the graph this expression belongs to. If not provided, uses default ontology
+  """
+  graph: ID!
+
+  """A detailed description of the expression"""
+  description: String = null
+
+  """Permanent URL identifier for the expression"""
+  purl: String = null
+
+  """RGBA color values as list of 3 or 4 integers"""
+  color: [Int!] = null
+
+  """An optional image associated with this expression"""
+  image: ID = null
+
+  """A list of tags associated with this expression"""
+  tags: [String!] = null
+
+  """Whether this expression should be pinned or not"""
+  pin: Boolean = null
+
+  """The ID of the sequence this category will get internal_ids from"""
+  sequence: ID = null
+
+  """Whether to create a sequence if it does not exist"""
+  autoCreateSequence: Boolean = false
+
+  """The label/name of the expression"""
+  label: String!
+
+  """The source definition for this expression"""
+  sourceDefinition: CategoryDefinitionInput!
+
+  """The target definition for this expression"""
+  targetDefinition: CategoryDefinitionInput!
+}
+
+"""Input for updating an existing expression"""
+input UpdateStructureRelationCategoryInput {
+  """A detailed description of the expression"""
+  description: String = null
+
+  """Permanent URL identifier for the expression"""
+  purl: String = null
+
+  """RGBA color values as list of 3 or 4 integers"""
+  color: [Int!] = null
+
+  """An optional image associated with this expression"""
+  image: ID = null
+
+  """A list of tags associated with this expression"""
+  tags: [String!] = null
+
+  """Whether this expression should be pinned or not"""
+  pin: Boolean = null
+
+  """New label for the expression"""
+  label: String = null
+}
+
+"""Input for deleting an expression"""
+input DeleteStructureRelationCategoryInput {
   """The ID of the expression to delete"""
   id: ID!
 }
@@ -2985,6 +3133,42 @@ input MeasurementInput {
 
 """Input type for creating a relation between two entities"""
 input RelationInput {
+  """ID of the left entity (format: graph:id)"""
+  source: ID!
+
+  """ID of the right entity (format: graph:id)"""
+  target: ID!
+
+  """ID of the relation category (LinkedExpression)"""
+  category: ID!
+
+  """The context of the measurement"""
+  context: ContextInput = null
+}
+
+"A relation is an edge between two entities. It is a directed edge, that connects two entities and established a relationship\n                 that is not a measurement between them. I.e. when they are an subjective assertion about the entities.\n                 \n                 \n                 \n                 "
+type StructureRelation implements Edge {
+  """The unique identifier of the entity within its graph"""
+  id: NodeID!
+  label: String!
+  leftId: String!
+  rightId: String!
+  right: Node!
+  left: Node!
+
+  """Timestamp from when this entity is valid"""
+  validFrom: DateTime!
+
+  """Timestamp until when this entity is valid"""
+  validTo: DateTime!
+
+  """When this entity was created"""
+  createdAt: DateTime!
+  category: StructureRelationCategory!
+}
+
+"""Input type for creating a relation between two entities"""
+input StructureRelationInput {
   """ID of the left entity (format: graph:id)"""
   source: ID!
 
