@@ -1,6 +1,29 @@
 # CHANGELOG
 
 
+## v0.2.0 (2025-07-24)
+
+### Bug Fixes
+
+- Refactor datalayer and rath context management; update execute and subscribe functions
+  ([`7803ffe`](https://github.com/arkitektio/kraph/commit/7803ffe657b8e8c7253fed6df9df04ca4e671cad))
+
+- Updated the `__aexit__` method in `DataLayer` and `KraphRath` to include type hints and return
+  None. - Refactored `execute` and `subscribe` functions in `funcs.py` to use type hints and
+  improved error handling. - Changed `adownload_file` and `download_file` functions in `io.py` to
+  require a non-optional `file_name`. - Removed unused imports and unnecessary code in `kraph.py`
+  and `scalars.py`. - Updated dependencies in `pyproject.toml` and `uv.lock` to use `dokker` version
+  2.1.1. - Deleted unused `utils.py` file to clean up the codebase.
+
+### Features
+
+- Add unitests and pairs
+  ([`e331d86`](https://github.com/arkitektio/kraph/commit/e331d86068316f47803d85dc07d058035c5fe6ff))
+
+- Updated arkitekt stack
+  ([`151ed10`](https://github.com/arkitektio/kraph/commit/151ed10a041b9286536dc2cd7c8ce55e9e3a47e6))
+
+
 ## v0.1.0 (2025-05-11)
 
 ### Features
