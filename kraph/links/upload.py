@@ -76,15 +76,21 @@ async def apply_recursive(func, obj, typeguard):
     Returns:
         any: The nested structure with the function applied to elements of the specified type.
     """
-    if isinstance(obj, dict):  # If obj is a dictionary, recursively apply to each key-value pair
+    if isinstance(
+        obj, dict
+    ):  # If obj is a dictionary, recursively apply to each key-value pair
         return {k: await apply_recursive(func, v, typeguard) for k, v in obj.items()}
     elif isinstance(obj, list):  # If obj is a list, recursively apply to each element
-        return await asyncio.gather(*[apply_recursive(func, elem, typeguard) for elem in obj])
+        return await asyncio.gather(
+            *[apply_recursive(func, elem, typeguard) for elem in obj]
+        )
     elif isinstance(
         obj, tuple
     ):  # If obj is a tuple, recursively apply to each element and convert back to tuple
         return tuple(
-            await asyncio.gather(*[apply_recursive(func, elem, typeguard) for elem in obj])
+            await asyncio.gather(
+                *[apply_recursive(func, elem, typeguard) for elem in obj]
+            )
         )
     elif isinstance(obj, typeguard):  # If obj matches the typeguard, apply the function
         return await func(obj)
@@ -120,13 +126,13 @@ class UploadLink(ParsingLink):
 
         operation = opify(
             RequestUploadMutation.Meta.document,
-            variables={"key": key, "datalayer": datalayer},
+            variables={"input": {"key": key, "datalayer": datalayer}},
         )
 
         async for result in self.next.aexecute(operation):
             return RequestUploadMutation(**result.data).request_upload
 
-    async def aupload_remote(self, datalayer: "KraphDataLayer", file: RemoteUpload) -> str:
+    async def aupload_remote(self, datalayer: "DataLayer", file: RemoteUpload) -> str:
         assert datalayer is not None, "Datalayer must be set"
         endpoint_url = await datalayer.get_endpoint_url()
 

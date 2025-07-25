@@ -1,10 +1,16 @@
 fragment Pairs on Pairs {
   pairs {
     source {
-      id
+      ... on Structure {
+        identifier
+        object
+      }
     }
     target {
-      id
+      ... on Structure {
+        identifier
+        object
+      }
     }
   }
 }

@@ -2448,10 +2448,32 @@ input StructureRelationCategoryInput {
   label: String!
 
   """The source definition for this expression"""
-  sourceDefinition: CategoryDefinitionInput!
+  sourceDefinition: StructureCategoryDefinitionInput!
 
   """The target definition for this expression"""
-  targetDefinition: CategoryDefinitionInput!
+  targetDefinition: StructureCategoryDefinitionInput!
+}
+
+"""Input for creating a new expression"""
+input StructureCategoryDefinitionInput {
+  """A list of classes to filter the entities"""
+  categoryFilters: [ID!] = null
+
+  """A list of StructureIdentifier to filter the entities"""
+  identifierFilters: [StructureIdentifier!] = null
+
+  """A list of tags to filter the entities by"""
+  tagFilters: [String!] = null
+
+  """
+  The default ACTIVE reagent to use for this port if a reagent is not provided
+  """
+  defaultUseActive: ID = null
+
+  """
+  The default creation of entity or reagent to use for this port if a reagent is not provided
+  """
+  defaultUseNew: ID = null
 }
 
 """Input for updating an existing expression"""

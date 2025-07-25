@@ -26,3 +26,6 @@ def test_create_structure_category(deployed_app: DeployedKraph) -> None:
     IS_MASK_FOR = create_structure_relation_category(
         graph, "is_mask_for", source_definition=image_s, target_definition=image_s
     )
+    
+    
+    

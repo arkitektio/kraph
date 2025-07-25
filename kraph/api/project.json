@@ -84,6 +84,12 @@
                 "Graph": [
                     "kraph.traits.GraphTrait"
                 ],
+                "Node": [
+                    "kraph.traits.NodeTrait"
+                ],
+                "NodeCategory": [
+                    "kraph.traits.NodeCategoryTrait"
+                ],
                 "StructureCategory": [
                     "kraph.traits.StructureCategoryTrait"
                 ],
