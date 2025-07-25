@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.3.0 (2025-07-25)
+
+### Features
+
+- Add structure relation, integration tests
+  ([`ec26330`](https://github.com/arkitektio/kraph/commit/ec26330182ad868febe304617fb036c46b6d565f))
+
+
 ## v0.2.0 (2025-07-24)
 
 ### Bug Fixes
