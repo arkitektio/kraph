@@ -6,17 +6,20 @@ from rekuest_next.widgets import SearchWidget
 from kraph.api.schema import (
     Graph,
     SearchEntitiesQuery,
+    SearchStructureRelationCategoryQuery,
     aget_graph,
     Reagent,
     aget_reagent,
     StructureCategory,
     aget_structure_category,
+    aget_structure_relation_category,
     EntityCategory,
     aget_entity_category,
     MeasurementCategory,
     aget_measurment_category,
     RelationCategory,
     aget_relation_category,
+    StructureRelationCategory,
     GraphQuery,
     aget_graph_query,
     MetricCategory,
@@ -62,9 +65,7 @@ structure_reg.register_as_structure(
     identifier="@kraph/structurecategory",
     aexpand=aget_structure_category,
     ashrink=id_shrink,
-    default_widget=SearchWidget(
-        query=SearchStructureCategoryQuery.Meta.document, ward="kraph"
-    ),
+    default_widget=SearchWidget(query=SearchStructureCategoryQuery.Meta.document, ward="kraph"),
 )
 
 structure_reg.register_as_structure(
@@ -72,8 +73,16 @@ structure_reg.register_as_structure(
     identifier="@kraph/entitycategory",
     aexpand=aget_entity_category,
     ashrink=id_shrink,
+    default_widget=SearchWidget(query=SearchEntityCategoryQuery.Meta.document, ward="kraph"),
+)
+
+structure_reg.register_as_structure(
+    StructureRelationCategory,
+    identifier="@kraph/structurerelationcategory",
+    aexpand=aget_structure_relation_category,
+    ashrink=id_shrink,
     default_widget=SearchWidget(
-        query=SearchEntityCategoryQuery.Meta.document, ward="kraph"
+        query=SearchStructureRelationCategoryQuery.Meta.document, ward="kraph"
     ),
 )
 
@@ -83,9 +92,7 @@ structure_reg.register_as_structure(
     identifier="@kraph/measurementcategory",
     aexpand=aget_measurment_category,
     ashrink=id_shrink,
-    default_widget=SearchWidget(
-        query=SearchMeasurmentCategoryQuery.Meta.document, ward="kraph"
-    ),
+    default_widget=SearchWidget(query=SearchMeasurmentCategoryQuery.Meta.document, ward="kraph"),
 )
 
 structure_reg.register_as_structure(
@@ -93,9 +100,7 @@ structure_reg.register_as_structure(
     identifier="@kraph/relationcategory",
     aexpand=aget_relation_category,
     ashrink=id_shrink,
-    default_widget=SearchWidget(
-        query=SearchRelationCategoryQuery.Meta.document, ward="kraph"
-    ),
+    default_widget=SearchWidget(query=SearchRelationCategoryQuery.Meta.document, ward="kraph"),
 )
 
 structure_reg.register_as_structure(
@@ -103,9 +108,7 @@ structure_reg.register_as_structure(
     identifier="@kraph/graphquery",
     aexpand=aget_graph_query,
     ashrink=id_shrink,
-    default_widget=SearchWidget(
-        query=SearchGraphQueriesQuery.Meta.document, ward="kraph"
-    ),
+    default_widget=SearchWidget(query=SearchGraphQueriesQuery.Meta.document, ward="kraph"),
 )
 
 structure_reg.register_as_structure(
@@ -113,9 +116,7 @@ structure_reg.register_as_structure(
     identifier="@kraph/metriccategory",
     aexpand=aget_metric_category,
     ashrink=id_shrink,
-    default_widget=SearchWidget(
-        query=SearchMetricCategoryQuery.Meta.document, ward="kraph"
-    ),
+    default_widget=SearchWidget(query=SearchMetricCategoryQuery.Meta.document, ward="kraph"),
 )
 
 structure_reg.register_as_structure(
@@ -123,9 +124,7 @@ structure_reg.register_as_structure(
     identifier="@kraph/graphquery",
     aexpand=aget_graph_query,
     ashrink=id_shrink,
-    default_widget=SearchWidget(
-        query=SearchGraphQueriesQuery.Meta.document, ward="kraph"
-    ),
+    default_widget=SearchWidget(query=SearchGraphQueriesQuery.Meta.document, ward="kraph"),
 )
 
 
@@ -142,9 +141,7 @@ structure_reg.register_as_structure(
     identifier="@kraph/entity",
     aexpand=aget_structure,
     ashrink=id_shrink,
-    default_widget=SearchWidget(
-        query=SearchStructuresQuery.Meta.document, ward="kraph"
-    ),
+    default_widget=SearchWidget(query=SearchStructuresQuery.Meta.document, ward="kraph"),
 )
 
 structure_reg.register_as_structure(

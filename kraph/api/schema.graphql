@@ -428,6 +428,7 @@ type StructureCategoryDefinition implements CategoryDefintion {
   categoryFilters: [ID!]
   categoryExcludeFilters: [ID!]
   matches: [StructureCategory!]!
+  identifierFilters: [StructureIdentifier!]
 }
 
 interface CategoryDefintion {
@@ -489,6 +490,11 @@ type StructureCategory implements NodeCategory & BaseCategory {
   """The structure that this class represents"""
   identifier: String!
 }
+
+"""
+The `StructureIdentifier` scalar type represents a identifier of a structure
+"""
+scalar StructureIdentifier
 
 input MetricCategoryFilter {
   ids: [ID!]
@@ -926,6 +932,7 @@ input MeasurementCategoryFilter {
   id: ID
   search: String
   graph: ID
+  sourceIdentifier: String = null
   AND: MeasurementCategoryFilter
   OR: MeasurementCategoryFilter
   NOT: MeasurementCategoryFilter
@@ -1672,11 +1679,6 @@ type KnowledgeView {
   structure: Structure
 }
 
-"""
-The `StructureIdentifier` scalar type represents a identifier of a structure
-"""
-scalar StructureIdentifier
-
 """Filter for entity relations in the graph"""
 input StructureFilter {
   """Filter by graph ID"""
@@ -2236,10 +2238,32 @@ input MeasurementCategoryInput {
   label: String!
 
   """The source definition for this expression"""
-  structureDefinition: CategoryDefinitionInput!
+  structureDefinition: StructureCategoryDefinitionInput!
 
   """The target definition for this expression"""
   entityDefinition: CategoryDefinitionInput!
+}
+
+"""Input for creating a new expression"""
+input StructureCategoryDefinitionInput {
+  """A list of classes to filter the entities"""
+  categoryFilters: [ID!] = null
+
+  """A list of StructureIdentifier to filter the entities"""
+  identifierFilters: [StructureIdentifier!] = null
+
+  """A list of tags to filter the entities by"""
+  tagFilters: [String!] = null
+
+  """
+  The default ACTIVE reagent to use for this port if a reagent is not provided
+  """
+  defaultUseActive: ID = null
+
+  """
+  The default creation of entity or reagent to use for this port if a reagent is not provided
+  """
+  defaultUseNew: ID = null
 }
 
 """Input for updating an existing expression"""
@@ -2452,28 +2476,6 @@ input StructureRelationCategoryInput {
 
   """The target definition for this expression"""
   targetDefinition: StructureCategoryDefinitionInput!
-}
-
-"""Input for creating a new expression"""
-input StructureCategoryDefinitionInput {
-  """A list of classes to filter the entities"""
-  categoryFilters: [ID!] = null
-
-  """A list of StructureIdentifier to filter the entities"""
-  identifierFilters: [StructureIdentifier!] = null
-
-  """A list of tags to filter the entities by"""
-  tagFilters: [String!] = null
-
-  """
-  The default ACTIVE reagent to use for this port if a reagent is not provided
-  """
-  defaultUseActive: ID = null
-
-  """
-  The default creation of entity or reagent to use for this port if a reagent is not provided
-  """
-  defaultUseNew: ID = null
 }
 
 """Input for updating an existing expression"""
