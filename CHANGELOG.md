@@ -1,6 +1,19 @@
 # CHANGELOG
 
 
+## v0.3.1 (2025-08-06)
+
+### Bug Fixes
+
+- Add GraphQL queries for structure relation categories
+  ([`e3e3ec8`](https://github.com/arkitektio/kraph/commit/e3e3ec8ef57c554a3d346e309572c685afd6587d))
+
+- Implemented GetStructureRelationCategory query to fetch a specific structure relation category by
+  ID. - Added SearchStructureRelationCategory query for searching structure relation categories
+  based on a search string and a list of IDs. - Created ListStructureRelationCategory query to
+  retrieve a list of structure relation categories with optional filters and pagination.
+
+
 ## v0.3.0 (2025-07-25)
 
 ### Features
