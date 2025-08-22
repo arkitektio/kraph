@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.4.0 (2025-08-22)
+
+### Features
+
+- Add arkitekt-next support
+  ([`3fb5489`](https://github.com/arkitektio/kraph/commit/3fb5489165c909b52839688f1799feafd06668b0))
+
+
 ## v0.3.1 (2025-08-06)
 
 ### Bug Fixes
