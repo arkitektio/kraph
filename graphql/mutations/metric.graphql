@@ -3,3 +3,10 @@ mutation CreateMetric($input: MetricInput!) {
     ...Metric
   }
 }
+
+
+mutation CreateStructureMetric($input: StructureMetricInput!) {
+  createStructureMetric(input: $input) {
+    ...Metric
+  }
+}

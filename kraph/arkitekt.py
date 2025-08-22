@@ -5,11 +5,15 @@ from kraph.contrib.fakts.datalayer import FaktsKraphDataLayer
 from kraph.kraph import Kraph
 from kraph.links.upload import UploadLink
 from kraph.rath import KraphLinkComposition, KraphRath
+from rath.links import compose
+from rath.links.dictinglink import DictingLink
+from rath.links.shrink import ShrinkingLink
 from rath.links.split import SplitLink
 from fakts_next.contrib.rath.aiohttp import FaktsAIOHttpLink
 from fakts_next.contrib.rath.graphql_ws import FaktsGraphQLWSLink
 from graphql import OperationType
 from fakts_next import Fakts
+from rekuest_next.links.context import ContextLink
 
 
 from arkitekt_next.service_registry import (
@@ -41,12 +45,15 @@ class KraphService(BaseArkitektService):
 
         return ArkitektNextKraph(
             rath=KraphRath(
-                link=KraphLinkComposition(
-                    auth=FaktsAuthLink(fakts=fakts),
-                    upload=UploadLink(
+                link=compose(
+                    ShrinkingLink(),
+                    DictingLink(),
+                    FaktsAuthLink(fakts=fakts),
+                    UploadLink(
                         datalayer=datalayer,
                     ),
-                    split=SplitLink(
+                    ContextLink(),
+                    SplitLink(
                         left=FaktsAIOHttpLink(
                             fakts_group="kraph", fakts=fakts, endpoint_url="FAKE_URL"
                         ),

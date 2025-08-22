@@ -1,43 +1,43 @@
+from typing import Literal, Annotated, Union, Tuple, Iterable, List, Any, Optional
 from kraph.traits import (
-    MeasurementCategoryTrait,
-    ProtocolEventCategoryTrait,
-    ReagentRoleDefinitionInputTrait,
-    RelationCategoryTrait,
     RelationCategoryInputTrait,
-    NodeCategoryTrait,
-    HasPresignedDownloadAccessor,
-    StructureRelationCategoryInputTrait,
-    EntityRoleDefinitionInputTrait,
-    NodeTrait,
-    StructureTrait,
-    MetricTrait,
-    MetricCategoryTrait,
-    NaturalEventCategoryTrait,
     EntityCategoryTrait,
-    ReagentCategoryTrait,
-    StructureRelationCategoryTrait,
-    GraphTrait,
     StructureCategoryTrait,
-    MeasurementCategoryInputTrait,
-    EntityTrait,
+    ReagentRoleDefinitionInputTrait,
+    NodeTrait,
+    NaturalEventCategoryTrait,
     MetricCategoryInputTrait,
+    EntityRoleDefinitionInputTrait,
+    MeasurementCategoryInputTrait,
+    HasPresignedDownloadAccessor,
+    RelationCategoryTrait,
+    GraphTrait,
+    MetricCategoryTrait,
+    MetricTrait,
+    StructureTrait,
+    StructureRelationCategoryTrait,
+    ReagentCategoryTrait,
+    ProtocolEventCategoryTrait,
+    StructureRelationCategoryInputTrait,
+    EntityTrait,
+    NodeCategoryTrait,
+    MeasurementCategoryTrait,
 )
 from kraph.rath import KraphRath
 from pydantic import ConfigDict, Field, BaseModel
 from kraph.scalars import (
-    RemoteUpload,
-    Cypher,
-    NodeID,
-    StructureIdentifierCoercible,
-    StructureString,
-    StructureIdentifier,
     CypherCoercible,
+    StructureIdentifier,
+    StructureString,
+    Cypher,
+    StructureIdentifierCoercible,
+    NodeID,
+    RemoteUpload,
 )
-from typing import Iterable, Literal, Annotated, List, Optional, Tuple, Union, Any
 from kraph.funcs import execute, aexecute
+from rath.scalars import IDCoercible, ID
 from enum import Enum
 from datetime import datetime
-from rath.scalars import IDCoercible, ID
 
 
 class ViewKind(str, Enum):
@@ -800,6 +800,24 @@ class UpdateEntityCategoryInput(BaseModel):
     "The ID of the expression to update"
     label: Optional[str] = None
     "New label for the generic category"
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class StructureMetricInput(BaseModel):
+    """No documentation"""
+
+    structure: StructureString
+    label: str
+    "The name of the measurement"
+    description: Optional[str] = None
+    "The description of the measurement"
+    metric_kind: MetricKind = Field(alias="metricKind")
+    "The kind of the metric"
+    value: Any
+    "The value of the measurement"
+    graph: ID
     model_config = ConfigDict(
         frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
     )
@@ -1864,6 +1882,13 @@ class NaturalEvent(BaseModel):
     "Protocol steps where this entity was the target"
     model_config = ConfigDict(frozen=True)
 
+    class Meta:
+        """Meta class for NaturalEvent"""
+
+        document = "fragment NaturalEvent on NaturalEvent {\n  id\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}"
+        name = "NaturalEvent"
+        type = "NaturalEvent"
+
 
 class ProtocolEventCategory(ProtocolEventCategoryTrait, BaseModel):
     """No documentation"""
@@ -1894,6 +1919,13 @@ class ProtocolEvent(BaseModel):
     "Protocol steps where this entity was the target"
     model_config = ConfigDict(frozen=True)
 
+    class Meta:
+        """Meta class for ProtocolEvent"""
+
+        document = "fragment ProtocolEvent on ProtocolEvent {\n  id\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}"
+        name = "ProtocolEvent"
+        type = "ProtocolEvent"
+
 
 class PresignedPostCredentials(BaseModel):
     """Temporary Credentials for a file upload that can be used by a Client (e.g. in a python datalayer)"""
@@ -1911,6 +1943,13 @@ class PresignedPostCredentials(BaseModel):
     bucket: str
     store: str
     model_config = ConfigDict(frozen=True)
+
+    class Meta:
+        """Meta class for PresignedPostCredentials"""
+
+        document = "fragment PresignedPostCredentials on PresignedPostCredentials {\n  key\n  xAmzCredential\n  xAmzAlgorithm\n  xAmzDate\n  xAmzSignature\n  policy\n  datalayer\n  bucket\n  store\n  __typename\n}"
+        name = "PresignedPostCredentials"
+        type = "PresignedPostCredentials"
 
 
 class BaseEdgeBase(BaseModel):
@@ -2009,6 +2048,13 @@ class Measurement(BaseModel):
     category: MeasurementCategory
     model_config = ConfigDict(frozen=True)
 
+    class Meta:
+        """Meta class for Measurement"""
+
+        document = "fragment Measurement on Measurement {\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}"
+        name = "Measurement"
+        type = "Measurement"
+
 
 class RelationCategory(RelationCategoryTrait, BaseModel):
     """No documentation"""
@@ -2036,6 +2082,13 @@ class Relation(BaseModel):
     )
     category: RelationCategory
     model_config = ConfigDict(frozen=True)
+
+    class Meta:
+        """Meta class for Relation"""
+
+        document = "fragment Relation on Relation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}"
+        name = "Relation"
+        type = "Relation"
 
 
 class StructureRelationCategory(StructureRelationCategoryTrait, BaseModel):
@@ -2065,6 +2118,13 @@ class StructureRelation(BaseModel):
     category: StructureRelationCategory
     model_config = ConfigDict(frozen=True)
 
+    class Meta:
+        """Meta class for StructureRelation"""
+
+        document = "fragment StructureRelation on StructureRelation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}"
+        name = "StructureRelation"
+        type = "StructureRelation"
+
 
 class Participant(BaseModel):
     """A participant edge maps bioentitiy to an event (valid from is not necessary)"""
@@ -2077,6 +2137,15 @@ class Participant(BaseModel):
     quantity: Optional[float] = Field(default=None)
     "Timestamp from when this entity is valid"
     model_config = ConfigDict(frozen=True)
+
+    class Meta:
+        """Meta class for Participant"""
+
+        document = (
+            "fragment Participant on Participant {\n  role\n  quantity\n  __typename\n}"
+        )
+        name = "Participant"
+        type = "Participant"
 
 
 class EntityCategory(EntityCategoryTrait, BaseModel):
@@ -2105,6 +2174,13 @@ class Entity(EntityTrait, BaseModel):
     label: str
     model_config = ConfigDict(frozen=True)
 
+    class Meta:
+        """Meta class for Entity"""
+
+        document = "fragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}"
+        name = "Entity"
+        type = "Entity"
+
 
 class ListEntityCategory(EntityCategoryTrait, BaseModel):
     """No documentation"""
@@ -2132,6 +2208,13 @@ class ListEntity(EntityTrait, BaseModel):
     "Protocol steps where this entity was the target"
     model_config = ConfigDict(frozen=True)
 
+    class Meta:
+        """Meta class for ListEntity"""
+
+        document = "fragment ListEntity on Entity {\n  id\n  label\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}"
+        name = "ListEntity"
+        type = "Entity"
+
 
 class ListGraph(GraphTrait, BaseModel):
     """A graph, that contains entities and relations."""
@@ -2144,6 +2227,13 @@ class ListGraph(GraphTrait, BaseModel):
     description: Optional[str] = Field(default=None)
     pinned: bool
     model_config = ConfigDict(frozen=True)
+
+    class Meta:
+        """Meta class for ListGraph"""
+
+        document = "fragment ListGraph on Graph {\n  id\n  name\n  description\n  pinned\n  __typename\n}"
+        name = "ListGraph"
+        type = "Graph"
 
 
 class ListGraphQuery(BaseModel):
@@ -2158,6 +2248,13 @@ class ListGraphQuery(BaseModel):
     description: Optional[str] = Field(default=None)
     pinned: bool
     model_config = ConfigDict(frozen=True)
+
+    class Meta:
+        """Meta class for ListGraphQuery"""
+
+        document = "fragment ListGraphQuery on GraphQuery {\n  id\n  name\n  query\n  description\n  pinned\n  __typename\n}"
+        name = "ListGraphQuery"
+        type = "GraphQuery"
 
 
 class BaseListCategoryStore(HasPresignedDownloadAccessor, BaseModel):
@@ -2462,6 +2559,13 @@ class Metric(MetricTrait, BaseModel):
     "The value of the metric"
     model_config = ConfigDict(frozen=True)
 
+    class Meta:
+        """Meta class for Metric"""
+
+        document = "fragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}"
+        name = "Metric"
+        type = "Metric"
+
 
 class ListMetric(MetricTrait, BaseModel):
     """A Metric is a recorded data point in a graph. It always describes a structure and through the structure it can bring meaning to the measured entity. It can measure a property of an entity through a direct measurement edge, that connects the entity to the structure. It of course can relate to other structures through relation edges."""
@@ -2476,6 +2580,15 @@ class ListMetric(MetricTrait, BaseModel):
     label: str
     model_config = ConfigDict(frozen=True)
 
+    class Meta:
+        """Meta class for ListMetric"""
+
+        document = (
+            "fragment ListMetric on Metric {\n  id\n  value\n  label\n  __typename\n}"
+        )
+        name = "ListMetric"
+        type = "Metric"
+
 
 class NodeQuery(BaseModel):
     """A view of a node entities and relations."""
@@ -2487,6 +2600,15 @@ class NodeQuery(BaseModel):
     name: str
     pinned: bool
     model_config = ConfigDict(frozen=True)
+
+    class Meta:
+        """Meta class for NodeQuery"""
+
+        document = (
+            "fragment NodeQuery on NodeQuery {\n  id\n  name\n  pinned\n  __typename\n}"
+        )
+        name = "NodeQuery"
+        type = "NodeQuery"
 
 
 class ListNodeQuery(BaseModel):
@@ -2501,6 +2623,13 @@ class ListNodeQuery(BaseModel):
     description: Optional[str] = Field(default=None)
     pinned: bool
     model_config = ConfigDict(frozen=True)
+
+    class Meta:
+        """Meta class for ListNodeQuery"""
+
+        document = "fragment ListNodeQuery on NodeQuery {\n  id\n  name\n  query\n  description\n  pinned\n  __typename\n}"
+        name = "ListNodeQuery"
+        type = "NodeQuery"
 
 
 class PairsPairsSourceBase(NodeTrait, BaseModel):
@@ -2678,6 +2807,13 @@ class Pairs(BaseModel):
     "The paired entities."
     model_config = ConfigDict(frozen=True)
 
+    class Meta:
+        """Meta class for Pairs"""
+
+        document = "fragment Pairs on Pairs {\n  pairs {\n    source {\n      ... on Structure {\n        identifier\n        object\n      }\n      __typename\n    }\n    target {\n      ... on Structure {\n        identifier\n        object\n      }\n      __typename\n    }\n    __typename\n  }\n  __typename\n}"
+        name = "Pairs"
+        type = "Pairs"
+
 
 class ReagentCategory(ReagentCategoryTrait, BaseModel):
     """No documentation"""
@@ -2707,6 +2843,13 @@ class Reagent(BaseModel):
     label: str
     model_config = ConfigDict(frozen=True)
 
+    class Meta:
+        """Meta class for Reagent"""
+
+        document = "fragment Reagent on Reagent {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  externalId\n  label\n  __typename\n}"
+        name = "Reagent"
+        type = "Reagent"
+
 
 class ListReagent(BaseModel):
     """A Entity is a recorded data point in a graph. It can measure a property of an entity through a direct measurement edge, that connects the entity to the structure. It of course can relate to other structures through relation edges."""
@@ -2718,6 +2861,13 @@ class ListReagent(BaseModel):
     "The unique identifier of the entity within its graph"
     label: str
     model_config = ConfigDict(frozen=True)
+
+    class Meta:
+        """Meta class for ListReagent"""
+
+        document = "fragment ListReagent on Reagent {\n  id\n  label\n  __typename\n}"
+        name = "ListReagent"
+        type = "Reagent"
 
 
 class EntityCategoryDefinition(BaseModel):
@@ -2732,6 +2882,13 @@ class EntityCategoryDefinition(BaseModel):
     )
     model_config = ConfigDict(frozen=True)
 
+    class Meta:
+        """Meta class for EntityCategoryDefinition"""
+
+        document = "fragment EntityCategoryDefinition on EntityCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}"
+        name = "EntityCategoryDefinition"
+        type = "EntityCategoryDefinition"
+
 
 class ReagentCategoryDefinition(BaseModel):
     """No documentation"""
@@ -2745,6 +2902,13 @@ class ReagentCategoryDefinition(BaseModel):
     )
     model_config = ConfigDict(frozen=True)
 
+    class Meta:
+        """Meta class for ReagentCategoryDefinition"""
+
+        document = "fragment ReagentCategoryDefinition on ReagentCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}"
+        name = "ReagentCategoryDefinition"
+        type = "ReagentCategoryDefinition"
+
 
 class VariableDefinition(BaseModel):
     """No documentation"""
@@ -2757,6 +2921,13 @@ class VariableDefinition(BaseModel):
     default: Optional[Any] = Field(default=None)
     optional: bool
     model_config = ConfigDict(frozen=True)
+
+    class Meta:
+        """Meta class for VariableDefinition"""
+
+        document = "fragment VariableDefinition on VariableDefinition {\n  param\n  valueKind\n  default\n  optional\n  __typename\n}"
+        name = "VariableDefinition"
+        type = "VariableDefinition"
 
 
 class ScatterPlot(BaseModel):
@@ -2772,6 +2943,13 @@ class ScatterPlot(BaseModel):
     y_column: str = Field(alias="yColumn")
     model_config = ConfigDict(frozen=True)
 
+    class Meta:
+        """Meta class for ScatterPlot"""
+
+        document = "fragment ScatterPlot on ScatterPlot {\n  id\n  name\n  description\n  xColumn\n  yColumn\n  __typename\n}"
+        name = "ScatterPlot"
+        type = "ScatterPlot"
+
 
 class ListScatterPlot(BaseModel):
     """A scatter plot of a table graph, that contains entities and relations."""
@@ -2785,6 +2963,13 @@ class ListScatterPlot(BaseModel):
     y_column: str = Field(alias="yColumn")
     model_config = ConfigDict(frozen=True)
 
+    class Meta:
+        """Meta class for ListScatterPlot"""
+
+        document = "fragment ListScatterPlot on ScatterPlot {\n  id\n  name\n  xColumn\n  yColumn\n  __typename\n}"
+        name = "ListScatterPlot"
+        type = "ScatterPlot"
+
 
 class MediaStore(HasPresignedDownloadAccessor, BaseModel):
     """No documentation"""
@@ -2796,6 +2981,13 @@ class MediaStore(HasPresignedDownloadAccessor, BaseModel):
     presigned_url: str = Field(alias="presignedUrl")
     key: str
     model_config = ConfigDict(frozen=True)
+
+    class Meta:
+        """Meta class for MediaStore"""
+
+        document = "fragment MediaStore on MediaStore {\n  id\n  presignedUrl\n  key\n  __typename\n}"
+        name = "MediaStore"
+        type = "MediaStore"
 
 
 class Structure(StructureTrait, BaseModel):
@@ -2811,6 +3003,13 @@ class Structure(StructureTrait, BaseModel):
     identifier: str
     "The unique identifier of the entity within its graph"
     model_config = ConfigDict(frozen=True)
+
+    class Meta:
+        """Meta class for Structure"""
+
+        document = "fragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}"
+        name = "Structure"
+        type = "Structure"
 
 
 class ListStructureCategory(StructureCategoryTrait, BaseModel):
@@ -2837,6 +3036,13 @@ class ListStructure(StructureTrait, BaseModel):
     category: ListStructureCategory
     "Protocol steps where this entity was the target"
     model_config = ConfigDict(frozen=True)
+
+    class Meta:
+        """Meta class for ListStructure"""
+
+        document = "fragment ListStructure on Structure {\n  id\n  category {\n    identifier\n    id\n    __typename\n  }\n  __typename\n}"
+        name = "ListStructure"
+        type = "Structure"
 
 
 class InformedStructureCategory(StructureCategoryTrait, BaseModel):
@@ -2877,6 +3083,13 @@ class InformedStructure(StructureTrait, BaseModel):
     "The unique identifier of the entity within its graph"
     model_config = ConfigDict(frozen=True)
 
+    class Meta:
+        """Meta class for InformedStructure"""
+
+        document = "fragment InformedStructure on Structure {\n  id\n  category {\n    id\n    identifier\n    __typename\n  }\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}"
+        name = "InformedStructure"
+        type = "Structure"
+
 
 class Column(BaseModel):
     """A column definition for a table view."""
@@ -2895,6 +3108,13 @@ class Column(BaseModel):
     preferhidden: Optional[bool] = Field(default=None)
     model_config = ConfigDict(frozen=True)
 
+    class Meta:
+        """Meta class for Column"""
+
+        document = "fragment Column on Column {\n  name\n  kind\n  valueKind\n  label\n  description\n  category\n  searchable\n  idfor\n  preferhidden\n  __typename\n}"
+        name = "Column"
+        type = "Column"
+
 
 class StructureCategory(
     BaseNodeCategoryStructureCategory,
@@ -2910,6 +3130,13 @@ class StructureCategory(
     identifier: str
     "The structure that this class represents"
     model_config = ConfigDict(frozen=True)
+
+    class Meta:
+        """Meta class for StructureCategory"""
+
+        document = "fragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment StructureCategory on StructureCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  identifier\n  __typename\n}"
+        name = "StructureCategory"
+        type = "StructureCategory"
 
 
 class MetricCategory(
@@ -2927,6 +3154,13 @@ class MetricCategory(
     "The kind of metric this expression represents"
     model_config = ConfigDict(frozen=True)
 
+    class Meta:
+        """Meta class for MetricCategory"""
+
+        document = "fragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment MetricCategory on MetricCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  metricKind\n  __typename\n}"
+        name = "MetricCategory"
+        type = "MetricCategory"
+
 
 class ReagentCategory(
     BaseNodeCategoryReagentCategory,
@@ -2940,6 +3174,13 @@ class ReagentCategory(
         alias="__typename", default="ReagentCategory", exclude=True
     )
     model_config = ConfigDict(frozen=True)
+
+    class Meta:
+        """Meta class for ReagentCategory"""
+
+        document = "fragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment ReagentCategory on ReagentCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  __typename\n}"
+        name = "ReagentCategory"
+        type = "ReagentCategory"
 
 
 class MeasurementCategorySourcedefinition(BaseModel):
@@ -2988,6 +3229,13 @@ class MeasurementCategory(
     )
     model_config = ConfigDict(frozen=True)
 
+    class Meta:
+        """Meta class for MeasurementCategory"""
+
+        document = "fragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment BaseEdgeCategory on EdgeCategory {\n  id\n  __typename\n}\n\nfragment MeasurementCategory on MeasurementCategory {\n  ...BaseCategory\n  ...BaseEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  __typename\n}"
+        name = "MeasurementCategory"
+        type = "MeasurementCategory"
+
 
 class RelationCategorySourcedefinition(BaseModel):
     """No documentation"""
@@ -3035,6 +3283,13 @@ class RelationCategory(
     )
     model_config = ConfigDict(frozen=True)
 
+    class Meta:
+        """Meta class for RelationCategory"""
+
+        document = "fragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment BaseEdgeCategory on EdgeCategory {\n  id\n  __typename\n}\n\nfragment RelationCategory on RelationCategory {\n  ...BaseCategory\n  ...BaseEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  __typename\n}"
+        name = "RelationCategory"
+        type = "RelationCategory"
+
 
 class StructureRelationCategorySourcedefinition(BaseModel):
     """No documentation"""
@@ -3081,6 +3336,13 @@ class StructureRelationCategory(
         alias="targetDefinition"
     )
     model_config = ConfigDict(frozen=True)
+
+    class Meta:
+        """Meta class for StructureRelationCategory"""
+
+        document = "fragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment BaseEdgeCategory on EdgeCategory {\n  id\n  __typename\n}\n\nfragment StructureRelationCategory on StructureRelationCategory {\n  ...BaseCategory\n  ...BaseEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  __typename\n}"
+        name = "StructureRelationCategory"
+        type = "StructureRelationCategory"
 
 
 class EdgeBase(BaseModel):
@@ -3163,6 +3425,13 @@ class ListEntityCategory(
     "The label of the expression"
     model_config = ConfigDict(frozen=True)
 
+    class Meta:
+        """Meta class for ListEntityCategory"""
+
+        document = "fragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment BaseListCategory on BaseCategory {\n  id\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  tags {\n    id\n    value\n    __typename\n  }\n  __typename\n}\n\nfragment ListEntityCategory on EntityCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  instanceKind\n  label\n  __typename\n}"
+        name = "ListEntityCategory"
+        type = "EntityCategory"
+
 
 class ListReagentCategory(
     BaseNodeCategoryReagentCategory,
@@ -3180,6 +3449,13 @@ class ListReagentCategory(
     label: str
     "The label of the expression"
     model_config = ConfigDict(frozen=True)
+
+    class Meta:
+        """Meta class for ListReagentCategory"""
+
+        document = "fragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment BaseListCategory on BaseCategory {\n  id\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  tags {\n    id\n    value\n    __typename\n  }\n  __typename\n}\n\nfragment ListReagentCategory on ReagentCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  instanceKind\n  label\n  __typename\n}"
+        name = "ListReagentCategory"
+        type = "ReagentCategory"
 
 
 class ListMetricCategory(
@@ -3199,6 +3475,13 @@ class ListMetricCategory(
     "The kind of metric this expression represents"
     model_config = ConfigDict(frozen=True)
 
+    class Meta:
+        """Meta class for ListMetricCategory"""
+
+        document = "fragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment BaseListCategory on BaseCategory {\n  id\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  tags {\n    id\n    value\n    __typename\n  }\n  __typename\n}\n\nfragment ListMetricCategory on MetricCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  label\n  metricKind\n  __typename\n}"
+        name = "ListMetricCategory"
+        type = "MetricCategory"
+
 
 class ListStructureCategory(
     BaseListNodeCategoryStructureCategory,
@@ -3214,6 +3497,13 @@ class ListStructureCategory(
     identifier: str
     "The structure that this class represents"
     model_config = ConfigDict(frozen=True)
+
+    class Meta:
+        """Meta class for ListStructureCategory"""
+
+        document = "fragment BaseListCategory on BaseCategory {\n  id\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  tags {\n    id\n    value\n    __typename\n  }\n  __typename\n}\n\nfragment BaseListNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment ListStructureCategory on StructureCategory {\n  ...BaseListCategory\n  ...BaseListNodeCategory\n  identifier\n  __typename\n}"
+        name = "ListStructureCategory"
+        type = "StructureCategory"
 
 
 class ListMeasurementCategorySourcedefinition(BaseModel):
@@ -3264,6 +3554,13 @@ class ListMeasurementCategory(
     "The label of the expression"
     model_config = ConfigDict(frozen=True)
 
+    class Meta:
+        """Meta class for ListMeasurementCategory"""
+
+        document = "fragment BaseListEdgeCategory on EdgeCategory {\n  id\n  __typename\n}\n\nfragment BaseListCategory on BaseCategory {\n  id\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  tags {\n    id\n    value\n    __typename\n  }\n  __typename\n}\n\nfragment ListMeasurementCategory on MeasurementCategory {\n  ...BaseListCategory\n  ...BaseListEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  label\n  __typename\n}"
+        name = "ListMeasurementCategory"
+        type = "MeasurementCategory"
+
 
 class ListRelationCategorySourcedefinition(BaseModel):
     """No documentation"""
@@ -3312,6 +3609,13 @@ class ListRelationCategory(
     label: str
     "The label of the expression"
     model_config = ConfigDict(frozen=True)
+
+    class Meta:
+        """Meta class for ListRelationCategory"""
+
+        document = "fragment BaseListEdgeCategory on EdgeCategory {\n  id\n  __typename\n}\n\nfragment BaseListCategory on BaseCategory {\n  id\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  tags {\n    id\n    value\n    __typename\n  }\n  __typename\n}\n\nfragment ListRelationCategory on RelationCategory {\n  ...BaseListCategory\n  ...BaseListEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  label\n  __typename\n}"
+        name = "ListRelationCategory"
+        type = "RelationCategory"
 
 
 class ListStructureRelationCategorySourcedefinition(BaseModel):
@@ -3362,6 +3666,13 @@ class ListStructureRelationCategory(
     "The label of the expression"
     model_config = ConfigDict(frozen=True)
 
+    class Meta:
+        """Meta class for ListStructureRelationCategory"""
+
+        document = "fragment BaseListEdgeCategory on EdgeCategory {\n  id\n  __typename\n}\n\nfragment BaseListCategory on BaseCategory {\n  id\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  tags {\n    id\n    value\n    __typename\n  }\n  __typename\n}\n\nfragment ListStructureRelationCategory on StructureRelationCategory {\n  ...BaseListCategory\n  ...BaseListEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  label\n  __typename\n}"
+        name = "ListStructureRelationCategory"
+        type = "StructureRelationCategory"
+
 
 class EntityRoleDefinition(BaseModel):
     """No documentation"""
@@ -3375,6 +3686,13 @@ class EntityRoleDefinition(BaseModel):
     allow_multiple: bool = Field(alias="allowMultiple")
     model_config = ConfigDict(frozen=True)
 
+    class Meta:
+        """Meta class for EntityRoleDefinition"""
+
+        document = "fragment EntityCategoryDefinition on EntityCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment EntityRoleDefinition on EntityRoleDefinition {\n  role\n  categoryDefinition {\n    ...EntityCategoryDefinition\n    __typename\n  }\n  optional\n  allowMultiple\n  __typename\n}"
+        name = "EntityRoleDefinition"
+        type = "EntityRoleDefinition"
+
 
 class ReagentRoleDefinition(BaseModel):
     """No documentation"""
@@ -3387,6 +3705,13 @@ class ReagentRoleDefinition(BaseModel):
     needs_quantity: bool = Field(alias="needsQuantity")
     optional: bool
     model_config = ConfigDict(frozen=True)
+
+    class Meta:
+        """Meta class for ReagentRoleDefinition"""
+
+        document = "fragment ReagentCategoryDefinition on ReagentCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment ReagentRoleDefinition on ReagentRoleDefinition {\n  role\n  categoryDefinition {\n    ...ReagentCategoryDefinition\n    __typename\n  }\n  needsQuantity\n  optional\n  __typename\n}"
+        name = "ReagentRoleDefinition"
+        type = "ReagentRoleDefinition"
 
 
 class Model(BaseModel):
@@ -3402,6 +3727,13 @@ class Model(BaseModel):
     store: Optional[MediaStore] = Field(default=None)
     "Optional file storage location containing the model weights/parameters"
     model_config = ConfigDict(frozen=True)
+
+    class Meta:
+        """Meta class for Model"""
+
+        document = "fragment MediaStore on MediaStore {\n  id\n  presignedUrl\n  key\n  __typename\n}\n\nfragment Model on Model {\n  id\n  name\n  store {\n    ...MediaStore\n    __typename\n  }\n  __typename\n}"
+        name = "Model"
+        type = "Model"
 
 
 class NodeBase(NodeTrait, BaseModel):
@@ -3487,6 +3819,13 @@ class Table(BaseModel):
     "The columns describind this table."
     model_config = ConfigDict(frozen=True)
 
+    class Meta:
+        """Meta class for Table"""
+
+        document = "fragment Column on Column {\n  name\n  kind\n  valueKind\n  label\n  description\n  category\n  searchable\n  idfor\n  preferhidden\n  __typename\n}\n\nfragment Table on Table {\n  graph {\n    ageName\n    __typename\n  }\n  rows\n  columns {\n    ...Column\n    __typename\n  }\n  __typename\n}"
+        name = "Table"
+        type = "Table"
+
 
 class NaturalEventCategoryStore(HasPresignedDownloadAccessor, BaseModel):
     """No documentation"""
@@ -3533,6 +3872,13 @@ class NaturalEventCategory(
     "The unique identifier of the expression within its graph"
     model_config = ConfigDict(frozen=True)
 
+    class Meta:
+        """Meta class for NaturalEventCategory"""
+
+        document = "fragment EntityCategoryDefinition on EntityCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment EntityRoleDefinition on EntityRoleDefinition {\n  role\n  categoryDefinition {\n    ...EntityCategoryDefinition\n    __typename\n  }\n  optional\n  allowMultiple\n  __typename\n}\n\nfragment NaturalEventCategory on NaturalEventCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  plateChildren\n  label\n  ageName\n  label\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  __typename\n}"
+        name = "NaturalEventCategory"
+        type = "NaturalEventCategory"
+
 
 class ListNaturalEventCategory(
     BaseNodeCategoryNaturalEventCategory,
@@ -3556,6 +3902,13 @@ class ListNaturalEventCategory(
     )
     "The unique identifier of the expression within its graph"
     model_config = ConfigDict(frozen=True)
+
+    class Meta:
+        """Meta class for ListNaturalEventCategory"""
+
+        document = "fragment EntityCategoryDefinition on EntityCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment EntityRoleDefinition on EntityRoleDefinition {\n  role\n  categoryDefinition {\n    ...EntityCategoryDefinition\n    __typename\n  }\n  optional\n  allowMultiple\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment BaseListCategory on BaseCategory {\n  id\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  tags {\n    id\n    value\n    __typename\n  }\n  __typename\n}\n\nfragment ListNaturalEventCategory on NaturalEventCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  label\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  __typename\n}"
+        name = "ListNaturalEventCategory"
+        type = "NaturalEventCategory"
 
 
 class ProtocolEventCategoryStore(HasPresignedDownloadAccessor, BaseModel):
@@ -3614,6 +3967,13 @@ class ProtocolEventCategory(
     )
     model_config = ConfigDict(frozen=True)
 
+    class Meta:
+        """Meta class for ProtocolEventCategory"""
+
+        document = "fragment EntityCategoryDefinition on EntityCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment ReagentCategoryDefinition on ReagentCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment EntityRoleDefinition on EntityRoleDefinition {\n  role\n  categoryDefinition {\n    ...EntityCategoryDefinition\n    __typename\n  }\n  optional\n  allowMultiple\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment ReagentRoleDefinition on ReagentRoleDefinition {\n  role\n  categoryDefinition {\n    ...ReagentCategoryDefinition\n    __typename\n  }\n  needsQuantity\n  optional\n  __typename\n}\n\nfragment VariableDefinition on VariableDefinition {\n  param\n  valueKind\n  default\n  optional\n  __typename\n}\n\nfragment ProtocolEventCategory on ProtocolEventCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  plateChildren\n  label\n  ageName\n  label\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  sourceReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  targetReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  variableDefinitions {\n    ...VariableDefinition\n    __typename\n  }\n  __typename\n}"
+        name = "ProtocolEventCategory"
+        type = "ProtocolEventCategory"
+
 
 class ListProtocolEventCategory(
     BaseNodeCategoryProtocolEventCategory,
@@ -3645,6 +4005,13 @@ class ListProtocolEventCategory(
     )
     "The unique identifier of the expression within its graph"
     model_config = ConfigDict(frozen=True)
+
+    class Meta:
+        """Meta class for ListProtocolEventCategory"""
+
+        document = "fragment EntityCategoryDefinition on EntityCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment ReagentCategoryDefinition on ReagentCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment EntityRoleDefinition on EntityRoleDefinition {\n  role\n  categoryDefinition {\n    ...EntityCategoryDefinition\n    __typename\n  }\n  optional\n  allowMultiple\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment BaseListCategory on BaseCategory {\n  id\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  tags {\n    id\n    value\n    __typename\n  }\n  __typename\n}\n\nfragment ReagentRoleDefinition on ReagentRoleDefinition {\n  role\n  categoryDefinition {\n    ...ReagentCategoryDefinition\n    __typename\n  }\n  needsQuantity\n  optional\n  __typename\n}\n\nfragment ListProtocolEventCategory on ProtocolEventCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  label\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  sourceReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  targetReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  __typename\n}"
+        name = "ListProtocolEventCategory"
+        type = "ProtocolEventCategory"
 
 
 class DetailNodeGraph(GraphTrait, BaseModel):
@@ -3883,6 +4250,13 @@ class Path(BaseModel):
     ]
     model_config = ConfigDict(frozen=True)
 
+    class Meta:
+        """Meta class for Path"""
+
+        document = "fragment BaseEdge on Edge {\n  id\n  leftId\n  rightId\n  __typename\n}\n\nfragment StructureRelation on StructureRelation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNode on Node {\n  id\n  label\n  __typename\n}\n\nfragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}\n\nfragment Reagent on Reagent {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  externalId\n  label\n  __typename\n}\n\nfragment Measurement on Measurement {\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nfragment Participant on Participant {\n  role\n  quantity\n  __typename\n}\n\nfragment Relation on Relation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Edge on Edge {\n  ...BaseEdge\n  ...Measurement\n  ...Relation\n  ...Participant\n  ...StructureRelation\n  __typename\n}\n\nfragment Node on Node {\n  ...BaseNode\n  ...Entity\n  ...Structure\n  ...Metric\n  ...Reagent\n  __typename\n}\n\nfragment Path on Path {\n  nodes {\n    ...Node\n    __typename\n  }\n  edges {\n    ...Edge\n    __typename\n  }\n  __typename\n}"
+        name = "Path"
+        type = "Path"
+
 
 class GraphQueryGraph(GraphTrait, BaseModel):
     """A graph, that contains entities and relations."""
@@ -3910,6 +4284,13 @@ class GraphQuery(BaseModel):
     render: Union[Path, Pairs, Table]
     pinned: bool
     model_config = ConfigDict(frozen=True)
+
+    class Meta:
+        """Meta class for GraphQuery"""
+
+        document = "fragment BaseEdge on Edge {\n  id\n  leftId\n  rightId\n  __typename\n}\n\nfragment StructureRelation on StructureRelation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNode on Node {\n  id\n  label\n  __typename\n}\n\nfragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}\n\nfragment Reagent on Reagent {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  externalId\n  label\n  __typename\n}\n\nfragment Measurement on Measurement {\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nfragment Participant on Participant {\n  role\n  quantity\n  __typename\n}\n\nfragment Relation on Relation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Edge on Edge {\n  ...BaseEdge\n  ...Measurement\n  ...Relation\n  ...Participant\n  ...StructureRelation\n  __typename\n}\n\nfragment Node on Node {\n  ...BaseNode\n  ...Entity\n  ...Structure\n  ...Metric\n  ...Reagent\n  __typename\n}\n\nfragment Column on Column {\n  name\n  kind\n  valueKind\n  label\n  description\n  category\n  searchable\n  idfor\n  preferhidden\n  __typename\n}\n\nfragment ListScatterPlot on ScatterPlot {\n  id\n  name\n  xColumn\n  yColumn\n  __typename\n}\n\nfragment Table on Table {\n  graph {\n    ageName\n    __typename\n  }\n  rows\n  columns {\n    ...Column\n    __typename\n  }\n  __typename\n}\n\nfragment Path on Path {\n  nodes {\n    ...Node\n    __typename\n  }\n  edges {\n    ...Edge\n    __typename\n  }\n  __typename\n}\n\nfragment Pairs on Pairs {\n  pairs {\n    source {\n      ... on Structure {\n        identifier\n        object\n      }\n      __typename\n    }\n    target {\n      ... on Structure {\n        identifier\n        object\n      }\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nfragment GraphQuery on GraphQuery {\n  id\n  query\n  name\n  graph {\n    id\n    name\n    __typename\n  }\n  scatterPlots(pagination: {limit: 1}) {\n    ...ListScatterPlot\n    __typename\n  }\n  render {\n    ...Path\n    ...Pairs\n    ...Table\n    __typename\n  }\n  pinned\n  __typename\n}"
+        name = "GraphQuery"
+        type = "GraphQuery"
 
 
 class EntityCategoryStore(HasPresignedDownloadAccessor, BaseModel):
@@ -3945,6 +4326,13 @@ class EntityCategory(
     "An image or other media file that can be used to represent the expression."
     best_query: Optional[GraphQuery] = Field(default=None, alias="bestQuery")
     model_config = ConfigDict(frozen=True)
+
+    class Meta:
+        """Meta class for EntityCategory"""
+
+        document = "fragment BaseNode on Node {\n  id\n  label\n  __typename\n}\n\nfragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nfragment Participant on Participant {\n  role\n  quantity\n  __typename\n}\n\nfragment BaseEdge on Edge {\n  id\n  leftId\n  rightId\n  __typename\n}\n\nfragment StructureRelation on StructureRelation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Reagent on Reagent {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  externalId\n  label\n  __typename\n}\n\nfragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}\n\nfragment Measurement on Measurement {\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Relation on Relation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Edge on Edge {\n  ...BaseEdge\n  ...Measurement\n  ...Relation\n  ...Participant\n  ...StructureRelation\n  __typename\n}\n\nfragment Node on Node {\n  ...BaseNode\n  ...Entity\n  ...Structure\n  ...Metric\n  ...Reagent\n  __typename\n}\n\nfragment Column on Column {\n  name\n  kind\n  valueKind\n  label\n  description\n  category\n  searchable\n  idfor\n  preferhidden\n  __typename\n}\n\nfragment ListScatterPlot on ScatterPlot {\n  id\n  name\n  xColumn\n  yColumn\n  __typename\n}\n\nfragment Table on Table {\n  graph {\n    ageName\n    __typename\n  }\n  rows\n  columns {\n    ...Column\n    __typename\n  }\n  __typename\n}\n\nfragment Path on Path {\n  nodes {\n    ...Node\n    __typename\n  }\n  edges {\n    ...Edge\n    __typename\n  }\n  __typename\n}\n\nfragment Pairs on Pairs {\n  pairs {\n    source {\n      ... on Structure {\n        identifier\n        object\n      }\n      __typename\n    }\n    target {\n      ... on Structure {\n        identifier\n        object\n      }\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment GraphQuery on GraphQuery {\n  id\n  query\n  name\n  graph {\n    id\n    name\n    __typename\n  }\n  scatterPlots(pagination: {limit: 1}) {\n    ...ListScatterPlot\n    __typename\n  }\n  render {\n    ...Path\n    ...Pairs\n    ...Table\n    __typename\n  }\n  pinned\n  __typename\n}\n\nfragment EntityCategory on EntityCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  instanceKind\n  ageName\n  label\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  bestQuery {\n    ...GraphQuery\n    __typename\n  }\n  __typename\n}"
+        name = "EntityCategory"
+        type = "EntityCategory"
 
 
 class GraphLatestnodesBase(NodeTrait, BaseModel):
@@ -4075,6 +4463,13 @@ class Graph(GraphTrait, BaseModel):
     ] = Field(alias="latestNodes")
     model_config = ConfigDict(frozen=True)
 
+    class Meta:
+        """Meta class for Graph"""
+
+        document = "fragment Participant on Participant {\n  role\n  quantity\n  __typename\n}\n\nfragment BaseEdge on Edge {\n  id\n  leftId\n  rightId\n  __typename\n}\n\nfragment StructureRelation on StructureRelation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Measurement on Measurement {\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Relation on Relation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Edge on Edge {\n  ...BaseEdge\n  ...Measurement\n  ...Relation\n  ...Participant\n  ...StructureRelation\n  __typename\n}\n\nfragment ReagentCategoryDefinition on ReagentCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment EntityCategoryDefinition on EntityCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment Column on Column {\n  name\n  kind\n  valueKind\n  label\n  description\n  category\n  searchable\n  idfor\n  preferhidden\n  __typename\n}\n\nfragment BaseNode on Node {\n  id\n  label\n  __typename\n}\n\nfragment BaseListEdgeCategory on EdgeCategory {\n  id\n  __typename\n}\n\nfragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nfragment ListScatterPlot on ScatterPlot {\n  id\n  name\n  xColumn\n  yColumn\n  __typename\n}\n\nfragment Path on Path {\n  nodes {\n    ...Node\n    __typename\n  }\n  edges {\n    ...Edge\n    __typename\n  }\n  __typename\n}\n\nfragment Pairs on Pairs {\n  pairs {\n    source {\n      ... on Structure {\n        identifier\n        object\n      }\n      __typename\n    }\n    target {\n      ... on Structure {\n        identifier\n        object\n      }\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nfragment Reagent on Reagent {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  externalId\n  label\n  __typename\n}\n\nfragment Table on Table {\n  graph {\n    ageName\n    __typename\n  }\n  rows\n  columns {\n    ...Column\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment ReagentRoleDefinition on ReagentRoleDefinition {\n  role\n  categoryDefinition {\n    ...ReagentCategoryDefinition\n    __typename\n  }\n  needsQuantity\n  optional\n  __typename\n}\n\nfragment EntityRoleDefinition on EntityRoleDefinition {\n  role\n  categoryDefinition {\n    ...EntityCategoryDefinition\n    __typename\n  }\n  optional\n  allowMultiple\n  __typename\n}\n\nfragment BaseListNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}\n\nfragment BaseListCategory on BaseCategory {\n  id\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  tags {\n    id\n    value\n    __typename\n  }\n  __typename\n}\n\nfragment ListMeasurementCategory on MeasurementCategory {\n  ...BaseListCategory\n  ...BaseListEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment ListStructureRelationCategory on StructureRelationCategory {\n  ...BaseListCategory\n  ...BaseListEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment ListMetricCategory on MetricCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  label\n  metricKind\n  __typename\n}\n\nfragment ListEntityCategory on EntityCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  instanceKind\n  label\n  __typename\n}\n\nfragment ListProtocolEventCategory on ProtocolEventCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  label\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  sourceReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  targetReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment GraphQuery on GraphQuery {\n  id\n  query\n  name\n  graph {\n    id\n    name\n    __typename\n  }\n  scatterPlots(pagination: {limit: 1}) {\n    ...ListScatterPlot\n    __typename\n  }\n  render {\n    ...Path\n    ...Pairs\n    ...Table\n    __typename\n  }\n  pinned\n  __typename\n}\n\nfragment ListRelationCategory on RelationCategory {\n  ...BaseListCategory\n  ...BaseListEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment Node on Node {\n  ...BaseNode\n  ...Entity\n  ...Structure\n  ...Metric\n  ...Reagent\n  __typename\n}\n\nfragment ListNaturalEventCategory on NaturalEventCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  label\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment ListStructureCategory on StructureCategory {\n  ...BaseListCategory\n  ...BaseListNodeCategory\n  identifier\n  __typename\n}\n\nfragment Graph on Graph {\n  id\n  name\n  description\n  structureCategories {\n    ...ListStructureCategory\n    __typename\n  }\n  entityCategories {\n    ...ListEntityCategory\n    __typename\n  }\n  metricCategories {\n    ...ListMetricCategory\n    __typename\n  }\n  protocolEventCategories {\n    ...ListProtocolEventCategory\n    __typename\n  }\n  naturalEventCategories {\n    ...ListNaturalEventCategory\n    __typename\n  }\n  relationCategories {\n    ...ListRelationCategory\n    __typename\n  }\n  measurementCategories {\n    ...ListMeasurementCategory\n    __typename\n  }\n  structureRelationCategories {\n    ...ListStructureRelationCategory\n    __typename\n  }\n  graphQueries(pagination: {limit: 0}) {\n    ...GraphQuery\n    __typename\n  }\n  latestNodes(pagination: {limit: 2}) {\n    ...Node\n    __typename\n  }\n  __typename\n}"
+        name = "Graph"
+        type = "Graph"
+
 
 class NodeCategoryBase(NodeCategoryTrait, BaseModel):
     """No documentation"""
@@ -4164,7 +4559,7 @@ class CreateMeasurementCategoryMutation(BaseModel):
     class Meta:
         """Meta class for CreateMeasurementCategory"""
 
-        document = "fragment BaseEdgeCategory on EdgeCategory {\n  id\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment MeasurementCategory on MeasurementCategory {\n  ...BaseCategory\n  ...BaseEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  __typename\n}\n\nmutation CreateMeasurementCategory($input: MeasurementCategoryInput!) {\n  createMeasurementCategory(input: $input) {\n    ...MeasurementCategory\n    __typename\n  }\n}"
+        document = "fragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment BaseEdgeCategory on EdgeCategory {\n  id\n  __typename\n}\n\nfragment MeasurementCategory on MeasurementCategory {\n  ...BaseCategory\n  ...BaseEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  __typename\n}\n\nmutation CreateMeasurementCategory($input: MeasurementCategoryInput!) {\n  createMeasurementCategory(input: $input) {\n    ...MeasurementCategory\n    __typename\n  }\n}"
 
 
 class CreateMetricCategoryMutation(BaseModel):
@@ -4182,7 +4577,7 @@ class CreateMetricCategoryMutation(BaseModel):
     class Meta:
         """Meta class for CreateMetricCategory"""
 
-        document = "fragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment MetricCategory on MetricCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  metricKind\n  __typename\n}\n\nmutation CreateMetricCategory($input: MetricCategoryInput!) {\n  createMetricCategory(input: $input) {\n    ...MetricCategory\n    __typename\n  }\n}"
+        document = "fragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment MetricCategory on MetricCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  metricKind\n  __typename\n}\n\nmutation CreateMetricCategory($input: MetricCategoryInput!) {\n  createMetricCategory(input: $input) {\n    ...MetricCategory\n    __typename\n  }\n}"
 
 
 class CreateReagentCategoryMutation(BaseModel):
@@ -4200,7 +4595,7 @@ class CreateReagentCategoryMutation(BaseModel):
     class Meta:
         """Meta class for CreateReagentCategory"""
 
-        document = "fragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment ReagentCategory on ReagentCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  __typename\n}\n\nmutation CreateReagentCategory($input: ReagentCategoryInput!) {\n  createReagentCategory(input: $input) {\n    ...ReagentCategory\n    __typename\n  }\n}"
+        document = "fragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment ReagentCategory on ReagentCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  __typename\n}\n\nmutation CreateReagentCategory($input: ReagentCategoryInput!) {\n  createReagentCategory(input: $input) {\n    ...ReagentCategory\n    __typename\n  }\n}"
 
 
 class CreateRelationCategoryMutation(BaseModel):
@@ -4218,7 +4613,7 @@ class CreateRelationCategoryMutation(BaseModel):
     class Meta:
         """Meta class for CreateRelationCategory"""
 
-        document = "fragment BaseEdgeCategory on EdgeCategory {\n  id\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment RelationCategory on RelationCategory {\n  ...BaseCategory\n  ...BaseEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  __typename\n}\n\nmutation CreateRelationCategory($input: RelationCategoryInput!) {\n  createRelationCategory(input: $input) {\n    ...RelationCategory\n    __typename\n  }\n}"
+        document = "fragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment BaseEdgeCategory on EdgeCategory {\n  id\n  __typename\n}\n\nfragment RelationCategory on RelationCategory {\n  ...BaseCategory\n  ...BaseEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  __typename\n}\n\nmutation CreateRelationCategory($input: RelationCategoryInput!) {\n  createRelationCategory(input: $input) {\n    ...RelationCategory\n    __typename\n  }\n}"
 
 
 class CreateEntityMutation(BaseModel):
@@ -4254,7 +4649,7 @@ class CreateEntityCategoryMutation(BaseModel):
     class Meta:
         """Meta class for CreateEntityCategory"""
 
-        document = "fragment Reagent on Reagent {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  externalId\n  label\n  __typename\n}\n\nfragment BaseEdge on Edge {\n  id\n  leftId\n  rightId\n  __typename\n}\n\nfragment Participant on Participant {\n  role\n  quantity\n  __typename\n}\n\nfragment BaseNode on Node {\n  id\n  label\n  __typename\n}\n\nfragment Measurement on Measurement {\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nfragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment Relation on Relation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}\n\nfragment StructureRelation on StructureRelation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Node on Node {\n  ...BaseNode\n  ...Entity\n  ...Structure\n  ...Metric\n  ...Reagent\n  __typename\n}\n\nfragment Column on Column {\n  name\n  kind\n  valueKind\n  label\n  description\n  category\n  searchable\n  idfor\n  preferhidden\n  __typename\n}\n\nfragment Edge on Edge {\n  ...BaseEdge\n  ...Measurement\n  ...Relation\n  ...Participant\n  ...StructureRelation\n  __typename\n}\n\nfragment ListScatterPlot on ScatterPlot {\n  id\n  name\n  xColumn\n  yColumn\n  __typename\n}\n\nfragment Pairs on Pairs {\n  pairs {\n    source {\n      ... on Structure {\n        identifier\n        object\n      }\n      __typename\n    }\n    target {\n      ... on Structure {\n        identifier\n        object\n      }\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nfragment Table on Table {\n  graph {\n    ageName\n    __typename\n  }\n  rows\n  columns {\n    ...Column\n    __typename\n  }\n  __typename\n}\n\nfragment Path on Path {\n  nodes {\n    ...Node\n    __typename\n  }\n  edges {\n    ...Edge\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment GraphQuery on GraphQuery {\n  id\n  query\n  name\n  graph {\n    id\n    name\n    __typename\n  }\n  scatterPlots(pagination: {limit: 1}) {\n    ...ListScatterPlot\n    __typename\n  }\n  render {\n    ...Path\n    ...Pairs\n    ...Table\n    __typename\n  }\n  pinned\n  __typename\n}\n\nfragment EntityCategory on EntityCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  instanceKind\n  ageName\n  label\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  bestQuery {\n    ...GraphQuery\n    __typename\n  }\n  __typename\n}\n\nmutation CreateEntityCategory($input: EntityCategoryInput!) {\n  createEntityCategory(input: $input) {\n    ...EntityCategory\n    __typename\n  }\n}"
+        document = "fragment BaseNode on Node {\n  id\n  label\n  __typename\n}\n\nfragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nfragment Participant on Participant {\n  role\n  quantity\n  __typename\n}\n\nfragment BaseEdge on Edge {\n  id\n  leftId\n  rightId\n  __typename\n}\n\nfragment StructureRelation on StructureRelation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Reagent on Reagent {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  externalId\n  label\n  __typename\n}\n\nfragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}\n\nfragment Measurement on Measurement {\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Relation on Relation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Edge on Edge {\n  ...BaseEdge\n  ...Measurement\n  ...Relation\n  ...Participant\n  ...StructureRelation\n  __typename\n}\n\nfragment Node on Node {\n  ...BaseNode\n  ...Entity\n  ...Structure\n  ...Metric\n  ...Reagent\n  __typename\n}\n\nfragment Column on Column {\n  name\n  kind\n  valueKind\n  label\n  description\n  category\n  searchable\n  idfor\n  preferhidden\n  __typename\n}\n\nfragment ListScatterPlot on ScatterPlot {\n  id\n  name\n  xColumn\n  yColumn\n  __typename\n}\n\nfragment Table on Table {\n  graph {\n    ageName\n    __typename\n  }\n  rows\n  columns {\n    ...Column\n    __typename\n  }\n  __typename\n}\n\nfragment Path on Path {\n  nodes {\n    ...Node\n    __typename\n  }\n  edges {\n    ...Edge\n    __typename\n  }\n  __typename\n}\n\nfragment Pairs on Pairs {\n  pairs {\n    source {\n      ... on Structure {\n        identifier\n        object\n      }\n      __typename\n    }\n    target {\n      ... on Structure {\n        identifier\n        object\n      }\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment GraphQuery on GraphQuery {\n  id\n  query\n  name\n  graph {\n    id\n    name\n    __typename\n  }\n  scatterPlots(pagination: {limit: 1}) {\n    ...ListScatterPlot\n    __typename\n  }\n  render {\n    ...Path\n    ...Pairs\n    ...Table\n    __typename\n  }\n  pinned\n  __typename\n}\n\nfragment EntityCategory on EntityCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  instanceKind\n  ageName\n  label\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  bestQuery {\n    ...GraphQuery\n    __typename\n  }\n  __typename\n}\n\nmutation CreateEntityCategory($input: EntityCategoryInput!) {\n  createEntityCategory(input: $input) {\n    ...EntityCategory\n    __typename\n  }\n}"
 
 
 class UpdateEntityCategoryMutation(BaseModel):
@@ -4272,7 +4667,7 @@ class UpdateEntityCategoryMutation(BaseModel):
     class Meta:
         """Meta class for UpdateEntityCategory"""
 
-        document = "fragment Reagent on Reagent {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  externalId\n  label\n  __typename\n}\n\nfragment BaseEdge on Edge {\n  id\n  leftId\n  rightId\n  __typename\n}\n\nfragment Participant on Participant {\n  role\n  quantity\n  __typename\n}\n\nfragment BaseNode on Node {\n  id\n  label\n  __typename\n}\n\nfragment Measurement on Measurement {\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nfragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment Relation on Relation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}\n\nfragment StructureRelation on StructureRelation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Node on Node {\n  ...BaseNode\n  ...Entity\n  ...Structure\n  ...Metric\n  ...Reagent\n  __typename\n}\n\nfragment Column on Column {\n  name\n  kind\n  valueKind\n  label\n  description\n  category\n  searchable\n  idfor\n  preferhidden\n  __typename\n}\n\nfragment Edge on Edge {\n  ...BaseEdge\n  ...Measurement\n  ...Relation\n  ...Participant\n  ...StructureRelation\n  __typename\n}\n\nfragment ListScatterPlot on ScatterPlot {\n  id\n  name\n  xColumn\n  yColumn\n  __typename\n}\n\nfragment Pairs on Pairs {\n  pairs {\n    source {\n      ... on Structure {\n        identifier\n        object\n      }\n      __typename\n    }\n    target {\n      ... on Structure {\n        identifier\n        object\n      }\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nfragment Table on Table {\n  graph {\n    ageName\n    __typename\n  }\n  rows\n  columns {\n    ...Column\n    __typename\n  }\n  __typename\n}\n\nfragment Path on Path {\n  nodes {\n    ...Node\n    __typename\n  }\n  edges {\n    ...Edge\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment GraphQuery on GraphQuery {\n  id\n  query\n  name\n  graph {\n    id\n    name\n    __typename\n  }\n  scatterPlots(pagination: {limit: 1}) {\n    ...ListScatterPlot\n    __typename\n  }\n  render {\n    ...Path\n    ...Pairs\n    ...Table\n    __typename\n  }\n  pinned\n  __typename\n}\n\nfragment EntityCategory on EntityCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  instanceKind\n  ageName\n  label\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  bestQuery {\n    ...GraphQuery\n    __typename\n  }\n  __typename\n}\n\nmutation UpdateEntityCategory($input: UpdateEntityCategoryInput!) {\n  updateEntityCategory(input: $input) {\n    ...EntityCategory\n    __typename\n  }\n}"
+        document = "fragment BaseNode on Node {\n  id\n  label\n  __typename\n}\n\nfragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nfragment Participant on Participant {\n  role\n  quantity\n  __typename\n}\n\nfragment BaseEdge on Edge {\n  id\n  leftId\n  rightId\n  __typename\n}\n\nfragment StructureRelation on StructureRelation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Reagent on Reagent {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  externalId\n  label\n  __typename\n}\n\nfragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}\n\nfragment Measurement on Measurement {\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Relation on Relation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Edge on Edge {\n  ...BaseEdge\n  ...Measurement\n  ...Relation\n  ...Participant\n  ...StructureRelation\n  __typename\n}\n\nfragment Node on Node {\n  ...BaseNode\n  ...Entity\n  ...Structure\n  ...Metric\n  ...Reagent\n  __typename\n}\n\nfragment Column on Column {\n  name\n  kind\n  valueKind\n  label\n  description\n  category\n  searchable\n  idfor\n  preferhidden\n  __typename\n}\n\nfragment ListScatterPlot on ScatterPlot {\n  id\n  name\n  xColumn\n  yColumn\n  __typename\n}\n\nfragment Table on Table {\n  graph {\n    ageName\n    __typename\n  }\n  rows\n  columns {\n    ...Column\n    __typename\n  }\n  __typename\n}\n\nfragment Path on Path {\n  nodes {\n    ...Node\n    __typename\n  }\n  edges {\n    ...Edge\n    __typename\n  }\n  __typename\n}\n\nfragment Pairs on Pairs {\n  pairs {\n    source {\n      ... on Structure {\n        identifier\n        object\n      }\n      __typename\n    }\n    target {\n      ... on Structure {\n        identifier\n        object\n      }\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment GraphQuery on GraphQuery {\n  id\n  query\n  name\n  graph {\n    id\n    name\n    __typename\n  }\n  scatterPlots(pagination: {limit: 1}) {\n    ...ListScatterPlot\n    __typename\n  }\n  render {\n    ...Path\n    ...Pairs\n    ...Table\n    __typename\n  }\n  pinned\n  __typename\n}\n\nfragment EntityCategory on EntityCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  instanceKind\n  ageName\n  label\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  bestQuery {\n    ...GraphQuery\n    __typename\n  }\n  __typename\n}\n\nmutation UpdateEntityCategory($input: UpdateEntityCategoryInput!) {\n  updateEntityCategory(input: $input) {\n    ...EntityCategory\n    __typename\n  }\n}"
 
 
 class CreateGraphMutation(BaseModel):
@@ -4290,7 +4685,7 @@ class CreateGraphMutation(BaseModel):
     class Meta:
         """Meta class for CreateGraph"""
 
-        document = "fragment BaseEdge on Edge {\n  id\n  leftId\n  rightId\n  __typename\n}\n\nfragment Participant on Participant {\n  role\n  quantity\n  __typename\n}\n\nfragment Measurement on Measurement {\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Relation on Relation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment StructureRelation on StructureRelation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment EntityCategoryDefinition on EntityCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment Column on Column {\n  name\n  kind\n  valueKind\n  label\n  description\n  category\n  searchable\n  idfor\n  preferhidden\n  __typename\n}\n\nfragment ReagentCategoryDefinition on ReagentCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment Edge on Edge {\n  ...BaseEdge\n  ...Measurement\n  ...Relation\n  ...Participant\n  ...StructureRelation\n  __typename\n}\n\nfragment BaseListCategory on BaseCategory {\n  id\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  tags {\n    id\n    value\n    __typename\n  }\n  __typename\n}\n\nfragment Reagent on Reagent {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  externalId\n  label\n  __typename\n}\n\nfragment BaseNode on Node {\n  id\n  label\n  __typename\n}\n\nfragment Pairs on Pairs {\n  pairs {\n    source {\n      ... on Structure {\n        identifier\n        object\n      }\n      __typename\n    }\n    target {\n      ... on Structure {\n        identifier\n        object\n      }\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nfragment EntityRoleDefinition on EntityRoleDefinition {\n  role\n  categoryDefinition {\n    ...EntityCategoryDefinition\n    __typename\n  }\n  optional\n  allowMultiple\n  __typename\n}\n\nfragment BaseListNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment Path on Path {\n  nodes {\n    ...Node\n    __typename\n  }\n  edges {\n    ...Edge\n    __typename\n  }\n  __typename\n}\n\nfragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment BaseListEdgeCategory on EdgeCategory {\n  id\n  __typename\n}\n\nfragment ListScatterPlot on ScatterPlot {\n  id\n  name\n  xColumn\n  yColumn\n  __typename\n}\n\nfragment Table on Table {\n  graph {\n    ageName\n    __typename\n  }\n  rows\n  columns {\n    ...Column\n    __typename\n  }\n  __typename\n}\n\nfragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}\n\nfragment ReagentRoleDefinition on ReagentRoleDefinition {\n  role\n  categoryDefinition {\n    ...ReagentCategoryDefinition\n    __typename\n  }\n  needsQuantity\n  optional\n  __typename\n}\n\nfragment ListProtocolEventCategory on ProtocolEventCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  label\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  sourceReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  targetReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment ListMeasurementCategory on MeasurementCategory {\n  ...BaseListCategory\n  ...BaseListEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment ListRelationCategory on RelationCategory {\n  ...BaseListCategory\n  ...BaseListEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment ListStructureRelationCategory on StructureRelationCategory {\n  ...BaseListCategory\n  ...BaseListEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment ListStructureCategory on StructureCategory {\n  ...BaseListCategory\n  ...BaseListNodeCategory\n  identifier\n  __typename\n}\n\nfragment ListMetricCategory on MetricCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  label\n  metricKind\n  __typename\n}\n\nfragment ListEntityCategory on EntityCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  instanceKind\n  label\n  __typename\n}\n\nfragment GraphQuery on GraphQuery {\n  id\n  query\n  name\n  graph {\n    id\n    name\n    __typename\n  }\n  scatterPlots(pagination: {limit: 1}) {\n    ...ListScatterPlot\n    __typename\n  }\n  render {\n    ...Path\n    ...Pairs\n    ...Table\n    __typename\n  }\n  pinned\n  __typename\n}\n\nfragment Node on Node {\n  ...BaseNode\n  ...Entity\n  ...Structure\n  ...Metric\n  ...Reagent\n  __typename\n}\n\nfragment ListNaturalEventCategory on NaturalEventCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  label\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment Graph on Graph {\n  id\n  name\n  description\n  structureCategories {\n    ...ListStructureCategory\n    __typename\n  }\n  entityCategories {\n    ...ListEntityCategory\n    __typename\n  }\n  metricCategories {\n    ...ListMetricCategory\n    __typename\n  }\n  protocolEventCategories {\n    ...ListProtocolEventCategory\n    __typename\n  }\n  naturalEventCategories {\n    ...ListNaturalEventCategory\n    __typename\n  }\n  relationCategories {\n    ...ListRelationCategory\n    __typename\n  }\n  measurementCategories {\n    ...ListMeasurementCategory\n    __typename\n  }\n  structureRelationCategories {\n    ...ListStructureRelationCategory\n    __typename\n  }\n  graphQueries(pagination: {limit: 0}) {\n    ...GraphQuery\n    __typename\n  }\n  latestNodes(pagination: {limit: 2}) {\n    ...Node\n    __typename\n  }\n  __typename\n}\n\nmutation CreateGraph($input: GraphInput!) {\n  createGraph(input: $input) {\n    ...Graph\n    __typename\n  }\n}"
+        document = "fragment Participant on Participant {\n  role\n  quantity\n  __typename\n}\n\nfragment BaseEdge on Edge {\n  id\n  leftId\n  rightId\n  __typename\n}\n\nfragment StructureRelation on StructureRelation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Measurement on Measurement {\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Relation on Relation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Edge on Edge {\n  ...BaseEdge\n  ...Measurement\n  ...Relation\n  ...Participant\n  ...StructureRelation\n  __typename\n}\n\nfragment ReagentCategoryDefinition on ReagentCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment EntityCategoryDefinition on EntityCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment Column on Column {\n  name\n  kind\n  valueKind\n  label\n  description\n  category\n  searchable\n  idfor\n  preferhidden\n  __typename\n}\n\nfragment BaseNode on Node {\n  id\n  label\n  __typename\n}\n\nfragment BaseListEdgeCategory on EdgeCategory {\n  id\n  __typename\n}\n\nfragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nfragment ListScatterPlot on ScatterPlot {\n  id\n  name\n  xColumn\n  yColumn\n  __typename\n}\n\nfragment Path on Path {\n  nodes {\n    ...Node\n    __typename\n  }\n  edges {\n    ...Edge\n    __typename\n  }\n  __typename\n}\n\nfragment Pairs on Pairs {\n  pairs {\n    source {\n      ... on Structure {\n        identifier\n        object\n      }\n      __typename\n    }\n    target {\n      ... on Structure {\n        identifier\n        object\n      }\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nfragment Reagent on Reagent {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  externalId\n  label\n  __typename\n}\n\nfragment Table on Table {\n  graph {\n    ageName\n    __typename\n  }\n  rows\n  columns {\n    ...Column\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment ReagentRoleDefinition on ReagentRoleDefinition {\n  role\n  categoryDefinition {\n    ...ReagentCategoryDefinition\n    __typename\n  }\n  needsQuantity\n  optional\n  __typename\n}\n\nfragment EntityRoleDefinition on EntityRoleDefinition {\n  role\n  categoryDefinition {\n    ...EntityCategoryDefinition\n    __typename\n  }\n  optional\n  allowMultiple\n  __typename\n}\n\nfragment BaseListNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}\n\nfragment BaseListCategory on BaseCategory {\n  id\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  tags {\n    id\n    value\n    __typename\n  }\n  __typename\n}\n\nfragment ListMeasurementCategory on MeasurementCategory {\n  ...BaseListCategory\n  ...BaseListEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment ListStructureRelationCategory on StructureRelationCategory {\n  ...BaseListCategory\n  ...BaseListEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment ListMetricCategory on MetricCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  label\n  metricKind\n  __typename\n}\n\nfragment ListEntityCategory on EntityCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  instanceKind\n  label\n  __typename\n}\n\nfragment ListProtocolEventCategory on ProtocolEventCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  label\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  sourceReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  targetReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment GraphQuery on GraphQuery {\n  id\n  query\n  name\n  graph {\n    id\n    name\n    __typename\n  }\n  scatterPlots(pagination: {limit: 1}) {\n    ...ListScatterPlot\n    __typename\n  }\n  render {\n    ...Path\n    ...Pairs\n    ...Table\n    __typename\n  }\n  pinned\n  __typename\n}\n\nfragment ListRelationCategory on RelationCategory {\n  ...BaseListCategory\n  ...BaseListEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment Node on Node {\n  ...BaseNode\n  ...Entity\n  ...Structure\n  ...Metric\n  ...Reagent\n  __typename\n}\n\nfragment ListNaturalEventCategory on NaturalEventCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  label\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment ListStructureCategory on StructureCategory {\n  ...BaseListCategory\n  ...BaseListNodeCategory\n  identifier\n  __typename\n}\n\nfragment Graph on Graph {\n  id\n  name\n  description\n  structureCategories {\n    ...ListStructureCategory\n    __typename\n  }\n  entityCategories {\n    ...ListEntityCategory\n    __typename\n  }\n  metricCategories {\n    ...ListMetricCategory\n    __typename\n  }\n  protocolEventCategories {\n    ...ListProtocolEventCategory\n    __typename\n  }\n  naturalEventCategories {\n    ...ListNaturalEventCategory\n    __typename\n  }\n  relationCategories {\n    ...ListRelationCategory\n    __typename\n  }\n  measurementCategories {\n    ...ListMeasurementCategory\n    __typename\n  }\n  structureRelationCategories {\n    ...ListStructureRelationCategory\n    __typename\n  }\n  graphQueries(pagination: {limit: 0}) {\n    ...GraphQuery\n    __typename\n  }\n  latestNodes(pagination: {limit: 2}) {\n    ...Node\n    __typename\n  }\n  __typename\n}\n\nmutation CreateGraph($input: GraphInput!) {\n  createGraph(input: $input) {\n    ...Graph\n    __typename\n  }\n}"
 
 
 class PinGraphMutation(BaseModel):
@@ -4308,7 +4703,7 @@ class PinGraphMutation(BaseModel):
     class Meta:
         """Meta class for PinGraph"""
 
-        document = "fragment BaseEdge on Edge {\n  id\n  leftId\n  rightId\n  __typename\n}\n\nfragment Participant on Participant {\n  role\n  quantity\n  __typename\n}\n\nfragment Measurement on Measurement {\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Relation on Relation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment StructureRelation on StructureRelation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment EntityCategoryDefinition on EntityCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment Column on Column {\n  name\n  kind\n  valueKind\n  label\n  description\n  category\n  searchable\n  idfor\n  preferhidden\n  __typename\n}\n\nfragment ReagentCategoryDefinition on ReagentCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment Edge on Edge {\n  ...BaseEdge\n  ...Measurement\n  ...Relation\n  ...Participant\n  ...StructureRelation\n  __typename\n}\n\nfragment BaseListCategory on BaseCategory {\n  id\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  tags {\n    id\n    value\n    __typename\n  }\n  __typename\n}\n\nfragment Reagent on Reagent {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  externalId\n  label\n  __typename\n}\n\nfragment BaseNode on Node {\n  id\n  label\n  __typename\n}\n\nfragment Pairs on Pairs {\n  pairs {\n    source {\n      ... on Structure {\n        identifier\n        object\n      }\n      __typename\n    }\n    target {\n      ... on Structure {\n        identifier\n        object\n      }\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nfragment EntityRoleDefinition on EntityRoleDefinition {\n  role\n  categoryDefinition {\n    ...EntityCategoryDefinition\n    __typename\n  }\n  optional\n  allowMultiple\n  __typename\n}\n\nfragment BaseListNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment Path on Path {\n  nodes {\n    ...Node\n    __typename\n  }\n  edges {\n    ...Edge\n    __typename\n  }\n  __typename\n}\n\nfragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment BaseListEdgeCategory on EdgeCategory {\n  id\n  __typename\n}\n\nfragment ListScatterPlot on ScatterPlot {\n  id\n  name\n  xColumn\n  yColumn\n  __typename\n}\n\nfragment Table on Table {\n  graph {\n    ageName\n    __typename\n  }\n  rows\n  columns {\n    ...Column\n    __typename\n  }\n  __typename\n}\n\nfragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}\n\nfragment ReagentRoleDefinition on ReagentRoleDefinition {\n  role\n  categoryDefinition {\n    ...ReagentCategoryDefinition\n    __typename\n  }\n  needsQuantity\n  optional\n  __typename\n}\n\nfragment ListProtocolEventCategory on ProtocolEventCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  label\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  sourceReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  targetReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment ListMeasurementCategory on MeasurementCategory {\n  ...BaseListCategory\n  ...BaseListEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment ListRelationCategory on RelationCategory {\n  ...BaseListCategory\n  ...BaseListEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment ListStructureRelationCategory on StructureRelationCategory {\n  ...BaseListCategory\n  ...BaseListEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment ListStructureCategory on StructureCategory {\n  ...BaseListCategory\n  ...BaseListNodeCategory\n  identifier\n  __typename\n}\n\nfragment ListMetricCategory on MetricCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  label\n  metricKind\n  __typename\n}\n\nfragment ListEntityCategory on EntityCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  instanceKind\n  label\n  __typename\n}\n\nfragment GraphQuery on GraphQuery {\n  id\n  query\n  name\n  graph {\n    id\n    name\n    __typename\n  }\n  scatterPlots(pagination: {limit: 1}) {\n    ...ListScatterPlot\n    __typename\n  }\n  render {\n    ...Path\n    ...Pairs\n    ...Table\n    __typename\n  }\n  pinned\n  __typename\n}\n\nfragment Node on Node {\n  ...BaseNode\n  ...Entity\n  ...Structure\n  ...Metric\n  ...Reagent\n  __typename\n}\n\nfragment ListNaturalEventCategory on NaturalEventCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  label\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment Graph on Graph {\n  id\n  name\n  description\n  structureCategories {\n    ...ListStructureCategory\n    __typename\n  }\n  entityCategories {\n    ...ListEntityCategory\n    __typename\n  }\n  metricCategories {\n    ...ListMetricCategory\n    __typename\n  }\n  protocolEventCategories {\n    ...ListProtocolEventCategory\n    __typename\n  }\n  naturalEventCategories {\n    ...ListNaturalEventCategory\n    __typename\n  }\n  relationCategories {\n    ...ListRelationCategory\n    __typename\n  }\n  measurementCategories {\n    ...ListMeasurementCategory\n    __typename\n  }\n  structureRelationCategories {\n    ...ListStructureRelationCategory\n    __typename\n  }\n  graphQueries(pagination: {limit: 0}) {\n    ...GraphQuery\n    __typename\n  }\n  latestNodes(pagination: {limit: 2}) {\n    ...Node\n    __typename\n  }\n  __typename\n}\n\nmutation PinGraph($input: PinGraphInput!) {\n  pinGraph(input: $input) {\n    ...Graph\n    __typename\n  }\n}"
+        document = "fragment Participant on Participant {\n  role\n  quantity\n  __typename\n}\n\nfragment BaseEdge on Edge {\n  id\n  leftId\n  rightId\n  __typename\n}\n\nfragment StructureRelation on StructureRelation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Measurement on Measurement {\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Relation on Relation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Edge on Edge {\n  ...BaseEdge\n  ...Measurement\n  ...Relation\n  ...Participant\n  ...StructureRelation\n  __typename\n}\n\nfragment ReagentCategoryDefinition on ReagentCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment EntityCategoryDefinition on EntityCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment Column on Column {\n  name\n  kind\n  valueKind\n  label\n  description\n  category\n  searchable\n  idfor\n  preferhidden\n  __typename\n}\n\nfragment BaseNode on Node {\n  id\n  label\n  __typename\n}\n\nfragment BaseListEdgeCategory on EdgeCategory {\n  id\n  __typename\n}\n\nfragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nfragment ListScatterPlot on ScatterPlot {\n  id\n  name\n  xColumn\n  yColumn\n  __typename\n}\n\nfragment Path on Path {\n  nodes {\n    ...Node\n    __typename\n  }\n  edges {\n    ...Edge\n    __typename\n  }\n  __typename\n}\n\nfragment Pairs on Pairs {\n  pairs {\n    source {\n      ... on Structure {\n        identifier\n        object\n      }\n      __typename\n    }\n    target {\n      ... on Structure {\n        identifier\n        object\n      }\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nfragment Reagent on Reagent {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  externalId\n  label\n  __typename\n}\n\nfragment Table on Table {\n  graph {\n    ageName\n    __typename\n  }\n  rows\n  columns {\n    ...Column\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment ReagentRoleDefinition on ReagentRoleDefinition {\n  role\n  categoryDefinition {\n    ...ReagentCategoryDefinition\n    __typename\n  }\n  needsQuantity\n  optional\n  __typename\n}\n\nfragment EntityRoleDefinition on EntityRoleDefinition {\n  role\n  categoryDefinition {\n    ...EntityCategoryDefinition\n    __typename\n  }\n  optional\n  allowMultiple\n  __typename\n}\n\nfragment BaseListNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}\n\nfragment BaseListCategory on BaseCategory {\n  id\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  tags {\n    id\n    value\n    __typename\n  }\n  __typename\n}\n\nfragment ListMeasurementCategory on MeasurementCategory {\n  ...BaseListCategory\n  ...BaseListEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment ListStructureRelationCategory on StructureRelationCategory {\n  ...BaseListCategory\n  ...BaseListEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment ListMetricCategory on MetricCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  label\n  metricKind\n  __typename\n}\n\nfragment ListEntityCategory on EntityCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  instanceKind\n  label\n  __typename\n}\n\nfragment ListProtocolEventCategory on ProtocolEventCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  label\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  sourceReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  targetReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment GraphQuery on GraphQuery {\n  id\n  query\n  name\n  graph {\n    id\n    name\n    __typename\n  }\n  scatterPlots(pagination: {limit: 1}) {\n    ...ListScatterPlot\n    __typename\n  }\n  render {\n    ...Path\n    ...Pairs\n    ...Table\n    __typename\n  }\n  pinned\n  __typename\n}\n\nfragment ListRelationCategory on RelationCategory {\n  ...BaseListCategory\n  ...BaseListEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment Node on Node {\n  ...BaseNode\n  ...Entity\n  ...Structure\n  ...Metric\n  ...Reagent\n  __typename\n}\n\nfragment ListNaturalEventCategory on NaturalEventCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  label\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment ListStructureCategory on StructureCategory {\n  ...BaseListCategory\n  ...BaseListNodeCategory\n  identifier\n  __typename\n}\n\nfragment Graph on Graph {\n  id\n  name\n  description\n  structureCategories {\n    ...ListStructureCategory\n    __typename\n  }\n  entityCategories {\n    ...ListEntityCategory\n    __typename\n  }\n  metricCategories {\n    ...ListMetricCategory\n    __typename\n  }\n  protocolEventCategories {\n    ...ListProtocolEventCategory\n    __typename\n  }\n  naturalEventCategories {\n    ...ListNaturalEventCategory\n    __typename\n  }\n  relationCategories {\n    ...ListRelationCategory\n    __typename\n  }\n  measurementCategories {\n    ...ListMeasurementCategory\n    __typename\n  }\n  structureRelationCategories {\n    ...ListStructureRelationCategory\n    __typename\n  }\n  graphQueries(pagination: {limit: 0}) {\n    ...GraphQuery\n    __typename\n  }\n  latestNodes(pagination: {limit: 2}) {\n    ...Node\n    __typename\n  }\n  __typename\n}\n\nmutation PinGraph($input: PinGraphInput!) {\n  pinGraph(input: $input) {\n    ...Graph\n    __typename\n  }\n}"
 
 
 class DeleteGraphMutation(BaseModel):
@@ -4344,7 +4739,7 @@ class UpdateGraphMutation(BaseModel):
     class Meta:
         """Meta class for UpdateGraph"""
 
-        document = "fragment BaseEdge on Edge {\n  id\n  leftId\n  rightId\n  __typename\n}\n\nfragment Participant on Participant {\n  role\n  quantity\n  __typename\n}\n\nfragment Measurement on Measurement {\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Relation on Relation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment StructureRelation on StructureRelation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment EntityCategoryDefinition on EntityCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment Column on Column {\n  name\n  kind\n  valueKind\n  label\n  description\n  category\n  searchable\n  idfor\n  preferhidden\n  __typename\n}\n\nfragment ReagentCategoryDefinition on ReagentCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment Edge on Edge {\n  ...BaseEdge\n  ...Measurement\n  ...Relation\n  ...Participant\n  ...StructureRelation\n  __typename\n}\n\nfragment BaseListCategory on BaseCategory {\n  id\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  tags {\n    id\n    value\n    __typename\n  }\n  __typename\n}\n\nfragment Reagent on Reagent {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  externalId\n  label\n  __typename\n}\n\nfragment BaseNode on Node {\n  id\n  label\n  __typename\n}\n\nfragment Pairs on Pairs {\n  pairs {\n    source {\n      ... on Structure {\n        identifier\n        object\n      }\n      __typename\n    }\n    target {\n      ... on Structure {\n        identifier\n        object\n      }\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nfragment EntityRoleDefinition on EntityRoleDefinition {\n  role\n  categoryDefinition {\n    ...EntityCategoryDefinition\n    __typename\n  }\n  optional\n  allowMultiple\n  __typename\n}\n\nfragment BaseListNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment Path on Path {\n  nodes {\n    ...Node\n    __typename\n  }\n  edges {\n    ...Edge\n    __typename\n  }\n  __typename\n}\n\nfragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment BaseListEdgeCategory on EdgeCategory {\n  id\n  __typename\n}\n\nfragment ListScatterPlot on ScatterPlot {\n  id\n  name\n  xColumn\n  yColumn\n  __typename\n}\n\nfragment Table on Table {\n  graph {\n    ageName\n    __typename\n  }\n  rows\n  columns {\n    ...Column\n    __typename\n  }\n  __typename\n}\n\nfragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}\n\nfragment ReagentRoleDefinition on ReagentRoleDefinition {\n  role\n  categoryDefinition {\n    ...ReagentCategoryDefinition\n    __typename\n  }\n  needsQuantity\n  optional\n  __typename\n}\n\nfragment ListProtocolEventCategory on ProtocolEventCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  label\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  sourceReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  targetReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment ListMeasurementCategory on MeasurementCategory {\n  ...BaseListCategory\n  ...BaseListEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment ListRelationCategory on RelationCategory {\n  ...BaseListCategory\n  ...BaseListEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment ListStructureRelationCategory on StructureRelationCategory {\n  ...BaseListCategory\n  ...BaseListEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment ListStructureCategory on StructureCategory {\n  ...BaseListCategory\n  ...BaseListNodeCategory\n  identifier\n  __typename\n}\n\nfragment ListMetricCategory on MetricCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  label\n  metricKind\n  __typename\n}\n\nfragment ListEntityCategory on EntityCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  instanceKind\n  label\n  __typename\n}\n\nfragment GraphQuery on GraphQuery {\n  id\n  query\n  name\n  graph {\n    id\n    name\n    __typename\n  }\n  scatterPlots(pagination: {limit: 1}) {\n    ...ListScatterPlot\n    __typename\n  }\n  render {\n    ...Path\n    ...Pairs\n    ...Table\n    __typename\n  }\n  pinned\n  __typename\n}\n\nfragment Node on Node {\n  ...BaseNode\n  ...Entity\n  ...Structure\n  ...Metric\n  ...Reagent\n  __typename\n}\n\nfragment ListNaturalEventCategory on NaturalEventCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  label\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment Graph on Graph {\n  id\n  name\n  description\n  structureCategories {\n    ...ListStructureCategory\n    __typename\n  }\n  entityCategories {\n    ...ListEntityCategory\n    __typename\n  }\n  metricCategories {\n    ...ListMetricCategory\n    __typename\n  }\n  protocolEventCategories {\n    ...ListProtocolEventCategory\n    __typename\n  }\n  naturalEventCategories {\n    ...ListNaturalEventCategory\n    __typename\n  }\n  relationCategories {\n    ...ListRelationCategory\n    __typename\n  }\n  measurementCategories {\n    ...ListMeasurementCategory\n    __typename\n  }\n  structureRelationCategories {\n    ...ListStructureRelationCategory\n    __typename\n  }\n  graphQueries(pagination: {limit: 0}) {\n    ...GraphQuery\n    __typename\n  }\n  latestNodes(pagination: {limit: 2}) {\n    ...Node\n    __typename\n  }\n  __typename\n}\n\nmutation UpdateGraph($input: UpdateGraphInput!) {\n  updateGraph(input: $input) {\n    ...Graph\n    __typename\n  }\n}"
+        document = "fragment Participant on Participant {\n  role\n  quantity\n  __typename\n}\n\nfragment BaseEdge on Edge {\n  id\n  leftId\n  rightId\n  __typename\n}\n\nfragment StructureRelation on StructureRelation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Measurement on Measurement {\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Relation on Relation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Edge on Edge {\n  ...BaseEdge\n  ...Measurement\n  ...Relation\n  ...Participant\n  ...StructureRelation\n  __typename\n}\n\nfragment ReagentCategoryDefinition on ReagentCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment EntityCategoryDefinition on EntityCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment Column on Column {\n  name\n  kind\n  valueKind\n  label\n  description\n  category\n  searchable\n  idfor\n  preferhidden\n  __typename\n}\n\nfragment BaseNode on Node {\n  id\n  label\n  __typename\n}\n\nfragment BaseListEdgeCategory on EdgeCategory {\n  id\n  __typename\n}\n\nfragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nfragment ListScatterPlot on ScatterPlot {\n  id\n  name\n  xColumn\n  yColumn\n  __typename\n}\n\nfragment Path on Path {\n  nodes {\n    ...Node\n    __typename\n  }\n  edges {\n    ...Edge\n    __typename\n  }\n  __typename\n}\n\nfragment Pairs on Pairs {\n  pairs {\n    source {\n      ... on Structure {\n        identifier\n        object\n      }\n      __typename\n    }\n    target {\n      ... on Structure {\n        identifier\n        object\n      }\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nfragment Reagent on Reagent {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  externalId\n  label\n  __typename\n}\n\nfragment Table on Table {\n  graph {\n    ageName\n    __typename\n  }\n  rows\n  columns {\n    ...Column\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment ReagentRoleDefinition on ReagentRoleDefinition {\n  role\n  categoryDefinition {\n    ...ReagentCategoryDefinition\n    __typename\n  }\n  needsQuantity\n  optional\n  __typename\n}\n\nfragment EntityRoleDefinition on EntityRoleDefinition {\n  role\n  categoryDefinition {\n    ...EntityCategoryDefinition\n    __typename\n  }\n  optional\n  allowMultiple\n  __typename\n}\n\nfragment BaseListNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}\n\nfragment BaseListCategory on BaseCategory {\n  id\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  tags {\n    id\n    value\n    __typename\n  }\n  __typename\n}\n\nfragment ListMeasurementCategory on MeasurementCategory {\n  ...BaseListCategory\n  ...BaseListEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment ListStructureRelationCategory on StructureRelationCategory {\n  ...BaseListCategory\n  ...BaseListEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment ListMetricCategory on MetricCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  label\n  metricKind\n  __typename\n}\n\nfragment ListEntityCategory on EntityCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  instanceKind\n  label\n  __typename\n}\n\nfragment ListProtocolEventCategory on ProtocolEventCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  label\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  sourceReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  targetReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment GraphQuery on GraphQuery {\n  id\n  query\n  name\n  graph {\n    id\n    name\n    __typename\n  }\n  scatterPlots(pagination: {limit: 1}) {\n    ...ListScatterPlot\n    __typename\n  }\n  render {\n    ...Path\n    ...Pairs\n    ...Table\n    __typename\n  }\n  pinned\n  __typename\n}\n\nfragment ListRelationCategory on RelationCategory {\n  ...BaseListCategory\n  ...BaseListEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment Node on Node {\n  ...BaseNode\n  ...Entity\n  ...Structure\n  ...Metric\n  ...Reagent\n  __typename\n}\n\nfragment ListNaturalEventCategory on NaturalEventCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  label\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment ListStructureCategory on StructureCategory {\n  ...BaseListCategory\n  ...BaseListNodeCategory\n  identifier\n  __typename\n}\n\nfragment Graph on Graph {\n  id\n  name\n  description\n  structureCategories {\n    ...ListStructureCategory\n    __typename\n  }\n  entityCategories {\n    ...ListEntityCategory\n    __typename\n  }\n  metricCategories {\n    ...ListMetricCategory\n    __typename\n  }\n  protocolEventCategories {\n    ...ListProtocolEventCategory\n    __typename\n  }\n  naturalEventCategories {\n    ...ListNaturalEventCategory\n    __typename\n  }\n  relationCategories {\n    ...ListRelationCategory\n    __typename\n  }\n  measurementCategories {\n    ...ListMeasurementCategory\n    __typename\n  }\n  structureRelationCategories {\n    ...ListStructureRelationCategory\n    __typename\n  }\n  graphQueries(pagination: {limit: 0}) {\n    ...GraphQuery\n    __typename\n  }\n  latestNodes(pagination: {limit: 2}) {\n    ...Node\n    __typename\n  }\n  __typename\n}\n\nmutation UpdateGraph($input: UpdateGraphInput!) {\n  updateGraph(input: $input) {\n    ...Graph\n    __typename\n  }\n}"
 
 
 class CreateGraphQueryMutation(BaseModel):
@@ -4362,7 +4757,7 @@ class CreateGraphQueryMutation(BaseModel):
     class Meta:
         """Meta class for CreateGraphQuery"""
 
-        document = "fragment Reagent on Reagent {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  externalId\n  label\n  __typename\n}\n\nfragment BaseEdge on Edge {\n  id\n  leftId\n  rightId\n  __typename\n}\n\nfragment Participant on Participant {\n  role\n  quantity\n  __typename\n}\n\nfragment BaseNode on Node {\n  id\n  label\n  __typename\n}\n\nfragment Measurement on Measurement {\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nfragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment Relation on Relation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}\n\nfragment StructureRelation on StructureRelation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Node on Node {\n  ...BaseNode\n  ...Entity\n  ...Structure\n  ...Metric\n  ...Reagent\n  __typename\n}\n\nfragment Column on Column {\n  name\n  kind\n  valueKind\n  label\n  description\n  category\n  searchable\n  idfor\n  preferhidden\n  __typename\n}\n\nfragment Edge on Edge {\n  ...BaseEdge\n  ...Measurement\n  ...Relation\n  ...Participant\n  ...StructureRelation\n  __typename\n}\n\nfragment ListScatterPlot on ScatterPlot {\n  id\n  name\n  xColumn\n  yColumn\n  __typename\n}\n\nfragment Pairs on Pairs {\n  pairs {\n    source {\n      ... on Structure {\n        identifier\n        object\n      }\n      __typename\n    }\n    target {\n      ... on Structure {\n        identifier\n        object\n      }\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nfragment Table on Table {\n  graph {\n    ageName\n    __typename\n  }\n  rows\n  columns {\n    ...Column\n    __typename\n  }\n  __typename\n}\n\nfragment Path on Path {\n  nodes {\n    ...Node\n    __typename\n  }\n  edges {\n    ...Edge\n    __typename\n  }\n  __typename\n}\n\nfragment GraphQuery on GraphQuery {\n  id\n  query\n  name\n  graph {\n    id\n    name\n    __typename\n  }\n  scatterPlots(pagination: {limit: 1}) {\n    ...ListScatterPlot\n    __typename\n  }\n  render {\n    ...Path\n    ...Pairs\n    ...Table\n    __typename\n  }\n  pinned\n  __typename\n}\n\nmutation CreateGraphQuery($input: GraphQueryInput!) {\n  createGraphQuery(input: $input) {\n    ...GraphQuery\n    __typename\n  }\n}"
+        document = "fragment BaseNode on Node {\n  id\n  label\n  __typename\n}\n\nfragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nfragment Participant on Participant {\n  role\n  quantity\n  __typename\n}\n\nfragment BaseEdge on Edge {\n  id\n  leftId\n  rightId\n  __typename\n}\n\nfragment StructureRelation on StructureRelation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Reagent on Reagent {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  externalId\n  label\n  __typename\n}\n\nfragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}\n\nfragment Measurement on Measurement {\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Relation on Relation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Edge on Edge {\n  ...BaseEdge\n  ...Measurement\n  ...Relation\n  ...Participant\n  ...StructureRelation\n  __typename\n}\n\nfragment Node on Node {\n  ...BaseNode\n  ...Entity\n  ...Structure\n  ...Metric\n  ...Reagent\n  __typename\n}\n\nfragment Column on Column {\n  name\n  kind\n  valueKind\n  label\n  description\n  category\n  searchable\n  idfor\n  preferhidden\n  __typename\n}\n\nfragment ListScatterPlot on ScatterPlot {\n  id\n  name\n  xColumn\n  yColumn\n  __typename\n}\n\nfragment Table on Table {\n  graph {\n    ageName\n    __typename\n  }\n  rows\n  columns {\n    ...Column\n    __typename\n  }\n  __typename\n}\n\nfragment Path on Path {\n  nodes {\n    ...Node\n    __typename\n  }\n  edges {\n    ...Edge\n    __typename\n  }\n  __typename\n}\n\nfragment Pairs on Pairs {\n  pairs {\n    source {\n      ... on Structure {\n        identifier\n        object\n      }\n      __typename\n    }\n    target {\n      ... on Structure {\n        identifier\n        object\n      }\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nfragment GraphQuery on GraphQuery {\n  id\n  query\n  name\n  graph {\n    id\n    name\n    __typename\n  }\n  scatterPlots(pagination: {limit: 1}) {\n    ...ListScatterPlot\n    __typename\n  }\n  render {\n    ...Path\n    ...Pairs\n    ...Table\n    __typename\n  }\n  pinned\n  __typename\n}\n\nmutation CreateGraphQuery($input: GraphQueryInput!) {\n  createGraphQuery(input: $input) {\n    ...GraphQuery\n    __typename\n  }\n}"
 
 
 class PinGraphQueryMutation(BaseModel):
@@ -4380,7 +4775,7 @@ class PinGraphQueryMutation(BaseModel):
     class Meta:
         """Meta class for PinGraphQuery"""
 
-        document = "fragment Reagent on Reagent {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  externalId\n  label\n  __typename\n}\n\nfragment BaseEdge on Edge {\n  id\n  leftId\n  rightId\n  __typename\n}\n\nfragment Participant on Participant {\n  role\n  quantity\n  __typename\n}\n\nfragment BaseNode on Node {\n  id\n  label\n  __typename\n}\n\nfragment Measurement on Measurement {\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nfragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment Relation on Relation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}\n\nfragment StructureRelation on StructureRelation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Node on Node {\n  ...BaseNode\n  ...Entity\n  ...Structure\n  ...Metric\n  ...Reagent\n  __typename\n}\n\nfragment Column on Column {\n  name\n  kind\n  valueKind\n  label\n  description\n  category\n  searchable\n  idfor\n  preferhidden\n  __typename\n}\n\nfragment Edge on Edge {\n  ...BaseEdge\n  ...Measurement\n  ...Relation\n  ...Participant\n  ...StructureRelation\n  __typename\n}\n\nfragment ListScatterPlot on ScatterPlot {\n  id\n  name\n  xColumn\n  yColumn\n  __typename\n}\n\nfragment Pairs on Pairs {\n  pairs {\n    source {\n      ... on Structure {\n        identifier\n        object\n      }\n      __typename\n    }\n    target {\n      ... on Structure {\n        identifier\n        object\n      }\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nfragment Table on Table {\n  graph {\n    ageName\n    __typename\n  }\n  rows\n  columns {\n    ...Column\n    __typename\n  }\n  __typename\n}\n\nfragment Path on Path {\n  nodes {\n    ...Node\n    __typename\n  }\n  edges {\n    ...Edge\n    __typename\n  }\n  __typename\n}\n\nfragment GraphQuery on GraphQuery {\n  id\n  query\n  name\n  graph {\n    id\n    name\n    __typename\n  }\n  scatterPlots(pagination: {limit: 1}) {\n    ...ListScatterPlot\n    __typename\n  }\n  render {\n    ...Path\n    ...Pairs\n    ...Table\n    __typename\n  }\n  pinned\n  __typename\n}\n\nmutation PinGraphQuery($input: PinGraphQueryInput!) {\n  pinGraphQuery(input: $input) {\n    ...GraphQuery\n    __typename\n  }\n}"
+        document = "fragment BaseNode on Node {\n  id\n  label\n  __typename\n}\n\nfragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nfragment Participant on Participant {\n  role\n  quantity\n  __typename\n}\n\nfragment BaseEdge on Edge {\n  id\n  leftId\n  rightId\n  __typename\n}\n\nfragment StructureRelation on StructureRelation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Reagent on Reagent {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  externalId\n  label\n  __typename\n}\n\nfragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}\n\nfragment Measurement on Measurement {\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Relation on Relation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Edge on Edge {\n  ...BaseEdge\n  ...Measurement\n  ...Relation\n  ...Participant\n  ...StructureRelation\n  __typename\n}\n\nfragment Node on Node {\n  ...BaseNode\n  ...Entity\n  ...Structure\n  ...Metric\n  ...Reagent\n  __typename\n}\n\nfragment Column on Column {\n  name\n  kind\n  valueKind\n  label\n  description\n  category\n  searchable\n  idfor\n  preferhidden\n  __typename\n}\n\nfragment ListScatterPlot on ScatterPlot {\n  id\n  name\n  xColumn\n  yColumn\n  __typename\n}\n\nfragment Table on Table {\n  graph {\n    ageName\n    __typename\n  }\n  rows\n  columns {\n    ...Column\n    __typename\n  }\n  __typename\n}\n\nfragment Path on Path {\n  nodes {\n    ...Node\n    __typename\n  }\n  edges {\n    ...Edge\n    __typename\n  }\n  __typename\n}\n\nfragment Pairs on Pairs {\n  pairs {\n    source {\n      ... on Structure {\n        identifier\n        object\n      }\n      __typename\n    }\n    target {\n      ... on Structure {\n        identifier\n        object\n      }\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nfragment GraphQuery on GraphQuery {\n  id\n  query\n  name\n  graph {\n    id\n    name\n    __typename\n  }\n  scatterPlots(pagination: {limit: 1}) {\n    ...ListScatterPlot\n    __typename\n  }\n  render {\n    ...Path\n    ...Pairs\n    ...Table\n    __typename\n  }\n  pinned\n  __typename\n}\n\nmutation PinGraphQuery($input: PinGraphQueryInput!) {\n  pinGraphQuery(input: $input) {\n    ...GraphQuery\n    __typename\n  }\n}"
 
 
 class CreateMeasurementMutation(BaseModel):
@@ -4417,6 +4812,24 @@ class CreateMetricMutation(BaseModel):
         """Meta class for CreateMetric"""
 
         document = "fragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nmutation CreateMetric($input: MetricInput!) {\n  createMetric(input: $input) {\n    ...Metric\n    __typename\n  }\n}"
+
+
+class CreateStructureMetricMutation(BaseModel):
+    """No documentation found for this operation."""
+
+    create_structure_metric: Metric = Field(alias="createStructureMetric")
+    "Create a new structure metric"
+
+    class Arguments(BaseModel):
+        """Arguments for CreateStructureMetric"""
+
+        input: StructureMetricInput
+        model_config = ConfigDict(populate_by_name=True)
+
+    class Meta:
+        """Meta class for CreateStructureMetric"""
+
+        document = "fragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nmutation CreateStructureMetric($input: StructureMetricInput!) {\n  createStructureMetric(input: $input) {\n    ...Metric\n    __typename\n  }\n}"
 
 
 class CreateModelMutation(BaseModel):
@@ -4472,7 +4885,7 @@ class CreateNaturalEventCategoryMutation(BaseModel):
     class Meta:
         """Meta class for CreateNaturalEventCategory"""
 
-        document = "fragment EntityCategoryDefinition on EntityCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment EntityRoleDefinition on EntityRoleDefinition {\n  role\n  categoryDefinition {\n    ...EntityCategoryDefinition\n    __typename\n  }\n  optional\n  allowMultiple\n  __typename\n}\n\nfragment NaturalEventCategory on NaturalEventCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  plateChildren\n  label\n  ageName\n  label\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  __typename\n}\n\nmutation CreateNaturalEventCategory($input: NaturalEventCategoryInput!) {\n  createNaturalEventCategory(input: $input) {\n    ...NaturalEventCategory\n    __typename\n  }\n}"
+        document = "fragment EntityCategoryDefinition on EntityCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment EntityRoleDefinition on EntityRoleDefinition {\n  role\n  categoryDefinition {\n    ...EntityCategoryDefinition\n    __typename\n  }\n  optional\n  allowMultiple\n  __typename\n}\n\nfragment NaturalEventCategory on NaturalEventCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  plateChildren\n  label\n  ageName\n  label\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  __typename\n}\n\nmutation CreateNaturalEventCategory($input: NaturalEventCategoryInput!) {\n  createNaturalEventCategory(input: $input) {\n    ...NaturalEventCategory\n    __typename\n  }\n}"
 
 
 class UpdateNaturalEventCategoryMutation(BaseModel):
@@ -4492,7 +4905,7 @@ class UpdateNaturalEventCategoryMutation(BaseModel):
     class Meta:
         """Meta class for UpdateNaturalEventCategory"""
 
-        document = "fragment EntityCategoryDefinition on EntityCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment EntityRoleDefinition on EntityRoleDefinition {\n  role\n  categoryDefinition {\n    ...EntityCategoryDefinition\n    __typename\n  }\n  optional\n  allowMultiple\n  __typename\n}\n\nfragment NaturalEventCategory on NaturalEventCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  plateChildren\n  label\n  ageName\n  label\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  __typename\n}\n\nmutation UpdateNaturalEventCategory($input: UpdateNaturalEventCategoryInput!) {\n  updateNaturalEventCategory(input: $input) {\n    ...NaturalEventCategory\n    __typename\n  }\n}"
+        document = "fragment EntityCategoryDefinition on EntityCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment EntityRoleDefinition on EntityRoleDefinition {\n  role\n  categoryDefinition {\n    ...EntityCategoryDefinition\n    __typename\n  }\n  optional\n  allowMultiple\n  __typename\n}\n\nfragment NaturalEventCategory on NaturalEventCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  plateChildren\n  label\n  ageName\n  label\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  __typename\n}\n\nmutation UpdateNaturalEventCategory($input: UpdateNaturalEventCategoryInput!) {\n  updateNaturalEventCategory(input: $input) {\n    ...NaturalEventCategory\n    __typename\n  }\n}"
 
 
 class CreateNodeQueryMutation(BaseModel):
@@ -4566,7 +4979,7 @@ class CreateProtocolEventCategoryMutation(BaseModel):
     class Meta:
         """Meta class for CreateProtocolEventCategory"""
 
-        document = "fragment EntityCategoryDefinition on EntityCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment ReagentCategoryDefinition on ReagentCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment EntityRoleDefinition on EntityRoleDefinition {\n  role\n  categoryDefinition {\n    ...EntityCategoryDefinition\n    __typename\n  }\n  optional\n  allowMultiple\n  __typename\n}\n\nfragment VariableDefinition on VariableDefinition {\n  param\n  valueKind\n  default\n  optional\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment ReagentRoleDefinition on ReagentRoleDefinition {\n  role\n  categoryDefinition {\n    ...ReagentCategoryDefinition\n    __typename\n  }\n  needsQuantity\n  optional\n  __typename\n}\n\nfragment ProtocolEventCategory on ProtocolEventCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  plateChildren\n  label\n  ageName\n  label\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  sourceReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  targetReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  variableDefinitions {\n    ...VariableDefinition\n    __typename\n  }\n  __typename\n}\n\nmutation CreateProtocolEventCategory($input: ProtocolEventCategoryInput!) {\n  createProtocolEventCategory(input: $input) {\n    ...ProtocolEventCategory\n    __typename\n  }\n}"
+        document = "fragment EntityCategoryDefinition on EntityCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment ReagentCategoryDefinition on ReagentCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment EntityRoleDefinition on EntityRoleDefinition {\n  role\n  categoryDefinition {\n    ...EntityCategoryDefinition\n    __typename\n  }\n  optional\n  allowMultiple\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment ReagentRoleDefinition on ReagentRoleDefinition {\n  role\n  categoryDefinition {\n    ...ReagentCategoryDefinition\n    __typename\n  }\n  needsQuantity\n  optional\n  __typename\n}\n\nfragment VariableDefinition on VariableDefinition {\n  param\n  valueKind\n  default\n  optional\n  __typename\n}\n\nfragment ProtocolEventCategory on ProtocolEventCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  plateChildren\n  label\n  ageName\n  label\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  sourceReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  targetReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  variableDefinitions {\n    ...VariableDefinition\n    __typename\n  }\n  __typename\n}\n\nmutation CreateProtocolEventCategory($input: ProtocolEventCategoryInput!) {\n  createProtocolEventCategory(input: $input) {\n    ...ProtocolEventCategory\n    __typename\n  }\n}"
 
 
 class UpdateProtocolEventCategoryMutation(BaseModel):
@@ -4586,7 +4999,7 @@ class UpdateProtocolEventCategoryMutation(BaseModel):
     class Meta:
         """Meta class for UpdateProtocolEventCategory"""
 
-        document = "fragment EntityCategoryDefinition on EntityCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment ReagentCategoryDefinition on ReagentCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment EntityRoleDefinition on EntityRoleDefinition {\n  role\n  categoryDefinition {\n    ...EntityCategoryDefinition\n    __typename\n  }\n  optional\n  allowMultiple\n  __typename\n}\n\nfragment VariableDefinition on VariableDefinition {\n  param\n  valueKind\n  default\n  optional\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment ReagentRoleDefinition on ReagentRoleDefinition {\n  role\n  categoryDefinition {\n    ...ReagentCategoryDefinition\n    __typename\n  }\n  needsQuantity\n  optional\n  __typename\n}\n\nfragment ProtocolEventCategory on ProtocolEventCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  plateChildren\n  label\n  ageName\n  label\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  sourceReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  targetReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  variableDefinitions {\n    ...VariableDefinition\n    __typename\n  }\n  __typename\n}\n\nmutation UpdateProtocolEventCategory($input: UpdateProtocolEventCategoryInput!) {\n  updateProtocolEventCategory(input: $input) {\n    ...ProtocolEventCategory\n    __typename\n  }\n}"
+        document = "fragment EntityCategoryDefinition on EntityCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment ReagentCategoryDefinition on ReagentCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment EntityRoleDefinition on EntityRoleDefinition {\n  role\n  categoryDefinition {\n    ...EntityCategoryDefinition\n    __typename\n  }\n  optional\n  allowMultiple\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment ReagentRoleDefinition on ReagentRoleDefinition {\n  role\n  categoryDefinition {\n    ...ReagentCategoryDefinition\n    __typename\n  }\n  needsQuantity\n  optional\n  __typename\n}\n\nfragment VariableDefinition on VariableDefinition {\n  param\n  valueKind\n  default\n  optional\n  __typename\n}\n\nfragment ProtocolEventCategory on ProtocolEventCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  plateChildren\n  label\n  ageName\n  label\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  sourceReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  targetReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  variableDefinitions {\n    ...VariableDefinition\n    __typename\n  }\n  __typename\n}\n\nmutation UpdateProtocolEventCategory($input: UpdateProtocolEventCategoryInput!) {\n  updateProtocolEventCategory(input: $input) {\n    ...ProtocolEventCategory\n    __typename\n  }\n}"
 
 
 class CreateReagentMutation(BaseModel):
@@ -4696,7 +5109,7 @@ class CreateStructureCategoryMutation(BaseModel):
     class Meta:
         """Meta class for CreateStructureCategory"""
 
-        document = "fragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment StructureCategory on StructureCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  identifier\n  __typename\n}\n\nmutation CreateStructureCategory($input: StructureCategoryInput!) {\n  createStructureCategory(input: $input) {\n    ...StructureCategory\n    __typename\n  }\n}"
+        document = "fragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment StructureCategory on StructureCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  identifier\n  __typename\n}\n\nmutation CreateStructureCategory($input: StructureCategoryInput!) {\n  createStructureCategory(input: $input) {\n    ...StructureCategory\n    __typename\n  }\n}"
 
 
 class UpdateStructureCategoryMutation(BaseModel):
@@ -4716,7 +5129,7 @@ class UpdateStructureCategoryMutation(BaseModel):
     class Meta:
         """Meta class for UpdateStructureCategory"""
 
-        document = "fragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment StructureCategory on StructureCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  identifier\n  __typename\n}\n\nmutation UpdateStructureCategory($input: UpdateStructureCategoryInput!) {\n  updateStructureCategory(input: $input) {\n    ...StructureCategory\n    __typename\n  }\n}"
+        document = "fragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment StructureCategory on StructureCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  identifier\n  __typename\n}\n\nmutation UpdateStructureCategory($input: UpdateStructureCategoryInput!) {\n  updateStructureCategory(input: $input) {\n    ...StructureCategory\n    __typename\n  }\n}"
 
 
 class CreateStructureRelationMutation(BaseModel):
@@ -4756,7 +5169,7 @@ class CreateStructureRelationCategoryMutation(BaseModel):
     class Meta:
         """Meta class for CreateStructureRelationCategory"""
 
-        document = "fragment BaseEdgeCategory on EdgeCategory {\n  id\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment StructureRelationCategory on StructureRelationCategory {\n  ...BaseCategory\n  ...BaseEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  __typename\n}\n\nmutation CreateStructureRelationCategory($input: StructureRelationCategoryInput!) {\n  createStructureRelationCategory(input: $input) {\n    ...StructureRelationCategory\n    __typename\n  }\n}"
+        document = "fragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment BaseEdgeCategory on EdgeCategory {\n  id\n  __typename\n}\n\nfragment StructureRelationCategory on StructureRelationCategory {\n  ...BaseCategory\n  ...BaseEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  __typename\n}\n\nmutation CreateStructureRelationCategory($input: StructureRelationCategoryInput!) {\n  createStructureRelationCategory(input: $input) {\n    ...StructureRelationCategory\n    __typename\n  }\n}"
 
 
 class UpdateStructureRelationCategoryMutation(BaseModel):
@@ -4776,7 +5189,7 @@ class UpdateStructureRelationCategoryMutation(BaseModel):
     class Meta:
         """Meta class for UpdateStructureRelationCategory"""
 
-        document = "fragment BaseEdgeCategory on EdgeCategory {\n  id\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment StructureRelationCategory on StructureRelationCategory {\n  ...BaseCategory\n  ...BaseEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  __typename\n}\n\nmutation UpdateStructureRelationCategory($input: UpdateStructureRelationCategoryInput!) {\n  updateStructureRelationCategory(input: $input) {\n    ...StructureRelationCategory\n    __typename\n  }\n}"
+        document = "fragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment BaseEdgeCategory on EdgeCategory {\n  id\n  __typename\n}\n\nfragment StructureRelationCategory on StructureRelationCategory {\n  ...BaseCategory\n  ...BaseEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  __typename\n}\n\nmutation UpdateStructureRelationCategory($input: UpdateStructureRelationCategoryInput!) {\n  updateStructureRelationCategory(input: $input) {\n    ...StructureRelationCategory\n    __typename\n  }\n}"
 
 
 class CreateToldyousoMutation(BaseModel):
@@ -4915,7 +5328,7 @@ class GetEntityCategoryQuery(BaseModel):
     class Meta:
         """Meta class for GetEntityCategory"""
 
-        document = "fragment Reagent on Reagent {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  externalId\n  label\n  __typename\n}\n\nfragment BaseEdge on Edge {\n  id\n  leftId\n  rightId\n  __typename\n}\n\nfragment Participant on Participant {\n  role\n  quantity\n  __typename\n}\n\nfragment BaseNode on Node {\n  id\n  label\n  __typename\n}\n\nfragment Measurement on Measurement {\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nfragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment Relation on Relation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}\n\nfragment StructureRelation on StructureRelation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Node on Node {\n  ...BaseNode\n  ...Entity\n  ...Structure\n  ...Metric\n  ...Reagent\n  __typename\n}\n\nfragment Column on Column {\n  name\n  kind\n  valueKind\n  label\n  description\n  category\n  searchable\n  idfor\n  preferhidden\n  __typename\n}\n\nfragment Edge on Edge {\n  ...BaseEdge\n  ...Measurement\n  ...Relation\n  ...Participant\n  ...StructureRelation\n  __typename\n}\n\nfragment ListScatterPlot on ScatterPlot {\n  id\n  name\n  xColumn\n  yColumn\n  __typename\n}\n\nfragment Pairs on Pairs {\n  pairs {\n    source {\n      ... on Structure {\n        identifier\n        object\n      }\n      __typename\n    }\n    target {\n      ... on Structure {\n        identifier\n        object\n      }\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nfragment Table on Table {\n  graph {\n    ageName\n    __typename\n  }\n  rows\n  columns {\n    ...Column\n    __typename\n  }\n  __typename\n}\n\nfragment Path on Path {\n  nodes {\n    ...Node\n    __typename\n  }\n  edges {\n    ...Edge\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment GraphQuery on GraphQuery {\n  id\n  query\n  name\n  graph {\n    id\n    name\n    __typename\n  }\n  scatterPlots(pagination: {limit: 1}) {\n    ...ListScatterPlot\n    __typename\n  }\n  render {\n    ...Path\n    ...Pairs\n    ...Table\n    __typename\n  }\n  pinned\n  __typename\n}\n\nfragment EntityCategory on EntityCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  instanceKind\n  ageName\n  label\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  bestQuery {\n    ...GraphQuery\n    __typename\n  }\n  __typename\n}\n\nquery GetEntityCategory($id: ID!) {\n  entityCategory(id: $id) {\n    ...EntityCategory\n    __typename\n  }\n}"
+        document = "fragment BaseNode on Node {\n  id\n  label\n  __typename\n}\n\nfragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nfragment Participant on Participant {\n  role\n  quantity\n  __typename\n}\n\nfragment BaseEdge on Edge {\n  id\n  leftId\n  rightId\n  __typename\n}\n\nfragment StructureRelation on StructureRelation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Reagent on Reagent {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  externalId\n  label\n  __typename\n}\n\nfragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}\n\nfragment Measurement on Measurement {\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Relation on Relation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Edge on Edge {\n  ...BaseEdge\n  ...Measurement\n  ...Relation\n  ...Participant\n  ...StructureRelation\n  __typename\n}\n\nfragment Node on Node {\n  ...BaseNode\n  ...Entity\n  ...Structure\n  ...Metric\n  ...Reagent\n  __typename\n}\n\nfragment Column on Column {\n  name\n  kind\n  valueKind\n  label\n  description\n  category\n  searchable\n  idfor\n  preferhidden\n  __typename\n}\n\nfragment ListScatterPlot on ScatterPlot {\n  id\n  name\n  xColumn\n  yColumn\n  __typename\n}\n\nfragment Table on Table {\n  graph {\n    ageName\n    __typename\n  }\n  rows\n  columns {\n    ...Column\n    __typename\n  }\n  __typename\n}\n\nfragment Path on Path {\n  nodes {\n    ...Node\n    __typename\n  }\n  edges {\n    ...Edge\n    __typename\n  }\n  __typename\n}\n\nfragment Pairs on Pairs {\n  pairs {\n    source {\n      ... on Structure {\n        identifier\n        object\n      }\n      __typename\n    }\n    target {\n      ... on Structure {\n        identifier\n        object\n      }\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment GraphQuery on GraphQuery {\n  id\n  query\n  name\n  graph {\n    id\n    name\n    __typename\n  }\n  scatterPlots(pagination: {limit: 1}) {\n    ...ListScatterPlot\n    __typename\n  }\n  render {\n    ...Path\n    ...Pairs\n    ...Table\n    __typename\n  }\n  pinned\n  __typename\n}\n\nfragment EntityCategory on EntityCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  instanceKind\n  ageName\n  label\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  bestQuery {\n    ...GraphQuery\n    __typename\n  }\n  __typename\n}\n\nquery GetEntityCategory($id: ID!) {\n  entityCategory(id: $id) {\n    ...EntityCategory\n    __typename\n  }\n}"
 
 
 class SearchEntityCategoryQueryOptions(EntityCategoryTrait, BaseModel):
@@ -4966,7 +5379,7 @@ class ListEntityCategoryQuery(BaseModel):
     class Meta:
         """Meta class for ListEntityCategory"""
 
-        document = "fragment BaseListCategory on BaseCategory {\n  id\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  tags {\n    id\n    value\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment ListEntityCategory on EntityCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  instanceKind\n  label\n  __typename\n}\n\nquery ListEntityCategory($filters: EntityCategoryFilter, $pagination: OffsetPaginationInput) {\n  entityCategories(filters: $filters, pagination: $pagination) {\n    ...ListEntityCategory\n    __typename\n  }\n}"
+        document = "fragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment BaseListCategory on BaseCategory {\n  id\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  tags {\n    id\n    value\n    __typename\n  }\n  __typename\n}\n\nfragment ListEntityCategory on EntityCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  instanceKind\n  label\n  __typename\n}\n\nquery ListEntityCategory($filters: EntityCategoryFilter, $pagination: OffsetPaginationInput) {\n  entityCategories(filters: $filters, pagination: $pagination) {\n    ...ListEntityCategory\n    __typename\n  }\n}"
 
 
 class GlobalSearchQuery(BaseModel):
@@ -4996,7 +5409,7 @@ class GlobalSearchQuery(BaseModel):
     class Meta:
         """Meta class for GlobalSearch"""
 
-        document = "fragment BaseListEdgeCategory on EdgeCategory {\n  id\n  __typename\n}\n\nfragment BaseListNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment BaseListCategory on BaseCategory {\n  id\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  tags {\n    id\n    value\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment ListRelationCategory on RelationCategory {\n  ...BaseListCategory\n  ...BaseListEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment ListStructureCategory on StructureCategory {\n  ...BaseListCategory\n  ...BaseListNodeCategory\n  identifier\n  __typename\n}\n\nfragment ListEntityCategory on EntityCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  instanceKind\n  label\n  __typename\n}\n\nfragment ListMeasurementCategory on MeasurementCategory {\n  ...BaseListCategory\n  ...BaseListEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  label\n  __typename\n}\n\nquery GlobalSearch($search: String!) {\n  entityCategories(filters: {search: $search}, pagination: {limit: 10}) {\n    ...ListEntityCategory\n    __typename\n  }\n  relationCategories(filters: {search: $search}, pagination: {limit: 10}) {\n    ...ListRelationCategory\n    __typename\n  }\n  measurementCategories(filters: {search: $search}, pagination: {limit: 10}) {\n    ...ListMeasurementCategory\n    __typename\n  }\n  structureCategories(filters: {search: $search}, pagination: {limit: 10}) {\n    ...ListStructureCategory\n    __typename\n  }\n}"
+        document = "fragment BaseListNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment BaseListEdgeCategory on EdgeCategory {\n  id\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment BaseListCategory on BaseCategory {\n  id\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  tags {\n    id\n    value\n    __typename\n  }\n  __typename\n}\n\nfragment ListRelationCategory on RelationCategory {\n  ...BaseListCategory\n  ...BaseListEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment ListStructureCategory on StructureCategory {\n  ...BaseListCategory\n  ...BaseListNodeCategory\n  identifier\n  __typename\n}\n\nfragment ListEntityCategory on EntityCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  instanceKind\n  label\n  __typename\n}\n\nfragment ListMeasurementCategory on MeasurementCategory {\n  ...BaseListCategory\n  ...BaseListEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  label\n  __typename\n}\n\nquery GlobalSearch($search: String!) {\n  entityCategories(filters: {search: $search}, pagination: {limit: 10}) {\n    ...ListEntityCategory\n    __typename\n  }\n  relationCategories(filters: {search: $search}, pagination: {limit: 10}) {\n    ...ListRelationCategory\n    __typename\n  }\n  measurementCategories(filters: {search: $search}, pagination: {limit: 10}) {\n    ...ListMeasurementCategory\n    __typename\n  }\n  structureCategories(filters: {search: $search}, pagination: {limit: 10}) {\n    ...ListStructureCategory\n    __typename\n  }\n}"
 
 
 class GetGraphQuery(BaseModel):
@@ -5013,7 +5426,7 @@ class GetGraphQuery(BaseModel):
     class Meta:
         """Meta class for GetGraph"""
 
-        document = "fragment BaseEdge on Edge {\n  id\n  leftId\n  rightId\n  __typename\n}\n\nfragment Participant on Participant {\n  role\n  quantity\n  __typename\n}\n\nfragment Measurement on Measurement {\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Relation on Relation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment StructureRelation on StructureRelation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment EntityCategoryDefinition on EntityCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment Column on Column {\n  name\n  kind\n  valueKind\n  label\n  description\n  category\n  searchable\n  idfor\n  preferhidden\n  __typename\n}\n\nfragment ReagentCategoryDefinition on ReagentCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment Edge on Edge {\n  ...BaseEdge\n  ...Measurement\n  ...Relation\n  ...Participant\n  ...StructureRelation\n  __typename\n}\n\nfragment BaseListCategory on BaseCategory {\n  id\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  tags {\n    id\n    value\n    __typename\n  }\n  __typename\n}\n\nfragment Reagent on Reagent {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  externalId\n  label\n  __typename\n}\n\nfragment BaseNode on Node {\n  id\n  label\n  __typename\n}\n\nfragment Pairs on Pairs {\n  pairs {\n    source {\n      ... on Structure {\n        identifier\n        object\n      }\n      __typename\n    }\n    target {\n      ... on Structure {\n        identifier\n        object\n      }\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nfragment EntityRoleDefinition on EntityRoleDefinition {\n  role\n  categoryDefinition {\n    ...EntityCategoryDefinition\n    __typename\n  }\n  optional\n  allowMultiple\n  __typename\n}\n\nfragment BaseListNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment Path on Path {\n  nodes {\n    ...Node\n    __typename\n  }\n  edges {\n    ...Edge\n    __typename\n  }\n  __typename\n}\n\nfragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment BaseListEdgeCategory on EdgeCategory {\n  id\n  __typename\n}\n\nfragment ListScatterPlot on ScatterPlot {\n  id\n  name\n  xColumn\n  yColumn\n  __typename\n}\n\nfragment Table on Table {\n  graph {\n    ageName\n    __typename\n  }\n  rows\n  columns {\n    ...Column\n    __typename\n  }\n  __typename\n}\n\nfragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}\n\nfragment ReagentRoleDefinition on ReagentRoleDefinition {\n  role\n  categoryDefinition {\n    ...ReagentCategoryDefinition\n    __typename\n  }\n  needsQuantity\n  optional\n  __typename\n}\n\nfragment ListProtocolEventCategory on ProtocolEventCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  label\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  sourceReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  targetReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment ListMeasurementCategory on MeasurementCategory {\n  ...BaseListCategory\n  ...BaseListEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment ListRelationCategory on RelationCategory {\n  ...BaseListCategory\n  ...BaseListEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment ListStructureRelationCategory on StructureRelationCategory {\n  ...BaseListCategory\n  ...BaseListEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment ListStructureCategory on StructureCategory {\n  ...BaseListCategory\n  ...BaseListNodeCategory\n  identifier\n  __typename\n}\n\nfragment ListMetricCategory on MetricCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  label\n  metricKind\n  __typename\n}\n\nfragment ListEntityCategory on EntityCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  instanceKind\n  label\n  __typename\n}\n\nfragment GraphQuery on GraphQuery {\n  id\n  query\n  name\n  graph {\n    id\n    name\n    __typename\n  }\n  scatterPlots(pagination: {limit: 1}) {\n    ...ListScatterPlot\n    __typename\n  }\n  render {\n    ...Path\n    ...Pairs\n    ...Table\n    __typename\n  }\n  pinned\n  __typename\n}\n\nfragment Node on Node {\n  ...BaseNode\n  ...Entity\n  ...Structure\n  ...Metric\n  ...Reagent\n  __typename\n}\n\nfragment ListNaturalEventCategory on NaturalEventCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  label\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment Graph on Graph {\n  id\n  name\n  description\n  structureCategories {\n    ...ListStructureCategory\n    __typename\n  }\n  entityCategories {\n    ...ListEntityCategory\n    __typename\n  }\n  metricCategories {\n    ...ListMetricCategory\n    __typename\n  }\n  protocolEventCategories {\n    ...ListProtocolEventCategory\n    __typename\n  }\n  naturalEventCategories {\n    ...ListNaturalEventCategory\n    __typename\n  }\n  relationCategories {\n    ...ListRelationCategory\n    __typename\n  }\n  measurementCategories {\n    ...ListMeasurementCategory\n    __typename\n  }\n  structureRelationCategories {\n    ...ListStructureRelationCategory\n    __typename\n  }\n  graphQueries(pagination: {limit: 0}) {\n    ...GraphQuery\n    __typename\n  }\n  latestNodes(pagination: {limit: 2}) {\n    ...Node\n    __typename\n  }\n  __typename\n}\n\nquery GetGraph($id: ID!) {\n  graph(id: $id) {\n    ...Graph\n    __typename\n  }\n}"
+        document = "fragment Participant on Participant {\n  role\n  quantity\n  __typename\n}\n\nfragment BaseEdge on Edge {\n  id\n  leftId\n  rightId\n  __typename\n}\n\nfragment StructureRelation on StructureRelation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Measurement on Measurement {\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Relation on Relation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Edge on Edge {\n  ...BaseEdge\n  ...Measurement\n  ...Relation\n  ...Participant\n  ...StructureRelation\n  __typename\n}\n\nfragment ReagentCategoryDefinition on ReagentCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment EntityCategoryDefinition on EntityCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment Column on Column {\n  name\n  kind\n  valueKind\n  label\n  description\n  category\n  searchable\n  idfor\n  preferhidden\n  __typename\n}\n\nfragment BaseNode on Node {\n  id\n  label\n  __typename\n}\n\nfragment BaseListEdgeCategory on EdgeCategory {\n  id\n  __typename\n}\n\nfragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nfragment ListScatterPlot on ScatterPlot {\n  id\n  name\n  xColumn\n  yColumn\n  __typename\n}\n\nfragment Path on Path {\n  nodes {\n    ...Node\n    __typename\n  }\n  edges {\n    ...Edge\n    __typename\n  }\n  __typename\n}\n\nfragment Pairs on Pairs {\n  pairs {\n    source {\n      ... on Structure {\n        identifier\n        object\n      }\n      __typename\n    }\n    target {\n      ... on Structure {\n        identifier\n        object\n      }\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nfragment Reagent on Reagent {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  externalId\n  label\n  __typename\n}\n\nfragment Table on Table {\n  graph {\n    ageName\n    __typename\n  }\n  rows\n  columns {\n    ...Column\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment ReagentRoleDefinition on ReagentRoleDefinition {\n  role\n  categoryDefinition {\n    ...ReagentCategoryDefinition\n    __typename\n  }\n  needsQuantity\n  optional\n  __typename\n}\n\nfragment EntityRoleDefinition on EntityRoleDefinition {\n  role\n  categoryDefinition {\n    ...EntityCategoryDefinition\n    __typename\n  }\n  optional\n  allowMultiple\n  __typename\n}\n\nfragment BaseListNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}\n\nfragment BaseListCategory on BaseCategory {\n  id\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  tags {\n    id\n    value\n    __typename\n  }\n  __typename\n}\n\nfragment ListMeasurementCategory on MeasurementCategory {\n  ...BaseListCategory\n  ...BaseListEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment ListStructureRelationCategory on StructureRelationCategory {\n  ...BaseListCategory\n  ...BaseListEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment ListMetricCategory on MetricCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  label\n  metricKind\n  __typename\n}\n\nfragment ListEntityCategory on EntityCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  instanceKind\n  label\n  __typename\n}\n\nfragment ListProtocolEventCategory on ProtocolEventCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  label\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  sourceReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  targetReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment GraphQuery on GraphQuery {\n  id\n  query\n  name\n  graph {\n    id\n    name\n    __typename\n  }\n  scatterPlots(pagination: {limit: 1}) {\n    ...ListScatterPlot\n    __typename\n  }\n  render {\n    ...Path\n    ...Pairs\n    ...Table\n    __typename\n  }\n  pinned\n  __typename\n}\n\nfragment ListRelationCategory on RelationCategory {\n  ...BaseListCategory\n  ...BaseListEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment Node on Node {\n  ...BaseNode\n  ...Entity\n  ...Structure\n  ...Metric\n  ...Reagent\n  __typename\n}\n\nfragment ListNaturalEventCategory on NaturalEventCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  label\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment ListStructureCategory on StructureCategory {\n  ...BaseListCategory\n  ...BaseListNodeCategory\n  identifier\n  __typename\n}\n\nfragment Graph on Graph {\n  id\n  name\n  description\n  structureCategories {\n    ...ListStructureCategory\n    __typename\n  }\n  entityCategories {\n    ...ListEntityCategory\n    __typename\n  }\n  metricCategories {\n    ...ListMetricCategory\n    __typename\n  }\n  protocolEventCategories {\n    ...ListProtocolEventCategory\n    __typename\n  }\n  naturalEventCategories {\n    ...ListNaturalEventCategory\n    __typename\n  }\n  relationCategories {\n    ...ListRelationCategory\n    __typename\n  }\n  measurementCategories {\n    ...ListMeasurementCategory\n    __typename\n  }\n  structureRelationCategories {\n    ...ListStructureRelationCategory\n    __typename\n  }\n  graphQueries(pagination: {limit: 0}) {\n    ...GraphQuery\n    __typename\n  }\n  latestNodes(pagination: {limit: 2}) {\n    ...Node\n    __typename\n  }\n  __typename\n}\n\nquery GetGraph($id: ID!) {\n  graph(id: $id) {\n    ...Graph\n    __typename\n  }\n}"
 
 
 class SearchGraphsQueryOptions(GraphTrait, BaseModel):
@@ -5079,7 +5492,7 @@ class GetGraphQueryQuery(BaseModel):
     class Meta:
         """Meta class for GetGraphQuery"""
 
-        document = "fragment Reagent on Reagent {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  externalId\n  label\n  __typename\n}\n\nfragment BaseEdge on Edge {\n  id\n  leftId\n  rightId\n  __typename\n}\n\nfragment Participant on Participant {\n  role\n  quantity\n  __typename\n}\n\nfragment BaseNode on Node {\n  id\n  label\n  __typename\n}\n\nfragment Measurement on Measurement {\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nfragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment Relation on Relation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}\n\nfragment StructureRelation on StructureRelation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Node on Node {\n  ...BaseNode\n  ...Entity\n  ...Structure\n  ...Metric\n  ...Reagent\n  __typename\n}\n\nfragment Column on Column {\n  name\n  kind\n  valueKind\n  label\n  description\n  category\n  searchable\n  idfor\n  preferhidden\n  __typename\n}\n\nfragment Edge on Edge {\n  ...BaseEdge\n  ...Measurement\n  ...Relation\n  ...Participant\n  ...StructureRelation\n  __typename\n}\n\nfragment ListScatterPlot on ScatterPlot {\n  id\n  name\n  xColumn\n  yColumn\n  __typename\n}\n\nfragment Pairs on Pairs {\n  pairs {\n    source {\n      ... on Structure {\n        identifier\n        object\n      }\n      __typename\n    }\n    target {\n      ... on Structure {\n        identifier\n        object\n      }\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nfragment Table on Table {\n  graph {\n    ageName\n    __typename\n  }\n  rows\n  columns {\n    ...Column\n    __typename\n  }\n  __typename\n}\n\nfragment Path on Path {\n  nodes {\n    ...Node\n    __typename\n  }\n  edges {\n    ...Edge\n    __typename\n  }\n  __typename\n}\n\nfragment GraphQuery on GraphQuery {\n  id\n  query\n  name\n  graph {\n    id\n    name\n    __typename\n  }\n  scatterPlots(pagination: {limit: 1}) {\n    ...ListScatterPlot\n    __typename\n  }\n  render {\n    ...Path\n    ...Pairs\n    ...Table\n    __typename\n  }\n  pinned\n  __typename\n}\n\nquery GetGraphQuery($id: ID!) {\n  graphQuery(id: $id) {\n    ...GraphQuery\n    __typename\n  }\n}"
+        document = "fragment BaseNode on Node {\n  id\n  label\n  __typename\n}\n\nfragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nfragment Participant on Participant {\n  role\n  quantity\n  __typename\n}\n\nfragment BaseEdge on Edge {\n  id\n  leftId\n  rightId\n  __typename\n}\n\nfragment StructureRelation on StructureRelation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Reagent on Reagent {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  externalId\n  label\n  __typename\n}\n\nfragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}\n\nfragment Measurement on Measurement {\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Relation on Relation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Edge on Edge {\n  ...BaseEdge\n  ...Measurement\n  ...Relation\n  ...Participant\n  ...StructureRelation\n  __typename\n}\n\nfragment Node on Node {\n  ...BaseNode\n  ...Entity\n  ...Structure\n  ...Metric\n  ...Reagent\n  __typename\n}\n\nfragment Column on Column {\n  name\n  kind\n  valueKind\n  label\n  description\n  category\n  searchable\n  idfor\n  preferhidden\n  __typename\n}\n\nfragment ListScatterPlot on ScatterPlot {\n  id\n  name\n  xColumn\n  yColumn\n  __typename\n}\n\nfragment Table on Table {\n  graph {\n    ageName\n    __typename\n  }\n  rows\n  columns {\n    ...Column\n    __typename\n  }\n  __typename\n}\n\nfragment Path on Path {\n  nodes {\n    ...Node\n    __typename\n  }\n  edges {\n    ...Edge\n    __typename\n  }\n  __typename\n}\n\nfragment Pairs on Pairs {\n  pairs {\n    source {\n      ... on Structure {\n        identifier\n        object\n      }\n      __typename\n    }\n    target {\n      ... on Structure {\n        identifier\n        object\n      }\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nfragment GraphQuery on GraphQuery {\n  id\n  query\n  name\n  graph {\n    id\n    name\n    __typename\n  }\n  scatterPlots(pagination: {limit: 1}) {\n    ...ListScatterPlot\n    __typename\n  }\n  render {\n    ...Path\n    ...Pairs\n    ...Table\n    __typename\n  }\n  pinned\n  __typename\n}\n\nquery GetGraphQuery($id: ID!) {\n  graphQuery(id: $id) {\n    ...GraphQuery\n    __typename\n  }\n}"
 
 
 class SearchGraphQueriesQueryOptions(BaseModel):
@@ -5147,7 +5560,7 @@ class ListPrerenderedGraphQueriesQuery(BaseModel):
     class Meta:
         """Meta class for ListPrerenderedGraphQueries"""
 
-        document = "fragment Reagent on Reagent {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  externalId\n  label\n  __typename\n}\n\nfragment BaseEdge on Edge {\n  id\n  leftId\n  rightId\n  __typename\n}\n\nfragment Participant on Participant {\n  role\n  quantity\n  __typename\n}\n\nfragment BaseNode on Node {\n  id\n  label\n  __typename\n}\n\nfragment Measurement on Measurement {\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nfragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment Relation on Relation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}\n\nfragment StructureRelation on StructureRelation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Node on Node {\n  ...BaseNode\n  ...Entity\n  ...Structure\n  ...Metric\n  ...Reagent\n  __typename\n}\n\nfragment Column on Column {\n  name\n  kind\n  valueKind\n  label\n  description\n  category\n  searchable\n  idfor\n  preferhidden\n  __typename\n}\n\nfragment Edge on Edge {\n  ...BaseEdge\n  ...Measurement\n  ...Relation\n  ...Participant\n  ...StructureRelation\n  __typename\n}\n\nfragment ListScatterPlot on ScatterPlot {\n  id\n  name\n  xColumn\n  yColumn\n  __typename\n}\n\nfragment Pairs on Pairs {\n  pairs {\n    source {\n      ... on Structure {\n        identifier\n        object\n      }\n      __typename\n    }\n    target {\n      ... on Structure {\n        identifier\n        object\n      }\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nfragment Table on Table {\n  graph {\n    ageName\n    __typename\n  }\n  rows\n  columns {\n    ...Column\n    __typename\n  }\n  __typename\n}\n\nfragment Path on Path {\n  nodes {\n    ...Node\n    __typename\n  }\n  edges {\n    ...Edge\n    __typename\n  }\n  __typename\n}\n\nfragment GraphQuery on GraphQuery {\n  id\n  query\n  name\n  graph {\n    id\n    name\n    __typename\n  }\n  scatterPlots(pagination: {limit: 1}) {\n    ...ListScatterPlot\n    __typename\n  }\n  render {\n    ...Path\n    ...Pairs\n    ...Table\n    __typename\n  }\n  pinned\n  __typename\n}\n\nquery ListPrerenderedGraphQueries($filters: GraphQueryFilter, $pagination: OffsetPaginationInput) {\n  graphQueries(filters: $filters, pagination: $pagination) {\n    ...GraphQuery\n    __typename\n  }\n}"
+        document = "fragment BaseNode on Node {\n  id\n  label\n  __typename\n}\n\nfragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nfragment Participant on Participant {\n  role\n  quantity\n  __typename\n}\n\nfragment BaseEdge on Edge {\n  id\n  leftId\n  rightId\n  __typename\n}\n\nfragment StructureRelation on StructureRelation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Reagent on Reagent {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  externalId\n  label\n  __typename\n}\n\nfragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}\n\nfragment Measurement on Measurement {\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Relation on Relation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Edge on Edge {\n  ...BaseEdge\n  ...Measurement\n  ...Relation\n  ...Participant\n  ...StructureRelation\n  __typename\n}\n\nfragment Node on Node {\n  ...BaseNode\n  ...Entity\n  ...Structure\n  ...Metric\n  ...Reagent\n  __typename\n}\n\nfragment Column on Column {\n  name\n  kind\n  valueKind\n  label\n  description\n  category\n  searchable\n  idfor\n  preferhidden\n  __typename\n}\n\nfragment ListScatterPlot on ScatterPlot {\n  id\n  name\n  xColumn\n  yColumn\n  __typename\n}\n\nfragment Table on Table {\n  graph {\n    ageName\n    __typename\n  }\n  rows\n  columns {\n    ...Column\n    __typename\n  }\n  __typename\n}\n\nfragment Path on Path {\n  nodes {\n    ...Node\n    __typename\n  }\n  edges {\n    ...Edge\n    __typename\n  }\n  __typename\n}\n\nfragment Pairs on Pairs {\n  pairs {\n    source {\n      ... on Structure {\n        identifier\n        object\n      }\n      __typename\n    }\n    target {\n      ... on Structure {\n        identifier\n        object\n      }\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nfragment GraphQuery on GraphQuery {\n  id\n  query\n  name\n  graph {\n    id\n    name\n    __typename\n  }\n  scatterPlots(pagination: {limit: 1}) {\n    ...ListScatterPlot\n    __typename\n  }\n  render {\n    ...Path\n    ...Pairs\n    ...Table\n    __typename\n  }\n  pinned\n  __typename\n}\n\nquery ListPrerenderedGraphQueries($filters: GraphQueryFilter, $pagination: OffsetPaginationInput) {\n  graphQueries(filters: $filters, pagination: $pagination) {\n    ...GraphQuery\n    __typename\n  }\n}"
 
 
 class GetMeasurementQuery(BaseModel):
@@ -5211,7 +5624,7 @@ class GetMeasurmentCategoryQuery(BaseModel):
     class Meta:
         """Meta class for GetMeasurmentCategory"""
 
-        document = "fragment BaseEdgeCategory on EdgeCategory {\n  id\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment MeasurementCategory on MeasurementCategory {\n  ...BaseCategory\n  ...BaseEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  __typename\n}\n\nquery GetMeasurmentCategory($id: ID!) {\n  measurementCategory(id: $id) {\n    ...MeasurementCategory\n    __typename\n  }\n}"
+        document = "fragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment BaseEdgeCategory on EdgeCategory {\n  id\n  __typename\n}\n\nfragment MeasurementCategory on MeasurementCategory {\n  ...BaseCategory\n  ...BaseEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  __typename\n}\n\nquery GetMeasurmentCategory($id: ID!) {\n  measurementCategory(id: $id) {\n    ...MeasurementCategory\n    __typename\n  }\n}"
 
 
 class SearchMeasurmentCategoryQueryOptions(MeasurementCategoryTrait, BaseModel):
@@ -5264,7 +5677,7 @@ class ListMeasurmentCategoryQuery(BaseModel):
     class Meta:
         """Meta class for ListMeasurmentCategory"""
 
-        document = "fragment BaseListCategory on BaseCategory {\n  id\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  tags {\n    id\n    value\n    __typename\n  }\n  __typename\n}\n\nfragment BaseListEdgeCategory on EdgeCategory {\n  id\n  __typename\n}\n\nfragment ListMeasurementCategory on MeasurementCategory {\n  ...BaseListCategory\n  ...BaseListEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  label\n  __typename\n}\n\nquery ListMeasurmentCategory($filters: MeasurementCategoryFilter, $pagination: OffsetPaginationInput) {\n  measurementCategories(filters: $filters, pagination: $pagination) {\n    ...ListMeasurementCategory\n    __typename\n  }\n}"
+        document = "fragment BaseListEdgeCategory on EdgeCategory {\n  id\n  __typename\n}\n\nfragment BaseListCategory on BaseCategory {\n  id\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  tags {\n    id\n    value\n    __typename\n  }\n  __typename\n}\n\nfragment ListMeasurementCategory on MeasurementCategory {\n  ...BaseListCategory\n  ...BaseListEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  label\n  __typename\n}\n\nquery ListMeasurmentCategory($filters: MeasurementCategoryFilter, $pagination: OffsetPaginationInput) {\n  measurementCategories(filters: $filters, pagination: $pagination) {\n    ...ListMeasurementCategory\n    __typename\n  }\n}"
 
 
 class GetMetricQuery(BaseModel):
@@ -5346,7 +5759,7 @@ class GetMetricCategoryQuery(BaseModel):
     class Meta:
         """Meta class for GetMetricCategory"""
 
-        document = "fragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment MetricCategory on MetricCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  metricKind\n  __typename\n}\n\nquery GetMetricCategory($id: ID!) {\n  metricCategory(id: $id) {\n    ...MetricCategory\n    __typename\n  }\n}"
+        document = "fragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment MetricCategory on MetricCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  metricKind\n  __typename\n}\n\nquery GetMetricCategory($id: ID!) {\n  metricCategory(id: $id) {\n    ...MetricCategory\n    __typename\n  }\n}"
 
 
 class SearchMetricCategoryQueryOptions(MetricCategoryTrait, BaseModel):
@@ -5491,7 +5904,7 @@ class GetNaturalEventCategoryQuery(BaseModel):
     class Meta:
         """Meta class for GetNaturalEventCategory"""
 
-        document = "fragment EntityCategoryDefinition on EntityCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment EntityRoleDefinition on EntityRoleDefinition {\n  role\n  categoryDefinition {\n    ...EntityCategoryDefinition\n    __typename\n  }\n  optional\n  allowMultiple\n  __typename\n}\n\nfragment NaturalEventCategory on NaturalEventCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  plateChildren\n  label\n  ageName\n  label\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  __typename\n}\n\nquery GetNaturalEventCategory($id: ID!) {\n  naturalEventCategory(id: $id) {\n    ...NaturalEventCategory\n    __typename\n  }\n}"
+        document = "fragment EntityCategoryDefinition on EntityCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment EntityRoleDefinition on EntityRoleDefinition {\n  role\n  categoryDefinition {\n    ...EntityCategoryDefinition\n    __typename\n  }\n  optional\n  allowMultiple\n  __typename\n}\n\nfragment NaturalEventCategory on NaturalEventCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  plateChildren\n  label\n  ageName\n  label\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  __typename\n}\n\nquery GetNaturalEventCategory($id: ID!) {\n  naturalEventCategory(id: $id) {\n    ...NaturalEventCategory\n    __typename\n  }\n}"
 
 
 class SearchNaturalEventCategoriesQueryOptions(NaturalEventCategoryTrait, BaseModel):
@@ -5544,7 +5957,7 @@ class ListNaturalEventCategoriesQuery(BaseModel):
     class Meta:
         """Meta class for ListNaturalEventCategories"""
 
-        document = "fragment EntityCategoryDefinition on EntityCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment EntityRoleDefinition on EntityRoleDefinition {\n  role\n  categoryDefinition {\n    ...EntityCategoryDefinition\n    __typename\n  }\n  optional\n  allowMultiple\n  __typename\n}\n\nfragment NaturalEventCategory on NaturalEventCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  plateChildren\n  label\n  ageName\n  label\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  __typename\n}\n\nquery ListNaturalEventCategories($filters: NaturalEventCategoryFilter, $pagination: OffsetPaginationInput) {\n  naturalEventCategories(filters: $filters, pagination: $pagination) {\n    ...NaturalEventCategory\n    __typename\n  }\n}"
+        document = "fragment EntityCategoryDefinition on EntityCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment EntityRoleDefinition on EntityRoleDefinition {\n  role\n  categoryDefinition {\n    ...EntityCategoryDefinition\n    __typename\n  }\n  optional\n  allowMultiple\n  __typename\n}\n\nfragment NaturalEventCategory on NaturalEventCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  plateChildren\n  label\n  ageName\n  label\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  __typename\n}\n\nquery ListNaturalEventCategories($filters: NaturalEventCategoryFilter, $pagination: OffsetPaginationInput) {\n  naturalEventCategories(filters: $filters, pagination: $pagination) {\n    ...NaturalEventCategory\n    __typename\n  }\n}"
 
 
 class GetNodeQueryNodeBase(NodeTrait, BaseModel):
@@ -5644,7 +6057,7 @@ class GetNodeQuery(BaseModel):
     class Meta:
         """Meta class for GetNode"""
 
-        document = "fragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nfragment Reagent on Reagent {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  externalId\n  label\n  __typename\n}\n\nfragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}\n\nfragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment BaseNode on Node {\n  id\n  label\n  __typename\n}\n\nfragment Node on Node {\n  ...BaseNode\n  ...Entity\n  ...Structure\n  ...Metric\n  ...Reagent\n  __typename\n}\n\nfragment DetailNode on Node {\n  ...Node\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nquery GetNode($id: ID!) {\n  node(id: $id) {\n    ...DetailNode\n    __typename\n  }\n}"
+        document = "fragment BaseNode on Node {\n  id\n  label\n  __typename\n}\n\nfragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}\n\nfragment Reagent on Reagent {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  externalId\n  label\n  __typename\n}\n\nfragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nfragment Node on Node {\n  ...BaseNode\n  ...Entity\n  ...Structure\n  ...Metric\n  ...Reagent\n  __typename\n}\n\nfragment DetailNode on Node {\n  ...Node\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nquery GetNode($id: ID!) {\n  node(id: $id) {\n    ...DetailNode\n    __typename\n  }\n}"
 
 
 class SearchNodesQueryOptions(EntityTrait, BaseModel):
@@ -5799,7 +6212,7 @@ class NodeCategoriesQuery(BaseModel):
     class Meta:
         """Meta class for NodeCategories"""
 
-        document = "fragment Reagent on Reagent {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  externalId\n  label\n  __typename\n}\n\nfragment BaseEdge on Edge {\n  id\n  leftId\n  rightId\n  __typename\n}\n\nfragment Participant on Participant {\n  role\n  quantity\n  __typename\n}\n\nfragment BaseNode on Node {\n  id\n  label\n  __typename\n}\n\nfragment Measurement on Measurement {\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nfragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment Relation on Relation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}\n\nfragment StructureRelation on StructureRelation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Node on Node {\n  ...BaseNode\n  ...Entity\n  ...Structure\n  ...Metric\n  ...Reagent\n  __typename\n}\n\nfragment Column on Column {\n  name\n  kind\n  valueKind\n  label\n  description\n  category\n  searchable\n  idfor\n  preferhidden\n  __typename\n}\n\nfragment Edge on Edge {\n  ...BaseEdge\n  ...Measurement\n  ...Relation\n  ...Participant\n  ...StructureRelation\n  __typename\n}\n\nfragment EntityCategoryDefinition on EntityCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment Pairs on Pairs {\n  pairs {\n    source {\n      ... on Structure {\n        identifier\n        object\n      }\n      __typename\n    }\n    target {\n      ... on Structure {\n        identifier\n        object\n      }\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nfragment Path on Path {\n  nodes {\n    ...Node\n    __typename\n  }\n  edges {\n    ...Edge\n    __typename\n  }\n  __typename\n}\n\nfragment ReagentCategoryDefinition on ReagentCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment ListScatterPlot on ScatterPlot {\n  id\n  name\n  xColumn\n  yColumn\n  __typename\n}\n\nfragment Table on Table {\n  graph {\n    ageName\n    __typename\n  }\n  rows\n  columns {\n    ...Column\n    __typename\n  }\n  __typename\n}\n\nfragment EntityRoleDefinition on EntityRoleDefinition {\n  role\n  categoryDefinition {\n    ...EntityCategoryDefinition\n    __typename\n  }\n  optional\n  allowMultiple\n  __typename\n}\n\nfragment VariableDefinition on VariableDefinition {\n  param\n  valueKind\n  default\n  optional\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment ReagentRoleDefinition on ReagentRoleDefinition {\n  role\n  categoryDefinition {\n    ...ReagentCategoryDefinition\n    __typename\n  }\n  needsQuantity\n  optional\n  __typename\n}\n\nfragment GraphQuery on GraphQuery {\n  id\n  query\n  name\n  graph {\n    id\n    name\n    __typename\n  }\n  scatterPlots(pagination: {limit: 1}) {\n    ...ListScatterPlot\n    __typename\n  }\n  render {\n    ...Path\n    ...Pairs\n    ...Table\n    __typename\n  }\n  pinned\n  __typename\n}\n\nfragment StructureCategory on StructureCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  identifier\n  __typename\n}\n\nfragment NaturalEventCategory on NaturalEventCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  plateChildren\n  label\n  ageName\n  label\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment EntityCategory on EntityCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  instanceKind\n  ageName\n  label\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  bestQuery {\n    ...GraphQuery\n    __typename\n  }\n  __typename\n}\n\nfragment ReagentCategory on ReagentCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  __typename\n}\n\nfragment MetricCategory on MetricCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  metricKind\n  __typename\n}\n\nfragment ProtocolEventCategory on ProtocolEventCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  plateChildren\n  label\n  ageName\n  label\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  sourceReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  targetReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  variableDefinitions {\n    ...VariableDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment NodeCategory on NodeCategory {\n  ...StructureCategory\n  ...EntityCategory\n  ...ProtocolEventCategory\n  ...NaturalEventCategory\n  ...MetricCategory\n  ...ReagentCategory\n  __typename\n}\n\nquery NodeCategories {\n  nodeCategories {\n    ...NodeCategory\n    __typename\n  }\n}"
+        document = "fragment BaseNode on Node {\n  id\n  label\n  __typename\n}\n\nfragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nfragment Participant on Participant {\n  role\n  quantity\n  __typename\n}\n\nfragment BaseEdge on Edge {\n  id\n  leftId\n  rightId\n  __typename\n}\n\nfragment StructureRelation on StructureRelation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Reagent on Reagent {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  externalId\n  label\n  __typename\n}\n\nfragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}\n\nfragment Measurement on Measurement {\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Relation on Relation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Node on Node {\n  ...BaseNode\n  ...Entity\n  ...Structure\n  ...Metric\n  ...Reagent\n  __typename\n}\n\nfragment Edge on Edge {\n  ...BaseEdge\n  ...Measurement\n  ...Relation\n  ...Participant\n  ...StructureRelation\n  __typename\n}\n\nfragment Column on Column {\n  name\n  kind\n  valueKind\n  label\n  description\n  category\n  searchable\n  idfor\n  preferhidden\n  __typename\n}\n\nfragment ListScatterPlot on ScatterPlot {\n  id\n  name\n  xColumn\n  yColumn\n  __typename\n}\n\nfragment Path on Path {\n  nodes {\n    ...Node\n    __typename\n  }\n  edges {\n    ...Edge\n    __typename\n  }\n  __typename\n}\n\nfragment Pairs on Pairs {\n  pairs {\n    source {\n      ... on Structure {\n        identifier\n        object\n      }\n      __typename\n    }\n    target {\n      ... on Structure {\n        identifier\n        object\n      }\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nfragment Table on Table {\n  graph {\n    ageName\n    __typename\n  }\n  rows\n  columns {\n    ...Column\n    __typename\n  }\n  __typename\n}\n\nfragment ReagentCategoryDefinition on ReagentCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment EntityCategoryDefinition on EntityCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment EntityRoleDefinition on EntityRoleDefinition {\n  role\n  categoryDefinition {\n    ...EntityCategoryDefinition\n    __typename\n  }\n  optional\n  allowMultiple\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment GraphQuery on GraphQuery {\n  id\n  query\n  name\n  graph {\n    id\n    name\n    __typename\n  }\n  scatterPlots(pagination: {limit: 1}) {\n    ...ListScatterPlot\n    __typename\n  }\n  render {\n    ...Path\n    ...Pairs\n    ...Table\n    __typename\n  }\n  pinned\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment ReagentRoleDefinition on ReagentRoleDefinition {\n  role\n  categoryDefinition {\n    ...ReagentCategoryDefinition\n    __typename\n  }\n  needsQuantity\n  optional\n  __typename\n}\n\nfragment VariableDefinition on VariableDefinition {\n  param\n  valueKind\n  default\n  optional\n  __typename\n}\n\nfragment MetricCategory on MetricCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  metricKind\n  __typename\n}\n\nfragment ReagentCategory on ReagentCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  __typename\n}\n\nfragment StructureCategory on StructureCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  identifier\n  __typename\n}\n\nfragment NaturalEventCategory on NaturalEventCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  plateChildren\n  label\n  ageName\n  label\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment EntityCategory on EntityCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  instanceKind\n  ageName\n  label\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  bestQuery {\n    ...GraphQuery\n    __typename\n  }\n  __typename\n}\n\nfragment ProtocolEventCategory on ProtocolEventCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  plateChildren\n  label\n  ageName\n  label\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  sourceReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  targetReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  variableDefinitions {\n    ...VariableDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment NodeCategory on NodeCategory {\n  ...StructureCategory\n  ...EntityCategory\n  ...ProtocolEventCategory\n  ...NaturalEventCategory\n  ...MetricCategory\n  ...ReagentCategory\n  __typename\n}\n\nquery NodeCategories {\n  nodeCategories {\n    ...NodeCategory\n    __typename\n  }\n}"
 
 
 class GetNodeQueryQuery(BaseModel):
@@ -5835,7 +6248,7 @@ class RenderNodeQueryQuery(BaseModel):
     class Meta:
         """Meta class for RenderNodeQuery"""
 
-        document = "fragment Measurement on Measurement {\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nfragment Relation on Relation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Reagent on Reagent {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  externalId\n  label\n  __typename\n}\n\nfragment BaseEdge on Edge {\n  id\n  leftId\n  rightId\n  __typename\n}\n\nfragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}\n\nfragment StructureRelation on StructureRelation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Participant on Participant {\n  role\n  quantity\n  __typename\n}\n\nfragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment BaseNode on Node {\n  id\n  label\n  __typename\n}\n\nfragment Node on Node {\n  ...BaseNode\n  ...Entity\n  ...Structure\n  ...Metric\n  ...Reagent\n  __typename\n}\n\nfragment Column on Column {\n  name\n  kind\n  valueKind\n  label\n  description\n  category\n  searchable\n  idfor\n  preferhidden\n  __typename\n}\n\nfragment Edge on Edge {\n  ...BaseEdge\n  ...Measurement\n  ...Relation\n  ...Participant\n  ...StructureRelation\n  __typename\n}\n\nfragment Path on Path {\n  nodes {\n    ...Node\n    __typename\n  }\n  edges {\n    ...Edge\n    __typename\n  }\n  __typename\n}\n\nfragment Table on Table {\n  graph {\n    ageName\n    __typename\n  }\n  rows\n  columns {\n    ...Column\n    __typename\n  }\n  __typename\n}\n\nfragment Pairs on Pairs {\n  pairs {\n    source {\n      ... on Structure {\n        identifier\n        object\n      }\n      __typename\n    }\n    target {\n      ... on Structure {\n        identifier\n        object\n      }\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nquery RenderNodeQuery($id: ID!, $nodeId: ID!) {\n  renderNodeQuery(id: $id, nodeId: $nodeId) {\n    ...Path\n    ...Table\n    ...Pairs\n    __typename\n  }\n}"
+        document = "fragment BaseEdge on Edge {\n  id\n  leftId\n  rightId\n  __typename\n}\n\nfragment StructureRelation on StructureRelation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNode on Node {\n  id\n  label\n  __typename\n}\n\nfragment Entity on Entity {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  label\n  __typename\n}\n\nfragment Structure on Structure {\n  id\n  object\n  identifier\n  __typename\n}\n\nfragment Reagent on Reagent {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  externalId\n  label\n  __typename\n}\n\nfragment Measurement on Measurement {\n  validFrom\n  validTo\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Metric on Metric {\n  id\n  category {\n    id\n    label\n    __typename\n  }\n  value\n  __typename\n}\n\nfragment Participant on Participant {\n  role\n  quantity\n  __typename\n}\n\nfragment Relation on Relation {\n  category {\n    id\n    label\n    __typename\n  }\n  __typename\n}\n\nfragment Edge on Edge {\n  ...BaseEdge\n  ...Measurement\n  ...Relation\n  ...Participant\n  ...StructureRelation\n  __typename\n}\n\nfragment Node on Node {\n  ...BaseNode\n  ...Entity\n  ...Structure\n  ...Metric\n  ...Reagent\n  __typename\n}\n\nfragment Column on Column {\n  name\n  kind\n  valueKind\n  label\n  description\n  category\n  searchable\n  idfor\n  preferhidden\n  __typename\n}\n\nfragment Table on Table {\n  graph {\n    ageName\n    __typename\n  }\n  rows\n  columns {\n    ...Column\n    __typename\n  }\n  __typename\n}\n\nfragment Path on Path {\n  nodes {\n    ...Node\n    __typename\n  }\n  edges {\n    ...Edge\n    __typename\n  }\n  __typename\n}\n\nfragment Pairs on Pairs {\n  pairs {\n    source {\n      ... on Structure {\n        identifier\n        object\n      }\n      __typename\n    }\n    target {\n      ... on Structure {\n        identifier\n        object\n      }\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nquery RenderNodeQuery($id: ID!, $nodeId: ID!) {\n  renderNodeQuery(id: $id, nodeId: $nodeId) {\n    ...Path\n    ...Table\n    ...Pairs\n    __typename\n  }\n}"
 
 
 class SearchNodeQueriesQueryOptions(BaseModel):
@@ -5997,7 +6410,7 @@ class GetProtocolEventCategoryQuery(BaseModel):
     class Meta:
         """Meta class for GetProtocolEventCategory"""
 
-        document = "fragment EntityCategoryDefinition on EntityCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment ReagentCategoryDefinition on ReagentCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment EntityRoleDefinition on EntityRoleDefinition {\n  role\n  categoryDefinition {\n    ...EntityCategoryDefinition\n    __typename\n  }\n  optional\n  allowMultiple\n  __typename\n}\n\nfragment VariableDefinition on VariableDefinition {\n  param\n  valueKind\n  default\n  optional\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment ReagentRoleDefinition on ReagentRoleDefinition {\n  role\n  categoryDefinition {\n    ...ReagentCategoryDefinition\n    __typename\n  }\n  needsQuantity\n  optional\n  __typename\n}\n\nfragment ProtocolEventCategory on ProtocolEventCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  plateChildren\n  label\n  ageName\n  label\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  sourceReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  targetReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  variableDefinitions {\n    ...VariableDefinition\n    __typename\n  }\n  __typename\n}\n\nquery GetProtocolEventCategory($id: ID!) {\n  protocolEventCategory(id: $id) {\n    ...ProtocolEventCategory\n    __typename\n  }\n}"
+        document = "fragment EntityCategoryDefinition on EntityCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment ReagentCategoryDefinition on ReagentCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment EntityRoleDefinition on EntityRoleDefinition {\n  role\n  categoryDefinition {\n    ...EntityCategoryDefinition\n    __typename\n  }\n  optional\n  allowMultiple\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment ReagentRoleDefinition on ReagentRoleDefinition {\n  role\n  categoryDefinition {\n    ...ReagentCategoryDefinition\n    __typename\n  }\n  needsQuantity\n  optional\n  __typename\n}\n\nfragment VariableDefinition on VariableDefinition {\n  param\n  valueKind\n  default\n  optional\n  __typename\n}\n\nfragment ProtocolEventCategory on ProtocolEventCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  plateChildren\n  label\n  ageName\n  label\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  sourceReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  targetReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  variableDefinitions {\n    ...VariableDefinition\n    __typename\n  }\n  __typename\n}\n\nquery GetProtocolEventCategory($id: ID!) {\n  protocolEventCategory(id: $id) {\n    ...ProtocolEventCategory\n    __typename\n  }\n}"
 
 
 class SearchProtocolEventCategoriesQueryOptions(ProtocolEventCategoryTrait, BaseModel):
@@ -6050,7 +6463,7 @@ class ListProtocolEventCategoriesQuery(BaseModel):
     class Meta:
         """Meta class for ListProtocolEventCategories"""
 
-        document = "fragment EntityCategoryDefinition on EntityCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment ReagentCategoryDefinition on ReagentCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment EntityRoleDefinition on EntityRoleDefinition {\n  role\n  categoryDefinition {\n    ...EntityCategoryDefinition\n    __typename\n  }\n  optional\n  allowMultiple\n  __typename\n}\n\nfragment VariableDefinition on VariableDefinition {\n  param\n  valueKind\n  default\n  optional\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment ReagentRoleDefinition on ReagentRoleDefinition {\n  role\n  categoryDefinition {\n    ...ReagentCategoryDefinition\n    __typename\n  }\n  needsQuantity\n  optional\n  __typename\n}\n\nfragment ProtocolEventCategory on ProtocolEventCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  plateChildren\n  label\n  ageName\n  label\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  sourceReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  targetReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  variableDefinitions {\n    ...VariableDefinition\n    __typename\n  }\n  __typename\n}\n\nquery ListProtocolEventCategories($filters: ProtocolEventCategoryFilter, $pagination: OffsetPaginationInput) {\n  protocolEventCategories(filters: $filters, pagination: $pagination) {\n    ...ProtocolEventCategory\n    __typename\n  }\n}"
+        document = "fragment EntityCategoryDefinition on EntityCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment ReagentCategoryDefinition on ReagentCategoryDefinition {\n  tagFilters\n  categoryFilters\n  __typename\n}\n\nfragment EntityRoleDefinition on EntityRoleDefinition {\n  role\n  categoryDefinition {\n    ...EntityCategoryDefinition\n    __typename\n  }\n  optional\n  allowMultiple\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment ReagentRoleDefinition on ReagentRoleDefinition {\n  role\n  categoryDefinition {\n    ...ReagentCategoryDefinition\n    __typename\n  }\n  needsQuantity\n  optional\n  __typename\n}\n\nfragment VariableDefinition on VariableDefinition {\n  param\n  valueKind\n  default\n  optional\n  __typename\n}\n\nfragment ProtocolEventCategory on ProtocolEventCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  plateChildren\n  label\n  ageName\n  label\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  sourceEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  targetEntityRoles {\n    ...EntityRoleDefinition\n    __typename\n  }\n  sourceReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  targetReagentRoles {\n    ...ReagentRoleDefinition\n    __typename\n  }\n  variableDefinitions {\n    ...VariableDefinition\n    __typename\n  }\n  __typename\n}\n\nquery ListProtocolEventCategories($filters: ProtocolEventCategoryFilter, $pagination: OffsetPaginationInput) {\n  protocolEventCategories(filters: $filters, pagination: $pagination) {\n    ...ProtocolEventCategory\n    __typename\n  }\n}"
 
 
 class GetReagentQuery(BaseModel):
@@ -6133,7 +6546,7 @@ class GetReagentCategoryQuery(BaseModel):
     class Meta:
         """Meta class for GetReagentCategory"""
 
-        document = "fragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment ReagentCategory on ReagentCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  __typename\n}\n\nquery GetReagentCategory($id: ID!) {\n  reagentCategory(id: $id) {\n    ...ReagentCategory\n    __typename\n  }\n}"
+        document = "fragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment ReagentCategory on ReagentCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  __typename\n}\n\nquery GetReagentCategory($id: ID!) {\n  reagentCategory(id: $id) {\n    ...ReagentCategory\n    __typename\n  }\n}"
 
 
 class SearchReagentCategoryQueryOptions(ReagentCategoryTrait, BaseModel):
@@ -6186,7 +6599,7 @@ class ListReagentCategoryQuery(BaseModel):
     class Meta:
         """Meta class for ListReagentCategory"""
 
-        document = "fragment BaseListCategory on BaseCategory {\n  id\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  tags {\n    id\n    value\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment ListReagentCategory on ReagentCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  instanceKind\n  label\n  __typename\n}\n\nquery ListReagentCategory($filters: ReagentCategoryFilter, $pagination: OffsetPaginationInput) {\n  reagentCategories(filters: $filters, pagination: $pagination) {\n    ...ListReagentCategory\n    __typename\n  }\n}"
+        document = "fragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment BaseListCategory on BaseCategory {\n  id\n  description\n  store {\n    presignedUrl\n    __typename\n  }\n  tags {\n    id\n    value\n    __typename\n  }\n  __typename\n}\n\nfragment ListReagentCategory on ReagentCategory {\n  ...BaseListCategory\n  ...BaseNodeCategory\n  instanceKind\n  label\n  __typename\n}\n\nquery ListReagentCategory($filters: ReagentCategoryFilter, $pagination: OffsetPaginationInput) {\n  reagentCategories(filters: $filters, pagination: $pagination) {\n    ...ListReagentCategory\n    __typename\n  }\n}"
 
 
 class GetRelationQuery(BaseModel):
@@ -6255,7 +6668,7 @@ class GetRelationCategoryQuery(BaseModel):
     class Meta:
         """Meta class for GetRelationCategory"""
 
-        document = "fragment BaseEdgeCategory on EdgeCategory {\n  id\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment RelationCategory on RelationCategory {\n  ...BaseCategory\n  ...BaseEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  __typename\n}\n\nquery GetRelationCategory($id: ID!) {\n  relationCategory(id: $id) {\n    ...RelationCategory\n    __typename\n  }\n}"
+        document = "fragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment BaseEdgeCategory on EdgeCategory {\n  id\n  __typename\n}\n\nfragment RelationCategory on RelationCategory {\n  ...BaseCategory\n  ...BaseEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  __typename\n}\n\nquery GetRelationCategory($id: ID!) {\n  relationCategory(id: $id) {\n    ...RelationCategory\n    __typename\n  }\n}"
 
 
 class SearchRelationCategoryQueryOptions(RelationCategoryTrait, BaseModel):
@@ -6308,7 +6721,7 @@ class ListRelationCategoryQuery(BaseModel):
     class Meta:
         """Meta class for ListRelationCategory"""
 
-        document = "fragment BaseEdgeCategory on EdgeCategory {\n  id\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment RelationCategory on RelationCategory {\n  ...BaseCategory\n  ...BaseEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  __typename\n}\n\nquery ListRelationCategory($filters: RelationCategoryFilter, $pagination: OffsetPaginationInput) {\n  relationCategories(filters: $filters, pagination: $pagination) {\n    ...RelationCategory\n    __typename\n  }\n}"
+        document = "fragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment BaseEdgeCategory on EdgeCategory {\n  id\n  __typename\n}\n\nfragment RelationCategory on RelationCategory {\n  ...BaseCategory\n  ...BaseEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  __typename\n}\n\nquery ListRelationCategory($filters: RelationCategoryFilter, $pagination: OffsetPaginationInput) {\n  relationCategories(filters: $filters, pagination: $pagination) {\n    ...RelationCategory\n    __typename\n  }\n}"
 
 
 class GetStructureQuery(BaseModel):
@@ -6409,7 +6822,7 @@ class GetStructureCategoryQuery(BaseModel):
     class Meta:
         """Meta class for GetStructureCategory"""
 
-        document = "fragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment StructureCategory on StructureCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  identifier\n  __typename\n}\n\nquery GetStructureCategory($id: ID!) {\n  structureCategory(id: $id) {\n    ...StructureCategory\n    __typename\n  }\n}"
+        document = "fragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment StructureCategory on StructureCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  identifier\n  __typename\n}\n\nquery GetStructureCategory($id: ID!) {\n  structureCategory(id: $id) {\n    ...StructureCategory\n    __typename\n  }\n}"
 
 
 class SearchStructureCategoryQueryOptions(StructureCategoryTrait, BaseModel):
@@ -6462,7 +6875,7 @@ class ListStructureCategoryQuery(BaseModel):
     class Meta:
         """Meta class for ListStructureCategory"""
 
-        document = "fragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment StructureCategory on StructureCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  identifier\n  __typename\n}\n\nquery ListStructureCategory($filters: StructureCategoryFilter, $pagination: OffsetPaginationInput) {\n  structureCategories(filters: $filters, pagination: $pagination) {\n    ...StructureCategory\n    __typename\n  }\n}"
+        document = "fragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment BaseNodeCategory on NodeCategory {\n  id\n  positionX\n  positionY\n  width\n  height\n  __typename\n}\n\nfragment StructureCategory on StructureCategory {\n  ...BaseCategory\n  ...BaseNodeCategory\n  identifier\n  __typename\n}\n\nquery ListStructureCategory($filters: StructureCategoryFilter, $pagination: OffsetPaginationInput) {\n  structureCategories(filters: $filters, pagination: $pagination) {\n    ...StructureCategory\n    __typename\n  }\n}"
 
 
 class GetStructureRelationCategoryQuery(BaseModel):
@@ -6481,7 +6894,7 @@ class GetStructureRelationCategoryQuery(BaseModel):
     class Meta:
         """Meta class for GetStructureRelationCategory"""
 
-        document = "fragment BaseEdgeCategory on EdgeCategory {\n  id\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment StructureRelationCategory on StructureRelationCategory {\n  ...BaseCategory\n  ...BaseEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  __typename\n}\n\nquery GetStructureRelationCategory($id: ID!) {\n  structureRelationCategory(id: $id) {\n    ...StructureRelationCategory\n    __typename\n  }\n}"
+        document = "fragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment BaseEdgeCategory on EdgeCategory {\n  id\n  __typename\n}\n\nfragment StructureRelationCategory on StructureRelationCategory {\n  ...BaseCategory\n  ...BaseEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  __typename\n}\n\nquery GetStructureRelationCategory($id: ID!) {\n  structureRelationCategory(id: $id) {\n    ...StructureRelationCategory\n    __typename\n  }\n}"
 
 
 class SearchStructureRelationCategoryQueryOptions(
@@ -6536,7 +6949,7 @@ class ListStructureRelationCategoryQuery(BaseModel):
     class Meta:
         """Meta class for ListStructureRelationCategory"""
 
-        document = "fragment BaseEdgeCategory on EdgeCategory {\n  id\n  __typename\n}\n\nfragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment StructureRelationCategory on StructureRelationCategory {\n  ...BaseCategory\n  ...BaseEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  __typename\n}\n\nquery ListStructureRelationCategory($filters: StructureRelationCategoryFilter, $pagination: OffsetPaginationInput) {\n  structureRelationCategories(filters: $filters, pagination: $pagination) {\n    ...StructureRelationCategory\n    __typename\n  }\n}"
+        document = "fragment BaseCategory on BaseCategory {\n  id\n  graph {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment BaseEdgeCategory on EdgeCategory {\n  id\n  __typename\n}\n\nfragment StructureRelationCategory on StructureRelationCategory {\n  ...BaseCategory\n  ...BaseEdgeCategory\n  sourceDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  targetDefinition {\n    tagFilters\n    categoryFilters\n    __typename\n  }\n  __typename\n}\n\nquery ListStructureRelationCategory($filters: StructureRelationCategoryFilter, $pagination: OffsetPaginationInput) {\n  structureRelationCategories(filters: $filters, pagination: $pagination) {\n    ...StructureRelationCategory\n    __typename\n  }\n}"
 
 
 class SearchTagsQueryOptions(BaseModel):
@@ -7927,6 +8340,90 @@ def create_metric(
         },
         rath=rath,
     ).create_metric
+
+
+async def acreate_structure_metric(
+    structure: StructureString,
+    label: str,
+    metric_kind: MetricKind,
+    value: Any,
+    graph: IDCoercible,
+    description: Optional[str] = None,
+    rath: Optional[KraphRath] = None,
+) -> Metric:
+    """CreateStructureMetric
+
+    Create a new structure metric
+
+    Args:
+        structure: The `StructureString` scalar type represents a string with a structure (required)
+        label: The name of the measurement
+        description: The description of the measurement
+        metric_kind: The kind of the metric
+        value: The value of the measurement
+        graph: The `ID` scalar type represents a unique identifier, often used to refetch an object or as key for a cache. The ID type appears in a JSON response as a String; however, it is not intended to be human-readable. When expected as an input type, any string (such as `"4"`) or integer (such as `4`) input value will be accepted as an ID. (required)
+        rath (kraph.rath.KraphRath, optional): The mikro rath client
+
+    Returns:
+        Metric
+    """
+    return (
+        await aexecute(
+            CreateStructureMetricMutation,
+            {
+                "input": {
+                    "structure": structure,
+                    "label": label,
+                    "description": description,
+                    "metricKind": metric_kind,
+                    "value": value,
+                    "graph": graph,
+                }
+            },
+            rath=rath,
+        )
+    ).create_structure_metric
+
+
+def create_structure_metric(
+    structure: StructureString,
+    label: str,
+    metric_kind: MetricKind,
+    value: Any,
+    graph: IDCoercible,
+    description: Optional[str] = None,
+    rath: Optional[KraphRath] = None,
+) -> Metric:
+    """CreateStructureMetric
+
+    Create a new structure metric
+
+    Args:
+        structure: The `StructureString` scalar type represents a string with a structure (required)
+        label: The name of the measurement
+        description: The description of the measurement
+        metric_kind: The kind of the metric
+        value: The value of the measurement
+        graph: The `ID` scalar type represents a unique identifier, often used to refetch an object or as key for a cache. The ID type appears in a JSON response as a String; however, it is not intended to be human-readable. When expected as an input type, any string (such as `"4"`) or integer (such as `4`) input value will be accepted as an ID. (required)
+        rath (kraph.rath.KraphRath, optional): The mikro rath client
+
+    Returns:
+        Metric
+    """
+    return execute(
+        CreateStructureMetricMutation,
+        {
+            "input": {
+                "structure": structure,
+                "label": label,
+                "description": description,
+                "metricKind": metric_kind,
+                "value": value,
+                "graph": graph,
+            }
+        },
+        rath=rath,
+    ).create_structure_metric
 
 
 async def acreate_model(

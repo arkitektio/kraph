@@ -1920,6 +1920,9 @@ type Mutation {
   """Delete an existing expression"""
   deleteEntityCategory(input: DeleteEntityCategoryInput!): ID!
 
+  """Create a new structure metric"""
+  createStructureMetric(input: StructureMetricInput!): Metric!
+
   """Create a new expression"""
   createReagentCategory(input: ReagentCategoryInput!): ReagentCategory!
 
@@ -2600,6 +2603,26 @@ input DeleteEntityCategoryInput {
   id: ID!
 }
 
+input StructureMetricInput {
+  structure: StructureString!
+
+  """The name of the measurement"""
+  label: String!
+
+  """The description of the measurement"""
+  description: String = null
+
+  """The kind of the metric"""
+  metricKind: MetricKind! = FLOAT
+
+  """The value of the measurement"""
+  value: Any!
+  graph: ID!
+}
+
+"""The `StructureString` scalar type represents a string with a structure"""
+scalar StructureString
+
 """Input for creating a new expression"""
 input ReagentCategoryInput {
   """
@@ -3224,9 +3247,6 @@ input StructureInput {
   """The context of the measurement"""
   context: ContextInput = null
 }
-
-"""The `StructureString` scalar type represents a string with a structure"""
-scalar StructureString
 
 """Input type for creating a new model"""
 input CreateModelInput {
