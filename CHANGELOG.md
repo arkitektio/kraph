@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.5.0 (2025-09-14)
+
+### Features
+
+- Add metric support
+  ([`cbd039a`](https://github.com/arkitektio/kraph/commit/cbd039a136d308c0c5401e7319b57a23d278f08f))
+
+
 ## v0.4.0 (2025-08-22)
 
 ### Features
