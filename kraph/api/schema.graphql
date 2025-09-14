@@ -3,6 +3,15 @@ A Entity is a recorded data point in a graph. It can measure a property of an en
 """
 type Entity implements Node {
   """The unique identifier of the entity within its graph"""
+  pinned: Boolean!
+
+  """The unique identifier of the entity within its graph"""
+  pinnedBy: [User!]!
+
+  """The tags associated with this entity. Currently not implemented   """
+  tags: [Tag!]
+
+  """The unique identifier of the entity within its graph"""
   externalId: String
 
   """The unique identifier of the entity within its graph"""
@@ -40,6 +49,32 @@ type Entity implements Node {
 
   """Subjectable to"""
   targetableBy: [PlayableEntityRoleInProtocolEvent!]!
+
+  """Measurements that this entity is involved in"""
+  measuredBy: [Measurement!]!
+
+  """Measurements that this entity is involved in"""
+  subjectedTo: [Participant!]!
+
+  """Measurements that this entity is involved in"""
+  targetedBy: [Participant!]!
+}
+
+type User {
+  sub: String!
+  preferredUsername: String!
+  activeOrganization: Organization
+}
+
+type Organization {
+  id: String!
+  slug: String!
+}
+
+"""A tag is a label that can be assigned to entities and relations."""
+type Tag {
+  id: ID!
+  value: String!
 }
 
 """A view of a node entities and relations."""
@@ -70,6 +105,9 @@ type Graph {
   name: String!
   description: String
   ageName: String!
+
+  """The media store that contains the image for this graph"""
+  store: MediaStore
 
   """The list of metric expressions defined in this ontology"""
   nodeQueries(filters: NodeQueryFilter, pagination: OffsetPaginationInput): [NodeQuery!]!
@@ -109,6 +147,14 @@ type Graph {
   pinned: Boolean!
 }
 
+type MediaStore {
+  id: ID!
+  path: String!
+  bucket: String!
+  key: String!
+  presignedUrl(host: String = null): String!
+}
+
 input NodeQueryFilter {
   """Filter by list of IDs"""
   ids: [ID!] = null
@@ -139,7 +185,9 @@ type GraphQuery {
   """The list of metric expressions defined in this ontology"""
   scatterPlots(filters: ScatterPlotFilter, pagination: OffsetPaginationInput): [ScatterPlot!]!
   pinned: Boolean!
-  render: PathPairsTable!
+  render: PathPairsTableNodeList!
+  columns: [Column!]!
+  relevantFor: [BaseCategory!]!
 }
 
 """A scatter plot of a table graph, that contains entities and relations."""
@@ -173,7 +221,7 @@ input ScatterPlotFilter {
   DISTINCT: Boolean
 }
 
-union PathPairsTable = Path | Pairs | Table
+union PathPairsTableNodeList = Path | Pairs | Table | NodeList
 
 type Path {
   nodes: [Node!]!
@@ -227,12 +275,15 @@ type Column {
   searchable: Boolean
   idfor: [ID!]
   preferhidden: Boolean
+  identifier: String
 }
 
 enum ColumnKind {
   NODE
   VALUE
   EDGE
+  STRUCTURE
+  USER
 }
 
 enum MetricKind {
@@ -247,6 +298,67 @@ enum MetricKind {
   ONE_D_VECTOR
   FOUR_D_VECTOR
   N_VECTOR
+}
+
+"""A column in a table."""
+type NodeList {
+  """The nodes in the list."""
+  nodes: [Node!]!
+
+  """The graph this list was queried from."""
+  graph: Graph!
+}
+
+interface BaseCategory {
+  """The ontology the expression belongs to."""
+  graph: Graph!
+
+  """A description of the expression."""
+  description: String
+
+  """
+  An image or other media file that can be used to represent the expression.
+  """
+  store: MediaStore
+
+  """The unique identifier of the expression within its graph"""
+  id: ID!
+
+  """The unique identifier of the expression within its graph"""
+  ageName: String!
+  color: [Float!]
+
+  """The kind of expression"""
+  kind: ExpressionKind!
+
+  """The tags that are associated with the expression"""
+  tags: [Tag!]!
+
+  """The unique identifier of the expression within its graph"""
+  purl: String
+
+  """The sequence of the expression within its graph"""
+  sequence: GraphSequence
+  relevantQueries: [GraphQuery!]!
+  relevantNodeQueries: [NodeQuery!]!
+  bestQuery: GraphQuery
+  pinned: Boolean!
+}
+
+enum ExpressionKind {
+  STRUCTURE
+  MEASUREMENT
+  RELATION
+  ENTITY
+  METRIC
+  RELATION_METRIC
+  CONCEPT
+}
+
+type GraphSequence {
+  graph: Graph!
+  id: ID!
+  categories: [BaseCategory!]!
 }
 
 input GraphQueryFilter {
@@ -317,8 +429,8 @@ type MetricCategory implements NodeCategory & BaseCategory {
   """The kind of metric this expression represents"""
   metricKind: MetricKind!
 
-  """The unique identifier of the expression within its graph"""
-  structureDefinition: StructureCategoryDefinition!
+  """The structure that this metric measures"""
+  structureCategory: StructureCategory!
 }
 
 interface NodeCategory {
@@ -341,72 +453,6 @@ interface NodeCategory {
   color: [Float!]
 }
 
-interface BaseCategory {
-  """The ontology the expression belongs to."""
-  graph: Graph!
-
-  """A description of the expression."""
-  description: String
-
-  """
-  An image or other media file that can be used to represent the expression.
-  """
-  store: MediaStore
-
-  """The unique identifier of the expression within its graph"""
-  id: ID!
-
-  """The unique identifier of the expression within its graph"""
-  ageName: String!
-  color: [Float!]
-
-  """The kind of expression"""
-  kind: ExpressionKind!
-
-  """The tags that are associated with the expression"""
-  tags: [Tag!]!
-
-  """The unique identifier of the expression within its graph"""
-  purl: String
-
-  """The sequence of the expression within its graph"""
-  sequence: GraphSequence
-  relevantQueries: [GraphQuery!]!
-  relevantNodeQueries: [NodeQuery!]!
-  bestQuery: GraphQuery
-  pinned: Boolean!
-}
-
-type MediaStore {
-  id: ID!
-  path: String!
-  bucket: String!
-  key: String!
-  presignedUrl(host: String = null): String!
-}
-
-enum ExpressionKind {
-  STRUCTURE
-  MEASUREMENT
-  RELATION
-  ENTITY
-  METRIC
-  RELATION_METRIC
-  CONCEPT
-}
-
-"""A tag is a label that can be assigned to entities and relations."""
-type Tag {
-  id: ID!
-  value: String!
-}
-
-type GraphSequence {
-  graph: Graph!
-  id: ID!
-  categories: [BaseCategory!]!
-}
-
 input TagFilter {
   """Filter by list of IDs"""
   ids: [ID!] = null
@@ -420,22 +466,6 @@ input TagFilter {
   OR: TagFilter
   NOT: TagFilter
   DISTINCT: Boolean
-}
-
-type StructureCategoryDefinition implements CategoryDefintion {
-  tagFilters: [String!]
-  tagExcludeFilters: [ID!]
-  categoryFilters: [ID!]
-  categoryExcludeFilters: [ID!]
-  matches: [StructureCategory!]!
-  identifierFilters: [StructureIdentifier!]
-}
-
-interface CategoryDefintion {
-  tagFilters: [String!]
-  tagExcludeFilters: [ID!]
-  categoryFilters: [ID!]
-  categoryExcludeFilters: [ID!]
 }
 
 type StructureCategory implements NodeCategory & BaseCategory {
@@ -490,11 +520,6 @@ type StructureCategory implements NodeCategory & BaseCategory {
   """The structure that this class represents"""
   identifier: String!
 }
-
-"""
-The `StructureIdentifier` scalar type represents a identifier of a structure
-"""
-scalar StructureIdentifier
 
 input MetricCategoryFilter {
   ids: [ID!]
@@ -601,6 +626,7 @@ type EntityRoleDefinition {
   label: String
   optional: Boolean!
   currentDefault: Entity
+  createCategory: EntityCategory
 }
 
 type EntityCategoryDefinition implements CategoryDefintion {
@@ -609,6 +635,14 @@ type EntityCategoryDefinition implements CategoryDefintion {
   categoryFilters: [ID!]
   categoryExcludeFilters: [ID!]
   matches: [EntityCategory!]!
+  defaultUseNew: EntityCategory
+}
+
+interface CategoryDefintion {
+  tagFilters: [String!]
+  tagExcludeFilters: [ID!]
+  categoryFilters: [ID!]
+  categoryExcludeFilters: [ID!]
 }
 
 type EntityCategory implements NodeCategory & BaseCategory {
@@ -665,6 +699,7 @@ type EntityCategory implements NodeCategory & BaseCategory {
 
   """The unique identifier of the expression within its graph"""
   instanceKind: InstanceKind!
+  latest(limit: Int = 5): [Entity!]!
 }
 
 enum InstanceKind {
@@ -747,6 +782,7 @@ type ReagentCategory implements NodeCategory & BaseCategory {
 
   """The unique identifier of the expression within its graph"""
   instanceKind: InstanceKind!
+  latest(limit: Int = 5): [Reagent!]!
 }
 
 type VariableDefinition {
@@ -927,6 +963,20 @@ interface EdgeCategory {
   id: ID!
 }
 
+type StructureCategoryDefinition implements CategoryDefintion {
+  tagFilters: [String!]
+  tagExcludeFilters: [ID!]
+  categoryFilters: [ID!]
+  categoryExcludeFilters: [ID!]
+  matches: [StructureCategory!]!
+  identifierFilters: [StructureIdentifier!]
+}
+
+"""
+The `StructureIdentifier` scalar type represents a identifier of a structure
+"""
+scalar StructureIdentifier
+
 input MeasurementCategoryFilter {
   ids: [ID!]
   id: ID
@@ -989,6 +1039,8 @@ input RelationCategoryFilter {
   graph: ID
   ontology: ID
   pinned: Boolean
+  sourceEntity: ID
+  targetEntity: ID
   AND: RelationCategoryFilter
   OR: RelationCategoryFilter
   NOT: RelationCategoryFilter
@@ -1106,6 +1158,8 @@ input GraphPaginationInput {
   offset: Int = 0
 }
 
+union PathPairsTable = Path | Pairs | Table
+
 type NodeQueryView {
   query: NodeQuery!
   render: PathPairsTable!
@@ -1155,13 +1209,27 @@ interface Edge {
   """The unique identifier of the entity within its graph"""
   id: NodeID!
   label: String!
+
+  """The unique identifier of the entity within its graph"""
+  reverseLabel: String!
   leftId: String!
   rightId: String!
   right: Node!
   left: Node!
+  target: Node!
+  source: Node!
 }
 
 interface Node {
+  """The unique identifier of the entity within its graph"""
+  pinned: Boolean!
+
+  """The unique identifier of the entity within its graph"""
+  pinnedBy: [User!]!
+
+  """The tags associated with this entity. Currently not implemented   """
+  tags: [Tag!]
+
   """The unique identifier of the entity within its graph"""
   externalId: String
 
@@ -1197,6 +1265,15 @@ interface Node {
 A Structure is a recorded data point in a graph. It can measure a property of an entity through a direct measurement edge, that connects the entity to the structure. It of course can relate to other structures through relation edges.
 """
 type Structure implements Node {
+  """The unique identifier of the entity within its graph"""
+  pinned: Boolean!
+
+  """The unique identifier of the entity within its graph"""
+  pinnedBy: [User!]!
+
+  """The tags associated with this entity. Currently not implemented   """
+  tags: [Tag!]
+
   """The unique identifier of the entity within its graph"""
   externalId: String
 
@@ -1251,6 +1328,15 @@ A Metric is a recorded data point in a graph. It always describes a structure an
 """
 type Metric implements Node {
   """The unique identifier of the entity within its graph"""
+  pinned: Boolean!
+
+  """The unique identifier of the entity within its graph"""
+  pinnedBy: [User!]!
+
+  """The tags associated with this entity. Currently not implemented   """
+  tags: [Tag!]
+
+  """The unique identifier of the entity within its graph"""
   externalId: String
 
   """The unique identifier of the entity within its graph"""
@@ -1284,13 +1370,22 @@ type Metric implements Node {
   category: MetricCategory!
 
   """The value of the metric"""
-  value: Float!
+  value: String!
 }
 
 """
 A Metric is a recorded data point in a graph. It always describes a structure and through the structure it can bring meaning to the measured entity. It can measure a property of an entity through a direct measurement edge, that connects the entity to the structure. It of course can relate to other structures through relation edges.
 """
 type ProtocolEvent implements Node {
+  """The unique identifier of the entity within its graph"""
+  pinned: Boolean!
+
+  """The unique identifier of the entity within its graph"""
+  pinnedBy: [User!]!
+
+  """The tags associated with this entity. Currently not implemented   """
+  tags: [Tag!]
+
   """The unique identifier of the entity within its graph"""
   externalId: String
 
@@ -1344,6 +1439,15 @@ A Metric is a recorded data point in a graph. It always describes a structure an
 """
 type NaturalEvent implements Node {
   """The unique identifier of the entity within its graph"""
+  pinned: Boolean!
+
+  """The unique identifier of the entity within its graph"""
+  pinnedBy: [User!]!
+
+  """The tags associated with this entity. Currently not implemented   """
+  tags: [Tag!]
+
+  """The unique identifier of the entity within its graph"""
   externalId: String
 
   """The unique identifier of the entity within its graph"""
@@ -1390,16 +1494,21 @@ type Measurement implements Edge {
   """The unique identifier of the entity within its graph"""
   id: NodeID!
   label: String!
+
+  """The unique identifier of the entity within its graph"""
+  reverseLabel: String!
   leftId: String!
   rightId: String!
   right: Node!
   left: Node!
+  target: Node!
+  source: Node!
 
   """Timestamp from when this entity is valid"""
-  validFrom: DateTime!
+  validFrom: DateTime
 
   """Timestamp until when this entity is valid"""
-  validTo: DateTime!
+  validTo: DateTime
 
   """When this entity was created"""
   createdAt: DateTime!
@@ -1411,10 +1520,15 @@ type Relation implements Edge {
   """The unique identifier of the entity within its graph"""
   id: NodeID!
   label: String!
+
+  """The unique identifier of the entity within its graph"""
+  reverseLabel: String!
   leftId: String!
   rightId: String!
   right: Node!
   left: Node!
+  target: Node!
+  source: Node!
 
   """Timestamp from when this entity is valid"""
   validFrom: DateTime!
@@ -1432,10 +1546,15 @@ type Participant implements Edge {
   """The unique identifier of the entity within its graph"""
   id: NodeID!
   label: String!
+
+  """The unique identifier of the entity within its graph"""
+  reverseLabel: String!
   leftId: String!
   rightId: String!
   right: Node!
   left: Node!
+  target: Node!
+  source: Node!
 
   """Timestamp from when this entity is valid"""
   quantity: Float
@@ -1448,6 +1567,15 @@ type Participant implements Edge {
 A Entity is a recorded data point in a graph. It can measure a property of an entity through a direct measurement edge, that connects the entity to the structure. It of course can relate to other structures through relation edges.
 """
 type Reagent implements Node {
+  """The unique identifier of the entity within its graph"""
+  pinned: Boolean!
+
+  """The unique identifier of the entity within its graph"""
+  pinnedBy: [User!]!
+
+  """The tags associated with this entity. Currently not implemented   """
+  tags: [Tag!]
+
   """The unique identifier of the entity within its graph"""
   externalId: String
 
@@ -1493,10 +1621,15 @@ type Description implements Edge {
   """The unique identifier of the entity within its graph"""
   id: NodeID!
   label: String!
+
+  """The unique identifier of the entity within its graph"""
+  reverseLabel: String!
   leftId: String!
   rightId: String!
   right: Node!
   left: Node!
+  target: Node!
+  source: Node!
 }
 
 type Query {
@@ -1595,6 +1728,8 @@ type Query {
   measurements(filters: MeasurementFilter = null, pagination: GraphPaginationInput = null): [Measurement!]!
   relation(id: ID!): Relation!
   relations(filters: RelationFilter = null, pagination: GraphPaginationInput = null): [Relation!]!
+  structureRelation(id: ID!): StructureRelation!
+  structureRelations(filters: StructureRelationFilter = null, pagination: GraphPaginationInput = null): [StructureRelation!]!
   participant(id: ID!): Participant!
   participants(filters: ParticipantFilter = null, pagination: GraphPaginationInput = null): [Participant!]!
   graph(id: ID!): Graph!
@@ -1829,6 +1964,56 @@ input RelationFilter {
   rightId: ID = null
 }
 
+"A relation is an edge between two entities. It is a directed edge, that connects two entities and established a relationship\n                 that is not a measurement between them. I.e. when they are an subjective assertion about the entities.\n                 \n                 \n                 \n                 "
+type StructureRelation implements Edge {
+  """The unique identifier of the entity within its graph"""
+  id: NodeID!
+  label: String!
+
+  """The unique identifier of the entity within its graph"""
+  reverseLabel: String!
+  leftId: String!
+  rightId: String!
+  right: Node!
+  left: Node!
+  target: Node!
+  source: Node!
+
+  """Timestamp from when this entity is valid"""
+  validFrom: DateTime
+
+  """Timestamp until when this entity is valid"""
+  validTo: DateTime
+
+  """When this entity was created"""
+  createdAt: DateTime
+  category: StructureRelationCategory!
+}
+
+"""Filter for entity relations in the graph"""
+input StructureRelationFilter {
+  """Filter by graph ID"""
+  graph: ID = null
+
+  """Filter by relation kind"""
+  kind: ID = null
+
+  """Filter by list of relation IDs"""
+  ids: [ID!] = null
+
+  """Search relations by text"""
+  search: String = null
+
+  """Include self-relations"""
+  withSelf: Boolean = null
+
+  """Filter by left entity ID"""
+  leftId: ID = null
+
+  """Filter by right entity ID"""
+  rightId: ID = null
+}
+
 """Filter for entity relations in the graph"""
 input ParticipantFilter {
   """Filter by graph ID"""
@@ -1980,8 +2165,14 @@ type Mutation {
   """Create a new metric for an entity"""
   createMetric(input: MetricInput!): Metric!
 
+  """Update an existing entity"""
+  updateEntity(input: UpdateEntityInput!): Entity!
+
   """Create a new structure"""
   createStructure(input: StructureInput!): Structure!
+
+  """Create a new tag"""
+  createTag(input: TagInput!): Tag!
 
   """Create a new model"""
   createModel(input: CreateModelInput!): Model!
@@ -2003,6 +2194,9 @@ type Mutation {
 
   """Create a new graph query"""
   createGraphQuery(input: GraphQueryInput!): GraphQuery!
+
+  """Update an existing graph query"""
+  updateGraphQuery(input: UpdateGraphQueryInput!): GraphQuery!
 
   """Pin or unpin a graph query"""
   pinGraphQuery(input: PinGraphQueryInput!): GraphQuery!
@@ -2132,33 +2326,17 @@ input MetricCategoryInput {
   """An optional width for the ontology node"""
   width: Float = null
 
-  """The structure category for this expression"""
-  structureDefinition: CategoryDefinitionInput!
+  """The structure category that this metric describes"""
+  structureCategory: ID = null
+
+  """The structure identifier within the structure category"""
+  structureIdentifier: StructureIdentifier = null
 
   """The label/name of the expression"""
   label: String!
 
   """The type of metric data this expression represents"""
   kind: MetricKind!
-}
-
-"""Input for creating a new expression"""
-input CategoryDefinitionInput {
-  """A list of classes to filter the entities"""
-  categoryFilters: [ID!] = null
-
-  """A list of tags to filter the entities by"""
-  tagFilters: [String!] = null
-
-  """
-  The default ACTIVE reagent to use for this port if a reagent is not provided
-  """
-  defaultUseActive: ID = null
-
-  """
-  The default creation of entity or reagent to use for this port if a reagent is not provided
-  """
-  defaultUseNew: ID = null
 }
 
 """Input for updating an existing expression"""
@@ -2197,7 +2375,29 @@ input UpdateMetricCategoryInput {
   kind: MetricKind = null
 
   """The structure category for this expression"""
-  structureDefinition: CategoryDefinitionInput = null
+  structureDefinition: StructureCategoryDefinitionInput = null
+}
+
+"""Input for creating a new expression"""
+input StructureCategoryDefinitionInput {
+  """A list of classes to filter the entities"""
+  categoryFilters: [ID!] = null
+
+  """A list of StructureIdentifier to filter the entities"""
+  identifierFilters: [StructureIdentifier!] = null
+
+  """A list of tags to filter the entities by"""
+  tagFilters: [String!] = null
+
+  """
+  The default ACTIVE reagent to use for this port if a reagent is not provided
+  """
+  defaultUseActive: ID = null
+
+  """
+  The default creation of entity or reagent to use for this port if a reagent is not provided
+  """
+  defaultUseNew: ID = null
 }
 
 """Input for deleting an expression"""
@@ -2244,24 +2444,16 @@ input MeasurementCategoryInput {
   structureDefinition: StructureCategoryDefinitionInput!
 
   """The target definition for this expression"""
-  entityDefinition: CategoryDefinitionInput!
+  entityDefinition: EntityCategoryDefinitionInput!
 }
 
 """Input for creating a new expression"""
-input StructureCategoryDefinitionInput {
+input EntityCategoryDefinitionInput {
   """A list of classes to filter the entities"""
   categoryFilters: [ID!] = null
 
-  """A list of StructureIdentifier to filter the entities"""
-  identifierFilters: [StructureIdentifier!] = null
-
   """A list of tags to filter the entities by"""
   tagFilters: [String!] = null
-
-  """
-  The default ACTIVE reagent to use for this port if a reagent is not provided
-  """
-  defaultUseActive: ID = null
 
   """
   The default creation of entity or reagent to use for this port if a reagent is not provided
@@ -2404,10 +2596,10 @@ input RelationCategoryInput {
   label: String!
 
   """The source definition for this expression"""
-  sourceDefinition: CategoryDefinitionInput!
+  sourceDefinition: EntityCategoryDefinitionInput!
 
   """The target definition for this expression"""
-  targetDefinition: CategoryDefinitionInput!
+  targetDefinition: EntityCategoryDefinitionInput!
 }
 
 """Input for updating an existing expression"""
@@ -2503,6 +2695,9 @@ input UpdateStructureRelationCategoryInput {
 
   """New label for the expression"""
   label: String = null
+
+  """The ID of the expression to update"""
+  id: ID!
 }
 
 """Input for deleting an expression"""
@@ -2704,6 +2899,9 @@ input UpdateReagentCategoryInput {
 
   """The ID of the expression to update"""
   id: ID!
+
+  """The label/name of the expression"""
+  label: String = null
 }
 
 """Input for deleting a generic category"""
@@ -2783,7 +2981,7 @@ input EntityRoleDefinitionInput {
   optional: Boolean = false
 
   """The category definition for this expression"""
-  categoryDefinition: CategoryDefinitionInput!
+  categoryDefinition: EntityCategoryDefinitionInput!
 
   """A detailed description of the role"""
   description: String = null
@@ -2793,6 +2991,28 @@ input EntityRoleDefinitionInput {
 
   """Whether this port allows multiple entities or not"""
   allowMultiple: Boolean = false
+
+  """The ID of the category to create an entity for if it doesn't exist"""
+  createCategory: ID = null
+}
+
+"""Input for creating a new expression"""
+input CategoryDefinitionInput {
+  """A list of classes to filter the entities"""
+  categoryFilters: [ID!] = null
+
+  """A list of tags to filter the entities by"""
+  tagFilters: [String!] = null
+
+  """
+  The default ACTIVE reagent category to use for this port if a reagent is not provided
+  """
+  defaultUseActive: ID = null
+
+  """
+  The default creation of entity or reagent to use for this port if a reagent is not provided
+  """
+  defaultUseNew: ID = null
 }
 
 input PlateChildInput {
@@ -2946,7 +3166,7 @@ input ReagentRoleDefinitionInput {
   optional: Boolean = false
 
   """The category definition for this expression"""
-  categoryDefinition: CategoryDefinitionInput!
+  categoryDefinition: ReagentCategoryDefinitionInput!
 
   """A detailed description of the role"""
   description: String = null
@@ -2956,6 +3176,28 @@ input ReagentRoleDefinitionInput {
 
   """Whether this port allows multiple entities or not"""
   allowMultiple: Boolean = false
+
+  """The ID of the category to create a new reagent for if it doesn't exist"""
+  createCategory: ID = null
+}
+
+"""Input for creating a new expression"""
+input ReagentCategoryDefinitionInput {
+  """A list of classes to filter the entities"""
+  categoryFilters: [ID!] = null
+
+  """A list of tags to filter the entities by"""
+  tagFilters: [String!] = null
+
+  """
+  The default ACTIVE reagent category to use for this port if a reagent is not provided
+  """
+  defaultUseActive: ID = null
+
+  """
+  The default creation of entity or reagent to use for this port if a reagent is not provided
+  """
+  defaultUseNew: ID = null
 }
 
 """Input for creating a new expression"""
@@ -3127,6 +3369,7 @@ input RecordProtocolEventInput {
   variables: [VariableMappingInput!] = null
   validFrom: DateTime = null
   validTo: DateTime = null
+  performedBy: ID = null
 }
 
 input VariableMappingInput {
@@ -3193,27 +3436,6 @@ input RelationInput {
   context: ContextInput = null
 }
 
-"A relation is an edge between two entities. It is a directed edge, that connects two entities and established a relationship\n                 that is not a measurement between them. I.e. when they are an subjective assertion about the entities.\n                 \n                 \n                 \n                 "
-type StructureRelation implements Edge {
-  """The unique identifier of the entity within its graph"""
-  id: NodeID!
-  label: String!
-  leftId: String!
-  rightId: String!
-  right: Node!
-  left: Node!
-
-  """Timestamp from when this entity is valid"""
-  validFrom: DateTime!
-
-  """Timestamp until when this entity is valid"""
-  validTo: DateTime!
-
-  """When this entity was created"""
-  createdAt: DateTime!
-  category: StructureRelationCategory!
-}
-
 """Input type for creating a relation between two entities"""
 input StructureRelationInput {
   """ID of the left entity (format: graph:id)"""
@@ -3240,12 +3462,34 @@ input MetricInput {
   context: ContextInput = null
 }
 
+"""Input type for creating a new entity"""
+input UpdateEntityInput {
+  id: ID!
+
+  """Optional name for the entity"""
+  name: String = null
+
+  """An optional external ID for the entity (will upsert if exists)"""
+  externalId: String = null
+
+  """Optional tags for the entity"""
+  tags: [String!] = null
+
+  """Whether the entity should be pinned by this user"""
+  pinned: Boolean = null
+}
+
 input StructureInput {
   structure: StructureString!
   graph: ID!
 
   """The context of the measurement"""
   context: ContextInput = null
+}
+
+input TagInput {
+  value: String!
+  graph: ID!
 }
 
 """Input type for creating a new model"""
@@ -3290,6 +3534,9 @@ input EntityInput {
 
   """An optional external ID for the entity (will upsert if exists)"""
   externalId: String = null
+
+  """Whether the entity should be pinned"""
+  pinned: Boolean = null
 }
 
 input DeleteEntityInput {
@@ -3357,6 +3604,39 @@ input ColumnInput {
   searchable: Boolean = null
   idfor: [ID!] = null
   preferhidden: Boolean = null
+  identifier: String = null
+}
+
+"""Input for updating an existing expression"""
+input UpdateGraphQueryInput {
+  """
+  The ID of the ontology this expression belongs to. If not provided, uses default ontology
+  """
+  graph: ID!
+
+  """The label/name of the expression"""
+  name: String!
+
+  """The label/name of the expression"""
+  query: Cypher!
+
+  """A detailed description of the expression"""
+  description: String = null
+
+  """The kind/type of this expression"""
+  kind: ViewKind!
+
+  """The columns (if ViewKind is Table)"""
+  columns: [ColumnInput!] = null
+
+  """A list of categories where this query is releveant and should be shown"""
+  relevantFor: [ID!] = null
+
+  """Whether to pin this expression for the current user"""
+  pin: Boolean = null
+
+  """The ID of the expression to update"""
+  id: ID!
 }
 
 input PinGraphQueryInput {

@@ -14,6 +14,10 @@ CypherCoercible = str
 """ A custom scalar for wrapping of every supported array like structure on"""
 
 
+StructureStringCoerciblae = str
+""" A custom scalar for wrapping of every supported array like structure on"""
+
+
 class RemoteUpload(str):
     """A custom scalar for wrapping of every supported array like structure on
     the mikro platform. This scalar enables validation of various array formats
@@ -30,7 +34,9 @@ class RemoteUpload(str):
         handler: GetCoreSchemaHandler,  # noqa: ANN401
     ) -> CoreSchema:
         """Get the pydantic core schema for the validator function"""
-        return core_schema.no_info_before_validator_function(cls.validate, handler(object))
+        return core_schema.no_info_before_validator_function(
+            cls.validate, handler(object)
+        )
 
     @classmethod
     def validate(cls, v, *info):
@@ -79,7 +85,9 @@ class NodeID(str):
         if isinstance(v, int):
             return cls(str(v))
 
-        raise TypeError("Needs to be either a instance of BaseModel (with an id) or a string")
+        raise TypeError(
+            "Needs to be either a instance of BaseModel (with an id) or a string"
+        )
 
 
 class StructureIdentifier(str):
@@ -120,7 +128,9 @@ class StructureIdentifier(str):
         if isinstance(v, int):
             return cls(str(v))
 
-        raise TypeError("Needs to be either a instance of BaseModel (with an id) or a string")
+        raise TypeError(
+            "Needs to be either a instance of BaseModel (with an id) or a string"
+        )
 
 
 class StructureString(str):
@@ -158,7 +168,9 @@ class StructureString(str):
         if isinstance(v, int):
             return cls(str(v))
 
-        raise TypeError("Needs to be either a instance of BaseModel (with an id) or a string")
+        raise TypeError(
+            "Needs to be either a instance of BaseModel (with an id) or a string"
+        )
 
 
 class Cypher(str):

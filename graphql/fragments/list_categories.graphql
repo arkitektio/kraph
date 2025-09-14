@@ -1,5 +1,6 @@
 fragment BaseListCategory on BaseCategory {
   id
+  ageName
   description
   store {
     presignedUrl

@@ -1,5 +1,6 @@
 fragment BaseCategory on BaseCategory {
   id
+  ageName
   graph {
     id
     name

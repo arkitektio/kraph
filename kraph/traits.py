@@ -22,6 +22,8 @@ Key Components:
 
 from typing import Self, TypeVar, Optional, Union, Type
 from collections.abc import Iterable
+
+from more_itertools import value_chain
 from koil import unkoil
 from pydantic import BaseModel, field_validator
 from typing import TYPE_CHECKING, Any, List, Optional, Union
@@ -43,6 +45,7 @@ if TYPE_CHECKING:
         StructureCategory,
         MetricKind,
         Structure,
+        EntityCategoryDefinitionInput,
         Metric,
     )
     from rekuest_next.structures.registry import StructureRegistry
@@ -77,9 +80,9 @@ def validate_reagent_category_definition(cls, value):
         >>> validate_reagent_category_definition(None, "class:antibody")
         >>> validate_reagent_category_definition(None, ["tag:primary", "class:antibody"])
     """
-    from kraph.api.schema import CategoryDefinitionInput
+    from kraph.api.schema import ReagentCategoryDefinitionInput
 
-    if isinstance(value, CategoryDefinitionInput):
+    if isinstance(value, ReagentCategoryDefinitionInput):
         return value
 
     tagFilters = []
@@ -108,7 +111,7 @@ def validate_reagent_category_definition(cls, value):
     if not categoryFilters and not tagFilters:
         raise ValueError("You must specify at least one class or tag filter")
 
-    return CategoryDefinitionInput(
+    return ReagentCategoryDefinitionInput(
         categoryFilters=categoryFilters,
         tagFilters=tagFilters,
     )
@@ -122,8 +125,9 @@ CoercibleCategoryDefinitionInput = Union[
 
 
 def validate_entitiy_category_definition(
-    cls, value: list[CoercibleCategoryDefinitionInput] | CoercibleCategoryDefinitionInput
-) -> "CategoryDefinitionInput":
+    cls,
+    value: list[CoercibleCategoryDefinitionInput] | CoercibleCategoryDefinitionInput,
+) -> "EntityCategoryDefinitionInput":
     """
     Validate and normalize entity category definition input.
 
@@ -152,9 +156,9 @@ def validate_entitiy_category_definition(
         >>> validate_entitiy_category_definition(None, "class:protein")
         >>> validate_entitiy_category_definition(None, ["tag:enzyme", "class:protein"])
     """
-    from kraph.api.schema import CategoryDefinitionInput
+    from kraph.api.schema import EntityCategoryDefinitionInput
 
-    if isinstance(value, CategoryDefinitionInput):
+    if isinstance(value, EntityCategoryDefinitionInput):
         return value
 
     tagFilters: list[str] = []
@@ -184,7 +188,7 @@ def validate_entitiy_category_definition(
     if not categoryFilters and not tagFilters:
         raise ValueError("You must specify at least one class or tag filter")
 
-    return CategoryDefinitionInput(
+    return EntityCategoryDefinitionInput(
         categoryFilters=tuple(categoryFilters),
         tagFilters=tuple(tagFilters),
     )
@@ -276,7 +280,9 @@ def validate_structure_category_definition(cls, value):
                 raise e
 
     if not categoryFilters and not tagFilters and not identifierFilters:
-        raise ValueError("You must specify at least one class, identifier or tag filter")
+        raise ValueError(
+            "You must specify at least one class, identifier or tag filter"
+        )
 
     return StructureCategoryDefinitionInput(
         categoryFilters=categoryFilters,
@@ -419,7 +425,9 @@ class MetricWithValue:
             assert other.graph.id == self.metric_category.graph.id, (
                 "Structure and metric must be in the same graph"
             )
-            return create_metric(structure=other, category=self.metric_category, value=self.value)
+            return create_metric(
+                structure=other, category=self.metric_category, value=self.value
+            )
 
         raise NotImplementedError("You can only merge a measurement with a structure")
 
@@ -481,7 +489,9 @@ class MeasurementWithStructureAndValidity:
             )
 
         if isinstance(other, BaseModel):
-            raise NotImplementedError("You can only merge a measurement with a structure")
+            raise NotImplementedError(
+                "You can only merge a measurement with a structure"
+            )
 
         raise NotImplementedError("You can only merge a measurement with a structure")
 
@@ -586,9 +596,11 @@ class IntermediateRelation:
                     f"Source {self.left.category} not in {source.category_filters}"
                 )
             if source.tag_filters:
-                assert self.left.category.id in source.tag_filters, (
-                    f"Source {self.left.category.id} not in {source.tag_filters}"
-                )
+                #
+                # assert self.left.category.t in source.tag_filters, (
+                #    f"Source {self.left.category.id} not in {source.tag_filters}"
+                # )
+                pass
 
             if target.category_filters:
                 assert other.category.id in target.category_filters, (
@@ -596,11 +608,15 @@ class IntermediateRelation:
                 )
 
             if target.tag_filters:
-                assert other.category.id in target.tag_filters, (
-                    f"Target {other.category.id} not in {target.tag_filters}"
-                )
+                #
+                # assert self.left.category.t in source.tag_filters, (
+                #    f"Source {self.left.category.id} not in {source.tag_filters}"
+                # )
+                pass
 
-            return create_relation(source=self.left, target=other, category=self.category)
+            return create_relation(
+                source=self.left, target=other, category=self.category
+            )
 
         raise NotImplementedError("You can only merge a relation with an entity")
 
@@ -845,7 +861,9 @@ class StructureRelationCategoryTrait(BaseModel):
         raise NotImplementedError
 
     def __call__(self, valid_from=None, valid_to=None):
-        return StructureRelationWithValidity(kind=self, valid_from=valid_from, valid_to=valid_to)
+        return StructureRelationWithValidity(
+            kind=self, valid_from=valid_from, valid_to=valid_to
+        )
 
 
 class MeasurementCategoryTrait(BaseModel):
@@ -991,7 +1009,9 @@ class ProtocolEventCategoryTrait(BaseModel):
         entity_targets: list[NodeMapping] = kwargs.get("entity_targets", [])
         reagent_sources: list[NodeMapping] = kwargs.get("reagent_sources", [])
         reagent_targets: list[NodeMapping] = kwargs.get("reagent_targets", [])
-        variable_mappings: list[VariableMappingInput] = kwargs.get("variable_mappings", [])
+        variable_mappings: list[VariableMappingInput] = kwargs.get(
+            "variable_mappings", []
+        )
 
         validated_entity_sources = []
         validated_entity_targets = []
@@ -1009,7 +1029,9 @@ class ProtocolEventCategoryTrait(BaseModel):
                 elif i.role in kwargs:
                     passed_value = kwargs.pop(i.role)
                     assert_is_reagent_or_id(passed_value)
-                    validated_reagent_sources.append(NodeMapping(key=i.role, node=passed_value))
+                    validated_reagent_sources.append(
+                        NodeMapping(key=i.role, node=passed_value)
+                    )
 
                 else:
                     if i.optional:
@@ -1032,17 +1054,23 @@ class ProtocolEventCategoryTrait(BaseModel):
             if i.role not in [x.key for x in entity_sources]:
                 if i.role in kwargs:
                     passed_value = kwargs.pop(i.role)
-                    if isinstance(passed_value, list) or isinstance(passed_value, tuple):
+                    if isinstance(passed_value, list) or isinstance(
+                        passed_value, tuple
+                    ):
                         assert i.allow_multiple, (
                             f"Entity source role {i.role} does not allow multiple values. You need to specify a single value for {i.role}"
                         )
 
                         for passed_v in passed_value:
                             assert_is_entity_or_id(passed_v)
-                            validated_entity_sources.append(NodeMapping(key=i.role, node=passed_v))
+                            validated_entity_sources.append(
+                                NodeMapping(key=i.role, node=passed_v)
+                            )
                     else:
                         assert_is_entity_or_id(passed_value)
-                        validated_entity_sources.append(NodeMapping(key=i.role, node=passed_value))
+                        validated_entity_sources.append(
+                            NodeMapping(key=i.role, node=passed_value)
+                        )
                 else:
                     if i.optional:
                         continue
@@ -1074,7 +1102,9 @@ class ProtocolEventCategoryTrait(BaseModel):
                 elif i.role in kwargs:
                     passed_value = kwargs.pop(i.role)
                     assert_is_reagent_or_id(passed_value)
-                    validated_reagent_targets.append(NodeMapping(key=i.role, node=passed_value))
+                    validated_reagent_targets.append(
+                        NodeMapping(key=i.role, node=passed_value)
+                    )
 
                 else:
                     if i.optional:
@@ -1097,17 +1127,23 @@ class ProtocolEventCategoryTrait(BaseModel):
             if i.role not in [x.key for x in entity_targets]:
                 if i.role in kwargs:
                     passed_value = kwargs.pop(i.role)
-                    if isinstance(passed_value, list) or isinstance(passed_value, tuple):
+                    if isinstance(passed_value, list) or isinstance(
+                        passed_value, tuple
+                    ):
                         assert i.allow_multiple, (
                             f"Entity target role {i.role} does not allow multiple values. You need to specify a single value for {i.role}"
                         )
 
                         for passed_v in passed_value:
                             assert_is_entity_or_id(passed_v)
-                            validated_entity_targets.append(NodeMapping(key=i.role, node=passed_v))
+                            validated_entity_targets.append(
+                                NodeMapping(key=i.role, node=passed_v)
+                            )
                     else:
                         assert_is_entity_or_id(passed_value)
-                        validated_entity_targets.append(NodeMapping(key=i.role, node=passed_value))
+                        validated_entity_targets.append(
+                            NodeMapping(key=i.role, node=passed_value)
+                        )
                 else:
                     if i.optional:
                         continue
@@ -1161,6 +1197,7 @@ class ProtocolEventCategoryTrait(BaseModel):
             entity_targets=validated_entity_targets,
             reagent_sources=validated_reagent_sources,
             reagent_targets=validated_reagent_targets,
+            variables=validated_variable_mappings,
             **kwargs,
         )
 
@@ -1199,7 +1236,9 @@ class MetricCategoryTrait(BaseModel):
 
         if target is not None:
             assert isinstance(target, StructureTrait), "Target must be an structure"
-            assert target.graph.id == self.graph.id, "Target and metric must be in the same graph"
+            assert target.graph.id == self.graph.id, (
+                "Target and metric must be in the same graph"
+            )
             return create_metric(
                 target,
                 category=self,
@@ -1260,7 +1299,9 @@ class EntityTrait(BaseModel):
             NotImplementedError: For invalid combinations
         """
         if isinstance(other, RelationWithValidity):
-            return IntermediateRelationWithValidity(left=self, relation_with_validity=other)
+            return IntermediateRelationWithValidity(
+                left=self, relation_with_validity=other
+            )
         if isinstance(other, EntityTrait):
             raise NotImplementedError(
                 "Cannot merge entities directly, use a relation or measurement inbetween"
@@ -1360,7 +1401,9 @@ class GraphTrait(BaseModel):
         """
         from kraph.api.schema import create_entity_category
 
-        return create_entity_category(graph=self, label=label, description=description, **kwargs)
+        return create_entity_category(
+            graph=self, label=label, description=description, **kwargs
+        )
 
     def create_structure_category(
         self,
@@ -1655,7 +1698,29 @@ class MetricCategoryInputTrait(BaseModel):
     this metric can be applied to.
     """
 
-    @field_validator("structure_definition", mode="before", check_fields=False)
-    def validate_source_definition(cls, value):
+    @field_validator("structure_identifier", mode="before", check_fields=False)
+    def validate_structure_identifier(cls, value):
         """Validate and normalize structure category definition."""
-        return validate_structure_category_definition(cls, value)
+        if value is None:
+            return value
+
+        if isinstance(value, str):
+            return value_chain
+
+        try:
+            # check if it is a class
+            if not isinstance(value, type):
+                i = value.__class__
+
+            if issubclass(value, BaseModel):
+                from rekuest_next.structures.default import (
+                    get_default_structure_registry,
+                )
+
+                registry = get_default_structure_registry()
+                identifier = registry.get_identifier_for_cls(value)
+                return identifier
+            else:
+                raise ValueError(f"Unknown filter {i}")
+        except TypeError as e:
+            raise e
