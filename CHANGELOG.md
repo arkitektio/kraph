@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.5.1 (2025-09-26)
+
+### Bug Fixes
+
+- Kraph structure
+  ([`4d5aae6`](https://github.com/arkitektio/kraph/commit/4d5aae650a986e16ccb596b624d6d7d7cf75aa3c))
+
+
 ## v0.5.0 (2025-09-14)
 
 ### Features
