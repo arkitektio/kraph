@@ -138,7 +138,7 @@ structure_reg.register_as_structure(
 
 structure_reg.register_as_structure(
     Structure,
-    identifier="@kraph/entity",
+    identifier="@kraph/structure",
     aexpand=aget_structure,
     ashrink=id_shrink,
     default_widget=SearchWidget(query=SearchStructuresQuery.Meta.document, ward="kraph"),
