@@ -1,0 +1,5 @@
+query GetEdgeCategoryByGraphAndLabel($graph: ID!, $label: String!) {
+  edgeCategory(graph: $graph, label: $label) {
+    ...BaseEdgeCategory
+  }
+}

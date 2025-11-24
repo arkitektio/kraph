@@ -2,6 +2,15 @@
 A Entity is a recorded data point in a graph. It can measure a property of an entity through a direct measurement edge, that connects the entity to the structure. It of course can relate to other structures through relation edges.
 """
 type Entity implements Node {
+  """The map of for Node"""
+  properties: Any!
+
+  """Property List"""
+  propertyList: [Property!]!
+
+  """The variables"""
+  property(key: String!): Property!
+
   """The unique identifier of the entity within its graph"""
   pinned: Boolean!
 
@@ -58,6 +67,21 @@ type Entity implements Node {
 
   """Measurements that this entity is involved in"""
   targetedBy: [Participant!]!
+
+  """Protocol steps where this entity was the target"""
+  editedIn: [Edited!]!
+}
+
+"""The `Any` scalar any type"""
+scalar Any
+
+"""The Variables of the Node"""
+type Property {
+  """THe value of the variable"""
+  value: Any!
+
+  """The key of the variable"""
+  key: String!
 }
 
 type User {
@@ -85,6 +109,8 @@ type NodeQuery {
   kind: ViewKind!
   graph: Graph!
   query: String!
+  columns: [Column!]!
+  relevantFor: [BaseCategory!]!
   pinned: Boolean!
   render(nodeId: ID!): PathPairsTable!
 }
@@ -141,6 +167,7 @@ type Graph {
 
   """The list of structure relation expressions defined in this ontology"""
   structureRelationCategories(filters: StructureRelationCategoryFilter, pagination: OffsetPaginationInput): [StructureRelationCategory!]!
+  materializedEdges: [MaterializedEdge!]!
   nodeCategories(filters: NodeCategoryFilter, pagination: OffsetPaginationInput): [NodeCategory!]!
   edgeCategories(filters: EdgeCategoryFilter, pagination: OffsetPaginationInput): [EdgeCategory!]!
   latestNodes(filters: EntityFilter = null, pagination: GraphPaginationInput = null): [Node!]!
@@ -185,14 +212,17 @@ type GraphQuery {
   """The list of metric expressions defined in this ontology"""
   scatterPlots(filters: ScatterPlotFilter, pagination: OffsetPaginationInput): [ScatterPlot!]!
   pinned: Boolean!
-  render: PathPairsTableNodeList!
+  render(filters: GraphQueryFilters = null, pagination: GraphQueryPagination = null, order: GraphQueryOrder = null): PathPairsTableNodeList!
   columns: [Column!]!
+  matches: [MatchPath!]!
+  returns: [ReturnStatement!]!
+  wheres: [WhereClause!]!
   relevantFor: [BaseCategory!]!
 }
 
 """A scatter plot of a table graph, that contains entities and relations."""
 type ScatterPlot {
-  graph: GraphQuery!
+  query: GraphQuery!
   id: ID!
   name: String!
   description: String
@@ -215,6 +245,7 @@ input ScatterPlotFilter {
   """Search by text"""
   search: String = null
   id: ID
+  graph: ID
   AND: ScatterPlotFilter
   OR: ScatterPlotFilter
   NOT: ScatterPlotFilter
@@ -261,9 +292,6 @@ type Table {
   graph: Graph!
 }
 
-"""The `Any` scalar any type"""
-scalar Any
-
 """A column definition for a table view."""
 type Column {
   name: String!
@@ -307,7 +335,134 @@ type NodeList {
 
   """The graph this list was queried from."""
   graph: Graph!
+
+  """The category of nodes in this list."""
+  category: NodeCategory!
 }
+
+interface NodeCategory {
+  """The unique identifier of the expression within its graph"""
+  id: ID!
+
+  """The x position of the node in the graph"""
+  positionX: Float
+
+  """The y position of the node in the graph"""
+  positionY: Float
+
+  """The height of the node in the graph"""
+  height: Float
+
+  """The width of the node in the graph"""
+  width: Float
+
+  """The color of the node in the graph"""
+  color: [Float!]
+
+  """A description of the expression."""
+  description: String
+
+  """The defined properties"""
+  propertyDefinitions: [PropertyDefinition!]!
+
+  """The label"""
+  label: String!
+}
+
+type PropertyDefinition {
+  valueKind: MetricKind!
+  key: String!
+  description: String
+  label: String
+  optional: Boolean!
+  default: Any
+  options: [VariableOption!]
+}
+
+type VariableOption {
+  value: String!
+  label: String!
+  description: String
+}
+
+input GraphQueryFilters {
+  search: String = null
+  validFrom: DateTime = null
+  validTo: DateTime = null
+}
+
+input GraphQueryPagination {
+  limit: Int = null
+  offset: Int = null
+}
+
+input GraphQueryOrder {
+  field: String = null
+  direction: String = null
+}
+
+type MatchPath {
+  """List of node IDs to match"""
+  nodes: [ID!]!
+
+  """List of relation IDs to match"""
+  relations: [ID!]!
+
+  """Whether the path match is optional"""
+  optional: Boolean!
+
+  """Title for the matched path"""
+  title: String
+
+  """Color for the matched path as RGB values"""
+  color: [Float!]
+
+  """List of relation directions for the matched path"""
+  relationDirections: [Boolean!]
+}
+
+type ReturnStatement {
+  """The path ID to return"""
+  path: ID!
+
+  """The node ID to return"""
+  node: ID
+
+  """The property name to return"""
+  property: String
+}
+
+type WhereClause {
+  """The path ID to apply the where clause to"""
+  path: ID!
+
+  """The node ID to apply the where clause to"""
+  node: ID
+
+  """The property name to apply the where clause to"""
+  property: String!
+
+  """The operator to use for filtering"""
+  operator: WhereOperator!
+
+  """The value to compare against"""
+  value: CypherLiteral!
+}
+
+enum WhereOperator {
+  EQUALS
+  NOT_EQUALS
+  GREATER_THAN
+  LESS_THAN
+  GREATER_THAN_OR_EQUAL
+  LESS_THAN_OR_EQUAL
+  CONTAINS
+  STARTS_WITH
+  ENDS_WITH
+}
+
+"""The `Cypher` scalar type represents a cypher query"""
+scalar CypherLiteral
 
 interface BaseCategory {
   """The ontology the expression belongs to."""
@@ -336,6 +491,9 @@ interface BaseCategory {
 
   """The unique identifier of the expression within its graph"""
   purl: String
+
+  """A human readable label for the expression"""
+  label: String!
 
   """The sequence of the expression within its graph"""
   sequence: GraphSequence
@@ -368,6 +526,10 @@ input GraphQueryFilter {
   """Search by text"""
   search: String = null
   id: ID
+  pinned: Boolean = null
+  kind: ViewKind = null
+  graph: ID = null
+  relevantFor: ID = null
   AND: GraphQueryFilter
   OR: GraphQueryFilter
   NOT: GraphQueryFilter
@@ -393,11 +555,17 @@ type MetricCategory implements NodeCategory & BaseCategory {
   """The color of the node in the graph"""
   color: [Float!]
 
-  """The ontology the expression belongs to."""
-  graph: Graph!
-
   """A description of the expression."""
   description: String
+
+  """The defined properties"""
+  propertyDefinitions: [PropertyDefinition!]!
+
+  """The label of the expression"""
+  label: String!
+
+  """The ontology the expression belongs to."""
+  graph: Graph!
 
   """
   An image or other media file that can be used to represent the expression.
@@ -423,34 +591,11 @@ type MetricCategory implements NodeCategory & BaseCategory {
   bestQuery: GraphQuery
   pinned: Boolean!
 
-  """The label of the expression"""
-  label: String!
-
   """The kind of metric this expression represents"""
   metricKind: MetricKind!
 
   """The structure that this metric measures"""
   structureCategory: StructureCategory!
-}
-
-interface NodeCategory {
-  """The unique identifier of the expression within its graph"""
-  id: ID!
-
-  """The x position of the node in the graph"""
-  positionX: Float
-
-  """The y position of the node in the graph"""
-  positionY: Float
-
-  """The height of the node in the graph"""
-  height: Float
-
-  """The width of the node in the graph"""
-  width: Float
-
-  """The color of the node in the graph"""
-  color: [Float!]
 }
 
 input TagFilter {
@@ -487,11 +632,17 @@ type StructureCategory implements NodeCategory & BaseCategory {
   """The color of the node in the graph"""
   color: [Float!]
 
-  """The ontology the expression belongs to."""
-  graph: Graph!
-
   """A description of the expression."""
   description: String
+
+  """The defined properties"""
+  propertyDefinitions: [PropertyDefinition!]!
+
+  """The label"""
+  label: String!
+
+  """The ontology the expression belongs to."""
+  graph: Graph!
 
   """
   An image or other media file that can be used to represent the expression.
@@ -565,11 +716,17 @@ type ProtocolEventCategory implements NodeCategory & BaseCategory {
   """The color of the node in the graph"""
   color: [Float!]
 
-  """The ontology the expression belongs to."""
-  graph: Graph!
-
   """A description of the expression."""
   description: String
+
+  """The defined properties"""
+  propertyDefinitions: [PropertyDefinition!]!
+
+  """The label of the expression"""
+  label: String!
+
+  """The ontology the expression belongs to."""
+  graph: Graph!
 
   """
   An image or other media file that can be used to represent the expression.
@@ -594,9 +751,6 @@ type ProtocolEventCategory implements NodeCategory & BaseCategory {
   relevantNodeQueries: [NodeQuery!]!
   bestQuery: GraphQuery
   pinned: Boolean!
-
-  """The label of the expression"""
-  label: String!
 
   """The children of this plate"""
   plateChildren: [UntypedPlateChild!]
@@ -664,11 +818,17 @@ type EntityCategory implements NodeCategory & BaseCategory {
   """The color of the node in the graph"""
   color: [Float!]
 
-  """The ontology the expression belongs to."""
-  graph: Graph!
-
   """A description of the expression."""
   description: String
+
+  """The defined properties"""
+  propertyDefinitions: [PropertyDefinition!]!
+
+  """The label of the expression"""
+  label: String!
+
+  """The ontology the expression belongs to."""
+  graph: Graph!
 
   """
   An image or other media file that can be used to represent the expression.
@@ -693,9 +853,6 @@ type EntityCategory implements NodeCategory & BaseCategory {
   relevantNodeQueries: [NodeQuery!]!
   bestQuery: GraphQuery
   pinned: Boolean!
-
-  """The label of the expression"""
-  label: String!
 
   """The unique identifier of the expression within its graph"""
   instanceKind: InstanceKind!
@@ -747,11 +904,17 @@ type ReagentCategory implements NodeCategory & BaseCategory {
   """The color of the node in the graph"""
   color: [Float!]
 
-  """The ontology the expression belongs to."""
-  graph: Graph!
-
   """A description of the expression."""
   description: String
+
+  """The defined properties"""
+  propertyDefinitions: [PropertyDefinition!]!
+
+  """The label of the expression"""
+  label: String!
+
+  """The ontology the expression belongs to."""
+  graph: Graph!
 
   """
   An image or other media file that can be used to represent the expression.
@@ -777,9 +940,6 @@ type ReagentCategory implements NodeCategory & BaseCategory {
   bestQuery: GraphQuery
   pinned: Boolean!
 
-  """The label of the expression"""
-  label: String!
-
   """The unique identifier of the expression within its graph"""
   instanceKind: InstanceKind!
   latest(limit: Int = 5): [Reagent!]!
@@ -790,16 +950,8 @@ type VariableDefinition {
   param: String!
   description: String
   label: String
-  optional: Boolean!
-  needsQuantity: Boolean!
   default: Any
-  options: [VariableOption!]
-}
-
-type VariableOption {
-  value: String!
-  label: String!
-  description: String
+  optional: Boolean!
 }
 
 input ProtocolEventCategoryFilter {
@@ -833,11 +985,17 @@ type NaturalEventCategory implements NodeCategory & BaseCategory {
   """The color of the node in the graph"""
   color: [Float!]
 
-  """The ontology the expression belongs to."""
-  graph: Graph!
-
   """A description of the expression."""
   description: String
+
+  """The defined properties"""
+  propertyDefinitions: [PropertyDefinition!]!
+
+  """The label of the expression"""
+  label: String!
+
+  """The ontology the expression belongs to."""
+  graph: Graph!
 
   """
   An image or other media file that can be used to represent the expression.
@@ -862,9 +1020,6 @@ type NaturalEventCategory implements NodeCategory & BaseCategory {
   relevantNodeQueries: [NodeQuery!]!
   bestQuery: GraphQuery
   pinned: Boolean!
-
-  """The label of the expression"""
-  label: String!
 
   """The children of this plate"""
   plateChildren: [UntypedPlateChild!]
@@ -919,11 +1074,14 @@ type MeasurementCategory implements EdgeCategory & BaseCategory {
   """The unique identifier of the expression within its graph"""
   id: ID!
 
-  """The ontology the expression belongs to."""
-  graph: Graph!
+  """The label of the expression"""
+  label: String!
 
   """A description of the expression."""
   description: String
+
+  """The ontology the expression belongs to."""
+  graph: Graph!
 
   """
   An image or other media file that can be used to represent the expression.
@@ -950,9 +1108,6 @@ type MeasurementCategory implements EdgeCategory & BaseCategory {
   bestQuery: GraphQuery
   pinned: Boolean!
 
-  """The label of the expression"""
-  label: String!
-
   """The unique identifier of the expression within its graph"""
   sourceDefinition: StructureCategoryDefinition!
   targetDefinition: EntityCategoryDefinition!
@@ -961,6 +1116,12 @@ type MeasurementCategory implements EdgeCategory & BaseCategory {
 interface EdgeCategory {
   """The unique identifier of the expression within its graph"""
   id: ID!
+
+  """A human readable label for the expression"""
+  label: String!
+
+  """A description of the expression."""
+  description: String
 }
 
 type StructureCategoryDefinition implements CategoryDefintion {
@@ -993,11 +1154,14 @@ type RelationCategory implements EdgeCategory & BaseCategory {
   """The unique identifier of the expression within its graph"""
   id: ID!
 
-  """The ontology the expression belongs to."""
-  graph: Graph!
+  """The label of the expression"""
+  label: String!
 
   """A description of the expression."""
   description: String
+
+  """The ontology the expression belongs to."""
+  graph: Graph!
 
   """
   An image or other media file that can be used to represent the expression.
@@ -1023,9 +1187,6 @@ type RelationCategory implements EdgeCategory & BaseCategory {
   relevantNodeQueries: [NodeQuery!]!
   bestQuery: GraphQuery
   pinned: Boolean!
-
-  """The label of the expression"""
-  label: String!
 
   """The unique identifier of the expression within its graph"""
   sourceDefinition: EntityCategoryDefinition!
@@ -1051,11 +1212,14 @@ type StructureRelationCategory implements EdgeCategory & BaseCategory {
   """The unique identifier of the expression within its graph"""
   id: ID!
 
-  """The ontology the expression belongs to."""
-  graph: Graph!
+  """The label of the expression"""
+  label: String!
 
   """A description of the expression."""
   description: String
+
+  """The ontology the expression belongs to."""
+  graph: Graph!
 
   """
   An image or other media file that can be used to represent the expression.
@@ -1082,9 +1246,6 @@ type StructureRelationCategory implements EdgeCategory & BaseCategory {
   bestQuery: GraphQuery
   pinned: Boolean!
 
-  """The label of the expression"""
-  label: String!
-
   """The unique identifier of the expression within its graph"""
   sourceDefinition: StructureCategoryDefinition!
   targetDefinition: StructureCategoryDefinition!
@@ -1103,6 +1264,16 @@ input StructureRelationCategoryFilter {
   OR: StructureRelationCategoryFilter
   NOT: StructureRelationCategoryFilter
   DISTINCT: Boolean
+}
+
+"""A materialized edge between two entities in a graph."""
+type MaterializedEdge {
+  id: ID!
+  graph: Graph!
+  source: NodeCategory!
+  target: NodeCategory!
+  relation: EdgeCategory!
+  label: String!
 }
 
 input NodeCategoryFilter {
@@ -1220,7 +1391,52 @@ interface Edge {
   source: Node!
 }
 
+"A participant edge maps bioentitiy to an event (valid from is not necessary)\n                 "
+type Edited implements Edge {
+  """The unique identifier of the entity within its graph"""
+  id: NodeID!
+  label: String!
+
+  """The unique identifier of the entity within its graph"""
+  reverseLabel: String!
+  leftId: String!
+  rightId: String!
+  right: Node!
+  left: Node!
+  target: Node!
+  source: Node!
+
+  """Protocol steps where this entity was the target"""
+  changeKind: ChangeKind!
+
+  """Protocol steps where this entity was the target"""
+  propertyName: String
+
+  """Protocol steps where this entity was the target"""
+  previousValue: Any
+
+  """Protocol steps where this entity was the target"""
+  newValue: Any
+  event: EditEvent!
+}
+
+enum ChangeKind {
+  CREATE
+  UPDATE
+  DELETE
+  IMPORT
+}
+
 interface Node {
+  """The map of for Node"""
+  properties: Any!
+
+  """Property List"""
+  propertyList: [Property!]!
+
+  """The variables"""
+  property(key: String!): Property!
+
   """The unique identifier of the entity within its graph"""
   pinned: Boolean!
 
@@ -1262,9 +1478,80 @@ interface Node {
 }
 
 """
+A Metric is a recorded data point in a graph. It always describes a structure and through the structure it can bring meaning to the measured entity. It can measure a property of an entity through a direct measurement edge, that connects the entity to the structure. It of course can relate to other structures through relation edges.
+"""
+type EditEvent implements Node {
+  """The map of for Node"""
+  properties: Any!
+
+  """Property List"""
+  propertyList: [Property!]!
+
+  """The variables"""
+  property(key: String!): Property!
+
+  """The unique identifier of the entity within its graph"""
+  pinned: Boolean!
+
+  """The unique identifier of the entity within its graph"""
+  pinnedBy: [User!]!
+
+  """The tags associated with this entity. Currently not implemented   """
+  tags: [Tag!]
+
+  """The unique identifier of the entity within its graph"""
+  externalId: String
+
+  """The unique identifier of the entity within its graph"""
+  localId: String
+  relevantQueries: [NodeQuery!]!
+  views: [NodeQueryView!]!
+
+  """The best view of the node given the current context"""
+  bestView: NodeQueryView
+
+  """The unique identifier of the entity within its graph"""
+  graph: Graph!
+  label(full: Boolean = null): String!
+
+  """The unique identifier of the entity within its graph"""
+  id: NodeID!
+
+  """The unique identifier of the entity within its graph"""
+  graphId: ID!
+
+  """The unique identifier of the entity within its graph"""
+  rightEdges: [Edge!]!
+
+  """The unique identifier of the entity within its graph"""
+  leftEdges: [Edge!]!
+
+  """The unique identifier of the entity within its graph"""
+  edges(filter: EntityRelationFilter = null, pagination: GraphPaginationInput = null): [Edge!]!
+
+  """Protocol steps where this entity was the target"""
+  editor: User!
+
+  """Protocol steps where this entity was the target"""
+  timestamp: DateTime!
+
+  """Protocol steps where this entity was the target"""
+  edited: [Edited!]!
+}
+
+"""
 A Structure is a recorded data point in a graph. It can measure a property of an entity through a direct measurement edge, that connects the entity to the structure. It of course can relate to other structures through relation edges.
 """
 type Structure implements Node {
+  """The map of for Node"""
+  properties: Any!
+
+  """Property List"""
+  propertyList: [Property!]!
+
+  """The variables"""
+  property(key: String!): Property!
+
   """The unique identifier of the entity within its graph"""
   pinned: Boolean!
 
@@ -1317,7 +1604,7 @@ type Structure implements Node {
   activeMeasurements: [Measurement!]!
 
   """The expression that defines this entity's type"""
-  metrics: [Metric!]!
+  metrics(pagination: GraphPaginationInput = null): [Metric!]!
 
   """The unique identifier of the entity within its graph"""
   measures: [Entity!]!
@@ -1327,6 +1614,15 @@ type Structure implements Node {
 A Metric is a recorded data point in a graph. It always describes a structure and through the structure it can bring meaning to the measured entity. It can measure a property of an entity through a direct measurement edge, that connects the entity to the structure. It of course can relate to other structures through relation edges.
 """
 type Metric implements Node {
+  """The map of for Node"""
+  properties: Any!
+
+  """Property List"""
+  propertyList: [Property!]!
+
+  """The variables"""
+  property(key: String!): Property!
+
   """The unique identifier of the entity within its graph"""
   pinned: Boolean!
 
@@ -1371,12 +1667,30 @@ type Metric implements Node {
 
   """The value of the metric"""
   value: String!
+
+  """The unit of the metric"""
+  createdBy: String
+
+  """The unit of the metric"""
+  createdApp: String
+
+  """The unit of the metric"""
+  createdThrough: String
 }
 
 """
 A Metric is a recorded data point in a graph. It always describes a structure and through the structure it can bring meaning to the measured entity. It can measure a property of an entity through a direct measurement edge, that connects the entity to the structure. It of course can relate to other structures through relation edges.
 """
 type ProtocolEvent implements Node {
+  """The map of for Node"""
+  properties: Any!
+
+  """Property List"""
+  propertyList: [Property!]!
+
+  """The variables"""
+  property(key: String!): Property!
+
   """The unique identifier of the entity within its graph"""
   pinned: Boolean!
 
@@ -1420,6 +1734,12 @@ type ProtocolEvent implements Node {
   category: ProtocolEventCategory!
 
   """Protocol steps where this entity was the target"""
+  sourceParticipants: [Participant!]!
+
+  """Protocol steps where this entity was the target"""
+  targetParticipants: [Participant!]!
+
+  """Protocol steps where this entity was the target"""
   variables: [VariableMapping!]!
 
   """Protocol steps where this entity was the target"""
@@ -1438,6 +1758,15 @@ type VariableMapping {
 A Metric is a recorded data point in a graph. It always describes a structure and through the structure it can bring meaning to the measured entity. It can measure a property of an entity through a direct measurement edge, that connects the entity to the structure. It of course can relate to other structures through relation edges.
 """
 type NaturalEvent implements Node {
+  """The map of for Node"""
+  properties: Any!
+
+  """Property List"""
+  propertyList: [Property!]!
+
+  """The variables"""
+  property(key: String!): Property!
+
   """The unique identifier of the entity within its graph"""
   pinned: Boolean!
 
@@ -1567,6 +1896,15 @@ type Participant implements Edge {
 A Entity is a recorded data point in a graph. It can measure a property of an entity through a direct measurement edge, that connects the entity to the structure. It of course can relate to other structures through relation edges.
 """
 type Reagent implements Node {
+  """The map of for Node"""
+  properties: Any!
+
+  """Property List"""
+  propertyList: [Property!]!
+
+  """The variables"""
+  property(key: String!): Property!
+
   """The unique identifier of the entity within its graph"""
   pinned: Boolean!
 
@@ -1614,6 +1952,9 @@ type Reagent implements Node {
 
   """Subjectable to"""
   createableFrom: [ProtocolEventCategory!]!
+
+  """Protocol steps where this entity was the target"""
+  editedIn: [Edited!]!
 }
 
 "A participant edge maps bioentitiy to an event (valid from is not necessary)\n                 "
@@ -1638,6 +1979,9 @@ type Query {
 
   """List of all graph sequences"""
   graphSequences(filters: GraphSequenceFilter, pagination: OffsetPaginationInput): [GraphSequence!]!
+
+  """List of all materialized edges"""
+  materializedEdges(filters: MaterializedEdgeFilter, pagination: OffsetPaginationInput): [MaterializedEdge!]!
 
   """List of all graph queries"""
   graphQueries(filters: GraphQueryFilter, pagination: OffsetPaginationInput): [GraphQuery!]!
@@ -1686,17 +2030,31 @@ type Query {
 
   """List of all tags in the system"""
   tags(filters: TagFilter, pagination: OffsetPaginationInput): [Tag!]!
+
+  """Stats about knowledge graphs"""
+  graphStats(filters: GraphFilter = null): GraphStats!
   structure(id: ID!): Structure!
 
   """Render a node query"""
-  renderNodeQuery(id: ID!, nodeId: ID!): PairsPathTable!
+  renderNodeQuery(id: ID!, nodeId: ID!, filters: NodeQueryFilters = null, pagination: NodeQueryPagination = null, order: NodeQueryOrder = null): PairsPathTableNodeList!
+
+  """All entity nodes for the category"""
+  entityNodes(id: ID!, filters: CategoryNodesFilter = null, pagination: GraphQueryPagination = null, order: CategoryNodesOrder = null): [Entity!]!
+
+  """Statistics for entity category including count"""
+  entityCategoryStats(id: ID!, filters: CategoryNodesFilter = null, pagination: GraphQueryPagination = null, order: CategoryNodesOrder = null): EntityCategoryStats!
+
+  """Render a graph query"""
+  renderGraphQuery(id: ID!, filters: GraphQueryFilters = null, pagination: GraphQueryPagination = null, order: GraphQueryOrder = null): PairsPathTableNodeList!
   knowledgeViews(identifier: StructureIdentifier!, object: ID!): [KnowledgeView!]!
+  materializedEdge(id: ID!): MaterializedEdge!
 
   """The best view of the node given the current context"""
   nodeView(query: ID!, nodeId: ID!): NodeQueryView!
   scatterPlot(id: ID!): ScatterPlot!
   graphSequence(id: ID!): GraphSequence!
-  entityCategory(id: ID!): EntityCategory!
+  entityCategory(id: ID = null, graph: ID = null, label: String = null): EntityCategory!
+  edgeCategory(id: ID = null, graph: ID = null, label: String = null): EdgeCategory!
   getEntityByCategoryAndExternalId(category: ID!, externalId: String!): Entity!
   structureRelationCategory(id: ID!): StructureRelationCategory!
   metricCategory(id: ID!): MetricCategory!
@@ -1719,6 +2077,8 @@ type Query {
   reagent(id: ID!): Reagent!
   reagents(filters: ReagentFilter = null, pagination: GraphPaginationInput = null): [Reagent!]!
   protocolEvent(id: ID!): ProtocolEvent!
+  editEvent(id: ID!): EditEvent!
+  editEvents(filters: EditEventFilter = null, pagination: GraphPaginationInput = null): [EditEvent!]!
   protocolEvents(filters: ProtocolEventFilter = null, pagination: GraphPaginationInput = null): [ProtocolEvent!]!
   naturalEvent(id: ID!): NaturalEvent!
   naturalEvents(filters: NaturalEventFilter = null, pagination: GraphPaginationInput = null): [ProtocolEvent!]!
@@ -1764,6 +2124,23 @@ input GraphSequenceFilter {
   DISTINCT: Boolean
 }
 
+"""Input for creating a new expression"""
+input MaterializedEdgeFilter {
+  """Filter by list of IDs"""
+  ids: [ID!] = null
+  source: ID
+  sourceIdentifier: String
+  target: ID
+  targetIdentifier: String
+  relation: ID
+  search: String
+  pinnedGraph: Boolean
+  AND: MaterializedEdgeFilter
+  OR: MaterializedEdgeFilter
+  NOT: MaterializedEdgeFilter
+  DISTINCT: Boolean
+}
+
 """
 A model represents a trained machine learning model that can be used for analysis.
 """
@@ -1805,9 +2182,128 @@ input NodeFilter {
 
   """Search relations by text"""
   search: String = null
+
+  """Property matches that should or should not hold true"""
+  propertyMatches: [PropertyMatch!] = null
 }
 
-union PairsPathTable = Pairs | Path | Table
+input PropertyMatch {
+  """The property matching"""
+  key: String!
+
+  """The operator to use"""
+  operator: WhereOperator!
+
+  """THe value to filter agains"""
+  value: Any!
+}
+
+type GraphStats {
+  """Total number of items in the selection"""
+  count: Int!
+
+  """Number of distinct values for the field"""
+  distinctCount(field: GraphField!): Int!
+
+  """Maximum"""
+  max(field: GraphField!): Float
+
+  """Minimum"""
+  min(field: GraphField!): Float
+
+  """Average"""
+  avg(field: GraphField!): Float
+
+  """Sum"""
+  sum(field: GraphField!): Float
+
+  """Time-bucketed stats over a datetime field."""
+  series(field: GraphField!, timestampField: GraphTimestampField!, by: Granularity!): [TimeBucket!]!
+}
+
+"""Numeric/aggregatable fields of Graph"""
+enum GraphField {
+  CREATED_AT
+}
+
+type TimeBucket {
+  ts: DateTime!
+  count: Int!
+  distinctCount: Int!
+  max: Float
+  min: Float
+  avg: Float
+  sum: Float
+}
+
+"""Datetime fields of Graph for bucketing"""
+enum GraphTimestampField {
+  CREATED_AT
+}
+
+enum Granularity {
+  HOUR
+  DAY
+  WEEK
+  MONTH
+  QUARTER
+  YEAR
+}
+
+union PairsPathTableNodeList = Pairs | Path | Table | NodeList
+
+input NodeQueryFilters {
+  search: String = null
+  validFrom: DateTime = null
+  validTo: DateTime = null
+}
+
+input NodeQueryPagination {
+  limit: Int = null
+  offset: Int = null
+}
+
+input NodeQueryOrder {
+  field: String = null
+  direction: String = null
+}
+
+"""Filter for entities in the graph"""
+input CategoryNodesFilter {
+  """Filter by list of entity IDs"""
+  ids: [ID!] = null
+
+  """Search entities by text"""
+  search: String = null
+
+  """Property matches that should or should not hold true"""
+  propertyMatches: [PropertyMatch!] = null
+}
+
+"""Filter for entities in the graph"""
+input CategoryNodesOrder {
+  """Property matches that should or should not hold true"""
+  propertyOrder: [PropertyOrder!] = null
+}
+
+input PropertyOrder {
+  """THe property"""
+  key: String!
+
+  """The order direction"""
+  direction: OrderDirection!
+}
+
+enum OrderDirection {
+  ASC
+  DESC
+}
+
+"""Category state"""
+type EntityCategoryStats {
+  """The count of elements in the list"""
+  count: Int!
+}
 
 type KnowledgeView {
   structureCategory: StructureCategory!
@@ -1830,6 +2326,9 @@ input StructureFilter {
 
   """Search relations by text"""
   search: String = null
+
+  """Property matches that should or should not hold true"""
+  propertyMatches: [PropertyMatch!] = null
 }
 
 """Filter for entities in the graph"""
@@ -1863,6 +2362,27 @@ input ReagentFilter {
 }
 
 """Filter for entity relations in the graph"""
+input EditEventFilter {
+  """Filter by graph ID"""
+  graph: ID = null
+
+  """Filter by relation kind"""
+  kind: ID = null
+
+  """Filter by list of relation IDs"""
+  ids: [ID!] = null
+
+  """Filter by linked expression ID"""
+  linkedExpression: ID = null
+
+  """Search relations by text"""
+  search: String = null
+
+  """Property matches that should or should not hold true"""
+  propertyMatches: [PropertyMatch!] = null
+}
+
+"""Filter for entity relations in the graph"""
 input ProtocolEventFilter {
   """Filter by graph ID"""
   graph: ID = null
@@ -1878,6 +2398,9 @@ input ProtocolEventFilter {
 
   """Search relations by text"""
   search: String = null
+
+  """Property matches that should or should not hold true"""
+  propertyMatches: [PropertyMatch!] = null
 }
 
 """Filter for entity relations in the graph"""
@@ -1896,6 +2419,9 @@ input NaturalEventFilter {
 
   """Search relations by text"""
   search: String = null
+
+  """Property matches that should or should not hold true"""
+  propertyMatches: [PropertyMatch!] = null
 }
 
 """Filter for entity relations in the graph"""
@@ -1914,6 +2440,9 @@ input MetricFilter {
 
   """Search relations by text"""
   search: String = null
+
+  """Property matches that should or should not hold true"""
+  propertyMatches: [PropertyMatch!] = null
 }
 
 """Filter for entity relations in the graph"""
@@ -2045,11 +2574,20 @@ type Mutation {
   """Update an existing graph"""
   updateGraph(input: UpdateGraphInput!): Graph!
 
+  """Materialize a graph """
+  materializeGraph(input: MaterializeGraphInput!): Graph!
+
   """Delete an existing graph"""
   deleteGraph(input: DeleteGraphInput!): ID!
 
   """Pin or unpin a graph"""
   pinGraph(input: PinGraphInput!): Graph!
+
+  """Set a property on a node"""
+  setNodeProperty(input: SetNodePropertyInput!): Node!
+
+  """Import a graph with nodes and relations"""
+  importGraph(input: ImportGraphInput!): Graph!
 
   """Create a new expression"""
   createMetricCategory(input: MetricCategoryInput!): MetricCategory!
@@ -2141,11 +2679,25 @@ type Mutation {
   """Delete an existing scatter plot"""
   deleteScatterPlot(input: DeleteScatterPlotInput!): ID!
 
+  """Update a new scatter plot"""
+  uploadScatterPlot(input: UpdateScatterPlotInput!): ScatterPlot!
+
   """Record a new natural event"""
   recordNaturalEvent(input: RecordNaturalEventInput!): NaturalEvent!
 
   """Record a new protocol event"""
   recordProtocolEvent(input: RecordProtocolEventInput!): ProtocolEvent!
+
+  """Delete an existing node"""
+  deleteNode(input: DeleteNodeInput!): ID!
+
+  """
+  Detach and delete an existing node (will delete all connected edges as well)
+  """
+  detachDeleteNode(input: DeleteNodeInput!): ID!
+
+  """Delete an existing edge"""
+  deleteEdge(input: DeleteEdgeInput!): ID!
 
   """Create a new 'told you so' supporting structure"""
   createToldyouso(input: ToldYouSoInput!): Structure!
@@ -2198,6 +2750,9 @@ type Mutation {
   """Update an existing graph query"""
   updateGraphQuery(input: UpdateGraphQueryInput!): GraphQuery!
 
+  """Delete graph query"""
+  deleteGraphQuery(input: DeleteGraphQueryInput!): ID!
+
   """Pin or unpin a graph query"""
   pinGraphQuery(input: PinGraphQueryInput!): GraphQuery!
 
@@ -2206,6 +2761,9 @@ type Mutation {
 
   """Pin or unpin a node query"""
   pinNodeQuery(input: PinNodeQueryInput!): NodeQuery!
+
+  """Update a new node query"""
+  updateNodeQuery(input: UpdateNodeQueryInput!): NodeQuery!
 }
 
 """Input type for creating a new ontology"""
@@ -2221,75 +2779,31 @@ input GraphInput {
 
   """Whether this ontology should be pinned or not"""
   pin: Boolean = null
+
+  """An optional schema defining the categories in the ontology"""
+  schema: SchemaInput = null
 }
 
-"""Input type for updating an existing ontology"""
-input UpdateGraphInput {
-  """The ID of the ontology to update"""
-  id: ID!
+"""An ontology/graph"""
+input SchemaInput {
+  """List of entity categories in the ontology"""
+  entitySchemas: [EntityCategorySchemaInput!]!
 
-  """New name for the ontology (will be converted to snake_case)"""
-  name: String = null
+  """List of measurement categories in the ontology"""
+  measurementSchemas: [MeasurementCategorySchemaInput!]!
 
-  """A new PURL for the ontology (will be converted to snake_case)"""
-  purl: String = null
+  """List of natural event categories in the ontology"""
+  naturalEventSchemas: [NaturalEventCategorySchemaInput!] = null
 
-  """New description for the ontology"""
-  description: String = null
+  """List of protocol event categories in the ontology"""
+  protocolEventSchemas: [ProtocolEventCategorySchemaInput!] = null
 
-  """New ID reference to an associated image"""
-  image: ID = null
-
-  """New nodes for the ontology"""
-  nodes: [GraphNodeInput!] = null
-
-  """Whether this ontology should be pinned or not"""
-  pin: Boolean = null
-}
-
-"""Input type for creating a new ontology node"""
-input GraphNodeInput {
-  """The AGE_NAME of the ontology"""
-  id: String!
-
-  """An optional x position for the ontology node"""
-  positionX: Float = null
-
-  """An optional y position for the ontology node"""
-  positionY: Float = null
-
-  """An optional height for the ontology node"""
-  height: Float = null
-
-  """An optional width for the ontology node"""
-  width: Float = null
-
-  """An optional RGBA color for the ontology node"""
-  color: [Int!] = null
-}
-
-"""Input type for deleting an ontology"""
-input DeleteGraphInput {
-  """The ID of the ontology to delete"""
-  id: ID!
-}
-
-"""Input type for pinning an ontology"""
-input PinGraphInput {
-  """The ID of the ontology to pin"""
-  id: ID!
-
-  """Whether to pin the ontology or not"""
-  pinned: Boolean!
+  """List of relation categories in the ontology"""
+  relationSchemas: [RelationCategorySchemaInput!] = null
 }
 
 """Input for creating a new expression"""
-input MetricCategoryInput {
-  """
-  The ID of the graph this expression belongs to. If not provided, uses default ontology
-  """
-  graph: ID!
-
+input EntityCategorySchemaInput {
   """A detailed description of the expression"""
   description: String = null
 
@@ -2314,6 +2828,9 @@ input MetricCategoryInput {
   """Whether to create a sequence if it does not exist"""
   autoCreateSequence: Boolean = false
 
+  """A list of descriptor IDs to associate with this category"""
+  descriptors: [DescriptorInput!] = null
+
   """An optional x position for the ontology node"""
   positionX: Float = null
 
@@ -2326,21 +2843,64 @@ input MetricCategoryInput {
   """An optional width for the ontology node"""
   width: Float = null
 
-  """The structure category that this metric describes"""
-  structureCategory: ID = null
-
-  """The structure identifier within the structure category"""
-  structureIdentifier: StructureIdentifier = null
+  """A list of property definitions for this node category"""
+  propertyDefinitions: [PropertyDefinitionInput!] = null
 
   """The label/name of the expression"""
   label: String!
-
-  """The type of metric data this expression represents"""
-  kind: MetricKind!
 }
 
-"""Input for updating an existing expression"""
-input UpdateMetricCategoryInput {
+input DescriptorInput {
+  """A world unique key of the descriptor"""
+  key: String!
+
+  """An optional value for the descriptor"""
+  value: String = null
+
+  """A detailed description of the descriptor"""
+  description: String = null
+}
+
+"""Input for defining a property on a node category"""
+input PropertyDefinitionInput {
+  """The property key/name"""
+  key: String!
+
+  """The type of data this property stores"""
+  valueKind: MetricKind!
+
+  """Whether this property is optional or not"""
+  optional: Boolean = false
+
+  """The default value for this property"""
+  default: Any = null
+
+  """A detailed description of the property"""
+  description: String = null
+
+  """The label/name of the property"""
+  label: String = null
+
+  """A list of options for this property (if only a few values are allowed)"""
+  options: [OptionInput!] = null
+
+  """WHere or not this is searchable"""
+  searchable: Boolean = null
+}
+
+input OptionInput {
+  """The label of the option"""
+  label: String!
+
+  """The value of the option. This can be a string, number, or boolean"""
+  value: Any!
+
+  """A detailed description of the option"""
+  description: String = null
+}
+
+"""Input for creating a new expression"""
+input MeasurementCategorySchemaInput {
   """A detailed description of the expression"""
   description: String = null
 
@@ -2359,23 +2919,23 @@ input UpdateMetricCategoryInput {
   """Whether this expression should be pinned or not"""
   pin: Boolean = null
 
-  """An optional x position for the ontology node"""
-  positionX: Float = null
+  """The ID of the sequence this category will get internal_ids from"""
+  sequence: ID = null
 
-  """An optional y position for the ontology node"""
-  positionY: Float = null
+  """Whether to create a sequence if it does not exist"""
+  autoCreateSequence: Boolean = false
 
-  """An optional height for the ontology node"""
-  height: Float = null
+  """A list of descriptor IDs to associate with this category"""
+  descriptors: [DescriptorInput!] = null
 
-  """An optional width for the ontology node"""
-  width: Float = null
+  """The label/name of the expression"""
+  label: String!
 
-  """The type of metric data this expression represents"""
-  kind: MetricKind = null
+  """The source definition for this expression"""
+  structureDefinition: StructureCategoryDefinitionInput!
 
-  """The structure category for this expression"""
-  structureDefinition: StructureCategoryDefinitionInput = null
+  """The target definition for this expression"""
+  entityDefinition: EntityCategoryDefinitionInput!
 }
 
 """Input for creating a new expression"""
@@ -2400,53 +2960,6 @@ input StructureCategoryDefinitionInput {
   defaultUseNew: ID = null
 }
 
-"""Input for deleting an expression"""
-input DeleteMetricCategoryInput {
-  """The ID of the expression to delete"""
-  id: ID!
-}
-
-"""Input for creating a new expression"""
-input MeasurementCategoryInput {
-  """
-  The ID of the graph this expression belongs to. If not provided, uses default ontology
-  """
-  graph: ID!
-
-  """A detailed description of the expression"""
-  description: String = null
-
-  """Permanent URL identifier for the expression"""
-  purl: String = null
-
-  """RGBA color values as list of 3 or 4 integers"""
-  color: [Int!] = null
-
-  """An optional image associated with this expression"""
-  image: ID = null
-
-  """A list of tags associated with this expression"""
-  tags: [String!] = null
-
-  """Whether this expression should be pinned or not"""
-  pin: Boolean = null
-
-  """The ID of the sequence this category will get internal_ids from"""
-  sequence: ID = null
-
-  """Whether to create a sequence if it does not exist"""
-  autoCreateSequence: Boolean = false
-
-  """The label/name of the expression"""
-  label: String!
-
-  """The source definition for this expression"""
-  structureDefinition: StructureCategoryDefinitionInput!
-
-  """The target definition for this expression"""
-  entityDefinition: EntityCategoryDefinitionInput!
-}
-
 """Input for creating a new expression"""
 input EntityCategoryDefinitionInput {
   """A list of classes to filter the entities"""
@@ -2461,113 +2974,8 @@ input EntityCategoryDefinitionInput {
   defaultUseNew: ID = null
 }
 
-"""Input for updating an existing expression"""
-input UpdateMeasurementCategoryInput {
-  """The ID of the expression to update"""
-  id: ID!
-
-  """New label for the expression"""
-  label: String = null
-
-  """New description for the expression"""
-  description: String = null
-
-  """New permanent URL for the expression"""
-  purl: String = null
-
-  """New RGBA color values as list of 3 or 4 integers"""
-  color: [Int!] = null
-
-  """New image ID for the expression"""
-  image: ID = null
-}
-
-"""Input for deleting an expression"""
-input DeleteMeasurementCategoryInput {
-  """The ID of the expression to delete"""
-  id: ID!
-}
-
-"""Input for creating a new expression"""
-input StructureCategoryInput {
-  """
-  The ID of the graph this expression belongs to. If not provided, uses default ontology
-  """
-  graph: ID!
-
-  """A detailed description of the expression"""
-  description: String = null
-
-  """Permanent URL identifier for the expression"""
-  purl: String = null
-
-  """RGBA color values as list of 3 or 4 integers"""
-  color: [Int!] = null
-
-  """An optional image associated with this expression"""
-  image: RemoteUpload = null
-
-  """A list of tags associated with this expression"""
-  tags: [String!] = null
-
-  """Whether this expression should be pinned or not"""
-  pin: Boolean = null
-
-  """The ID of the sequence this category will get internal_ids from"""
-  sequence: ID = null
-
-  """Whether to create a sequence if it does not exist"""
-  autoCreateSequence: Boolean = false
-
-  """The label/name of the expression"""
-  identifier: StructureIdentifier!
-}
-
-"""
-The `RemoteUpload` scalar type represents a reference to a remote upload on a datalayer
-"""
-scalar RemoteUpload
-
-"""Input for updating an existing expression"""
-input UpdateStructureCategoryInput {
-  """A detailed description of the expression"""
-  description: String = null
-
-  """Permanent URL identifier for the expression"""
-  purl: String = null
-
-  """RGBA color values as list of 3 or 4 integers"""
-  color: [Int!] = null
-
-  """An optional image associated with this expression"""
-  image: ID = null
-
-  """A list of tags associated with this expression"""
-  tags: [String!] = null
-
-  """Whether this expression should be pinned or not"""
-  pin: Boolean = null
-
-  """The ID of the expression to update"""
-  id: ID!
-
-  """The label/name of the expression"""
-  identifier: String = null
-}
-
-"""Input for deleting an expression"""
-input DeleteStructureCategoryInput {
-  """The ID of the expression to delete"""
-  id: ID!
-}
-
-"""Input for creating a new expression"""
-input RelationCategoryInput {
-  """
-  The ID of the graph this expression belongs to. If not provided, uses default ontology
-  """
-  graph: ID!
-
+"""Input for creating a new natural event category"""
+input NaturalEventCategorySchemaInput {
   """A detailed description of the expression"""
   description: String = null
 
@@ -2592,150 +3000,8 @@ input RelationCategoryInput {
   """Whether to create a sequence if it does not exist"""
   autoCreateSequence: Boolean = false
 
-  """The label/name of the expression"""
-  label: String!
-
-  """The source definition for this expression"""
-  sourceDefinition: EntityCategoryDefinitionInput!
-
-  """The target definition for this expression"""
-  targetDefinition: EntityCategoryDefinitionInput!
-}
-
-"""Input for updating an existing expression"""
-input UpdateRelationCategoryInput {
-  """A detailed description of the expression"""
-  description: String = null
-
-  """Permanent URL identifier for the expression"""
-  purl: String = null
-
-  """RGBA color values as list of 3 or 4 integers"""
-  color: [Int!] = null
-
-  """An optional image associated with this expression"""
-  image: ID = null
-
-  """A list of tags associated with this expression"""
-  tags: [String!] = null
-
-  """Whether this expression should be pinned or not"""
-  pin: Boolean = null
-
-  """New label for the expression"""
-  label: String = null
-}
-
-"""Input for deleting an expression"""
-input DeleteRelationCategoryInput {
-  """The ID of the expression to delete"""
-  id: ID!
-}
-
-"""Input for creating a new expression"""
-input StructureRelationCategoryInput {
-  """
-  The ID of the graph this expression belongs to. If not provided, uses default ontology
-  """
-  graph: ID!
-
-  """A detailed description of the expression"""
-  description: String = null
-
-  """Permanent URL identifier for the expression"""
-  purl: String = null
-
-  """RGBA color values as list of 3 or 4 integers"""
-  color: [Int!] = null
-
-  """An optional image associated with this expression"""
-  image: ID = null
-
-  """A list of tags associated with this expression"""
-  tags: [String!] = null
-
-  """Whether this expression should be pinned or not"""
-  pin: Boolean = null
-
-  """The ID of the sequence this category will get internal_ids from"""
-  sequence: ID = null
-
-  """Whether to create a sequence if it does not exist"""
-  autoCreateSequence: Boolean = false
-
-  """The label/name of the expression"""
-  label: String!
-
-  """The source definition for this expression"""
-  sourceDefinition: StructureCategoryDefinitionInput!
-
-  """The target definition for this expression"""
-  targetDefinition: StructureCategoryDefinitionInput!
-}
-
-"""Input for updating an existing expression"""
-input UpdateStructureRelationCategoryInput {
-  """A detailed description of the expression"""
-  description: String = null
-
-  """Permanent URL identifier for the expression"""
-  purl: String = null
-
-  """RGBA color values as list of 3 or 4 integers"""
-  color: [Int!] = null
-
-  """An optional image associated with this expression"""
-  image: ID = null
-
-  """A list of tags associated with this expression"""
-  tags: [String!] = null
-
-  """Whether this expression should be pinned or not"""
-  pin: Boolean = null
-
-  """New label for the expression"""
-  label: String = null
-
-  """The ID of the expression to update"""
-  id: ID!
-}
-
-"""Input for deleting an expression"""
-input DeleteStructureRelationCategoryInput {
-  """The ID of the expression to delete"""
-  id: ID!
-}
-
-"""Input for creating a new expression"""
-input EntityCategoryInput {
-  """
-  The ID of the graph this expression belongs to. If not provided, uses default ontology
-  """
-  graph: ID!
-
-  """A detailed description of the expression"""
-  description: String = null
-
-  """Permanent URL identifier for the expression"""
-  purl: String = null
-
-  """RGBA color values as list of 3 or 4 integers"""
-  color: [Int!] = null
-
-  """An optional image associated with this expression"""
-  image: ID = null
-
-  """A list of tags associated with this expression"""
-  tags: [String!] = null
-
-  """Whether this expression should be pinned or not"""
-  pin: Boolean = null
-
-  """The ID of the sequence this category will get internal_ids from"""
-  sequence: ID = null
-
-  """Whether to create a sequence if it does not exist"""
-  autoCreateSequence: Boolean = false
+  """A list of descriptor IDs to associate with this category"""
+  descriptors: [DescriptorInput!] = null
 
   """An optional x position for the ontology node"""
   positionX: Float = null
@@ -2749,224 +3015,17 @@ input EntityCategoryInput {
   """An optional width for the ontology node"""
   width: Float = null
 
-  """The label/name of the expression"""
-  label: String!
-}
-
-"""Input for updating an existing generic category"""
-input UpdateEntityCategoryInput {
-  """New description for the expression"""
-  description: String = null
-
-  """New permanent URL for the expression"""
-  purl: String = null
-
-  """New RGBA color values as list of 3 or 4 integers"""
-  color: [Int!] = null
-
-  """New image ID for the expression"""
-  image: ID = null
-
-  """A list of tags associated with this expression"""
-  tags: [String!] = null
-
-  """Whether this expression should be pinned or not"""
-  pin: Boolean = null
-
-  """An optional x position for the ontology node"""
-  positionX: Float = null
-
-  """An optional y position for the ontology node"""
-  positionY: Float = null
-
-  """An optional height for the ontology node"""
-  height: Float = null
-
-  """An optional width for the ontology node"""
-  width: Float = null
-
-  """The ID of the expression to update"""
-  id: ID!
-
-  """New label for the generic category"""
-  label: String = null
-}
-
-"""Input for deleting a generic category"""
-input DeleteEntityCategoryInput {
-  """The ID of the expression to delete"""
-  id: ID!
-}
-
-input StructureMetricInput {
-  structure: StructureString!
-
-  """The name of the measurement"""
-  label: String!
-
-  """The description of the measurement"""
-  description: String = null
-
-  """The kind of the metric"""
-  metricKind: MetricKind! = FLOAT
-
-  """The value of the measurement"""
-  value: Any!
-  graph: ID!
-}
-
-"""The `StructureString` scalar type represents a string with a structure"""
-scalar StructureString
-
-"""Input for creating a new expression"""
-input ReagentCategoryInput {
-  """
-  The ID of the graph this expression belongs to. If not provided, uses default ontology
-  """
-  graph: ID!
-
-  """A detailed description of the expression"""
-  description: String = null
-
-  """Permanent URL identifier for the expression"""
-  purl: String = null
-
-  """RGBA color values as list of 3 or 4 integers"""
-  color: [Int!] = null
-
-  """An optional image associated with this expression"""
-  image: ID = null
-
-  """A list of tags associated with this expression"""
-  tags: [String!] = null
-
-  """Whether this expression should be pinned or not"""
-  pin: Boolean = null
-
-  """The ID of the sequence this category will get internal_ids from"""
-  sequence: ID = null
-
-  """Whether to create a sequence if it does not exist"""
-  autoCreateSequence: Boolean = false
-
-  """An optional x position for the ontology node"""
-  positionX: Float = null
-
-  """An optional y position for the ontology node"""
-  positionY: Float = null
-
-  """An optional height for the ontology node"""
-  height: Float = null
-
-  """An optional width for the ontology node"""
-  width: Float = null
-
-  """The label/name of the expression"""
-  label: String!
-}
-
-"""Input for updating an existing generic category"""
-input UpdateReagentCategoryInput {
-  """A detailed description of the expression"""
-  description: String = null
-
-  """Permanent URL identifier for the expression"""
-  purl: String = null
-
-  """RGBA color values as list of 3 or 4 integers"""
-  color: [Int!] = null
-
-  """An optional image associated with this expression"""
-  image: ID = null
-
-  """A list of tags associated with this expression"""
-  tags: [String!] = null
-
-  """Whether this expression should be pinned or not"""
-  pin: Boolean = null
-
-  """An optional x position for the ontology node"""
-  positionX: Float = null
-
-  """An optional y position for the ontology node"""
-  positionY: Float = null
-
-  """An optional height for the ontology node"""
-  height: Float = null
-
-  """An optional width for the ontology node"""
-  width: Float = null
-
-  """The ID of the expression to update"""
-  id: ID!
-
-  """The label/name of the expression"""
-  label: String = null
-}
-
-"""Input for deleting a generic category"""
-input DeleteReagentCategoryInput {
-  """The ID of the expression to delete"""
-  id: ID!
-}
-
-"""Input for creating a new expression"""
-input NaturalEventCategoryInput {
-  """
-  The ID of the graph this expression belongs to. If not provided, uses default ontology
-  """
-  graph: ID!
-
-  """A detailed description of the expression"""
-  description: String = null
-
-  """Permanent URL identifier for the expression"""
-  purl: String = null
-
-  """RGBA color values as list of 3 or 4 integers"""
-  color: [Int!] = null
-
-  """An optional image associated with this expression"""
-  image: ID = null
-
-  """A list of tags associated with this expression"""
-  tags: [String!] = null
-
-  """Whether this expression should be pinned or not"""
-  pin: Boolean = null
-
-  """The ID of the sequence this category will get internal_ids from"""
-  sequence: ID = null
-
-  """Whether to create a sequence if it does not exist"""
-  autoCreateSequence: Boolean = false
-
-  """An optional x position for the ontology node"""
-  positionX: Float = null
-
-  """An optional y position for the ontology node"""
-  positionY: Float = null
-
-  """An optional height for the ontology node"""
-  height: Float = null
-
-  """An optional width for the ontology node"""
-  width: Float = null
+  """A list of property definitions for this node category"""
+  propertyDefinitions: [PropertyDefinitionInput!] = null
 
   """The label/name of the expression"""
   label: String!
 
   """The source definitions for this expression"""
-  sourceEntityRoles: [EntityRoleDefinitionInput!]!
+  sourceEntityRoles: [EntityRoleDefinitionInput!] = null
 
   """The target definitions for this expression"""
-  targetEntityRoles: [EntityRoleDefinitionInput!]!
-
-  """The support definition for this expression"""
-  supportDefinition: CategoryDefinitionInput!
-
-  """A list of children for the plate"""
-  plateChildren: [PlateChildInput!] = null
+  targetEntityRoles: [EntityRoleDefinitionInput!] = null
 }
 
 """Input for creating a new expression"""
@@ -2996,103 +3055,8 @@ input EntityRoleDefinitionInput {
   createCategory: ID = null
 }
 
-"""Input for creating a new expression"""
-input CategoryDefinitionInput {
-  """A list of classes to filter the entities"""
-  categoryFilters: [ID!] = null
-
-  """A list of tags to filter the entities by"""
-  tagFilters: [String!] = null
-
-  """
-  The default ACTIVE reagent category to use for this port if a reagent is not provided
-  """
-  defaultUseActive: ID = null
-
-  """
-  The default creation of entity or reagent to use for this port if a reagent is not provided
-  """
-  defaultUseNew: ID = null
-}
-
-input PlateChildInput {
-  id: ID = null
-  type: String = null
-  text: String = null
-  children: [PlateChildInput!] = null
-  value: String = null
-  color: String = null
-  fontSize: String = null
-  backgroundColor: String = null
-  bold: Boolean = null
-  italic: Boolean = null
-  underline: Boolean = null
-}
-
-"""Input for updating an existing expression"""
-input UpdateNaturalEventCategoryInput {
-  """A detailed description of the expression"""
-  description: String = null
-
-  """Permanent URL identifier for the expression"""
-  purl: String = null
-
-  """RGBA color values as list of 3 or 4 integers"""
-  color: [Int!] = null
-
-  """An optional ID reference to an associated image"""
-  image: ID = null
-
-  """A list of tags associated with this expression"""
-  tags: [String!] = null
-
-  """Whether this expression should be pinned or not"""
-  pin: Boolean = null
-
-  """An optional x position for the ontology node"""
-  positionX: Float = null
-
-  """An optional y position for the ontology node"""
-  positionY: Float = null
-
-  """An optional height for the ontology node"""
-  height: Float = null
-
-  """An optional width for the ontology node"""
-  width: Float = null
-
-  """The ID of the expression to update"""
-  id: ID!
-
-  """The label/name of the expression"""
-  label: String = null
-
-  """The source definitions for this expression"""
-  sourceEntityRoles: [EntityRoleDefinitionInput!] = null
-
-  """The target definitions for this expression"""
-  targetEntityRoles: [EntityRoleDefinitionInput!] = null
-
-  """The support definition for this expression"""
-  supportDefinition: CategoryDefinitionInput = null
-
-  """A list of children for the plate"""
-  plateChildren: [PlateChildInput!] = null
-}
-
-"""Input for deleting an expression"""
-input DeleteNaturalEventCategoryInput {
-  """The ID of the expression to delete"""
-  id: ID!
-}
-
-"""Input for creating a new expression"""
-input ProtocolEventCategoryInput {
-  """
-  The ID of the graph this expression belongs to. If not provided, uses default ontology
-  """
-  graph: ID!
-
+"""Input for creating a new protocol event category"""
+input ProtocolEventCategorySchemaInput {
   """A detailed description of the expression"""
   description: String = null
 
@@ -3117,6 +3081,9 @@ input ProtocolEventCategoryInput {
   """Whether to create a sequence if it does not exist"""
   autoCreateSequence: Boolean = false
 
+  """A list of descriptor IDs to associate with this category"""
+  descriptors: [DescriptorInput!] = null
+
   """An optional x position for the ontology node"""
   positionX: Float = null
 
@@ -3129,22 +3096,22 @@ input ProtocolEventCategoryInput {
   """An optional width for the ontology node"""
   width: Float = null
 
+  """A list of property definitions for this node category"""
+  propertyDefinitions: [PropertyDefinitionInput!] = null
+
   """The label/name of the expression"""
   label: String!
 
-  """A list of children for the plate"""
-  plateChildren: [PlateChildInput!] = null
-
-  """The source definitions for this expression"""
+  """The source entity roles for this expression"""
   sourceEntityRoles: [EntityRoleDefinitionInput!] = null
 
-  """The target definitions for this expression"""
-  sourceReagentRoles: [ReagentRoleDefinitionInput!] = null
-
-  """The target definitions for this expression"""
+  """The target entity roles for this expression"""
   targetEntityRoles: [EntityRoleDefinitionInput!] = null
 
-  """The target definitions for this expression"""
+  """The source reagent roles for this expression"""
+  sourceReagentRoles: [ReagentRoleDefinitionInput!] = null
+
+  """The target reagent roles for this expression"""
   targetReagentRoles: [ReagentRoleDefinitionInput!] = null
 
   """The variable definitions for this expression"""
@@ -3224,15 +3191,1036 @@ input VariableDefinitionInput {
   options: [OptionInput!] = null
 }
 
-input OptionInput {
-  """The label of the option"""
+"""Input for creating a new protocol event category"""
+input RelationCategorySchemaInput {
+  """A detailed description of the expression"""
+  description: String = null
+
+  """Permanent URL identifier for the expression"""
+  purl: String = null
+
+  """RGBA color values as list of 3 or 4 integers"""
+  color: [Int!] = null
+
+  """An optional image associated with this expression"""
+  image: ID = null
+
+  """A list of tags associated with this expression"""
+  tags: [String!] = null
+
+  """Whether this expression should be pinned or not"""
+  pin: Boolean = null
+
+  """The ID of the sequence this category will get internal_ids from"""
+  sequence: ID = null
+
+  """Whether to create a sequence if it does not exist"""
+  autoCreateSequence: Boolean = false
+
+  """A list of descriptor IDs to associate with this category"""
+  descriptors: [DescriptorInput!] = null
+
+  """The label/name of the expression"""
   label: String!
 
-  """The value of the option. This can be a string, number, or boolean"""
-  value: Any!
+  """The source definition for this expression"""
+  sourceDefinition: SchemaDefinitionInput!
 
-  """A detailed description of the option"""
+  """The target definition for this expression"""
+  targetDefinition: SchemaDefinitionInput!
+
+  """A list of property definitions for this relation category"""
+  propertyDefinitions: [PropertyDefinitionInput!] = null
+}
+
+"""Input for creating a new protocol event category"""
+input SchemaDefinitionInput {
+  """A list of tags associated with this expression"""
+  tags: [String!] = null
+
+  """A list of labels associated with this expression"""
+  labels: [String!] = null
+}
+
+"""Input type for updating an existing ontology"""
+input UpdateGraphInput {
+  """The ID of the ontology to update"""
+  id: ID!
+
+  """New name for the ontology (will be converted to snake_case)"""
+  name: String = null
+
+  """A new PURL for the ontology (will be converted to snake_case)"""
+  purl: String = null
+
+  """New description for the ontology"""
   description: String = null
+
+  """New ID reference to an associated image"""
+  image: ID = null
+
+  """New nodes for the ontology"""
+  nodes: [GraphNodeInput!] = null
+
+  """Whether this ontology should be pinned or not"""
+  pin: Boolean = null
+}
+
+"""Input type for creating a new ontology node"""
+input GraphNodeInput {
+  """The AGE_NAME of the ontology"""
+  id: String!
+
+  """An optional x position for the ontology node"""
+  positionX: Float = null
+
+  """An optional y position for the ontology node"""
+  positionY: Float = null
+
+  """An optional height for the ontology node"""
+  height: Float = null
+
+  """An optional width for the ontology node"""
+  width: Float = null
+
+  """An optional RGBA color for the ontology node"""
+  color: [Int!] = null
+}
+
+"""Input type for deleting an ontology"""
+input MaterializeGraphInput {
+  """The ID of the ontology to delete"""
+  id: ID!
+}
+
+"""Input type for deleting an ontology"""
+input DeleteGraphInput {
+  """The ID of the ontology to delete"""
+  id: ID!
+}
+
+"""Input type for pinning an ontology"""
+input PinGraphInput {
+  """The ID of the ontology to pin"""
+  id: ID!
+
+  """Whether to pin the ontology or not"""
+  pinned: Boolean!
+}
+
+"""Input type for creating a relation between two entities"""
+input SetNodePropertyInput {
+  """ID of the entity (format: graph:id)"""
+  entity: ID!
+
+  """ID of the variable (format: graph:id)"""
+  variable: String!
+
+  """The value to set for the variable"""
+  value: Any!
+}
+
+"""Input type for creating a new entity"""
+input ImportGraphInput {
+  """The ID of the graph to import into"""
+  graph: ID!
+
+  """List of nodes to import"""
+  nodes: [NodeImport!]!
+
+  """List of edges to import"""
+  edges: [EdgeImport!]!
+}
+
+input NodeImport {
+  """The ID of the category to import entities into"""
+  categoryId: ID!
+
+  """A unique identifier for the node used to reference it in relations"""
+  importId: String!
+
+  """List of nodes to import (list of properties)"""
+  properties: MetricMap!
+}
+
+"""The `MetricMap` scalar type represents a matrix values as specified by"""
+scalar MetricMap
+
+input EdgeImport {
+  """The ID of the category to import relations into"""
+  categoryId: ID!
+
+  """The import ID of the source node"""
+  importIdFrom: String!
+
+  """The import ID of the target node"""
+  importIdTo: String!
+
+  """A unique identifier for the relation"""
+  importId: String!
+
+  """Properties to set on the relation"""
+  properties: MetricMap!
+}
+
+"""Input for creating a new expression"""
+input MetricCategoryInput {
+  """A detailed description of the expression"""
+  description: String = null
+
+  """Permanent URL identifier for the expression"""
+  purl: String = null
+
+  """RGBA color values as list of 3 or 4 integers"""
+  color: [Int!] = null
+
+  """An optional image associated with this expression"""
+  image: ID = null
+
+  """A list of tags associated with this expression"""
+  tags: [String!] = null
+
+  """Whether this expression should be pinned or not"""
+  pin: Boolean = null
+
+  """The ID of the sequence this category will get internal_ids from"""
+  sequence: ID = null
+
+  """Whether to create a sequence if it does not exist"""
+  autoCreateSequence: Boolean = false
+
+  """A list of descriptor IDs to associate with this category"""
+  descriptors: [DescriptorInput!] = null
+
+  """An optional x position for the ontology node"""
+  positionX: Float = null
+
+  """An optional y position for the ontology node"""
+  positionY: Float = null
+
+  """An optional height for the ontology node"""
+  height: Float = null
+
+  """An optional width for the ontology node"""
+  width: Float = null
+
+  """A list of property definitions for this node category"""
+  propertyDefinitions: [PropertyDefinitionInput!] = null
+
+  """The ID of the graph"""
+  graph: ID!
+
+  """The structure category that this metric describes"""
+  structureCategory: ID = null
+
+  """The structure identifier within the structure category"""
+  structureIdentifier: StructureIdentifier = null
+
+  """The label/name of the expression"""
+  label: String!
+
+  """The type of metric data this expression represents"""
+  kind: MetricKind!
+}
+
+"""Input for updating an existing expression"""
+input UpdateMetricCategoryInput {
+  """A detailed description of the expression"""
+  description: String = null
+
+  """Permanent URL identifier for the expression"""
+  purl: String = null
+
+  """RGBA color values as list of 3 or 4 integers"""
+  color: [Int!] = null
+
+  """An optional image associated with this expression"""
+  image: ID = null
+
+  """A list of tags associated with this expression"""
+  tags: [String!] = null
+
+  """Whether this expression should be pinned or not"""
+  pin: Boolean = null
+
+  """An optional x position for the ontology node"""
+  positionX: Float = null
+
+  """An optional y position for the ontology node"""
+  positionY: Float = null
+
+  """An optional height for the ontology node"""
+  height: Float = null
+
+  """An optional width for the ontology node"""
+  width: Float = null
+
+  """A list of property definitions for this node category"""
+  propertyDefinitions: [PropertyDefinitionInput!] = null
+
+  """The type of metric data this expression represents"""
+  kind: MetricKind = null
+
+  """The structure category for this expression"""
+  structureDefinition: StructureCategoryDefinitionInput = null
+}
+
+"""Input for deleting an expression"""
+input DeleteMetricCategoryInput {
+  """The ID of the expression to delete"""
+  id: ID!
+}
+
+"""Input for creating a new expression"""
+input MeasurementCategoryInput {
+  """A detailed description of the expression"""
+  description: String = null
+
+  """Permanent URL identifier for the expression"""
+  purl: String = null
+
+  """RGBA color values as list of 3 or 4 integers"""
+  color: [Int!] = null
+
+  """An optional image associated with this expression"""
+  image: ID = null
+
+  """A list of tags associated with this expression"""
+  tags: [String!] = null
+
+  """Whether this expression should be pinned or not"""
+  pin: Boolean = null
+
+  """The ID of the sequence this category will get internal_ids from"""
+  sequence: ID = null
+
+  """Whether to create a sequence if it does not exist"""
+  autoCreateSequence: Boolean = false
+
+  """A list of descriptor IDs to associate with this category"""
+  descriptors: [DescriptorInput!] = null
+
+  """The label/name of the expression"""
+  label: String!
+
+  """The source definition for this expression"""
+  structureDefinition: StructureCategoryDefinitionInput!
+
+  """The target definition for this expression"""
+  entityDefinition: EntityCategoryDefinitionInput!
+
+  """
+  The ID of the graph this expression belongs to. If not provided, uses default ontology
+  """
+  graph: ID!
+}
+
+"""Input for updating an existing expression"""
+input UpdateMeasurementCategoryInput {
+  """The ID of the expression to update"""
+  id: ID!
+
+  """New label for the expression"""
+  label: String = null
+
+  """New description for the expression"""
+  description: String = null
+
+  """New permanent URL for the expression"""
+  purl: String = null
+
+  """New RGBA color values as list of 3 or 4 integers"""
+  color: [Int!] = null
+
+  """New image ID for the expression"""
+  image: ID = null
+}
+
+"""Input for deleting an expression"""
+input DeleteMeasurementCategoryInput {
+  """The ID of the expression to delete"""
+  id: ID!
+}
+
+"""Input for creating a new expression"""
+input StructureCategoryInput {
+  """A detailed description of the expression"""
+  description: String = null
+
+  """Permanent URL identifier for the expression"""
+  purl: String = null
+
+  """RGBA color values as list of 3 or 4 integers"""
+  color: [Int!] = null
+
+  """An optional image associated with this expression"""
+  image: RemoteUpload = null
+
+  """A list of tags associated with this expression"""
+  tags: [String!] = null
+
+  """Whether this expression should be pinned or not"""
+  pin: Boolean = null
+
+  """The ID of the sequence this category will get internal_ids from"""
+  sequence: ID = null
+
+  """Whether to create a sequence if it does not exist"""
+  autoCreateSequence: Boolean = false
+
+  """A list of descriptor IDs to associate with this category"""
+  descriptors: [DescriptorInput!] = null
+
+  """An optional x position for the ontology node"""
+  positionX: Float = null
+
+  """An optional y position for the ontology node"""
+  positionY: Float = null
+
+  """An optional height for the ontology node"""
+  height: Float = null
+
+  """An optional width for the ontology node"""
+  width: Float = null
+
+  """A list of property definitions for this node category"""
+  propertyDefinitions: [PropertyDefinitionInput!] = null
+
+  """The ID of the graph"""
+  graph: ID!
+
+  """The label/name of the expression"""
+  identifier: StructureIdentifier!
+}
+
+"""
+The `RemoteUpload` scalar type represents a reference to a remote upload on a datalayer
+"""
+scalar RemoteUpload
+
+"""Input for updating an existing expression"""
+input UpdateStructureCategoryInput {
+  """A detailed description of the expression"""
+  description: String = null
+
+  """Permanent URL identifier for the expression"""
+  purl: String = null
+
+  """RGBA color values as list of 3 or 4 integers"""
+  color: [Int!] = null
+
+  """An optional image associated with this expression"""
+  image: ID = null
+
+  """A list of tags associated with this expression"""
+  tags: [String!] = null
+
+  """Whether this expression should be pinned or not"""
+  pin: Boolean = null
+
+  """The ID of the expression to update"""
+  id: ID!
+
+  """The label/name of the expression"""
+  identifier: String = null
+}
+
+"""Input for deleting an expression"""
+input DeleteStructureCategoryInput {
+  """The ID of the expression to delete"""
+  id: ID!
+}
+
+"""Input for creating a new expression"""
+input RelationCategoryInput {
+  """A detailed description of the expression"""
+  description: String = null
+
+  """Permanent URL identifier for the expression"""
+  purl: String = null
+
+  """RGBA color values as list of 3 or 4 integers"""
+  color: [Int!] = null
+
+  """An optional image associated with this expression"""
+  image: ID = null
+
+  """A list of tags associated with this expression"""
+  tags: [String!] = null
+
+  """Whether this expression should be pinned or not"""
+  pin: Boolean = null
+
+  """The ID of the sequence this category will get internal_ids from"""
+  sequence: ID = null
+
+  """Whether to create a sequence if it does not exist"""
+  autoCreateSequence: Boolean = false
+
+  """A list of descriptor IDs to associate with this category"""
+  descriptors: [DescriptorInput!] = null
+
+  """The ID of the graph"""
+  graph: ID!
+
+  """The label/name of the expression"""
+  label: String!
+
+  """The source definition for this expression"""
+  sourceDefinition: EntityCategoryDefinitionInput!
+
+  """The target definition for this expression"""
+  targetDefinition: EntityCategoryDefinitionInput!
+}
+
+"""Input for updating an existing expression"""
+input UpdateRelationCategoryInput {
+  """A detailed description of the expression"""
+  description: String = null
+
+  """Permanent URL identifier for the expression"""
+  purl: String = null
+
+  """RGBA color values as list of 3 or 4 integers"""
+  color: [Int!] = null
+
+  """An optional image associated with this expression"""
+  image: ID = null
+
+  """A list of tags associated with this expression"""
+  tags: [String!] = null
+
+  """Whether this expression should be pinned or not"""
+  pin: Boolean = null
+
+  """New label for the expression"""
+  label: String = null
+}
+
+"""Input for deleting an expression"""
+input DeleteRelationCategoryInput {
+  """The ID of the expression to delete"""
+  id: ID!
+}
+
+"""Input for creating a new expression"""
+input StructureRelationCategoryInput {
+  """A detailed description of the expression"""
+  description: String = null
+
+  """Permanent URL identifier for the expression"""
+  purl: String = null
+
+  """RGBA color values as list of 3 or 4 integers"""
+  color: [Int!] = null
+
+  """An optional image associated with this expression"""
+  image: ID = null
+
+  """A list of tags associated with this expression"""
+  tags: [String!] = null
+
+  """Whether this expression should be pinned or not"""
+  pin: Boolean = null
+
+  """The ID of the sequence this category will get internal_ids from"""
+  sequence: ID = null
+
+  """Whether to create a sequence if it does not exist"""
+  autoCreateSequence: Boolean = false
+
+  """A list of descriptor IDs to associate with this category"""
+  descriptors: [DescriptorInput!] = null
+
+  """The ID of the graph"""
+  graph: ID!
+
+  """The label/name of the expression"""
+  label: String!
+
+  """The source definition for this expression"""
+  sourceDefinition: StructureCategoryDefinitionInput!
+
+  """The target definition for this expression"""
+  targetDefinition: StructureCategoryDefinitionInput!
+}
+
+"""Input for updating an existing expression"""
+input UpdateStructureRelationCategoryInput {
+  """A detailed description of the expression"""
+  description: String = null
+
+  """Permanent URL identifier for the expression"""
+  purl: String = null
+
+  """RGBA color values as list of 3 or 4 integers"""
+  color: [Int!] = null
+
+  """An optional image associated with this expression"""
+  image: ID = null
+
+  """A list of tags associated with this expression"""
+  tags: [String!] = null
+
+  """Whether this expression should be pinned or not"""
+  pin: Boolean = null
+
+  """New label for the expression"""
+  label: String = null
+
+  """The ID of the expression to update"""
+  id: ID!
+}
+
+"""Input for deleting an expression"""
+input DeleteStructureRelationCategoryInput {
+  """The ID of the expression to delete"""
+  id: ID!
+}
+
+"""Input for creating a new expression"""
+input EntityCategoryInput {
+  """A detailed description of the expression"""
+  description: String = null
+
+  """Permanent URL identifier for the expression"""
+  purl: String = null
+
+  """RGBA color values as list of 3 or 4 integers"""
+  color: [Int!] = null
+
+  """An optional image associated with this expression"""
+  image: ID = null
+
+  """A list of tags associated with this expression"""
+  tags: [String!] = null
+
+  """Whether this expression should be pinned or not"""
+  pin: Boolean = null
+
+  """The ID of the sequence this category will get internal_ids from"""
+  sequence: ID = null
+
+  """Whether to create a sequence if it does not exist"""
+  autoCreateSequence: Boolean = false
+
+  """A list of descriptor IDs to associate with this category"""
+  descriptors: [DescriptorInput!] = null
+
+  """An optional x position for the ontology node"""
+  positionX: Float = null
+
+  """An optional y position for the ontology node"""
+  positionY: Float = null
+
+  """An optional height for the ontology node"""
+  height: Float = null
+
+  """An optional width for the ontology node"""
+  width: Float = null
+
+  """A list of property definitions for this node category"""
+  propertyDefinitions: [PropertyDefinitionInput!] = null
+
+  """The label/name of the expression"""
+  label: String!
+
+  """
+  The ID of the graph this expression belongs to. If not provided, uses default ontology
+  """
+  graph: ID!
+}
+
+"""Input for updating an existing generic category"""
+input UpdateEntityCategoryInput {
+  """New description for the expression"""
+  description: String = null
+
+  """New permanent URL for the expression"""
+  purl: String = null
+
+  """New RGBA color values as list of 3 or 4 integers"""
+  color: [Int!] = null
+
+  """New image ID for the expression"""
+  image: ID = null
+
+  """A list of tags associated with this expression"""
+  tags: [String!] = null
+
+  """Whether this expression should be pinned or not"""
+  pin: Boolean = null
+
+  """An optional x position for the ontology node"""
+  positionX: Float = null
+
+  """An optional y position for the ontology node"""
+  positionY: Float = null
+
+  """An optional height for the ontology node"""
+  height: Float = null
+
+  """An optional width for the ontology node"""
+  width: Float = null
+
+  """A list of property definitions for this node category"""
+  propertyDefinitions: [PropertyDefinitionInput!] = null
+
+  """The ID of the expression to update"""
+  id: ID!
+
+  """New label for the generic category"""
+  label: String = null
+}
+
+"""Input for deleting a generic category"""
+input DeleteEntityCategoryInput {
+  """The ID of the expression to delete"""
+  id: ID!
+}
+
+input StructureMetricInput {
+  structure: StructureString!
+
+  """The name of the measurement"""
+  label: String!
+
+  """The description of the measurement"""
+  description: String = null
+
+  """The kind of the metric"""
+  metricKind: MetricKind! = FLOAT
+
+  """The value of the measurement"""
+  value: Any!
+  graph: ID!
+}
+
+"""The `StructureString` scalar type represents a string with a structure"""
+scalar StructureString
+
+"""Input for creating a new expression"""
+input ReagentCategoryInput {
+  """A detailed description of the expression"""
+  description: String = null
+
+  """Permanent URL identifier for the expression"""
+  purl: String = null
+
+  """RGBA color values as list of 3 or 4 integers"""
+  color: [Int!] = null
+
+  """An optional image associated with this expression"""
+  image: ID = null
+
+  """A list of tags associated with this expression"""
+  tags: [String!] = null
+
+  """Whether this expression should be pinned or not"""
+  pin: Boolean = null
+
+  """The ID of the sequence this category will get internal_ids from"""
+  sequence: ID = null
+
+  """Whether to create a sequence if it does not exist"""
+  autoCreateSequence: Boolean = false
+
+  """A list of descriptor IDs to associate with this category"""
+  descriptors: [DescriptorInput!] = null
+
+  """An optional x position for the ontology node"""
+  positionX: Float = null
+
+  """An optional y position for the ontology node"""
+  positionY: Float = null
+
+  """An optional height for the ontology node"""
+  height: Float = null
+
+  """An optional width for the ontology node"""
+  width: Float = null
+
+  """A list of property definitions for this node category"""
+  propertyDefinitions: [PropertyDefinitionInput!] = null
+
+  """The ID of the graph"""
+  graph: ID!
+
+  """The label/name of the expression"""
+  label: String!
+}
+
+"""Input for updating an existing generic category"""
+input UpdateReagentCategoryInput {
+  """A detailed description of the expression"""
+  description: String = null
+
+  """Permanent URL identifier for the expression"""
+  purl: String = null
+
+  """RGBA color values as list of 3 or 4 integers"""
+  color: [Int!] = null
+
+  """An optional image associated with this expression"""
+  image: ID = null
+
+  """A list of tags associated with this expression"""
+  tags: [String!] = null
+
+  """Whether this expression should be pinned or not"""
+  pin: Boolean = null
+
+  """An optional x position for the ontology node"""
+  positionX: Float = null
+
+  """An optional y position for the ontology node"""
+  positionY: Float = null
+
+  """An optional height for the ontology node"""
+  height: Float = null
+
+  """An optional width for the ontology node"""
+  width: Float = null
+
+  """A list of property definitions for this node category"""
+  propertyDefinitions: [PropertyDefinitionInput!] = null
+
+  """The ID of the expression to update"""
+  id: ID!
+
+  """The label/name of the expression"""
+  label: String = null
+}
+
+"""Input for deleting a generic category"""
+input DeleteReagentCategoryInput {
+  """The ID of the expression to delete"""
+  id: ID!
+}
+
+"""Input for creating a new expression"""
+input NaturalEventCategoryInput {
+  """A detailed description of the expression"""
+  description: String = null
+
+  """Permanent URL identifier for the expression"""
+  purl: String = null
+
+  """RGBA color values as list of 3 or 4 integers"""
+  color: [Int!] = null
+
+  """An optional image associated with this expression"""
+  image: ID = null
+
+  """A list of tags associated with this expression"""
+  tags: [String!] = null
+
+  """Whether this expression should be pinned or not"""
+  pin: Boolean = null
+
+  """The ID of the sequence this category will get internal_ids from"""
+  sequence: ID = null
+
+  """Whether to create a sequence if it does not exist"""
+  autoCreateSequence: Boolean = false
+
+  """A list of descriptor IDs to associate with this category"""
+  descriptors: [DescriptorInput!] = null
+
+  """An optional x position for the ontology node"""
+  positionX: Float = null
+
+  """An optional y position for the ontology node"""
+  positionY: Float = null
+
+  """An optional height for the ontology node"""
+  height: Float = null
+
+  """An optional width for the ontology node"""
+  width: Float = null
+
+  """A list of property definitions for this node category"""
+  propertyDefinitions: [PropertyDefinitionInput!] = null
+
+  """The ID of the graph"""
+  graph: ID!
+
+  """The label/name of the expression"""
+  label: String!
+
+  """The source definitions for this expression"""
+  sourceEntityRoles: [EntityRoleDefinitionInput!]!
+
+  """The target definitions for this expression"""
+  targetEntityRoles: [EntityRoleDefinitionInput!]!
+
+  """The support definition for this expression"""
+  supportDefinition: CategoryDefinitionInput!
+
+  """A list of children for the plate"""
+  plateChildren: [PlateChildInput!] = null
+}
+
+"""Input for creating a new expression"""
+input CategoryDefinitionInput {
+  """A list of classes to filter the entities"""
+  categoryFilters: [ID!] = null
+
+  """A list of tags to filter the entities by"""
+  tagFilters: [String!] = null
+
+  """
+  The default ACTIVE reagent category to use for this port if a reagent is not provided
+  """
+  defaultUseActive: ID = null
+
+  """
+  The default creation of entity or reagent to use for this port if a reagent is not provided
+  """
+  defaultUseNew: ID = null
+}
+
+input PlateChildInput {
+  id: ID = null
+  type: String = null
+  text: String = null
+  children: [PlateChildInput!] = null
+  value: String = null
+  color: String = null
+  fontSize: String = null
+  backgroundColor: String = null
+  bold: Boolean = null
+  italic: Boolean = null
+  underline: Boolean = null
+}
+
+"""Input for updating an existing expression"""
+input UpdateNaturalEventCategoryInput {
+  """A detailed description of the expression"""
+  description: String = null
+
+  """Permanent URL identifier for the expression"""
+  purl: String = null
+
+  """RGBA color values as list of 3 or 4 integers"""
+  color: [Int!] = null
+
+  """An optional ID reference to an associated image"""
+  image: ID = null
+
+  """A list of tags associated with this expression"""
+  tags: [String!] = null
+
+  """Whether this expression should be pinned or not"""
+  pin: Boolean = null
+
+  """An optional x position for the ontology node"""
+  positionX: Float = null
+
+  """An optional y position for the ontology node"""
+  positionY: Float = null
+
+  """An optional height for the ontology node"""
+  height: Float = null
+
+  """An optional width for the ontology node"""
+  width: Float = null
+
+  """A list of property definitions for this node category"""
+  propertyDefinitions: [PropertyDefinitionInput!] = null
+
+  """The ID of the expression to update"""
+  id: ID!
+
+  """The label/name of the expression"""
+  label: String = null
+
+  """The source definitions for this expression"""
+  sourceEntityRoles: [EntityRoleDefinitionInput!] = null
+
+  """The target definitions for this expression"""
+  targetEntityRoles: [EntityRoleDefinitionInput!] = null
+
+  """The support definition for this expression"""
+  supportDefinition: CategoryDefinitionInput = null
+
+  """A list of children for the plate"""
+  plateChildren: [PlateChildInput!] = null
+}
+
+"""Input for deleting an expression"""
+input DeleteNaturalEventCategoryInput {
+  """The ID of the expression to delete"""
+  id: ID!
+}
+
+"""Input for creating a new expression"""
+input ProtocolEventCategoryInput {
+  """A detailed description of the expression"""
+  description: String = null
+
+  """Permanent URL identifier for the expression"""
+  purl: String = null
+
+  """RGBA color values as list of 3 or 4 integers"""
+  color: [Int!] = null
+
+  """An optional image associated with this expression"""
+  image: ID = null
+
+  """A list of tags associated with this expression"""
+  tags: [String!] = null
+
+  """Whether this expression should be pinned or not"""
+  pin: Boolean = null
+
+  """The ID of the sequence this category will get internal_ids from"""
+  sequence: ID = null
+
+  """Whether to create a sequence if it does not exist"""
+  autoCreateSequence: Boolean = false
+
+  """A list of descriptor IDs to associate with this category"""
+  descriptors: [DescriptorInput!] = null
+
+  """An optional x position for the ontology node"""
+  positionX: Float = null
+
+  """An optional y position for the ontology node"""
+  positionY: Float = null
+
+  """An optional height for the ontology node"""
+  height: Float = null
+
+  """An optional width for the ontology node"""
+  width: Float = null
+
+  """A list of property definitions for this node category"""
+  propertyDefinitions: [PropertyDefinitionInput!] = null
+
+  """The ID of the graph"""
+  graph: ID!
+
+  """The label/name of the expression"""
+  label: String!
+
+  """A list of children for the plate"""
+  plateChildren: [PlateChildInput!] = null
+
+  """The source definitions for this expression"""
+  sourceEntityRoles: [EntityRoleDefinitionInput!] = null
+
+  """The target definitions for this expression"""
+  sourceReagentRoles: [ReagentRoleDefinitionInput!] = null
+
+  """The target definitions for this expression"""
+  targetEntityRoles: [EntityRoleDefinitionInput!] = null
+
+  """The target definitions for this expression"""
+  targetReagentRoles: [ReagentRoleDefinitionInput!] = null
+
+  """The variable definitions for this expression"""
+  variableDefinitions: [VariableDefinitionInput!] = null
 }
 
 """Input for updating an existing expression"""
@@ -3266,6 +4254,9 @@ input UpdateProtocolEventCategoryInput {
 
   """An optional width for the ontology node"""
   width: Float = null
+
+  """A list of property definitions for this node category"""
+  propertyDefinitions: [PropertyDefinitionInput!] = null
 
   """The ID of the expression to update"""
   id: ID!
@@ -3343,6 +4334,48 @@ input DeleteScatterPlotInput {
   id: ID!
 }
 
+"""Input for updating an existing expression"""
+input UpdateScatterPlotInput {
+  """The query to use"""
+  query: ID!
+
+  """The label/name of the expression"""
+  name: String!
+
+  """A detailed description of the expression"""
+  description: String = null
+
+  """The column to use for the ID of the points"""
+  idColumn: String!
+
+  """The column to use for the x-axis"""
+  xColumn: String!
+
+  """The column to use for the x-axis ID (node, or edge)"""
+  xIdColumn: String = null
+
+  """The column to use for the y-axis"""
+  yColumn: String!
+
+  """The column to use for the y-axis ID (node, or edge)"""
+  yIdColumn: String = null
+
+  """The column to use for the size of the points"""
+  sizeColumn: String = null
+
+  """The column to use for the color of the points"""
+  colorColumn: String = null
+
+  """The column to use for the shape of the points"""
+  shapeColumn: String = null
+
+  """The graph to test against"""
+  testAgainst: ID = null
+
+  """The ID of the expression to update"""
+  id: ID!
+}
+
 input RecordNaturalEventInput {
   category: ID!
   entitySources: [NodeMapping!] = null
@@ -3375,6 +4408,14 @@ input RecordProtocolEventInput {
 input VariableMappingInput {
   key: String!
   value: Any!
+}
+
+input DeleteNodeInput {
+  id: ID!
+}
+
+input DeleteEdgeInput {
+  id: ID!
 }
 
 """Input type for creating a new entity"""
@@ -3537,6 +4578,14 @@ input EntityInput {
 
   """Whether the entity should be pinned"""
   pinned: Boolean = null
+
+  """Optional variables to set on the entity upon creation"""
+  variables: MetricMap = null
+
+  """
+  Optional properties to set on the entity upon creation. Properties will be validated and serialized according to their definitions.
+  """
+  properties: MetricMap = null
 }
 
 input DeleteEntityInput {
@@ -3584,11 +4633,30 @@ input GraphQueryInput {
   """The columns (if ViewKind is Table)"""
   columns: [ColumnInput!] = null
 
+  """
+  An optional node category to associate with this query (if its a node-list)
+  """
+  nodeCategory: ID = null
+
   """A list of categories where this query is releveant and should be shown"""
   relevantFor: [ID!] = null
 
   """Whether to pin this expression for the current user"""
   pin: Boolean = null
+
+  """
+  If true, will check that the query can be rendered. If false, will skip this check.
+  """
+  checkExists: Boolean! = true
+
+  """List of paths to match in the query"""
+  matches: [MatchPathInput!] = null
+
+  """List of where clauses to apply to the query"""
+  wheres: [WhereClauseInput!] = null
+
+  """List of return statements for the query"""
+  returns: [ReturnInput!] = null
 }
 
 """The `Cypher` scalar type represents a cypher query"""
@@ -3605,6 +4673,58 @@ input ColumnInput {
   idfor: [ID!] = null
   preferhidden: Boolean = null
   identifier: String = null
+}
+
+"""Input for creating a new expression"""
+input MatchPathInput {
+  """List of node IDs to match"""
+  nodes: [ID!]!
+
+  """List of node IDs representing the path"""
+  relations: [ID!]!
+
+  """Whether the path match is optional"""
+  optional: Boolean! = false
+
+  """Title for the matched path"""
+  title: String = null
+
+  """Color for the matched path as RGB values"""
+  color: [Float!] = null
+
+  """
+  List of booleans indicating the direction of each relationship in the path (True for outgoing, False for incoming)
+  """
+  relationDirections: [Boolean!] = null
+}
+
+"""Input for updating an existing expression"""
+input WhereClauseInput {
+  """The path ID to apply the where clause to"""
+  path: ID!
+
+  """The node ID to apply the where clause to"""
+  node: ID = null
+
+  """The property name to filter on"""
+  property: String!
+
+  """The operator to use for filtering"""
+  operator: WhereOperator!
+
+  """The value to compare against"""
+  value: CypherLiteral!
+}
+
+input ReturnInput {
+  """The path ID to return"""
+  path: ID!
+
+  """The node ID to return"""
+  node: ID = null
+
+  """The property name to return"""
+  property: String = null
 }
 
 """Input for updating an existing expression"""
@@ -3629,13 +4749,38 @@ input UpdateGraphQueryInput {
   """The columns (if ViewKind is Table)"""
   columns: [ColumnInput!] = null
 
+  """
+  An optional node category to associate with this query (if its a node-list)
+  """
+  nodeCategory: ID = null
+
   """A list of categories where this query is releveant and should be shown"""
   relevantFor: [ID!] = null
 
   """Whether to pin this expression for the current user"""
   pin: Boolean = null
 
+  """
+  If true, will check that the query can be rendered. If false, will skip this check.
+  """
+  checkExists: Boolean! = true
+
+  """List of paths to match in the query"""
+  matches: [MatchPathInput!] = null
+
+  """List of where clauses to apply to the query"""
+  wheres: [WhereClauseInput!] = null
+
+  """List of return statements for the query"""
+  returns: [ReturnInput!] = null
+
   """The ID of the expression to update"""
+  id: ID!
+}
+
+"""Input for deleting an expression"""
+input DeleteGraphQueryInput {
+  """The ID of the expression to delete"""
   id: ID!
 }
 
@@ -3679,6 +4824,41 @@ input NodeQueryInput {
 input PinNodeQueryInput {
   id: ID!
   pin: Boolean!
+}
+
+"""Input for updating an existing expression"""
+input UpdateNodeQueryInput {
+  """
+  The ID of the ontology this expression belongs to. If not provided, uses default ontology
+  """
+  graph: ID!
+
+  """The label/name of the expression"""
+  name: String!
+
+  """The label/name of the expression"""
+  query: Cypher!
+
+  """A detailed description of the expression"""
+  description: String = null
+
+  """The kind/type of this expression"""
+  kind: ViewKind!
+
+  """The columns (if ViewKind is Table)"""
+  columns: [ColumnInput!] = null
+
+  """The node to test against"""
+  testAgainst: ID = null
+
+  """The list of categories this expression is relevant for"""
+  relevantFor: [ID!] = null
+
+  """Whether to pin this expression for the current user"""
+  pin: Boolean = null
+
+  """The ID of the expression to update"""
+  id: ID!
 }
 
 type Subscription {

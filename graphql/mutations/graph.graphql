@@ -10,6 +10,12 @@ mutation PinGraph($input: PinGraphInput!) {
   }
 }
 
+mutation ImportGraph($input: ImportGraphInput!) {
+  importGraph(input: $input) {
+    ...Graph
+  }
+}
+
 mutation DeleteGraph($input: DeleteGraphInput!) {
   deleteGraph(input: $input)
 }

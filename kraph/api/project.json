@@ -26,7 +26,9 @@
                 "StructureIdentifier": "kraph.scalars.StructureIdentifier",
                 "UntypedPlateChild": "typing.Any",
                 "Cypher": "kraph.scalars.Cypher",
+                "CypherLiteral": "kraph.scalars.CypherLiteral",
                 "Any": "typing.Any",
+                "MetricMap": "typing.Any",
                 "NodeID": "kraph.scalars.NodeID",
                 "ArrayLike": "kraph.scalars.ArrayLike",
                 "ParquetLike": "kraph.scalars.ParquetLike",
@@ -141,6 +143,9 @@
                 "RelationCategoryInput": [
                     "kraph.traits.RelationCategoryInputTrait"
                 ],
+                "SchemaInput": [
+                    "kraph.traits.SchemaBuilderTrait"
+                ],
                 "StructureRelationCategoryInput": [
                     "kraph.traits.StructureRelationCategoryInputTrait"
                 ],
@@ -173,6 +178,7 @@
                     "coercible_scalars": {
                         "ID": "rath.scalars.IDCoercible",
                         "Cypher": "kraph.scalars.CypherCoercible",
+                        "CypherLiteral": "kraph.scales.CypherLiteralCoercible",
                         "StructureIdentifier": "kraph.scalars.StructureIdentifierCoercible"
                     },
                     "expand_input_types": [

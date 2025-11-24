@@ -12,7 +12,8 @@ StructureIdentifierCoercible = str
 """ A custom scalar for wrapping of every supported array like structure on"""
 CypherCoercible = str
 """ A custom scalar for wrapping of every supported array like structure on"""
-
+CypherLiteralCoercible = str
+""" A custom scalar for wrapping of every supported array like structure on"""
 
 StructureStringCoerciblae = str
 """ A custom scalar for wrapping of every supported array like structure on"""
@@ -193,6 +194,25 @@ class Cypher(str):
 
     @classmethod
     def validate(cls, v: CypherCoercible, *info) -> "Cypher":
+        if isinstance(v, str):
+            return cls(v)
+        raise TypeError("Needs to be either str or a string")
+
+
+class CypherLiteral(str):
+    def __set__(self, owner, value: CypherLiteralCoercible) -> None: ...
+
+    @classmethod
+    def __get_pydantic_core_schema__(
+        cls,
+        source_type: Any,  # noqa: ANN401
+        handler: GetCoreSchemaHandler,  # noqa: ANN401
+    ) -> CoreSchema:
+        """Get the pydantic core schema for the validator function"""
+        return core_schema.no_info_before_validator_function(cls.validate, handler(str))
+
+    @classmethod
+    def validate(cls, v: CypherLiteralCoercible, *info) -> "CypherLiteral":
         if isinstance(v, str):
             return cls(v)
         raise TypeError("Needs to be either str or a string")

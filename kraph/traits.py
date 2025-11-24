@@ -23,6 +23,8 @@ Key Components:
 from typing import Self, TypeVar, Optional, Union, Type
 from collections.abc import Iterable
 
+import fieldz
+
 from koil import unkoil
 from pydantic import BaseModel, field_validator
 from typing import TYPE_CHECKING, Any, List, Optional, Union
@@ -46,6 +48,7 @@ if TYPE_CHECKING:
         Structure,
         EntityCategoryDefinitionInput,
         Metric,
+        SchemaInput,
     )
     from rekuest_next.structures.registry import StructureRegistry
 
@@ -279,7 +282,9 @@ def validate_structure_category_definition(cls, value):
                 raise e
 
     if not categoryFilters and not tagFilters and not identifierFilters:
-        raise ValueError("You must specify at least one class, identifier or tag filter")
+        raise ValueError(
+            "You must specify at least one class, identifier or tag filter"
+        )
 
     return StructureCategoryDefinitionInput(
         categoryFilters=categoryFilters,
@@ -422,7 +427,9 @@ class MetricWithValue:
             assert other.graph.id == self.metric_category.graph.id, (
                 "Structure and metric must be in the same graph"
             )
-            return create_metric(structure=other, category=self.metric_category, value=self.value)
+            return create_metric(
+                structure=other, category=self.metric_category, value=self.value
+            )
 
         raise NotImplementedError("You can only merge a measurement with a structure")
 
@@ -484,7 +491,9 @@ class MeasurementWithStructureAndValidity:
             )
 
         if isinstance(other, BaseModel):
-            raise NotImplementedError("You can only merge a measurement with a structure")
+            raise NotImplementedError(
+                "You can only merge a measurement with a structure"
+            )
 
         raise NotImplementedError("You can only merge a measurement with a structure")
 
@@ -607,7 +616,9 @@ class IntermediateRelation:
                 # )
                 pass
 
-            return create_relation(source=self.left, target=other, category=self.category)
+            return create_relation(
+                source=self.left, target=other, category=self.category
+            )
 
         raise NotImplementedError("You can only merge a relation with an entity")
 
@@ -852,7 +863,9 @@ class StructureRelationCategoryTrait(BaseModel):
         raise NotImplementedError
 
     def __call__(self, valid_from=None, valid_to=None):
-        return StructureRelationWithValidity(kind=self, valid_from=valid_from, valid_to=valid_to)
+        return StructureRelationWithValidity(
+            kind=self, valid_from=valid_from, valid_to=valid_to
+        )
 
 
 class MeasurementCategoryTrait(BaseModel):
@@ -998,7 +1011,9 @@ class ProtocolEventCategoryTrait(BaseModel):
         entity_targets: list[NodeMapping] = kwargs.get("entity_targets", [])
         reagent_sources: list[NodeMapping] = kwargs.get("reagent_sources", [])
         reagent_targets: list[NodeMapping] = kwargs.get("reagent_targets", [])
-        variable_mappings: list[VariableMappingInput] = kwargs.get("variable_mappings", [])
+        variable_mappings: list[VariableMappingInput] = kwargs.get(
+            "variable_mappings", []
+        )
 
         validated_entity_sources = []
         validated_entity_targets = []
@@ -1016,7 +1031,9 @@ class ProtocolEventCategoryTrait(BaseModel):
                 elif i.role in kwargs:
                     passed_value = kwargs.pop(i.role)
                     assert_is_reagent_or_id(passed_value)
-                    validated_reagent_sources.append(NodeMapping(key=i.role, node=passed_value))
+                    validated_reagent_sources.append(
+                        NodeMapping(key=i.role, node=passed_value)
+                    )
 
                 else:
                     if i.optional:
@@ -1039,17 +1056,23 @@ class ProtocolEventCategoryTrait(BaseModel):
             if i.role not in [x.key for x in entity_sources]:
                 if i.role in kwargs:
                     passed_value = kwargs.pop(i.role)
-                    if isinstance(passed_value, list) or isinstance(passed_value, tuple):
+                    if isinstance(passed_value, list) or isinstance(
+                        passed_value, tuple
+                    ):
                         assert i.allow_multiple, (
                             f"Entity source role {i.role} does not allow multiple values. You need to specify a single value for {i.role}"
                         )
 
                         for passed_v in passed_value:
                             assert_is_entity_or_id(passed_v)
-                            validated_entity_sources.append(NodeMapping(key=i.role, node=passed_v))
+                            validated_entity_sources.append(
+                                NodeMapping(key=i.role, node=passed_v)
+                            )
                     else:
                         assert_is_entity_or_id(passed_value)
-                        validated_entity_sources.append(NodeMapping(key=i.role, node=passed_value))
+                        validated_entity_sources.append(
+                            NodeMapping(key=i.role, node=passed_value)
+                        )
                 else:
                     if i.optional:
                         continue
@@ -1081,7 +1104,9 @@ class ProtocolEventCategoryTrait(BaseModel):
                 elif i.role in kwargs:
                     passed_value = kwargs.pop(i.role)
                     assert_is_reagent_or_id(passed_value)
-                    validated_reagent_targets.append(NodeMapping(key=i.role, node=passed_value))
+                    validated_reagent_targets.append(
+                        NodeMapping(key=i.role, node=passed_value)
+                    )
 
                 else:
                     if i.optional:
@@ -1104,17 +1129,23 @@ class ProtocolEventCategoryTrait(BaseModel):
             if i.role not in [x.key for x in entity_targets]:
                 if i.role in kwargs:
                     passed_value = kwargs.pop(i.role)
-                    if isinstance(passed_value, list) or isinstance(passed_value, tuple):
+                    if isinstance(passed_value, list) or isinstance(
+                        passed_value, tuple
+                    ):
                         assert i.allow_multiple, (
                             f"Entity target role {i.role} does not allow multiple values. You need to specify a single value for {i.role}"
                         )
 
                         for passed_v in passed_value:
                             assert_is_entity_or_id(passed_v)
-                            validated_entity_targets.append(NodeMapping(key=i.role, node=passed_v))
+                            validated_entity_targets.append(
+                                NodeMapping(key=i.role, node=passed_v)
+                            )
                     else:
                         assert_is_entity_or_id(passed_value)
-                        validated_entity_targets.append(NodeMapping(key=i.role, node=passed_value))
+                        validated_entity_targets.append(
+                            NodeMapping(key=i.role, node=passed_value)
+                        )
                 else:
                     if i.optional:
                         continue
@@ -1207,7 +1238,9 @@ class MetricCategoryTrait(BaseModel):
 
         if target is not None:
             assert isinstance(target, StructureTrait), "Target must be an structure"
-            assert target.graph.id == self.graph.id, "Target and metric must be in the same graph"
+            assert target.graph.id == self.graph.id, (
+                "Target and metric must be in the same graph"
+            )
             return create_metric(
                 target,
                 category=self,
@@ -1268,7 +1301,9 @@ class EntityTrait(BaseModel):
             NotImplementedError: For invalid combinations
         """
         if isinstance(other, RelationWithValidity):
-            return IntermediateRelationWithValidity(left=self, relation_with_validity=other)
+            return IntermediateRelationWithValidity(
+                left=self, relation_with_validity=other
+            )
         if isinstance(other, EntityTrait):
             raise NotImplementedError(
                 "Cannot merge entities directly, use a relation or measurement inbetween"
@@ -1309,6 +1344,8 @@ class GraphTrait(BaseModel):
     """
 
     _token = None
+    _registered_instances = {}
+    _registered_relations = {}
 
     def __enter__(self) -> Self:
         """
@@ -1339,8 +1376,90 @@ class GraphTrait(BaseModel):
             exc_value: Exception value (if any exception occurred)
             traceback: Exception traceback (if any exception occurred)
         """
+        self.run_import()
         current_graph.reset(self._token)
-        current_graph.reset(self._token)
+
+    def run_import(self):
+        from kraph.api.schema import (
+            get_entity_category_by_graph_and_label,
+            get_edge_category_by_graph_and_label,
+            ImportGraphInput,
+            NodeImport,
+            EdgeImport,
+            import_graph,
+        )
+
+        cls_id_map = {
+            cls: get_entity_category_by_graph_and_label(
+                graph=self.id, label=cls.__name__
+            )
+            for cls in self._registered_instances.keys()
+        }
+
+        cls_relation_id_map = {
+            cls: get_edge_category_by_graph_and_label(graph=self.id, label=cls.__name__)
+            for cls in self._registered_relations.keys()
+        }
+
+        import_nodes = []
+        import_edges = []
+
+        for cls, instances in self._registered_instances.items():
+            category = cls_id_map[cls]
+            for instance in instances:
+                import_nodes.append(
+                    NodeImport(
+                        category_id=category.id,
+                        importId=str(id(instance)),
+                        properties=instance.serialized_properties(),
+                    )
+                )
+
+        for cls, instances in self._registered_relations.items():
+            category = cls_relation_id_map[cls]
+            for cls in instances:
+                cls_left_id = id(get_attributes_or_error(cls, "source"))
+                cls_right_id = id(get_attributes_or_error(cls, "target"))
+
+                import_edges.append(
+                    EdgeImport(
+                        category_id=category.id,
+                        importId=f"{id(cls_left_id)}->{id(cls_right_id)}",
+                        import_id_from=str(cls_left_id),
+                        import_id_to=str(cls_right_id),
+                        properties=instance.serialized_properties(),
+                    )
+                )
+
+        return import_graph(
+            graph=self.id,
+            nodes=import_nodes,
+            edges=import_edges,
+        )
+
+    def get_entity_category_by_label(
+        self,
+        label: str,
+    ) -> "EntityCategory":
+        """
+        Retrieve an entity category by its label within this graph.
+
+        Args:
+            label (str): The label of the entity category to retrieve
+
+        Returns:
+            Optional[EntityCategory]: The matching entity category, or None if not found
+
+        Examples:
+            >>> protein_cat = graph.get_entity_category_by_label("Protein")
+            >>> if protein_cat:
+            ...     print(f"Found category: {protein_cat.label}")
+            ... else:
+            ...     print("Category not found")
+        """
+        from kraph.api.schema import get_entity_category_by_graph_and_label
+
+        return get_entity_category_by_graph_and_label(graph=self.id, label=label)
 
     def create_entity_category(
         self,
@@ -1368,7 +1487,9 @@ class GraphTrait(BaseModel):
         """
         from kraph.api.schema import create_entity_category
 
-        return create_entity_category(graph=self, label=label, description=description, **kwargs)
+        return create_entity_category(
+            graph=self, label=label, description=description, **kwargs
+        )
 
     def create_structure_category(
         self,
@@ -1463,6 +1584,18 @@ class GraphTrait(BaseModel):
             description=description,
             **kwargs,
         )
+
+    def register_instance(
+        self,
+        instance,
+    ) -> None:
+        self._registered_instances.setdefault(type(instance), []).append(instance)
+
+    def register_relation(
+        self,
+        relation,
+    ) -> None:
+        self._registered_relations.setdefault(type(relation), []).append(relation)
 
     def create_metric_category(
         self,
@@ -1689,3 +1822,13 @@ class MetricCategoryInputTrait(BaseModel):
                 raise ValueError(f"Unknown filter {i}")
         except TypeError as e:
             raise e
+
+
+class SchemaBuilderTrait(BaseModel):
+    """
+    Trait for building schema input objects from class definitions.
+
+    This trait provides a method to convert class definitions
+    """
+
+    pass
