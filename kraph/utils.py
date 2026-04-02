@@ -36,6 +36,7 @@ def property(
     description: str | None = None,
     searchable: bool = False,
     label: str | None = None,
+    use_as_label: bool = False,
     options: list[Union[str, OptionInput]] = None,
 ):
     """Helper to define a variable with description metadata."""
@@ -54,6 +55,7 @@ def property(
             "options": options,
             "searchable": searchable,
             "label": label,
+            "use_as_label": use_as_label,
         }
     )
 
@@ -270,6 +272,7 @@ def cls_to_entity_category_input(
             label=field_obj.metadata.get("label", titleize(field_obj.name)),
             options=field_obj.metadata.get("options", None),
             searchable=field_obj.metadata.get("searchable", False),
+            useAsLabel=field_obj.metadata.get("use_as_label", False),
         )
         print("Adding variable definition:", var_def)
         def_map[field_obj.name] = var_def

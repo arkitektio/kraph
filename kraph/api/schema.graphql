@@ -335,54 +335,6 @@ type NodeList {
 
   """The graph this list was queried from."""
   graph: Graph!
-
-  """The category of nodes in this list."""
-  category: NodeCategory!
-}
-
-interface NodeCategory {
-  """The unique identifier of the expression within its graph"""
-  id: ID!
-
-  """The x position of the node in the graph"""
-  positionX: Float
-
-  """The y position of the node in the graph"""
-  positionY: Float
-
-  """The height of the node in the graph"""
-  height: Float
-
-  """The width of the node in the graph"""
-  width: Float
-
-  """The color of the node in the graph"""
-  color: [Float!]
-
-  """A description of the expression."""
-  description: String
-
-  """The defined properties"""
-  propertyDefinitions: [PropertyDefinition!]!
-
-  """The label"""
-  label: String!
-}
-
-type PropertyDefinition {
-  valueKind: MetricKind!
-  key: String!
-  description: String
-  label: String
-  optional: Boolean!
-  default: Any
-  options: [VariableOption!]
-}
-
-type VariableOption {
-  value: String!
-  label: String!
-  description: String
 }
 
 input GraphQueryFilters {
@@ -596,6 +548,51 @@ type MetricCategory implements NodeCategory & BaseCategory {
 
   """The structure that this metric measures"""
   structureCategory: StructureCategory!
+}
+
+interface NodeCategory {
+  """The unique identifier of the expression within its graph"""
+  id: ID!
+
+  """The x position of the node in the graph"""
+  positionX: Float
+
+  """The y position of the node in the graph"""
+  positionY: Float
+
+  """The height of the node in the graph"""
+  height: Float
+
+  """The width of the node in the graph"""
+  width: Float
+
+  """The color of the node in the graph"""
+  color: [Float!]
+
+  """A description of the expression."""
+  description: String
+
+  """The defined properties"""
+  propertyDefinitions: [PropertyDefinition!]!
+
+  """The label"""
+  label: String!
+}
+
+type PropertyDefinition {
+  valueKind: MetricKind!
+  key: String!
+  description: String
+  label: String
+  optional: Boolean!
+  default: Any
+  options: [VariableOption!]
+}
+
+type VariableOption {
+  value: String!
+  label: String!
+  description: String
 }
 
 input TagFilter {
@@ -2886,6 +2883,11 @@ input PropertyDefinitionInput {
 
   """WHere or not this is searchable"""
   searchable: Boolean = null
+
+  """
+  Whether to use this property as a label when displaying nodes of this category
+  """
+  useAsLabel: Boolean = null
 }
 
 input OptionInput {

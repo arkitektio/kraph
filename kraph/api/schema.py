@@ -1,45 +1,45 @@
 from kraph.traits import (
-    StructureTrait,
-    MetricTrait,
-    NaturalEventCategoryTrait,
-    EntityRoleDefinitionInputTrait,
-    NodeCategoryTrait,
-    StructureCategoryTrait,
-    MetricCategoryTrait,
-    GraphTrait,
-    StructureRelationCategoryInputTrait,
-    ProtocolEventCategoryTrait,
+    ReagentRoleDefinitionInputTrait,
     HasPresignedDownloadAccessor,
     MeasurementCategoryInputTrait,
-    EntityCategoryTrait,
-    ReagentCategoryTrait,
-    RelationCategoryInputTrait,
-    SchemaBuilderTrait,
+    MeasurementCategoryTrait,
     EntityTrait,
     StructureRelationCategoryTrait,
-    ReagentRoleDefinitionInputTrait,
-    NodeTrait,
-    MeasurementCategoryTrait,
+    StructureCategoryTrait,
+    ReagentCategoryTrait,
     MetricCategoryInputTrait,
+    RelationCategoryInputTrait,
+    MetricCategoryTrait,
+    NodeTrait,
+    MetricTrait,
+    EntityRoleDefinitionInputTrait,
+    StructureTrait,
+    NaturalEventCategoryTrait,
+    SchemaBuilderTrait,
+    ProtocolEventCategoryTrait,
+    StructureRelationCategoryInputTrait,
+    EntityCategoryTrait,
     RelationCategoryTrait,
+    GraphTrait,
+    NodeCategoryTrait,
 )
-from typing import Union, List, Literal, Optional, Any, Iterable, Tuple, Annotated
-from pydantic import BaseModel, ConfigDict, Field
-from rath.scalars import IDCoercible, ID
-from kraph.rath import KraphRath
+from typing import Optional, Iterable, Annotated, Union, Any, List, Literal, Tuple
+from kraph.funcs import aexecute, execute
 from kraph.scalars import (
-    NodeID,
-    StructureIdentifierCoercible,
     CypherLiteral,
+    Cypher,
     StructureString,
-    StructureIdentifier,
     RemoteUpload,
     CypherCoercible,
-    Cypher,
+    StructureIdentifierCoercible,
+    NodeID,
+    StructureIdentifier,
 )
-from kraph.funcs import aexecute, execute
-from datetime import datetime
 from enum import Enum
+from pydantic import ConfigDict, BaseModel, Field
+from rath.scalars import ID, IDCoercible
+from kraph.rath import KraphRath
+from datetime import datetime
 
 
 class ViewKind(str, Enum):
@@ -556,6 +556,8 @@ class PropertyDefinitionInput(BaseModel):
     "A list of options for this property (if only a few values are allowed)"
     searchable: Optional[bool] = None
     "WHere or not this is searchable"
+    use_as_label: Optional[bool] = Field(alias="useAsLabel", default=None)
+    "Whether to use this property as a label when displaying nodes of this category"
     model_config = ConfigDict(
         frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
     )
