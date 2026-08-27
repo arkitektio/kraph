@@ -1,23 +1,62 @@
-mutation CreateMeasurementCategory($input: MeasurementCategoryInput!) {
-  createMeasurementCategory(input: $input) {
-    ...MeasurementCategory
-  }
+# A Category is one view's rule for a word: what it means HERE, how it is drawn, and which
+# properties are derived onto it. Creating one never records a claim.
+
+mutation CreateEntityCategory($input: CreateEntityCategoryInput!) {
+  createEntityCategory(input: $input) { ...EntityCategory }
+}
+mutation UpdateEntityCategory($input: UpdateEntityCategoryInput!) {
+  updateEntityCategory(input: $input) { ...EntityCategory }
+}
+mutation DeleteEntityCategory($input: DeleteEntityCategoryInput!) {
+  deleteEntityCategory(input: $input)
 }
 
-mutation CreateMetricCategory($input: MetricCategoryInput!) {
-  createMetricCategory(input: $input) {
-    ...MetricCategory
-  }
+mutation CreateRelationCategory($input: CreateRelationCategoryInput!) {
+  createRelationCategory(input: $input) { ...RelationCategory }
+}
+mutation UpdateRelationCategory($input: UpdateRelationCategoryInput!) {
+  updateRelationCategory(input: $input) { ...RelationCategory }
+}
+mutation DeleteRelationCategory($input: DeleteRelationCategoryInput!) {
+  deleteRelationCategory(input: $input)
 }
 
-mutation CreateReagentCategory($input: ReagentCategoryInput!) {
-  createReagentCategory(input: $input) {
-    ...ReagentCategory
-  }
+mutation CreateMeasurementCategory($input: CreateMeasurementCategoryInput!) {
+  createMeasurementCategory(input: $input) { ...MeasurementCategory }
+}
+mutation UpdateMeasurementCategory($input: UpdateMeasurementCategoryInput!) {
+  updateMeasurementCategory(input: $input) { ...MeasurementCategory }
+}
+mutation DeleteMeasurementCategory($input: DeleteMeasurementCategoryInput!) {
+  deleteMeasurementCategory(input: $input)
 }
 
-mutation CreateRelationCategory($input: RelationCategoryInput!) {
-  createRelationCategory(input: $input) {
-    ...RelationCategory
-  }
+mutation CreateStructureRelationCategory($input: CreateStructureRelationCategoryInput!) {
+  createStructureRelationCategory(input: $input) { ...StructureRelationCategory }
+}
+mutation UpdateStructureRelationCategory($input: UpdateStructureRelationCategoryInput!) {
+  updateStructureRelationCategory(input: $input) { ...StructureRelationCategory }
+}
+mutation DeleteStructureRelationCategory($input: DeleteStructureRelationCategoryInput!) {
+  deleteStructureRelationCategory(input: $input)
+}
+
+mutation CreateNaturalEventCategory($input: CreateNaturalEventCategoryInput!) {
+  createNaturalEventCategory(input: $input) { ...NaturalEventCategory }
+}
+mutation UpdateNaturalEventCategory($input: UpdateNaturalEventCategoryInput!) {
+  updateNaturalEventCategory(input: $input) { ...NaturalEventCategory }
+}
+mutation DeleteNaturalEventCategory($input: DeleteNaturalEventCategoryInput!) {
+  deleteNaturalEventCategory(input: $input)
+}
+
+mutation CreateProtocolEventCategory($input: CreateProtocolEventCategoryInput!) {
+  createProtocolEventCategory(input: $input) { ...ProtocolEventCategory }
+}
+mutation UpdateProtocolEventCategory($input: UpdateProtocolEventCategoryInput!) {
+  updateProtocolEventCategory(input: $input) { ...ProtocolEventCategory }
+}
+mutation DeleteProtocolEventCategory($input: DeleteProtocolEventCategoryInput!) {
+  deleteProtocolEventCategory(input: $input)
 }

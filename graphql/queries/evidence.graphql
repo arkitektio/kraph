@@ -1,0 +1,59 @@
+# Claim-grain reads: organization scope, addressed by a bare uuid, no graph argument.
+# `instance(id:)` is the fallback reader for a node no view draws.
+
+query GetInstance($id: ID!) {
+  instance(id: $id) { ...Instance }
+}
+
+query GetLink($id: ID!) {
+  link(id: $id) { ...Link }
+}
+
+# Every position anyone has taken on a claim, newest first. An empty list means nobody has
+# disputed it — silence is not dissent, and there is no folded boolean beside this.
+query GetStandings($id: ID!) {
+  standings(id: $id) { ...Standing }
+}
+
+query GetStructure($id: ID!) {
+  structure(id: $id) { ...StructureWithMetrics }
+}
+
+query GetStructureByIdentifier($identifier: StructureIdentifier!, $object: StructureObject!) {
+  structureByIdentifier(identifier: $identifier, object: $object) { ...StructureWithMetrics }
+}
+
+# Resolves a naming structure back to what it names — this is how an external id is looked up
+# now that `externalId` no longer exists on any write.
+query GetInformingStructures($entityId: String!) {
+  informingStructures(entityId: $entityId) { ...Structure }
+}
+
+query ListStructures($structureKindId: ID, $filters: StructureFilter, $ordering: [StructureOrder!], $pagination: StructurePaginationInput) {
+  structures(structureKindId: $structureKindId, filters: $filters, ordering: $ordering, pagination: $pagination) {
+    ...Structure
+  }
+}
+
+query GetMetric($id: ID!) {
+  metric(id: $id) { ...Metric }
+}
+
+query GetMetricsForStructure($structureId: ID!) {
+  metricsForStructure(structureId: $structureId) { ...Metric }
+}
+
+query GetComment($id: ID!) {
+  comment(id: $id) { ...Comment }
+}
+
+query GetCommentsFor($identifier: String!, $object: ID!) {
+  commentsFor(identifier: $identifier, object: $object) { ...Comment }
+}
+
+query SearchStructures($search: String, $values: [ID!]) {
+  options: structures(filters: {search: $search, ids: $values}, pagination: {limit: 10}) {
+    value: id
+    label: object
+  }
+}

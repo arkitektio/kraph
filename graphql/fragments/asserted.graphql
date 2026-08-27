@@ -1,0 +1,79 @@
+# Fourteen payloads, six shapes. Seven carry `drawings`, seven do not — a measurement or a
+# structure has no vertex to draw, so the field is genuinely absent, not merely empty.
+
+fragment AssertedEntity on AssertedEntity {
+  assertion { ...Assertion }
+  instance { ...Instance }
+  drawings { ...NodeDrawing }
+}
+
+fragment AssertedNaturalEvent on AssertedNaturalEvent {
+  assertion { ...Assertion }
+  instance { ...Instance }
+  drawings { ...NodeDrawing }
+}
+
+fragment AssertedProtocolEvent on AssertedProtocolEvent {
+  assertion { ...Assertion }
+  instance { ...Instance }
+  drawings { ...NodeDrawing }
+}
+
+fragment AssertedInstances on AssertedInstances {
+  assertion { ...Assertion }
+  instances { ...Instance }
+  drawings { ...NodeDrawing }
+}
+
+fragment AssertedRelation on AssertedRelation {
+  assertion { ...Assertion }
+  link { ...Link }
+  drawings { ...EdgeDrawing }
+}
+
+fragment AssertedParticipation on AssertedParticipation {
+  assertion { ...Assertion }
+  link { ...Link }
+  drawings { ...EdgeDrawing }
+}
+
+fragment AssertedLinks on AssertedLinks {
+  assertion { ...Assertion }
+  links { ...Link }
+  drawings { ...EdgeDrawing }
+}
+
+fragment AssertedMeasurement on AssertedMeasurement {
+  assertion { ...Assertion }
+  link { ...Link }
+}
+
+fragment AssertedStructureRelation on AssertedStructureRelation {
+  assertion { ...Assertion }
+  link { ...Link }
+}
+
+fragment AssertedDescription on AssertedDescription {
+  assertion { ...Assertion }
+  link { ...Link }
+}
+
+fragment AssertedSameness on AssertedSameness {
+  assertion { ...Assertion }
+  links { ...Link }
+}
+
+fragment AssertedStructure on AssertedStructure {
+  assertion { ...Assertion }
+  structure { ...StructureWithMetrics }
+}
+
+fragment AssertedMetric on AssertedMetric {
+  assertion { ...Assertion }
+  metric { ...Metric }
+}
+
+fragment AssertedComment on AssertedComment {
+  assertion { ...Assertion }
+  comment { ...Comment }
+}

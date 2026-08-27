@@ -1,0 +1,18 @@
+# View-grain reads: these name their view, and refuse a node the view does not admit.
+# `node(id, graph)` succeeds exactly when `nodes(graph:)` could list it.
+
+query GetNode($id: ID!, $graph: ID!) {
+  node(id: $id, graph: $graph) { ...NodeRef }
+}
+
+query ListNodes($graph: ID!, $filters: NodeFilters, $ordering: [NodeOrder!], $pagination: NodePaginationInput) {
+  nodes(graph: $graph, filters: $filters, ordering: $ordering, pagination: $pagination) {
+    ...NodeRef
+  }
+}
+
+# richProperties is where derived values surface — the only place a metric recorded on an
+# evidence structure becomes readable as a property of the node.
+query GetEntity($id: ID!, $graph: ID!) {
+  entity(id: $id, graph: $graph) { ...EntityView }
+}

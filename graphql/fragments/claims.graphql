@@ -1,0 +1,77 @@
+fragment InstanceRef on Instance {
+  id
+  kind
+  term {
+    ...TermRef
+  }
+}
+
+fragment Instance on Instance {
+  ...InstanceRef
+  createdAt
+  component
+  assertion {
+    ...Assertion
+  }
+}
+
+# Rule A: sourceRef/targetRef only. `source`/`target` are the ClaimEndpoint union, and
+# selecting them would fan out into four implementers for no gain on the write path.
+fragment LinkRef on Link {
+  id
+  kind
+  sourceRef
+  targetRef
+}
+
+fragment Link on Link {
+  ...LinkRef
+  role
+  createdAt
+  term {
+    ...TermRef
+  }
+  assertion {
+    ...Assertion
+  }
+}
+
+fragment Metric on Metric {
+  id
+  kindId
+  key
+  value
+  unit
+  confidence
+  confidenceType
+  measuredAt
+  assertedAt
+}
+
+fragment Structure on Structure {
+  id
+  identifier
+  object
+  kindId
+}
+
+fragment StructureWithMetrics on Structure {
+  ...Structure
+  metrics {
+    ...Metric
+  }
+}
+
+fragment Comment on Comment {
+  id
+  createdAt
+  text
+  resolved
+  mentions
+  parent {
+    id
+  }
+  assertion {
+    ...Assertion
+  }
+}

@@ -1,153 +1,98 @@
-from rekuest_next.structures.default import (
-    get_default_structure_registry,
-    id_shrink,
-)
+"""Registration of kraph types with the rekuest structure registry.
+
+The ``@kraph/…`` identifier strings are a wire contract: other arkitekt services resolve against
+them, so renaming one is a coordinated cross-service change, not a local refactor. Two of them
+therefore keep their old spelling while pointing at a renamed type — ``@kraph/structurecategory``
+now names a :class:`StructureKind`, and ``@kraph/metriccategory`` a :class:`MetricKind`.
+
+One registration changed meaning and could not keep its type. ``@kraph/entity`` used to expand
+through ``aget_node(id)``, but the view-grain readers (``node``/``entity``) now require a graph
+as well as an id, and ``aexpand`` is handed only the id. ``instance(id:)`` is the graph-free
+addressable claim, so that is what the identifier resolves to.
+
+``Reagent`` and ``GraphQuery`` are gone: reagents are ordinary entities now, and ``GraphQuery``
+is an interface whose only concrete member is the deferred table-query surface.
+"""
+
+from rekuest_next.structures.default import get_default_structure_registry, id_shrink
 from rekuest_next.widgets import SearchWidget
+
 from kraph.api.schema import (
-    Graph,
-    SearchEntitiesQuery,
-    SearchStructureRelationCategoryQuery,
-    aget_graph,
-    Reagent,
-    aget_reagent,
-    StructureCategory,
-    aget_structure_category,
-    aget_structure_relation_category,
     EntityCategory,
-    aget_entity_category,
+    Graph,
+    Instance,
+    Link,
     MeasurementCategory,
-    aget_measurment_category,
-    RelationCategory,
-    aget_relation_category,
-    StructureRelationCategory,
-    GraphQuery,
-    aget_graph_query,
-    MetricCategory,
-    aget_metric_category,
-    Entity,
-    aget_node,
-    Structure,
-    aget_structure,
     Metric,
-    aget_metric,
+    MetricKind,
+    NaturalEventCategory,
+    ProtocolEventCategory,
+    RelationCategory,
+    SearchEntityCategoriesQuery,
     SearchGraphsQuery,
-    SearchReagentsQuery,
-    SearchStructureCategoryQuery,
-    SearchEntityCategoryQuery,
-    SearchMeasurmentCategoryQuery,
-    SearchRelationCategoryQuery,
-    SearchGraphQueriesQuery,
-    SearchMetricsQuery,
+    SearchMeasurementCategoriesQuery,
+    SearchMetricKindsQuery,
+    SearchNaturalEventCategoriesQuery,
+    SearchProtocolEventCategoriesQuery,
+    SearchRelationCategoriesQuery,
+    SearchStructureKindsQuery,
+    SearchStructureRelationCategoriesQuery,
     SearchStructuresQuery,
-    SearchMetricCategoryQuery,
+    SearchTermsQuery,
+    Structure,
+    StructureKind,
+    StructureRelationCategory,
+    Term,
+    aget_entity_category,
+    aget_graph,
+    aget_instance,
+    aget_link,
+    aget_measurement_category,
+    aget_metric,
+    aget_metric_kind,
+    aget_natural_event_category,
+    aget_protocol_event_category,
+    aget_relation_category,
+    aget_structure,
+    aget_structure_kind,
+    aget_structure_relation_category,
+    aget_term,
 )
 
 structure_reg = get_default_structure_registry()
 
 
-structure_reg.register_as_structure(
-    Graph,
-    identifier="@kraph/graph",
-    aexpand=aget_graph,
-    ashrink=id_shrink,
-    default_widget=SearchWidget(query=SearchGraphsQuery.Meta.document, ward="kraph"),
-)
-structure_reg.register_as_structure(
-    Reagent,
-    identifier="@kraph/reagent",
-    aexpand=aget_reagent,
-    ashrink=id_shrink,
-    default_widget=SearchWidget(query=SearchReagentsQuery.Meta.document, ward="kraph"),
-)
-
-structure_reg.register_as_structure(
-    StructureCategory,
-    identifier="@kraph/structurecategory",
-    aexpand=aget_structure_category,
-    ashrink=id_shrink,
-    default_widget=SearchWidget(query=SearchStructureCategoryQuery.Meta.document, ward="kraph"),
-)
-
-structure_reg.register_as_structure(
-    EntityCategory,
-    identifier="@kraph/entitycategory",
-    aexpand=aget_entity_category,
-    ashrink=id_shrink,
-    default_widget=SearchWidget(query=SearchEntityCategoryQuery.Meta.document, ward="kraph"),
-)
-
-structure_reg.register_as_structure(
-    StructureRelationCategory,
-    identifier="@kraph/structurerelationcategory",
-    aexpand=aget_structure_relation_category,
-    ashrink=id_shrink,
-    default_widget=SearchWidget(
-        query=SearchStructureRelationCategoryQuery.Meta.document, ward="kraph"
-    ),
-)
+def _register(cls, identifier, aexpand, query=None):
+    structure_reg.register_as_structure(
+        cls,
+        identifier=identifier,
+        aexpand=aexpand,
+        ashrink=id_shrink,
+        default_widget=SearchWidget(query=query.Meta.document, ward="kraph")
+        if query is not None
+        else None,
+    )
 
 
-structure_reg.register_as_structure(
-    MeasurementCategory,
-    identifier="@kraph/measurementcategory",
-    aexpand=aget_measurment_category,
-    ashrink=id_shrink,
-    default_widget=SearchWidget(query=SearchMeasurmentCategoryQuery.Meta.document, ward="kraph"),
-)
+# --- views and their declarations -----------------------------------------------------------
+_register(Graph, "@kraph/graph", aget_graph, SearchGraphsQuery)
+_register(EntityCategory, "@kraph/entitycategory", aget_entity_category, SearchEntityCategoriesQuery)
+_register(RelationCategory, "@kraph/relationcategory", aget_relation_category, SearchRelationCategoriesQuery)
+_register(MeasurementCategory, "@kraph/measurementcategory", aget_measurement_category, SearchMeasurementCategoriesQuery)
+_register(StructureRelationCategory, "@kraph/structurerelationcategory", aget_structure_relation_category, SearchStructureRelationCategoriesQuery)
+_register(NaturalEventCategory, "@kraph/naturaleventcategory", aget_natural_event_category, SearchNaturalEventCategoriesQuery)
+_register(ProtocolEventCategory, "@kraph/protocoleventcategory", aget_protocol_event_category, SearchProtocolEventCategoriesQuery)
 
-structure_reg.register_as_structure(
-    RelationCategory,
-    identifier="@kraph/relationcategory",
-    aexpand=aget_relation_category,
-    ashrink=id_shrink,
-    default_widget=SearchWidget(query=SearchRelationCategoryQuery.Meta.document, ward="kraph"),
-)
+# --- claims ---------------------------------------------------------------------------------
+# `Instance` has no scalar label — its name lives at `term { key }` — so it gets no search
+# widget: a two-field `value`/`label` projection cannot reach it.
+_register(Instance, "@kraph/entity", aget_instance)
+_register(Link, "@kraph/link", aget_link)
+_register(Structure, "@kraph/structure", aget_structure, SearchStructuresQuery)
+_register(Metric, "@kraph/metric", aget_metric)
 
-structure_reg.register_as_structure(
-    GraphQuery,
-    identifier="@kraph/graphquery",
-    aexpand=aget_graph_query,
-    ashrink=id_shrink,
-    default_widget=SearchWidget(query=SearchGraphQueriesQuery.Meta.document, ward="kraph"),
-)
-
-structure_reg.register_as_structure(
-    MetricCategory,
-    identifier="@kraph/metriccategory",
-    aexpand=aget_metric_category,
-    ashrink=id_shrink,
-    default_widget=SearchWidget(query=SearchMetricCategoryQuery.Meta.document, ward="kraph"),
-)
-
-structure_reg.register_as_structure(
-    GraphQuery,
-    identifier="@kraph/graphquery",
-    aexpand=aget_graph_query,
-    ashrink=id_shrink,
-    default_widget=SearchWidget(query=SearchGraphQueriesQuery.Meta.document, ward="kraph"),
-)
-
-
-structure_reg.register_as_structure(
-    Entity,
-    identifier="@kraph/entity",
-    aexpand=aget_node,
-    ashrink=id_shrink,
-    default_widget=SearchWidget(query=SearchEntitiesQuery.Meta.document, ward="kraph"),
-)
-
-structure_reg.register_as_structure(
-    Structure,
-    identifier="@kraph/structure",
-    aexpand=aget_structure,
-    ashrink=id_shrink,
-    default_widget=SearchWidget(query=SearchStructuresQuery.Meta.document, ward="kraph"),
-)
-
-structure_reg.register_as_structure(
-    Metric,
-    identifier="@kraph/metric",
-    aexpand=aget_metric,
-    ashrink=id_shrink,
-    default_widget=SearchWidget(query=SearchMetricsQuery.Meta.document, ward="kraph"),
-)
+# --- vocabulary -----------------------------------------------------------------------------
+_register(Term, "@kraph/term", aget_term, SearchTermsQuery)
+# Identifier kept for wire compatibility; the type behind it is now StructureKind/MetricKind.
+_register(StructureKind, "@kraph/structurecategory", aget_structure_kind, SearchStructureKindsQuery)
+_register(MetricKind, "@kraph/metriccategory", aget_metric_kind, SearchMetricKindsQuery)

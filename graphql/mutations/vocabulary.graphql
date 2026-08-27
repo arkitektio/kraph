@@ -1,0 +1,27 @@
+# The organization's words. Terms are minted lazily by the first claim that names one, so
+# createTerm is only for declaring a word ahead of use (or giving it a label and colour).
+mutation CreateTerm($input: CreateTermInput!) {
+  createTerm(input: $input) { ...Term }
+}
+mutation UpdateTerm($input: UpdateTermInput!) {
+  updateTerm(input: $input) { ...Term }
+}
+mutation DeleteTerm($input: DeleteTermInput!) {
+  deleteTerm(input: $input)
+}
+
+# StructureKind and MetricKind are minted by the write that first needs them — there is no
+# create mutation for either, only these.
+mutation UpdateStructureKind($input: UpdateStructureKindInput!) {
+  updateStructureKind(input: $input) { ...StructureKind }
+}
+mutation DeleteStructureKind($input: DeleteStructureKindInput!) {
+  deleteStructureKind(input: $input)
+}
+
+mutation UpdateMetricKind($input: UpdateMetricKindInput!) {
+  updateMetricKind(input: $input) { ...MetricKind }
+}
+mutation DeleteMetricKind($input: DeleteMetricKindInput!) {
+  deleteMetricKind(input: $input)
+}

@@ -1,0 +1,83 @@
+# Standing: somebody's position on whether a claim still holds.
+#
+# `attest` records stands=True, `retract` records stands=False, and both are evidence of the
+# same kind. Neither deletes: the row, its metrics and its relations all survive a retraction,
+# because a derived value that dropped a contributing measurement still has to be explainable.
+# There is no reinstate and no state machine — only more evidence.
+
+mutation AttestEntity($input: AttestEntityInput!) {
+  attestEntity(input: $input) { ...AssertedEntity }
+}
+
+mutation RetractEntity($input: RetractEntityInput!) {
+  retractEntity(input: $input) { ...AssertedEntity }
+}
+
+mutation AttestNaturalEvent($input: AttestNaturalEventInput!) {
+  attestNaturalEvent(input: $input) { ...AssertedNaturalEvent }
+}
+
+mutation RetractNaturalEvent($input: RetractNaturalEventInput!) {
+  retractNaturalEvent(input: $input) { ...AssertedNaturalEvent }
+}
+
+mutation AttestProtocolEvent($input: AttestProtocolEventInput!) {
+  attestProtocolEvent(input: $input) { ...AssertedProtocolEvent }
+}
+
+mutation RetractProtocolEvent($input: RetractProtocolEventInput!) {
+  retractProtocolEvent(input: $input) { ...AssertedProtocolEvent }
+}
+
+mutation AttestStructure($input: AttestStructureInput!) {
+  attestStructure(input: $input) { ...AssertedStructure }
+}
+
+mutation RetractStructure($input: RetractStructureInput!) {
+  retractStructure(input: $input) { ...AssertedStructure }
+}
+
+mutation AttestMetric($input: AttestMetricInput!) {
+  attestMetric(input: $input) { ...AssertedMetric }
+}
+
+mutation RetractMetric($input: RetractMetricInput!) {
+  retractMetric(input: $input) { ...AssertedMetric }
+}
+
+mutation AttestComment($input: AttestCommentInput!) {
+  attestComment(input: $input) { ...AssertedComment }
+}
+
+mutation RetractComment($input: RetractCommentInput!) {
+  retractComment(input: $input) { ...AssertedComment }
+}
+
+mutation RetractRelation($input: RetractRelationInput!) {
+  retractRelation(input: $input) { ...AssertedRelation }
+}
+
+mutation RetractMeasurement($input: RetractMeasurementInput!) {
+  retractMeasurement(input: $input) { ...AssertedMeasurement }
+}
+
+mutation RetractStructureRelation($input: RetractStructureRelationInput!) {
+  retractStructureRelation(input: $input) { ...AssertedStructureRelation }
+}
+
+mutation RetractParticipation($input: RetractParticipationInput!) {
+  retractParticipation(input: $input) { ...AssertedParticipation }
+}
+
+mutation RetractSameInstance($input: RetractSameInstanceInput!) {
+  retractSameInstance(input: $input) { ...AssertedSameness }
+}
+
+mutation AttestLink($input: AttestLinkInput!) {
+  attestLink(input: $input) { ...AssertedLinks }
+}
+
+# One assertion over many link ids, of any link kind.
+mutation RetractLinks($input: RetractLinksInput!) {
+  retractLinks(input: $input) { ...AssertedLinks }
+}

@@ -1,0 +1,47 @@
+query GetEntityCategory($id: ID!) { entityCategory(id: $id) { ...EntityCategory } }
+query ListEntityCategories($filters: EntityCategoryFilter, $pagination: OffsetPaginationInput) {
+  entityCategories(filters: $filters, pagination: $pagination) { ...EntityCategory }
+}
+query SearchEntityCategories($search: String, $values: [ID!]) {
+  options: entityCategories(filters: {search: $search, ids: $values}, pagination: {limit: 10}) { value: id  label: label }
+}
+
+query GetRelationCategory($id: ID!) { relationCategory(id: $id) { ...RelationCategory } }
+query ListRelationCategories($filters: RelationCategoryFilter, $pagination: OffsetPaginationInput) {
+  relationCategories(filters: $filters, pagination: $pagination) { ...RelationCategory }
+}
+query SearchRelationCategories($search: String, $values: [ID!]) {
+  options: relationCategories(filters: {search: $search, ids: $values}, pagination: {limit: 10}) { value: id  label: label }
+}
+
+query GetMeasurementCategory($id: ID!) { measurementCategory(id: $id) { ...MeasurementCategory } }
+query ListMeasurementCategories($filters: MeasurementCategoryFilter, $pagination: OffsetPaginationInput) {
+  measurementCategories(filters: $filters, pagination: $pagination) { ...MeasurementCategory }
+}
+query SearchMeasurementCategories($search: String, $values: [ID!]) {
+  options: measurementCategories(filters: {search: $search, ids: $values}, pagination: {limit: 10}) { value: id  label: label }
+}
+
+query GetStructureRelationCategory($id: ID!) { structureRelationCategory(id: $id) { ...StructureRelationCategory } }
+query ListStructureRelationCategories($filters: StructureRelationCategoryFilter, $pagination: OffsetPaginationInput) {
+  structureRelationCategories(filters: $filters, pagination: $pagination) { ...StructureRelationCategory }
+}
+query SearchStructureRelationCategories($search: String, $values: [ID!]) {
+  options: structureRelationCategories(filters: {search: $search, ids: $values}, pagination: {limit: 10}) { value: id  label: label }
+}
+
+query GetNaturalEventCategory($id: ID!) { naturalEventCategory(id: $id) { ...NaturalEventCategory } }
+query ListNaturalEventCategories($filters: NaturalEventCategoryFilter, $pagination: OffsetPaginationInput) {
+  naturalEventCategories(filters: $filters, pagination: $pagination) { ...NaturalEventCategory }
+}
+query SearchNaturalEventCategories($search: String, $values: [ID!]) {
+  options: naturalEventCategories(filters: {search: $search, ids: $values}, pagination: {limit: 10}) { value: id  label: label }
+}
+
+query GetProtocolEventCategory($id: ID!) { protocolEventCategory(id: $id) { ...ProtocolEventCategory } }
+query ListProtocolEventCategories($filters: ProtocolEventCategoryFilter, $pagination: OffsetPaginationInput) {
+  protocolEventCategories(filters: $filters, pagination: $pagination) { ...ProtocolEventCategory }
+}
+query SearchProtocolEventCategories($search: String, $values: [ID!]) {
+  options: protocolEventCategories(filters: {search: $search, ids: $values}, pagination: {limit: 10}) { value: id  label: label }
+}

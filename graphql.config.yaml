@@ -1,0 +1,146 @@
+projects:
+  kraph:
+    schema: http://jhnnsrs-lab/kraph/schema
+    documents: graphql/*/**.graphql
+    extensions:
+      turms:
+        out_dir: kraph/api
+        exclude_typenames: true
+        dump_configuration: true
+        dump_schema: true
+        freeze:
+          enabled: true
+        options:
+          enabled: true
+          use_enum_values: true
+          populate_by_name: true
+          alias_mode: split
+          extra: forbid
+          types:
+            - input
+        stylers:
+          - type: turms.stylers.default.DefaultStyler
+          - type: turms.stylers.appender.AppenderStyler
+            append_fragment: ""
+        plugins:
+          - type: turms.plugins.enums.EnumsPlugin
+          - type: turms.plugins.inputs.InputsPlugin
+          - type: turms.plugins.fragments.FragmentsPlugin
+          - type: turms.plugins.operations.OperationsPlugin
+          - type: turms.plugins.funcs.FuncsPlugin
+            coercible_scalars:
+              ID: rath.scalars.IDCoercible
+              CypherLiteral: kraph.scalars.CypherLiteralCoercible
+              StructureIdentifier: kraph.scalars.StructureIdentifierCoercible
+              StructureObject: kraph.scalars.StructureObjectCoercible
+            expand_input_types:
+              - input
+            global_kwargs:
+              - type: kraph.rath.KraphRath
+                key: rath
+                description: The mikro rath client
+            definitions:
+              - type: subscription
+                is_async: true
+                use: kraph.funcs.asubscribe
+              - type: query
+                is_async: true
+                use: kraph.funcs.aexecute
+              - type: mutation
+                is_async: true
+                use: kraph.funcs.aexecute
+              - type: subscription
+                use: kraph.funcs.subscribe
+              - type: query
+                use: kraph.funcs.execute
+              - type: mutation
+                use: kraph.funcs.execute
+        processors:
+          - type: turms.processors.black.BlackProcessor
+        scalar_definitions:
+          ID: rath.scalars.ID
+          AnyScalar: typing.Any
+          JSON: typing.Any
+          CypherLiteral: kraph.scalars.CypherLiteral
+          StructureIdentifier: kraph.scalars.StructureIdentifier
+          StructureObject: kraph.scalars.StructureObject
+          UnixMilliseconds: int
+          _Any: typing.Any
+        additional_bases:
+          Graph:
+            - kraph.traits.GraphTrait
+          GraphProjection:
+            - kraph.traits.ProjectionTrait
+          Node:
+            - kraph.traits.NodeTrait
+          Category:
+            - kraph.traits.CategoryTrait
+          EntityCategory:
+            - kraph.traits.EntityCategoryTrait
+          RelationCategory:
+            - kraph.traits.RelationCategoryTrait
+          MeasurementCategory:
+            - kraph.traits.MeasurementCategoryTrait
+          StructureRelationCategory:
+            - kraph.traits.StructureRelationCategoryTrait
+          NaturalEventCategory:
+            - kraph.traits.NaturalEventCategoryTrait
+          ProtocolEventCategory:
+            - kraph.traits.ProtocolEventCategoryTrait
+          Entity:
+            - kraph.traits.EntityTrait
+          Instance:
+            - kraph.traits.InstanceTrait
+          Link:
+            - kraph.traits.LinkTrait
+          Structure:
+            - kraph.traits.StructureTrait
+          Metric:
+            - kraph.traits.MetricTrait
+          Term:
+            - kraph.traits.TermTrait
+          StructureKind:
+            - kraph.traits.StructureKindTrait
+          MetricKind:
+            - kraph.traits.MetricKindTrait
+          Assertion:
+            - kraph.traits.AssertionTrait
+          Standing:
+            - kraph.traits.StandingTrait
+          MediaStore:
+            - kraph.traits.HasPresignedDownloadAccessor
+          AssertedEntity:
+            - kraph.traits.AssertedTrait
+            - kraph.traits.HasDrawings
+          AssertedNaturalEvent:
+            - kraph.traits.AssertedTrait
+            - kraph.traits.HasDrawings
+          AssertedProtocolEvent:
+            - kraph.traits.AssertedTrait
+            - kraph.traits.HasDrawings
+          AssertedInstances:
+            - kraph.traits.AssertedTrait
+            - kraph.traits.HasDrawings
+          AssertedRelation:
+            - kraph.traits.AssertedTrait
+            - kraph.traits.HasDrawings
+          AssertedParticipation:
+            - kraph.traits.AssertedTrait
+            - kraph.traits.HasDrawings
+          AssertedLinks:
+            - kraph.traits.AssertedTrait
+            - kraph.traits.HasDrawings
+          AssertedStructure:
+            - kraph.traits.AssertedTrait
+          AssertedMetric:
+            - kraph.traits.AssertedTrait
+          AssertedComment:
+            - kraph.traits.AssertedTrait
+          AssertedMeasurement:
+            - kraph.traits.AssertedTrait
+          AssertedDescription:
+            - kraph.traits.AssertedTrait
+          AssertedStructureRelation:
+            - kraph.traits.AssertedTrait
+          AssertedSameness:
+            - kraph.traits.AssertedTrait

@@ -1,0 +1,29 @@
+fragment NodeRef on Node {
+  id
+  label
+}
+
+fragment NodeDrawing on NodeDrawing {
+  graph {
+    id
+    name
+  }
+  category {
+    ...CategoryRef
+  }
+  node {
+    ...NodeRef
+  }
+}
+
+# Deliberately omits `edge`: Edge is an eight-way fan-out, and the payload's own `link`/`links`
+# already carries the claim identity.
+fragment EdgeDrawing on EdgeDrawing {
+  graph {
+    id
+    name
+  }
+  category {
+    ...CategoryRef
+  }
+}

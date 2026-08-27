@@ -1,102 +1,36 @@
-import io
-from typing import IO, Any
-from pydantic import BaseModel
-from typing import Callable, Generator, Type
-from typing import Any, IO, List, Optional, TypeAlias, cast
-from pydantic import GetCoreSchemaHandler
-from pydantic_core import CoreSchema
+"""Custom scalars the kraph schema names.
 
-from pydantic_core import core_schema
+The evidence-log schema declares eight scalars, of which only these need Python behaviour;
+``AnyScalar``, ``JSON``, ``UnixMilliseconds`` and ``_Any`` map to plain builtins in
+``graphql.config.yaml``, and ``DateTime`` is a turms built-in.
+
+Note that a structure is addressed by **two** fields now — ``identifier`` and ``object`` — rather
+than by a single ``identifier:object`` string. The old ``StructureString`` scalar is gone with
+it, and the job of turning a Python object into that pair belongs to
+:func:`kraph.refs.as_structure_ref`, not to a scalar validator.
+"""
+
+from typing import Any, Type
+
+from pydantic import BaseModel, GetCoreSchemaHandler
+from pydantic_core import CoreSchema, core_schema
 
 StructureIdentifierCoercible = str
-""" A custom scalar for wrapping of every supported array like structure on"""
-CypherCoercible = str
-""" A custom scalar for wrapping of every supported array like structure on"""
+"""What may be passed where a StructureIdentifier is wanted."""
+
+StructureObjectCoercible = str
+"""What may be passed where a StructureObject is wanted."""
+
 CypherLiteralCoercible = str
-""" A custom scalar for wrapping of every supported array like structure on"""
-
-StructureStringCoerciblae = str
-""" A custom scalar for wrapping of every supported array like structure on"""
-
-
-class RemoteUpload(str):
-    """A custom scalar for wrapping of every supported array like structure on
-    the mikro platform. This scalar enables validation of various array formats
-    into a mikro api compliant xr.DataArray.."""
-
-    def __init__(self, value: IO[bytes]) -> None:
-        self.value = value
-        self.key = str(value.name)
-
-    @classmethod
-    def __get_pydantic_core_schema__(
-        cls,
-        source_type: Any,  # noqa: ANN401
-        handler: GetCoreSchemaHandler,  # noqa: ANN401
-    ) -> CoreSchema:
-        """Get the pydantic core schema for the validator function"""
-        return core_schema.no_info_before_validator_function(
-            cls.validate, handler(object)
-        )
-
-    @classmethod
-    def validate(cls, v, *info):
-        """Validate the input array and convert it to a xr.DataArray."""
-
-        if isinstance(v, str):
-            v = open(v, "rb")
-
-        if not isinstance(v, io.FileIO) and not isinstance(v, io.BufferedReader):
-            raise ValueError("This needs to be a instance of a file")
-
-        return cls(v)
-
-    def __repr__(self):
-        return f"RemoteUpload({self.value})"
-
-
-class NodeID(str):
-    def to_graph_id(self):
-        return self.split(":")[1]
-
-    def to_graph_name(self):
-        return self.split(":")[0]
-
-    @classmethod
-    def __get_pydantic_core_schema__(
-        cls,
-        source_type: Any,  # noqa: ANN401
-        handler: GetCoreSchemaHandler,  # noqa: ANN401
-    ) -> CoreSchema:
-        """Get the pydantic core schema for the validator function"""
-        return core_schema.no_info_before_validator_function(cls.validate, handler(str))
-
-    @classmethod
-    def validate(cls: Type["NodeID"], v: Any, *info) -> "NodeID":
-        """Validate the ID"""
-        if isinstance(v, BaseModel):
-            if hasattr(v, "id"):
-                return cls(v.id)  # type: ignore
-            else:
-                raise TypeError("This needs to be a instance of BaseModel with an id")
-
-        if isinstance(v, str):
-            return cls(v)
-
-        if isinstance(v, int):
-            return cls(str(v))
-
-        raise TypeError(
-            "Needs to be either a instance of BaseModel (with an id) or a string"
-        )
+"""What may be passed where a CypherLiteral is wanted."""
 
 
 class StructureIdentifier(str):
-    def to_graph_id(self):
-        return self.split(":")[1]
+    """Names a kind of external datum, e.g. ``@mikro/roi``.
 
-    def to_graph_name(self):
-        return self.split(":")[0]
+    Accepts a registered Python class directly, resolving it through the rekuest structure
+    registry, so ``Structures([ROI])`` and ``"@mikro/roi"`` mean the same thing.
+    """
 
     @classmethod
     def __get_pydantic_core_schema__(
@@ -109,37 +43,25 @@ class StructureIdentifier(str):
 
     @classmethod
     def validate(
-        cls: Type["StructureIdentifier"], v: StructureIdentifierCoercible
+        cls: Type["StructureIdentifier"], v: StructureIdentifierCoercible, *info: Any
     ) -> "StructureIdentifier":
-        """Validate the ID"""
+        if isinstance(v, BaseModel) or isinstance(v, type) and issubclass(v, BaseModel):
+            from kraph.refs import identifier_for_cls
 
-        if isinstance(v, BaseModel):
-            from rekuest_next.structures.default import get_default_structure_registry
-
-            registry = get_default_structure_registry()
-            print(registry)
-
-            identifier = registry.get_identifier_for_cls(v.__class__)
-            return identifier
+            target = v if isinstance(v, type) else type(v)
+            return cls(identifier_for_cls(target))
 
         if isinstance(v, str):
-            assert "@" in v, "The string needs to be a valid identifier"
+            assert "@" in v, f"{v!r} is not a valid structure identifier (expected '@ns/name')"
             return cls(v)
 
-        if isinstance(v, int):
-            return cls(str(v))
-
         raise TypeError(
-            "Needs to be either a instance of BaseModel (with an id) or a string"
+            "A structure identifier must be a '@ns/name' string or a registered structure class"
         )
 
 
-class StructureString(str):
-    def to_graph_id(self):
-        return self.split(":")[1]
-
-    def to_graph_name(self):
-        return self.split(":")[0]
+class StructureObject(str):
+    """Names the particular external datum, within its identifier's namespace."""
 
     @classmethod
     def __get_pydantic_core_schema__(
@@ -151,56 +73,20 @@ class StructureString(str):
         return core_schema.no_info_before_validator_function(cls.validate, handler(str))
 
     @classmethod
-    def validate(cls: Type["NodeID"], v: Any, *info) -> "NodeID":
-        """Validate the ID"""
+    def validate(
+        cls: Type["StructureObject"], v: StructureObjectCoercible, *info: Any
+    ) -> "StructureObject":
         if isinstance(v, BaseModel):
-            from rekuest_next.structures.default import get_default_structure_registry
+            from rath.turms.utils import get_attributes_or_error
 
-            registry = get_default_structure_registry()
-            identifier = registry.get_identifier_for_cls(v.__class__)
-            assert hasattr(v, "id"), "The structure needs to have an id"
-
-            return f"{identifier}:{v.id}"
-
-        if isinstance(v, str):
-            assert "@" in v, "The string needs to be a valid identifier"
-            return cls(v)
-
-        if isinstance(v, int):
+            return cls(str(get_attributes_or_error(v, "id")))
+        if isinstance(v, (str, int)):
             return cls(str(v))
-
-        raise TypeError(
-            "Needs to be either a instance of BaseModel (with an id) or a string"
-        )
-
-
-class Cypher(str):
-    def to_graph_id(self):
-        return self.split(":")[1]
-
-    def to_graph_name(self):
-        return self.split(":")[0]
-
-    def __set__(self, owner, value: CypherCoercible) -> None: ...
-
-    @classmethod
-    def __get_pydantic_core_schema__(
-        cls,
-        source_type: Any,  # noqa: ANN401
-        handler: GetCoreSchemaHandler,  # noqa: ANN401
-    ) -> CoreSchema:
-        """Get the pydantic core schema for the validator function"""
-        return core_schema.no_info_before_validator_function(cls.validate, handler(str))
-
-    @classmethod
-    def validate(cls, v: CypherCoercible, *info) -> "Cypher":
-        if isinstance(v, str):
-            return cls(v)
-        raise TypeError("Needs to be either str or a string")
+        raise TypeError("A structure object must be a string, an int, or a model with an id")
 
 
 class CypherLiteral(str):
-    def __set__(self, owner, value: CypherLiteralCoercible) -> None: ...
+    """A literal fragment of Cypher, used only by the deprecated saved-query surface."""
 
     @classmethod
     def __get_pydantic_core_schema__(
@@ -212,7 +98,7 @@ class CypherLiteral(str):
         return core_schema.no_info_before_validator_function(cls.validate, handler(str))
 
     @classmethod
-    def validate(cls, v: CypherLiteralCoercible, *info) -> "CypherLiteral":
+    def validate(cls, v: CypherLiteralCoercible, *info: Any) -> "CypherLiteral":
         if isinstance(v, str):
             return cls(v)
-        raise TypeError("Needs to be either str or a string")
+        raise TypeError("A CypherLiteral must be a string")

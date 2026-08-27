@@ -1,0 +1,65 @@
+fragment Assertion on Assertion {
+  id
+  subject
+  appId
+  actionId
+  actionName
+  assertedAt
+  recordedAt
+  seq
+}
+
+fragment Standing on Standing {
+  id
+  stands
+  at
+  assertion {
+    ...Assertion
+  }
+}
+
+fragment TermRef on Term {
+  id
+  key
+  kind
+}
+
+fragment Term on Term {
+  ...TermRef
+  label
+  description
+  purl
+  color
+  createdAt
+}
+
+fragment StructureKind on StructureKind {
+  id
+  identifier
+  label
+  description
+  purl
+  color
+  createdAt
+}
+
+fragment MetricKind on MetricKind {
+  id
+  key
+  valueKind
+  label
+  description
+  purl
+  color
+  createdAt
+  structureKind {
+    id
+    identifier
+  }
+}
+
+fragment MediaStore on MediaStore {
+  id
+  key
+  presignedUrl
+}

@@ -1,0 +1,146 @@
+# Rule B: one named fragment per unavoidable interface, spread everywhere.
+# Fan-out costs per fragment DEFINITION, not per usage — so `CategoryRef` pays for its six
+# implementers once, and every drawing that spreads it pays nothing further.
+fragment CategoryRef on Category {
+  id
+  key
+  label
+  ageName
+}
+
+fragment CategoryBase on Category {
+  ...CategoryRef
+  description
+  purl
+  color
+  pinned
+  image {
+    ...MediaStore
+  }
+  graph {
+    id
+    name
+  }
+  term {
+    ...TermRef
+  }
+}
+
+fragment PropertyDefinition on PropertyDefinition {
+  key
+  label
+  valueKind
+  unit
+  description
+  derivation
+  index
+  searchable
+}
+
+fragment EntityDescriptor on EntityDescriptor {
+  keys
+  ontologyTerms
+  defaultCategoryKey
+}
+
+# NOTE: StructureDescriptorInput accepts `identifiers`, but the output type does not expose it.
+# The asymmetry is the server's, not a typo here.
+fragment StructureDescriptor on StructureDescriptor {
+  keys
+  tags
+  ontologyTerms
+  defaultCategoryKey
+}
+
+fragment EventRole on EventRole {
+  key
+  role
+  descriptor {
+    ...EntityDescriptor
+  }
+}
+
+fragment EntityCategory on EntityCategory {
+  ...CategoryBase
+  instanceKind
+  positionX
+  positionY
+  width
+  height
+  propertyDefinitions {
+    ...PropertyDefinition
+  }
+}
+
+fragment RelationCategory on RelationCategory {
+  ...CategoryBase
+  sourceDescriptor {
+    ...EntityDescriptor
+  }
+  targetDescriptor {
+    ...EntityDescriptor
+  }
+  propertyDefinitions {
+    ...PropertyDefinition
+  }
+}
+
+fragment MeasurementCategory on MeasurementCategory {
+  ...CategoryBase
+  sourceDescriptor {
+    ...StructureDescriptor
+  }
+  targetDescriptor {
+    ...EntityDescriptor
+  }
+  propertyDefinitions {
+    ...PropertyDefinition
+  }
+}
+
+fragment StructureRelationCategory on StructureRelationCategory {
+  ...CategoryBase
+  sourceDescriptor {
+    ...StructureDescriptor
+  }
+  targetDescriptor {
+    ...StructureDescriptor
+  }
+  propertyDefinitions {
+    ...PropertyDefinition
+  }
+}
+
+fragment NaturalEventCategory on NaturalEventCategory {
+  ...CategoryBase
+  positionX
+  positionY
+  width
+  height
+  inputs {
+    ...EventRole
+  }
+  outputs {
+    ...EventRole
+  }
+  propertyDefinitions {
+    ...PropertyDefinition
+  }
+}
+
+fragment ProtocolEventCategory on ProtocolEventCategory {
+  ...CategoryBase
+  positionX
+  positionY
+  width
+  height
+  inputs {
+    ...EventRole
+  }
+  outputs {
+    ...EventRole
+  }
+  propertyDefinitions {
+    ...PropertyDefinition
+  }
+}

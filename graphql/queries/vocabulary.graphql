@@ -1,0 +1,23 @@
+query GetTerm($id: ID!) { term(id: $id) { ...Term } }
+query ListTerms($filters: TermFilter, $pagination: VocabularyPaginationInput) {
+  terms(filters: $filters, pagination: $pagination) { ...Term }
+}
+query SearchTerms($search: String, $values: [ID!]) {
+  options: terms(filters: {search: $search, ids: $values}, pagination: {limit: 10}) { value: id  label: key }
+}
+
+query GetStructureKind($id: ID!) { structureKind(id: $id) { ...StructureKind } }
+query ListStructureKinds($filters: StructureKindFilter, $pagination: VocabularyPaginationInput) {
+  structureKinds(filters: $filters, pagination: $pagination) { ...StructureKind }
+}
+query SearchStructureKinds($search: String, $values: [ID!]) {
+  options: structureKinds(filters: {search: $search, ids: $values}, pagination: {limit: 10}) { value: id  label: identifier }
+}
+
+query GetMetricKind($id: ID!) { metricKind(id: $id) { ...MetricKind } }
+query ListMetricKinds($filters: MetricKindFilter, $pagination: VocabularyPaginationInput) {
+  metricKinds(filters: $filters, pagination: $pagination) { ...MetricKind }
+}
+query SearchMetricKinds($search: String, $values: [ID!]) {
+  options: metricKinds(filters: {search: $search, ids: $values}, pagination: {limit: 10}) { value: id  label: key }
+}

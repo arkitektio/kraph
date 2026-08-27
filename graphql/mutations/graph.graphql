@@ -1,27 +1,22 @@
-mutation CreateGraph($input: GraphInput!) {
-  createGraph(input: $input) {
-    ...Graph
-  }
+# A Graph is a VIEW over the organization's claims, not a container. `definition.extensions`
+# carries a whole ontology, so one call can declare every word this view means to draw, and
+# `backfill` projects the claims those words already admit.
+mutation CreateGraph($input: CreateGraphInput!) {
+  createGraph(input: $input) { ...Graph }
 }
 
-mutation PinGraph($input: PinGraphInput!) {
-  pinGraph(input: $input) {
-    ...Graph
-  }
+mutation UpdateGraph($input: UpdateGraphInput!) {
+  updateGraph(input: $input) { ...Graph }
 }
 
-mutation ImportGraph($input: ImportGraphInput!) {
-  importGraph(input: $input) {
-    ...Graph
-  }
+mutation UpdateGraphVisual($input: UpdateGraphVisualInput!) {
+  updateGraphVisual(input: $input) { ...Graph }
+}
+
+mutation ArchiveGraph($input: ArchiveGraphInput!) {
+  archiveGraph(input: $input) { ...Graph }
 }
 
 mutation DeleteGraph($input: DeleteGraphInput!) {
   deleteGraph(input: $input)
-}
-
-mutation UpdateGraph($input: UpdateGraphInput!) {
-  updateGraph(input: $input) {
-    ...Graph
-  }
 }

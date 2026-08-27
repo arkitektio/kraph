@@ -1,8 +1,0 @@
-fragment Path on Path {
-  nodes {
-    ...Node
-  }
-  edges {
-    ...Edge
-  }
-}

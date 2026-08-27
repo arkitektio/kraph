@@ -1,42 +1,66 @@
-fragment Graph on Graph {
-  id
-  name
-  description
-  structureCategories {
-    ...ListStructureCategory
-  }
-  entityCategories {
-    ...ListEntityCategory
-  }
-  metricCategories {
-    ...ListMetricCategory
-  }
-  protocolEventCategories {
-    ...ListProtocolEventCategory
-  }
-  naturalEventCategories {
-    ...ListNaturalEventCategory
-  }
-  relationCategories {
-    ...ListRelationCategory
-  }
-  measurementCategories {
-    ...ListMeasurementCategory
-  }
-  structureRelationCategories {
-    ...ListStructureRelationCategory
-  }
-  graphQueries(pagination: { limit: 0 }) {
-    ...GraphQuery
-  }
-  latestNodes(pagination: { limit: 2 }) {
-    ...Node
-  }
+fragment GraphProjection on GraphProjection {
+  kind
+  status
+  projectedThroughSeq
+  derivedThroughSeq
+  lag
+  pending
+  schemaStale
+  schemaHash
+  derivedAt
+  rebuiltAt
 }
 
 fragment ListGraph on Graph {
   id
   name
   description
+  ageName
+  isArchived
   pinned
+}
+
+fragment Graph on Graph {
+  ...ListGraph
+  purl
+  color
+  projection {
+    ...GraphProjection
+  }
+  entityCategories {
+    ...EntityCategory
+  }
+  relationCategories {
+    ...RelationCategory
+  }
+  measurementCategories {
+    ...MeasurementCategory
+  }
+  structureRelationCategories {
+    ...StructureRelationCategory
+  }
+  naturalEventCategories {
+    ...NaturalEventCategory
+  }
+  protocolEventCategories {
+    ...ProtocolEventCategory
+  }
+}
+
+fragment EntityView on Entity {
+  id
+  label
+  kind
+  categoryId
+  validFrom
+  validTo
+  properties
+  richProperties {
+    key
+    value
+    nEvidence
+    spread
+    measuredFrom
+    measuredTo
+  }
 }

@@ -1,0 +1,93 @@
+# ---- existence: instances -----------------------------------------------------------------
+# A write names a WORD (`term`), never a graph and never a category id.
+
+mutation AssertEntityExists($input: AssertEntityExistsInput!) {
+  assertEntityExists(input: $input) { ...AssertedEntity }
+}
+
+mutation AssertNaturalEventExists($input: AssertNaturalEventExistsInput!) {
+  assertNaturalEventExists(input: $input) { ...AssertedNaturalEvent }
+}
+
+mutation AssertProtocolEventExists($input: AssertProtocolEventExistsInput!) {
+  assertProtocolEventExists(input: $input) { ...AssertedProtocolEvent }
+}
+
+# One assertion over many (node, term) pairs — a batch is one act.
+mutation ClassifyNodes($input: ClassifyNodesInput!) {
+  classifyNodes(input: $input) { ...AssertedInstances }
+}
+
+mutation AssertSameInstance($input: AssertSameInstanceInput!) {
+  assertSameInstance(input: $input) { ...AssertedSameness }
+}
+
+# ---- structures and metrics ---------------------------------------------------------------
+
+mutation AssertStructureExists($input: AssertStructureExistsInput!) {
+  assertStructureExists(input: $input) { ...AssertedStructure }
+}
+
+# Idempotent per (organization, identifier, object) — the get-or-create form.
+mutation EnsureStructure($input: EnsureStructureInput!) {
+  ensureStructure(input: $input) { ...AssertedStructure }
+}
+
+# Appends metrics; `object` is immutable and repointing it is refused, not superseded.
+mutation UpdateStructure($input: UpdateStructureInput!) {
+  updateStructure(input: $input) { ...AssertedStructure }
+}
+
+mutation AssertMetricValue($input: AssertMetricValueInput!) {
+  assertMetricValue(input: $input) { ...AssertedMetric }
+}
+
+mutation AssertMetricValueForStructure($input: AssertMetricValueForStructureInput!) {
+  assertMetricValueForStructure(input: $input) { ...AssertedMetric }
+}
+
+# Retracting Standing + the new Metric under ONE assertion. Returns a metric with a NEW id.
+mutation SupersedeMetricValue($input: SupersedeMetricValueInput!) {
+  supersedeMetricValue(input: $input) { ...AssertedMetric }
+}
+
+# ---- links ---------------------------------------------------------------------------------
+
+mutation AssertRelationExists($input: AssertRelationExistsInput!) {
+  assertRelationExists(input: $input) { ...AssertedRelation }
+}
+
+mutation UpdateRelation($input: UpdateRelationInput!) {
+  updateRelation(input: $input) { ...AssertedRelation }
+}
+
+mutation AssertMeasurementExists($input: AssertMeasurementExistsInput!) {
+  assertMeasurementExists(input: $input) { ...AssertedMeasurement }
+}
+
+mutation AssertStructureRelationExists($input: AssertStructureRelationExistsInput!) {
+  assertStructureRelationExists(input: $input) { ...AssertedStructureRelation }
+}
+
+mutation UpdateStructureRelation($input: UpdateStructureRelationInput!) {
+  updateStructureRelation(input: $input) { ...AssertedStructureRelation }
+}
+
+mutation LinkStructureToEntity($input: LinkStructureInput!) {
+  linkStructureToEntity(input: $input) { ...AssertedDescription }
+}
+
+mutation AssertParticipation($input: AssertParticipationInput!) {
+  assertParticipation(input: $input) { ...AssertedParticipation }
+}
+
+# Many participants in one event, one assertion.
+mutation AssertParticipations($input: AssertParticipationsInput!) {
+  assertParticipations(input: $input) { ...AssertedLinks }
+}
+
+# ---- comments ------------------------------------------------------------------------------
+
+mutation CommentOnStructure($input: CommentOnStructureInput!) {
+  commentOnStructure(input: $input) { ...AssertedComment }
+}
