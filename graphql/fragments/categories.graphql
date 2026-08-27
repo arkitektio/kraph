@@ -123,9 +123,9 @@ fragment NaturalEventCategory on NaturalEventCategory {
   outputs {
     ...EventRole
   }
-  propertyDefinitions {
-    ...PropertyDefinition
-  }
+  # propertyDefinitions is not selected on event categories: the server returns a raw dict
+  # there rather than a PropertyDefinition, which fails type resolution. It resolves correctly
+  # on entity/relation/measurement categories, which do select it.
 }
 
 fragment ProtocolEventCategory on ProtocolEventCategory {
@@ -140,7 +140,7 @@ fragment ProtocolEventCategory on ProtocolEventCategory {
   outputs {
     ...EventRole
   }
-  propertyDefinitions {
-    ...PropertyDefinition
-  }
+  # propertyDefinitions is not selected on event categories: the server returns a raw dict
+  # there rather than a PropertyDefinition, which fails type resolution. It resolves correctly
+  # on entity/relation/measurement categories, which do select it.
 }

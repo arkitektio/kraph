@@ -23,7 +23,8 @@ fragment ListGraph on Graph {
 fragment Graph on Graph {
   ...ListGraph
   purl
-  color
+  # `color` is not selected: the server's Graph.color resolver raises
+  # "'Graph' object has no attribute 'color'".
   projection {
     ...GraphProjection
   }
