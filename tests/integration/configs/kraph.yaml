@@ -1,11 +1,8 @@
-db:
-  db_name: kraph
-  dependency: db
-  engine: django.db.backends.postgresql
-  host: db
-  password: hello_django
-  port: 5432
-  username: hello_django
+# Settings for the jhnnsrs/kraph image under test. The server validates this
+# with pydantic-settings and refuses to boot on a missing block, so the layout
+# must track kraph_server/configuration.py (documented in the server's
+# CONFIG.md): `postgres`, `authentikate` and `datalayer` replaced the old
+# `db`, `lok`-only and `s3` blocks.
 django:
   admin:
     email: admin@admin.com
@@ -15,31 +12,54 @@ django:
   hosts:
     - "*"
   secret_key: ab94ec351412c22324b2f635e0d6b9dd
-my_script_name: ""
-lok:
+authentikate:
+  # Required since authentikate 4.0: without it the server refuses to boot, and a
+  # token an issuer minted for some other service would otherwise be accepted here.
+  audience: kraph
+  issuers:
+    - kind: rsa
+      iss: lok
+      kid: lok-key-1
+      public_key: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDXx/g7dyiwmfIQvkBKvUAM+KBuL1KdvZfZMlYhbyrz9Auk2xao1gLYiQJ183joiXadUreL4BugUrasQVdR9JvBWXOBeqm2FD5Ehf9VvqXdzCOQ7/fUXkb9N8sqmz5YitQuheKGDh0weNmVcfdsCGU38sACEvFQg+5dv1tqLbm7EllT+vogntDVX16DmvpvFEX4HYHpT8qM/xuqSB6yQ8+wBuQd3K7WTFgUrUqQx6zFrSMUbSArPrrY5Z0GJAeDAHKp4+V+um4mSHpYM2nBJ5pn80wYpsf97KIL9P+UJzjb/indB8dCqpPkAk3HogBhj67Tp5JoqCMoaXHFU3tiYQCp
   static_tokens:
     test:
       sub: 1
       iss: lok
+      org: test
+      client_id: test
+      client_app: test
+      client_release: v0.0.1
+      client_device: test
+lok:
   issuer: lok
   key_type: RS256
   public_key: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDXx/g7dyiwmfIQvkBKvUAM+KBuL1KdvZfZMlYhbyrz9Auk2xao1gLYiQJ183joiXadUreL4BugUrasQVdR9JvBWXOBeqm2FD5Ehf9VvqXdzCOQ7/fUXkb9N8sqmz5YitQuheKGDh0weNmVcfdsCGU38sACEvFQg+5dv1tqLbm7EllT+vogntDVX16DmvpvFEX4HYHpT8qM/xuqSB6yQ8+wBuQd3K7WTFgUrUqQx6zFrSMUbSArPrrY5Z0GJAeDAHKp4+V+um4mSHpYM2nBJ5pn80wYpsf97KIL9P+UJzjb/indB8dCqpPkAk3HogBhj67Tp5JoqCMoaXHFU3tiYQCp
 redis:
-  dependency: redis
   host: redis
   port: 6379
-s3:
+datalayer:
+  # The server mints scoped STS credentials per grant; MinIO ignores the ARN
+  # itself and scopes the session by the inline policy alone, so any ARN-shaped
+  # string does. The keys are the user that configs/minio.yaml creates.
+  role_arn: arn:aws:iam::000000000000:role/kraph
   access_key: minio_access_key
-  buckets:
-    media: media
-    parquet: parquet
-    zarr: zarr
-  dependency: minio
+  secret_key: minio_secret_key
   host: minio
-  name: lanky-green-dalmatian
   port: 9000
   protocol: http
-  secret_key: minio_secret_key
+  media:
+    bucket: media
+  zarr:
+    bucket: zarr
+  parquet:
+    bucket: parquet
+postgres:
+  db_name: kraph
+  engine: django.db.backends.postgresql
+  host: db
+  password: hello_django
+  port: 5432
+  username: hello_django
 scopes:
   mikro_read: Read image from the database
   mikro_write: Write image to the database
