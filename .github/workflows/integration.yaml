@@ -6,14 +6,16 @@ on:
     branches: [main, next]
 jobs:
   test_integration:
-    # Test prerelease branches against the prerelease backend (:next) and the
-    # stable line against :latest. base_ref is set on PRs, ref_name on pushes.
+    # Pinned to :next, the only moving tag jhnnsrs/kraph publishes -- there is
+    # no :latest yet (only rc tags and :next). The previous expression asked for
+    # :latest on main, so the image pull failed on the stable line. Restore the
+    # 'main -> latest' split once the backend cuts a stable image.
     env:
-      KRAPH_SERVICE_TAG: ${{ (github.base_ref || github.ref_name) == 'main' && 'latest' || 'next' }}
+      KRAPH_SERVICE_TAG: next
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.14"]
+        python-version: ["3.13"]
         os: [ubuntu-latest, ubuntu-24.04-arm]
     runs-on: ${{ matrix.os }}
     steps:
