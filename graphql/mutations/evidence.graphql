@@ -28,16 +28,6 @@ mutation AssertStructureExists($input: AssertStructureExistsInput!) {
   assertStructureExists(input: $input) { ...AssertedStructure }
 }
 
-# Idempotent per (organization, identifier, object) — the get-or-create form.
-mutation EnsureStructure($input: EnsureStructureInput!) {
-  ensureStructure(input: $input) { ...AssertedStructure }
-}
-
-# Appends metrics; `object` is immutable and repointing it is refused, not superseded.
-mutation UpdateStructure($input: UpdateStructureInput!) {
-  updateStructure(input: $input) { ...AssertedStructure }
-}
-
 mutation AssertMetricValue($input: AssertMetricValueInput!) {
   assertMetricValue(input: $input) { ...AssertedMetric }
 }
@@ -57,24 +47,12 @@ mutation AssertRelationExists($input: AssertRelationExistsInput!) {
   assertRelationExists(input: $input) { ...AssertedRelation }
 }
 
-mutation UpdateRelation($input: UpdateRelationInput!) {
-  updateRelation(input: $input) { ...AssertedRelation }
-}
-
 mutation AssertMeasurementExists($input: AssertMeasurementExistsInput!) {
   assertMeasurementExists(input: $input) { ...AssertedMeasurement }
 }
 
 mutation AssertStructureRelationExists($input: AssertStructureRelationExistsInput!) {
   assertStructureRelationExists(input: $input) { ...AssertedStructureRelation }
-}
-
-mutation UpdateStructureRelation($input: UpdateStructureRelationInput!) {
-  updateStructureRelation(input: $input) { ...AssertedStructureRelation }
-}
-
-mutation LinkStructureToEntity($input: LinkStructureInput!) {
-  linkStructureToEntity(input: $input) { ...AssertedDescription }
 }
 
 mutation AssertParticipation($input: AssertParticipationInput!) {

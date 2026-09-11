@@ -44,7 +44,7 @@ fragment Metric on Metric {
   unit
   confidence
   confidenceType
-  measuredAt
+  observedAt
   assertedAt
 }
 

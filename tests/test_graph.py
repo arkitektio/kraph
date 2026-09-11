@@ -8,9 +8,7 @@ graph at all).
 import pytest
 
 from kraph.api.schema import (
-    CreateEntityCategoryInput,
-    CreateGraphInput,
-    EntityDescriptorInput,
+    Cardinality,
     StructureDescriptorInput,
     assert_entity_exists,
     create_entity_category,
@@ -27,10 +25,9 @@ from .conftest import DeployedKraph
 def test_create_graph(deployed_app: DeployedKraph) -> None:
     """A graph is a view; creating one records no claim."""
     t = create_graph(
-        input=CreateGraphInput(
-            name="Christians GOLD GRAPH",
-            description="A graph for Christians masterlist",
-        )
+        name="Christians GOLD GRAPH",
+        description="A graph for Christians masterlist",
+        backfill=False,
     )
     assert t.description == "A graph for Christians masterlist"
 
@@ -42,16 +39,17 @@ def test_create_structure_relation_category(deployed_app: DeployedKraph) -> None
     There is no ``createStructureCategory`` any more: a ``StructureKind`` is minted by the first
     write that names it, so a descriptor just points at the identifier.
     """
-    graph = create_graph(input=CreateGraphInput(name="Image Masking Example"))
+    graph = create_graph(name="Image Masking Example", backfill=False)
 
     images = StructureDescriptorInput(identifiers=["@mikro/image"])
     category = create_structure_relation_category(
-        input={
-            "key": "is_mask_for",
-            "source": images,
-            "target": images,
-            "graph": graph.id,
-        }
+        key="is_mask_for",
+        ontology_references=[],
+        properties=[],
+        source=images,
+        target=images,
+        cardinality=Cardinality.ONE_TO_ONE,
+        graph=graph.id,
     )
     assert category.key == "is_mask_for"
 
@@ -59,12 +57,18 @@ def test_create_structure_relation_category(deployed_app: DeployedKraph) -> None
 @pytest.mark.integration
 def test_claim_names_a_word_not_a_graph(deployed_app: DeployedKraph) -> None:
     """A claim names a term. A view that declares that word then draws it."""
-    graph = create_graph(input=CreateGraphInput(name="Evidence smoke"))
+    graph = create_graph(name="Evidence smoke", backfill=False)
     create_entity_category(
-        input=CreateEntityCategoryInput(key="Neuron", graph=graph.id, backfill=True)
+        key="Neuron",
+        ontology_references=[],
+        property_definitions=[],
+        graph=graph.id,
+        backfill=True,
     )
 
-    asserted = assert_entity_exists(input={"term": "Neuron"})
+    asserted = assert_entity_exists(
+        term="Neuron", supporting_evidence=[], derived_from=[], same_as=[]
+    )
 
     assert asserted.assertion.seq > 0
     assert asserted.instance.kind.value == "ENTITY"
@@ -80,11 +84,13 @@ def test_claim_under_an_undeclared_word_still_succeeds(deployed_app: DeployedKra
     A claim names a word the organization owns; a view that declares no category for it simply
     does not draw it. The write still succeeds and is still addressable.
     """
-    asserted = assert_entity_exists(input={"term": "AWordNoViewDeclares"})
+    asserted = assert_entity_exists(
+        term="AWordNoViewDeclares", supporting_evidence=[], derived_from=[], same_as=[]
+    )
 
     assert asserted.assertion.seq > 0
     assert asserted.is_drawn is False
-    assert asserted.drawings == []
+    assert list(asserted.drawings) == []
 
 
 @pytest.mark.integration
@@ -92,8 +98,10 @@ def test_retraction_records_a_position_rather_than_deleting(
     deployed_app: DeployedKraph,
 ) -> None:
     """Retracting is evidence, not deletion — and both positions survive."""
-    asserted = assert_entity_exists(input={"term": "Neuron"})
-    retract_entity(input={"id": asserted.instance.id})
+    asserted = assert_entity_exists(
+        term="Neuron", supporting_evidence=[], derived_from=[], same_as=[]
+    )
+    retract_entity(id=asserted.instance.id)
 
     standings = get_standings(id=asserted.instance.id)
     # Newest first, and the retraction did not remove anything.

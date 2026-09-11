@@ -46,9 +46,6 @@ fragment EntityDescriptor on EntityDescriptor {
 # NOTE: StructureDescriptorInput accepts `identifiers`, but the output type does not expose it.
 # The asymmetry is the server's, not a typo here.
 fragment StructureDescriptor on StructureDescriptor {
-  keys
-  tags
-  ontologyTerms
   defaultCategoryKey
 }
 

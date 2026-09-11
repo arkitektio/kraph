@@ -32,8 +32,8 @@ def test_instance_kind_values() -> None:
     assert {k.value for k in InstanceKind} == {"ENTITY", "NATURAL_EVENT", "PROTOCOL_EVENT"}
 
 
-def test_link_kind_has_eight_members() -> None:
-    """The eight things one claim can say about two others."""
+def test_link_kind_has_ten_members() -> None:
+    """The ten things one claim can say about two others."""
     assert {k.value for k in LinkKind} == {
         "INFORMS",
         "RELATION",
@@ -43,12 +43,14 @@ def test_link_kind_has_eight_members() -> None:
         "PARTICIPATES_AS_OUTPUT",
         "CLASSIFIES",
         "SAME_AS",
+        "DIFFERENT_FROM",
+        "DERIVED_FROM",
     }
 
 
-def test_term_kind_still_carries_reagent() -> None:
-    """``REAGENT`` survives as a word even though nothing mints a reagent instance."""
-    assert TermKind.REAGENT.value == "REAGENT"
+def test_term_kind_no_longer_carries_reagent() -> None:
+    """``REAGENT`` left the term kinds with the evidence-log rewrite; nothing mints one."""
+    assert not hasattr(TermKind, "REAGENT")
 
 
 def test_write_and_schema_value_kinds_are_different_enums() -> None:
@@ -99,7 +101,19 @@ def test_only_the_right_payloads_report_drawings() -> None:
 
 def test_write_surface_is_assertion_shaped() -> None:
     """Writes are assert/attest/retract, and the old create* verbs are gone."""
-    for gone in ("create_entity", "create_relation", "create_measurement", "create_structure"):
+    for gone in (
+        "create_entity",
+        "create_relation",
+        "create_measurement",
+        "create_structure",
+        # The get-or-create and in-place update verbs went the same way: a
+        # structure is asserted, attested or retracted, never ensured or updated.
+        "ensure_structure",
+        "update_structure",
+        "update_relation",
+        "update_structure_relation",
+        "link_structure_to_entity",
+    ):
         assert not hasattr(schema, gone), gone
-    for present in ("assert_entity_exists", "retract_entity", "attest_entity", "ensure_structure"):
+    for present in ("assert_entity_exists", "retract_entity", "attest_entity", "attest_structure"):
         assert hasattr(schema, present), present

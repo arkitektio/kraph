@@ -53,11 +53,6 @@ fragment AssertedStructureRelation on AssertedStructureRelation {
   link { ...Link }
 }
 
-fragment AssertedDescription on AssertedDescription {
-  assertion { ...Assertion }
-  link { ...Link }
-}
-
 fragment AssertedSameness on AssertedSameness {
   assertion { ...Assertion }
   links { ...Link }

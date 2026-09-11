@@ -51,8 +51,7 @@ fragment Graph on Graph {
 fragment EntityView on Entity {
   id
   label
-  kind
-  categoryId
+  categoryIds
   validFrom
   validTo
   properties

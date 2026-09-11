@@ -1,5 +1,5 @@
 {
-    "schema": "http://jhnnsrs-lab/kraph/schema",
+    "schema": "/tmp/claude-1000/-home-jhnnsrs-Code-packages-fakts/f10ff07e-7fed-4d14-aec5-5e64e6c8e62b/scratchpad/kraph-next.schema.graphql",
     "documents": "graphql/*/**.graphql",
     "extensions": {
         "turms": {
