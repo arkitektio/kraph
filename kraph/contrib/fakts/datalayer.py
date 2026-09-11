@@ -1,6 +1,6 @@
 from typing import Any, Dict
 
-from fakts_next.fakts import Fakts
+from fakts.fakts import Fakts
 from kraph.datalayer import DataLayer
 from pydantic import BaseModel
 

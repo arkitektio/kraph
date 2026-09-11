@@ -1,6 +1,6 @@
 import json
-from fakts_next.contrib.rath.auth import FaktsAuthLink
-from fakts_next.models import Requirement
+from fakts.contrib.rath.auth import FaktsAuthLink
+from fakts.models import Requirement
 from kraph.contrib.fakts.datalayer import FaktsKraphDataLayer
 from kraph.kraph import Kraph
 from kraph.links.upload import UploadLink
@@ -9,11 +9,11 @@ from rath.links import compose
 from rath.links.dictinglink import DictingLink
 from rath.links.shrink import ShrinkingLink
 from rath.links.split import SplitLink
-from fakts_next.contrib.rath.aiohttp import FaktsAIOHttpLink
-from fakts_next.contrib.rath.graphql_ws import FaktsGraphQLWSLink
+from fakts.contrib.rath.aiohttp import FaktsAIOHttpLink
+from fakts.contrib.rath.graphql_ws import FaktsGraphQLWSLink
 from graphql import OperationType
-from fakts_next import Fakts
-from rekuest_next.links.context import ContextLink
+from fakts import Fakts
+from rekuest.links.context import ContextLink
 
 
 from arkitekt.service_registry import (

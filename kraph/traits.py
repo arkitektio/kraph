@@ -29,7 +29,7 @@ from pydantic import BaseModel
 from rath.turms.utils import get_attributes_or_error
 
 if TYPE_CHECKING:
-    from rekuest_next.structures.registry import StructureRegistry
+    from rekuest.structures.registry import StructureRegistry
 
 
 class AssertedTrait(BaseModel):
@@ -182,7 +182,7 @@ class StructureTrait(BaseModel):
         """
         identifier, object_id = get_attributes_or_error(self, "identifier", "object")
 
-        from rekuest_next.structures.default import get_default_structure_registry
+        from rekuest.structures.default import get_default_structure_registry
 
         registry = registry or get_default_structure_registry()
         fullfilled = registry.get_fullfilled_structure(identifier)

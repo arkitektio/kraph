@@ -14,7 +14,7 @@ try:
     from .rekuest import structure_reg
 except ImportError as e:
     try:
-        import rekuest_next
+        import rekuest
     except ImportError:
         pass
     else:
