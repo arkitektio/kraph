@@ -5,7 +5,7 @@ try:
     from .arkitekt import KraphService
 except ImportError as e:
     try:
-        import arkitekt_next
+        import arkitekt
     except ImportError:
         pass
     else:

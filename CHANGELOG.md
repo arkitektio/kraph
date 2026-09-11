@@ -21,7 +21,7 @@
 
 ### Features
 
-- Add arkitekt-next support
+- Add arkitekt support
   ([`3fb5489`](https://github.com/arkitektio/kraph/commit/3fb5489165c909b52839688f1799feafd06668b0))
 
 
