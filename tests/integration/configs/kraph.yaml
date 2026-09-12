@@ -44,7 +44,7 @@ datalayer:
   role_arn: arn:aws:iam::000000000000:role/kraph
   access_key: minio_access_key
   secret_key: minio_secret_key
-  host: minio
+  host: rustfs
   port: 9000
   protocol: http
   media:
