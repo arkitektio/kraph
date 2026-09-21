@@ -11,6 +11,7 @@ license = "GPL-3.0-or-later"
 dependencies = [
     "dokker>=2.3",
     "rath>=3.5",
+    "rekuest>=3",
     "websockets>=15.0.1",
 ]
 

@@ -27,7 +27,15 @@ projects:
           - type: turms.plugins.inputs.InputsPlugin
           - type: turms.plugins.fragments.FragmentsPlugin
           - type: turms.plugins.operations.OperationsPlugin
-          - type: turms.plugins.funcs.FuncsPlugin
+          - type: turms.plugins.client.ClientPlugin
+            # Every operation is a method of KraphApi, which the client mixes in.
+            # Each method hands its operation to execute/aexecute/subscribe/asubscribe
+            # of self, which the Kraph client implements over its rath, so no call
+            # looks a client up.
+            client_class: KraphApi
+            # The client's own attributes: pydantic lets a field hide a method.
+            reserved_from:
+              - kraph.kraph.Kraph
             coercible_scalars:
               ID: rath.scalars.IDCoercible
               CypherLiteral: kraph.scalars.CypherLiteralCoercible
@@ -35,26 +43,6 @@ projects:
               StructureObject: kraph.scalars.StructureObjectCoercible
             expand_input_types:
               - input
-            global_kwargs:
-              - type: kraph.rath.KraphRath
-                key: rath
-                description: The mikro rath client
-            definitions:
-              - type: subscription
-                is_async: true
-                use: kraph.funcs.asubscribe
-              - type: query
-                is_async: true
-                use: kraph.funcs.aexecute
-              - type: mutation
-                is_async: true
-                use: kraph.funcs.aexecute
-              - type: subscription
-                use: kraph.funcs.subscribe
-              - type: query
-                use: kraph.funcs.execute
-              - type: mutation
-                use: kraph.funcs.execute
         processors:
           - type: turms.processors.black.BlackProcessor
         scalar_definitions:

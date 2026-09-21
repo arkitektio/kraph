@@ -1,7 +1,5 @@
 from datetime import datetime
 from enum import Enum
-from kraph.funcs import aexecute, execute
-from kraph.rath import KraphRath
 from kraph.scalars import (
     StructureIdentifier,
     StructureIdentifierCoercible,
@@ -68,6 +66,29 @@ class UnsetType:
 UNSET = UnsetType()
 
 
+class AggregationFunction(str, Enum):
+    """No documentation"""
+
+    MEAN = "MEAN"
+    SUM = "SUM"
+    MAX = "MAX"
+    MIN = "MIN"
+    COUNT = "COUNT"
+    RANGE = "RANGE"
+    EUCLIDEAN_RANGE = "EUCLIDEAN_RANGE"
+    LATEST = "LATEST"
+    __str__ = str.__str__
+
+
+class Cardinality(str, Enum):
+    """No documentation"""
+
+    ONE_TO_ONE = "ONE_TO_ONE"
+    ONE_TO_MANY = "ONE_TO_MANY"
+    MANY_TO_ONE = "MANY_TO_ONE"
+    __str__ = str.__str__
+
+
 class ClaimField(str, Enum):
     """No documentation"""
 
@@ -96,40 +117,6 @@ class ClaimOperator(str, Enum):
     __str__ = str.__str__
 
 
-class WhereOperator(str, Enum):
-    """No documentation"""
-
-    EQUALS = "EQUALS"
-    NOT_EQUALS = "NOT_EQUALS"
-    GREATER_THAN = "GREATER_THAN"
-    LESS_THAN = "LESS_THAN"
-    GREATER_OR_EQUAL = "GREATER_OR_EQUAL"
-    LESS_OR_EQUAL = "LESS_OR_EQUAL"
-    IN = "IN"
-    NOT_IN = "NOT_IN"
-    CONTAINS = "CONTAINS"
-    STARTS_WITH = "STARTS_WITH"
-    ENDS_WITH = "ENDS_WITH"
-    __str__ = str.__str__
-
-
-class ValueKind(str, Enum):
-    """No documentation"""
-
-    INT = "INT"
-    FLOAT = "FLOAT"
-    DATETIME = "DATETIME"
-    STRING = "STRING"
-    CATEGORY = "CATEGORY"
-    BOOLEAN = "BOOLEAN"
-    THREE_D_VECTOR = "THREE_D_VECTOR"
-    TWO_D_VECTOR = "TWO_D_VECTOR"
-    ONE_D_VECTOR = "ONE_D_VECTOR"
-    FOUR_D_VECTOR = "FOUR_D_VECTOR"
-    N_VECTOR = "N_VECTOR"
-    __str__ = str.__str__
-
-
 class DerivationType(str, Enum):
     """No documentation"""
 
@@ -140,38 +127,20 @@ class DerivationType(str, Enum):
     __str__ = str.__str__
 
 
-class AggregationFunction(str, Enum):
-    """No documentation"""
+class DescendantKind(str, Enum):
+    """The kind of a comment descendant — how one node of the rich-text tree renders"""
 
-    MEAN = "MEAN"
-    SUM = "SUM"
-    MAX = "MAX"
-    MIN = "MIN"
-    COUNT = "COUNT"
-    RANGE = "RANGE"
-    EUCLIDEAN_RANGE = "EUCLIDEAN_RANGE"
-    LATEST = "LATEST"
+    LEAF = "LEAF"
+    MENTION = "MENTION"
+    PARAGRAPH = "PARAGRAPH"
     __str__ = str.__str__
 
 
-class Ordering(str, Enum):
+class EventKind(str, Enum):
     """No documentation"""
 
-    ASC = "ASC"
-    ASC_NULLS_FIRST = "ASC_NULLS_FIRST"
-    ASC_NULLS_LAST = "ASC_NULLS_LAST"
-    DESC = "DESC"
-    DESC_NULLS_FIRST = "DESC_NULLS_FIRST"
-    DESC_NULLS_LAST = "DESC_NULLS_LAST"
-    __str__ = str.__str__
-
-
-class ProjectionStatus(str, Enum):
-    """Whether a view's drawing reflects the log, has never been drawn, or is mid-replay"""
-
-    CONSISTENT = "CONSISTENT"
-    NEEDS_BACKFILL = "NEEDS_BACKFILL"
-    REBUILDING = "REBUILDING"
+    INTRINSIC = "INTRINSIC"
+    EXTRINSIC = "EXTRINSIC"
     __str__ = str.__str__
 
 
@@ -200,24 +169,24 @@ class LinkKind(str, Enum):
     __str__ = str.__str__
 
 
-class DescendantKind(str, Enum):
-    """The kind of a comment descendant — how one node of the rich-text tree renders"""
+class Ordering(str, Enum):
+    """No documentation"""
 
-    LEAF = "LEAF"
-    MENTION = "MENTION"
-    PARAGRAPH = "PARAGRAPH"
+    ASC = "ASC"
+    ASC_NULLS_FIRST = "ASC_NULLS_FIRST"
+    ASC_NULLS_LAST = "ASC_NULLS_LAST"
+    DESC = "DESC"
+    DESC_NULLS_FIRST = "DESC_NULLS_FIRST"
+    DESC_NULLS_LAST = "DESC_NULLS_LAST"
     __str__ = str.__str__
 
 
-class TermKind(str, Enum):
-    """No documentation"""
+class ProjectionStatus(str, Enum):
+    """Whether a view's drawing reflects the log, has never been drawn, or is mid-replay"""
 
-    ENTITY = "ENTITY"
-    NATURAL_EVENT = "NATURAL_EVENT"
-    PROTOCOL_EVENT = "PROTOCOL_EVENT"
-    MEASUREMENT = "MEASUREMENT"
-    RELATION = "RELATION"
-    STRUCTURE_RELATION = "STRUCTURE_RELATION"
+    CONSISTENT = "CONSISTENT"
+    NEEDS_BACKFILL = "NEEDS_BACKFILL"
+    REBUILDING = "REBUILDING"
     __str__ = str.__str__
 
 
@@ -233,588 +202,56 @@ class PropertyType(str, Enum):
     __str__ = str.__str__
 
 
-class Cardinality(str, Enum):
+class TermKind(str, Enum):
     """No documentation"""
 
-    ONE_TO_ONE = "ONE_TO_ONE"
-    ONE_TO_MANY = "ONE_TO_MANY"
-    MANY_TO_ONE = "MANY_TO_ONE"
+    ENTITY = "ENTITY"
+    NATURAL_EVENT = "NATURAL_EVENT"
+    PROTOCOL_EVENT = "PROTOCOL_EVENT"
+    MEASUREMENT = "MEASUREMENT"
+    RELATION = "RELATION"
+    STRUCTURE_RELATION = "STRUCTURE_RELATION"
     __str__ = str.__str__
 
 
-class EventKind(str, Enum):
+class ValueKind(str, Enum):
     """No documentation"""
 
-    INTRINSIC = "INTRINSIC"
-    EXTRINSIC = "EXTRINSIC"
+    INT = "INT"
+    FLOAT = "FLOAT"
+    DATETIME = "DATETIME"
+    STRING = "STRING"
+    CATEGORY = "CATEGORY"
+    BOOLEAN = "BOOLEAN"
+    THREE_D_VECTOR = "THREE_D_VECTOR"
+    TWO_D_VECTOR = "TWO_D_VECTOR"
+    ONE_D_VECTOR = "ONE_D_VECTOR"
+    FOUR_D_VECTOR = "FOUR_D_VECTOR"
+    N_VECTOR = "N_VECTOR"
     __str__ = str.__str__
 
 
-class MeasurementCategoryFilter(BaseModel):
+class WhereOperator(str, Enum):
     """No documentation"""
 
-    graph: "GraphFilter | None" = None
-    id: ID | None = None
-    label: str | None = None
-    and_: "MeasurementCategoryFilter | None" = Field(
-        validation_alias=AliasChoices("and_", "AND"),
-        serialization_alias="AND",
-        default=None,
-    )
-    or_: "MeasurementCategoryFilter | None" = Field(
-        validation_alias=AliasChoices("or_", "OR"),
-        serialization_alias="OR",
-        default=None,
-    )
-    not_: "MeasurementCategoryFilter | None" = Field(
-        validation_alias=AliasChoices("not_", "NOT"),
-        serialization_alias="NOT",
-        default=None,
-    )
-    distinct: bool | None = Field(
-        validation_alias=AliasChoices("distinct", "DISTINCT"),
-        serialization_alias="DISTINCT",
-        default=None,
-    )
-    ids: tuple[ID, ...] | None = Field(default=None, description="Filter by list of IDs")
-    pinned: bool | None = Field(default=None, description="Filter by list of IDs")
-    search: str | None = Field(default=None, description="Filter by list of IDs")
-    source_identifier: str | None = Field(
-        validation_alias=AliasChoices("source_identifier", "sourceIdentifier"),
-        serialization_alias="sourceIdentifier",
-        default=None,
-        description="Filter by the structure identifier this measurement's source selects",
-    )
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
+    EQUALS = "EQUALS"
+    NOT_EQUALS = "NOT_EQUALS"
+    GREATER_THAN = "GREATER_THAN"
+    LESS_THAN = "LESS_THAN"
+    GREATER_OR_EQUAL = "GREATER_OR_EQUAL"
+    LESS_OR_EQUAL = "LESS_OR_EQUAL"
+    IN = "IN"
+    NOT_IN = "NOT_IN"
+    CONTAINS = "CONTAINS"
+    STARTS_WITH = "STARTS_WITH"
+    ENDS_WITH = "ENDS_WITH"
+    __str__ = str.__str__
 
 
-class GraphFilter(BaseModel):
-    """No documentation"""
+class ArchiveGraphInput(BaseModel):
+    """Input for archiving a graph"""
 
-    id: ID | None = None
-    name: str | None = None
-    description: str | None = None
-    and_: "GraphFilter | None" = Field(
-        validation_alias=AliasChoices("and_", "AND"),
-        serialization_alias="AND",
-        default=None,
-    )
-    or_: "GraphFilter | None" = Field(
-        validation_alias=AliasChoices("or_", "OR"),
-        serialization_alias="OR",
-        default=None,
-    )
-    not_: "GraphFilter | None" = Field(
-        validation_alias=AliasChoices("not_", "NOT"),
-        serialization_alias="NOT",
-        default=None,
-    )
-    distinct: bool | None = Field(
-        validation_alias=AliasChoices("distinct", "DISTINCT"),
-        serialization_alias="DISTINCT",
-        default=None,
-    )
-    pinned: bool | None = Field(default=None, description="Filter by list of IDs")
-    ids: tuple[ID, ...] | None = Field(default=None, description="Filter by list of IDs")
-    search: str | None = Field(default=None, description="Filter by list of IDs")
-    is_archived: bool | None = Field(
-        validation_alias=AliasChoices("is_archived", "isArchived"),
-        serialization_alias="isArchived",
-        default=None,
-        description="Only archived graphs, or only live ones. Omitted shows both",
-    )
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class OffsetPaginationInput(BaseModel):
-    """No documentation"""
-
-    offset: Annotated[int | None, GraphQLDefault("0")] = None
-    "Default: 0"
-    limit: int | None = None
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class EntityCategoryFilter(BaseModel):
-    """No documentation"""
-
-    graph: GraphFilter | None = None
-    id: ID | None = None
-    label: str | None = None
-    and_: "EntityCategoryFilter | None" = Field(
-        validation_alias=AliasChoices("and_", "AND"),
-        serialization_alias="AND",
-        default=None,
-    )
-    or_: "EntityCategoryFilter | None" = Field(
-        validation_alias=AliasChoices("or_", "OR"),
-        serialization_alias="OR",
-        default=None,
-    )
-    not_: "EntityCategoryFilter | None" = Field(
-        validation_alias=AliasChoices("not_", "NOT"),
-        serialization_alias="NOT",
-        default=None,
-    )
-    distinct: bool | None = Field(
-        validation_alias=AliasChoices("distinct", "DISTINCT"),
-        serialization_alias="DISTINCT",
-        default=None,
-    )
-    ids: tuple[ID, ...] | None = Field(default=None, description="Filter by list of IDs")
-    pinned: bool | None = Field(default=None, description="Filter by list of IDs")
-    search: str | None = Field(default=None, description="Filter by list of IDs")
-    matches_descriptor: "EntityDescriptorInput | None" = Field(
-        validation_alias=AliasChoices("matches_descriptor", "matchesDescriptor"),
-        serialization_alias="matchesDescriptor",
-        default=None,
-        description="Filter by list of IDs",
-    )
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class EntityDescriptorInput(BaseModel):
-    """Filters that select which entity categories a descriptor matches"""
-
-    keys: tuple[str, ...] | None = Field(default=None, description="Filter by entity key/label")
-    ontology_terms: tuple[str, ...] | None = Field(
-        validation_alias=AliasChoices("ontology_terms", "ontologyTerms"),
-        serialization_alias="ontologyTerms",
-        default=None,
-        description="Filter by ontology references on the entity (format: 'PREFIX:TERM_ID')",
-    )
-    default_category_key: str | None = Field(
-        validation_alias=AliasChoices("default_category_key", "defaultCategoryKey"),
-        serialization_alias="defaultCategoryKey",
-        default=None,
-        description="Default category to link to if no entities match the filters",
-    )
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class ProtocolEventCategoryFilter(BaseModel):
-    """No documentation"""
-
-    graph: GraphFilter | None = None
-    id: ID | None = None
-    label: str | None = None
-    and_: "ProtocolEventCategoryFilter | None" = Field(
-        validation_alias=AliasChoices("and_", "AND"),
-        serialization_alias="AND",
-        default=None,
-    )
-    or_: "ProtocolEventCategoryFilter | None" = Field(
-        validation_alias=AliasChoices("or_", "OR"),
-        serialization_alias="OR",
-        default=None,
-    )
-    not_: "ProtocolEventCategoryFilter | None" = Field(
-        validation_alias=AliasChoices("not_", "NOT"),
-        serialization_alias="NOT",
-        default=None,
-    )
-    distinct: bool | None = Field(
-        validation_alias=AliasChoices("distinct", "DISTINCT"),
-        serialization_alias="DISTINCT",
-        default=None,
-    )
-    ids: tuple[ID, ...] | None = Field(default=None, description="Filter by list of IDs")
-    pinned: bool | None = Field(default=None, description="Filter by list of IDs")
-    search: str | None = Field(default=None, description="Filter by list of IDs")
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class NaturalEventCategoryFilter(BaseModel):
-    """No documentation"""
-
-    graph: GraphFilter | None = None
-    id: ID | None = None
-    label: str | None = None
-    and_: "NaturalEventCategoryFilter | None" = Field(
-        validation_alias=AliasChoices("and_", "AND"),
-        serialization_alias="AND",
-        default=None,
-    )
-    or_: "NaturalEventCategoryFilter | None" = Field(
-        validation_alias=AliasChoices("or_", "OR"),
-        serialization_alias="OR",
-        default=None,
-    )
-    not_: "NaturalEventCategoryFilter | None" = Field(
-        validation_alias=AliasChoices("not_", "NOT"),
-        serialization_alias="NOT",
-        default=None,
-    )
-    distinct: bool | None = Field(
-        validation_alias=AliasChoices("distinct", "DISTINCT"),
-        serialization_alias="DISTINCT",
-        default=None,
-    )
-    ids: tuple[ID, ...] | None = Field(default=None, description="Filter by list of IDs")
-    pinned: bool | None = Field(default=None, description="Filter by list of IDs")
-    search: str | None = Field(default=None, description="Filter by list of IDs")
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class RelationCategoryFilter(BaseModel):
-    """No documentation"""
-
-    graph: GraphFilter | None = None
-    id: ID | None = None
-    label: str | None = None
-    and_: "RelationCategoryFilter | None" = Field(
-        validation_alias=AliasChoices("and_", "AND"),
-        serialization_alias="AND",
-        default=None,
-    )
-    or_: "RelationCategoryFilter | None" = Field(
-        validation_alias=AliasChoices("or_", "OR"),
-        serialization_alias="OR",
-        default=None,
-    )
-    not_: "RelationCategoryFilter | None" = Field(
-        validation_alias=AliasChoices("not_", "NOT"),
-        serialization_alias="NOT",
-        default=None,
-    )
-    distinct: bool | None = Field(
-        validation_alias=AliasChoices("distinct", "DISTINCT"),
-        serialization_alias="DISTINCT",
-        default=None,
-    )
-    ids: tuple[ID, ...] | None = Field(default=None, description="Filter by list of IDs")
-    pinned: bool | None = Field(default=None, description="Filter by list of IDs")
-    search: str | None = Field(default=None, description="Filter by list of IDs")
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class StructureRelationCategoryFilter(BaseModel):
-    """No documentation"""
-
-    graph: GraphFilter | None = None
-    id: ID | None = None
-    label: str | None = None
-    and_: "StructureRelationCategoryFilter | None" = Field(
-        validation_alias=AliasChoices("and_", "AND"),
-        serialization_alias="AND",
-        default=None,
-    )
-    or_: "StructureRelationCategoryFilter | None" = Field(
-        validation_alias=AliasChoices("or_", "OR"),
-        serialization_alias="OR",
-        default=None,
-    )
-    not_: "StructureRelationCategoryFilter | None" = Field(
-        validation_alias=AliasChoices("not_", "NOT"),
-        serialization_alias="NOT",
-        default=None,
-    )
-    distinct: bool | None = Field(
-        validation_alias=AliasChoices("distinct", "DISTINCT"),
-        serialization_alias="DISTINCT",
-        default=None,
-    )
-    ids: tuple[ID, ...] | None = Field(default=None, description="Filter by list of IDs")
-    pinned: bool | None = Field(default=None, description="Filter by list of IDs")
-    search: str | None = Field(default=None, description="Filter by list of IDs")
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class StructureKindFilter(BaseModel):
-    """No documentation"""
-
-    and_: "StructureKindFilter | None" = Field(
-        validation_alias=AliasChoices("and_", "AND"),
-        serialization_alias="AND",
-        default=None,
-    )
-    or_: "StructureKindFilter | None" = Field(
-        validation_alias=AliasChoices("or_", "OR"),
-        serialization_alias="OR",
-        default=None,
-    )
-    not_: "StructureKindFilter | None" = Field(
-        validation_alias=AliasChoices("not_", "NOT"),
-        serialization_alias="NOT",
-        default=None,
-    )
-    distinct: bool | None = Field(
-        validation_alias=AliasChoices("distinct", "DISTINCT"),
-        serialization_alias="DISTINCT",
-        default=None,
-    )
-    ids: tuple[ID, ...] | None = Field(default=None, description="Filter by list of IDs")
-    search: str | None = Field(default=None, description="Search label and identifier")
-    identifiers: tuple[str, ...] | None = Field(
-        default=None, description="Filter by structure identifiers"
-    )
-    matches_descriptor: "StructureDescriptorInput | None" = Field(
-        validation_alias=AliasChoices("matches_descriptor", "matchesDescriptor"),
-        serialization_alias="matchesDescriptor",
-        default=None,
-        description="Filter by whether the kind matches a descriptor",
-    )
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class StructureDescriptorInput(BaseModel):
-    """Input for creating a new structure relation definition in the graph schema"""
-
-    default_category_key: str | None = Field(
-        validation_alias=AliasChoices("default_category_key", "defaultCategoryKey"),
-        serialization_alias="defaultCategoryKey",
-        default=None,
-        description="Default category to link to if no entities match the filters",
-    )
-    identifiers: tuple[str, ...] | None = Field(
-        default=None,
-        description="Structure identifiers to filter by (e.g. '@mikro/roi')",
-    )
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class MetricKindFilter(BaseModel):
-    """No documentation"""
-
-    and_: "MetricKindFilter | None" = Field(
-        validation_alias=AliasChoices("and_", "AND"),
-        serialization_alias="AND",
-        default=None,
-    )
-    or_: "MetricKindFilter | None" = Field(
-        validation_alias=AliasChoices("or_", "OR"),
-        serialization_alias="OR",
-        default=None,
-    )
-    not_: "MetricKindFilter | None" = Field(
-        validation_alias=AliasChoices("not_", "NOT"),
-        serialization_alias="NOT",
-        default=None,
-    )
-    distinct: bool | None = Field(
-        validation_alias=AliasChoices("distinct", "DISTINCT"),
-        serialization_alias="DISTINCT",
-        default=None,
-    )
-    ids: tuple[ID, ...] | None = Field(default=None, description="Filter by list of IDs")
-    search: str | None = Field(default=None, description="Search label and key")
-    value_kind: ValueKind | None = Field(
-        validation_alias=AliasChoices("value_kind", "valueKind"),
-        serialization_alias="valueKind",
-        default=None,
-        description="Filter by the kind of value this measurement carries",
-    )
-    structure_kind: ID | None = Field(
-        validation_alias=AliasChoices("structure_kind", "structureKind"),
-        serialization_alias="structureKind",
-        default=None,
-        description="Filter by the structure kind this describes",
-    )
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class NodeFilters(BaseModel):
-    """Filter options for querying nodes"""
-
-    ids: tuple[ID, ...] | None = Field(default=None, description="Filter by specific node IDs")
-    search: str | None = Field(
-        default=None,
-        description="Substring match on the claim's term key or label. A column of the log, not a derived property",
-    )
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class NodeOrder(BaseModel):
-    """Ordering options for node queries"""
-
-    created_at: Ordering | None = Field(
-        validation_alias=AliasChoices("created_at", "createdAt"),
-        serialization_alias="createdAt",
-        default=None,
-        description="Order by when the row was stored — arrival time. Prefer `seq`, the log's order",
-    )
-    seq: Ordering | None = Field(
-        default=None,
-        description="Order by the act's position in the log (`Assertion.seq`) — the log's own total order (RFC 0025)",
-    )
-    observed_at: Ordering | None = Field(
-        validation_alias=AliasChoices("observed_at", "observedAt"),
-        serialization_alias="observedAt",
-        default=None,
-        description="Order by world time — when the claim says the world was so (RFC 0015)",
-    )
-    id: Ordering | None = Field(default=None, description="Order by node ID")
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class NodePaginationInput(BaseModel):
-    """Pagination options for querying nodes"""
-
-    offset: Annotated[int | None, GraphQLDefault("0")] = Field(
-        default=None, description="Number of items to skip"
-    )
-    "Number of items to skip\nDefault: 0"
-    limit: Annotated[int | None, GraphQLDefault("100")] = Field(
-        default=None, description="Maximum number of items to return"
-    )
-    "Maximum number of items to return\nDefault: 100"
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class StructureFilter(BaseModel):
-    """Filter options for querying structures"""
-
-    ids: tuple[ID, ...] | None = Field(default=None, description="Filter by specific structure IDs")
-    has_property: str | None = Field(
-        validation_alias=AliasChoices("has_property", "hasProperty"),
-        serialization_alias="hasProperty",
-        default=None,
-        description="Filter structures that have a metric under this key",
-    )
-    search: str | None = Field(
-        default=None,
-        description="Substring match on the structure's `object`, not its properties",
-    )
-    matches: tuple["PropertyMatch", ...] | None = Field(
-        default=None,
-        description="Filter structures whose metrics match these conditions",
-    )
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class PropertyMatch(BaseModel):
-    """A property match condition for filtering structures"""
-
-    key: str = Field(description="The property matching")
-    operator: WhereOperator = Field(description="The operator to use")
-    value: str = Field(description="The value to filter against")
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class StructureOrder(BaseModel):
-    """Ordering options for structure queries"""
-
-    created_at: Ordering | None = Field(
-        validation_alias=AliasChoices("created_at", "createdAt"),
-        serialization_alias="createdAt",
-        default=None,
-        description="Order by when the row was stored — arrival time. Prefer `seq`, the log's order",
-    )
-    seq: Ordering | None = Field(
-        default=None,
-        description="Order by the act's position in the log (`Assertion.seq`) — the log's own total order (RFC 0025)",
-    )
-    observed_at: Ordering | None = Field(
-        validation_alias=AliasChoices("observed_at", "observedAt"),
-        serialization_alias="observedAt",
-        default=None,
-        description="Order by world time — when the claim says the world was so (RFC 0015)",
-    )
-    id: Ordering | None = Field(default=None, description="Order by structure ID")
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class StructurePaginationInput(BaseModel):
-    """Pagination options for querying structures"""
-
-    offset: Annotated[int | None, GraphQLDefault("0")] = Field(
-        default=None, description="Number of items to skip"
-    )
-    "Number of items to skip\nDefault: 0"
-    limit: Annotated[int | None, GraphQLDefault("100")] = Field(
-        default=None, description="Maximum number of items to return"
-    )
-    "Maximum number of items to return\nDefault: 100"
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class TermFilter(BaseModel):
-    """No documentation"""
-
-    and_: "TermFilter | None" = Field(
-        validation_alias=AliasChoices("and_", "AND"),
-        serialization_alias="AND",
-        default=None,
-    )
-    or_: "TermFilter | None" = Field(
-        validation_alias=AliasChoices("or_", "OR"),
-        serialization_alias="OR",
-        default=None,
-    )
-    not_: "TermFilter | None" = Field(
-        validation_alias=AliasChoices("not_", "NOT"),
-        serialization_alias="NOT",
-        default=None,
-    )
-    distinct: bool | None = Field(
-        validation_alias=AliasChoices("distinct", "DISTINCT"),
-        serialization_alias="DISTINCT",
-        default=None,
-    )
-    ids: tuple[ID, ...] | None = Field(default=None, description="Filter by list of IDs")
-    search: str | None = Field(default=None, description="Search key, label and description")
-    kinds: tuple[TermKind, ...] | None = Field(
-        default=None, description="Filter by what sort of thing the word names"
-    )
-    keys: tuple[str, ...] | None = Field(default=None, description="Filter by the words themselves")
-    declared: bool | None = Field(
-        default=None,
-        description="Filter to terms at least one graph declares a category for",
-    )
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class VocabularyPaginationInput(BaseModel):
-    """Pagination options for querying the organization's vocabulary"""
-
-    offset: Annotated[int | None, GraphQLDefault("0")] = Field(
-        default=None, description="Number of items to skip"
-    )
-    "Number of items to skip\nDefault: 0"
-    limit: Annotated[int | None, GraphQLDefault("100")] = Field(
-        default=None, description="Maximum number of items to return"
-    )
-    "Maximum number of items to return\nDefault: 100"
+    id: str = Field(description="The ID of the graph to archive")
     model_config = ConfigDict(
         frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
     )
@@ -864,109 +301,28 @@ class AssertEntityExistsInput(BaseModel):
     )
 
 
-class StructureReferenceInput(BaseModel):
-    """A reference to a structure by identifier and object"""
+class AssertMeasurementExistsInput(BaseModel):
+    """Input for creating a new measurement edge"""
 
-    identifier: str = Field(description="Schema identifier, e.g. '@mikro/roi'")
-    object: str = Field(description="The unique ID of the object this structure references")
-    metrics: Annotated[tuple["MetricInput", ...] | None, GraphQLDefault("[]")] = None
-    "Default: []"
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    source_id: str = Field(
+        validation_alias=AliasChoices("source_id", "sourceId"),
+        serialization_alias="sourceId",
+        description="The ID of the source entity/structure",
     )
-
-
-class MetricInput(BaseModel):
-    """One measured value about a structure"""
-
-    key: str
-    value: Any
-    value_kind: PropertyType = Field(
-        validation_alias=AliasChoices("value_kind", "valueKind"),
-        serialization_alias="valueKind",
-        description="What type of value this is. Required: it decides which column the value is stored in and which measurement term it is recorded under, and nothing infers it. Two callers may declare the same key differently — a float `confidence` and a category-label `confidence` are two terms, and both are recorded.",
+    target_id: str = Field(
+        validation_alias=AliasChoices("target_id", "targetId"),
+        serialization_alias="targetId",
+        description="The ID of the target entity/structure",
     )
-    confidence: float | None = Field(
+    supporting_evidence: Annotated[
+        tuple["StructureReferenceInput", ...] | None, GraphQLDefault("[]")
+    ] = Field(
+        validation_alias=AliasChoices("supporting_evidence", "supportingEvidence"),
+        serialization_alias="supportingEvidence",
         default=None,
-        description="How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.",
+        description="List of evidence structures with measurements",
     )
-    confidence_type: str | None = Field(
-        validation_alias=AliasChoices("confidence_type", "confidenceType"),
-        serialization_alias="confidenceType",
-        default=None,
-        description="What kind of number `confidence` is — a method's own score, a p-value. Measurement-only",
-    )
-    unit: str | None = None
-    observed_at: datetime | None = Field(
-        validation_alias=AliasChoices("observed_at", "observedAt"),
-        serialization_alias="observedAt",
-        default=None,
-        description="When the world was observed. Defaults to when it was claimed.",
-    )
-    derived_from: Annotated[tuple[str, ...] | None, GraphQLDefault("[]")] = Field(
-        validation_alias=AliasChoices("derived_from", "derivedFrom"),
-        serialization_alias="derivedFrom",
-        default=None,
-        description='The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.',
-    )
-    'The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.\nDefault: []'
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class RetractEntityInput(BaseModel):
-    """Input for retracting an entity claim"""
-
-    id: ID = Field(description="The ID of the entity to retract")
-    at: datetime | None = Field(
-        default=None,
-        description="When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.",
-    )
-    confidence: float | None = Field(
-        default=None,
-        description="How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.",
-    )
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class AttestEntityInput(BaseModel):
-    """Input for claiming that an entity exists"""
-
-    id: str = Field(
-        description="The uuid of the node being attested. The same id `retract*` returns, so the two round-trip."
-    )
-    at: datetime | None = Field(
-        default=None,
-        description="When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.",
-    )
-    confidence: float | None = Field(
-        default=None,
-        description="How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.",
-    )
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class AssertStructureExistsInput(BaseModel):
-    """Input for claiming that an external datum exists"""
-
-    object: str = Field(description="The unique ID of the object this structure references")
-    metrics: Annotated[tuple[MetricInput, ...] | None, GraphQLDefault("[]")] = Field(
-        default=None, description="List of measurements associated with this structure"
-    )
-    "List of measurements associated with this structure\nDefault: []"
-    derived_from: Annotated[tuple[str, ...] | None, GraphQLDefault("[]")] = Field(
-        validation_alias=AliasChoices("derived_from", "derivedFrom"),
-        serialization_alias="derivedFrom",
-        default=None,
-        description='The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.',
-    )
-    'The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.\nDefault: []'
-    identifier: str = Field(description="The structure identifier, e.g. '@mikro/roi'")
+    "List of evidence structures with measurements\nDefault: []"
     observed_at: datetime | None = Field(
         validation_alias=AliasChoices("observed_at", "observedAt"),
         serialization_alias="observedAt",
@@ -977,187 +333,6 @@ class AssertStructureExistsInput(BaseModel):
         default=None,
         description="How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.",
     )
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class AttestStructureInput(BaseModel):
-    """Input for claiming that a structure still stands"""
-
-    id: str = Field(
-        description="The ID of the structure to attest — a bare uuid, its evidence primary key"
-    )
-    at: datetime | None = Field(
-        default=None,
-        description="When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.",
-    )
-    confidence: float | None = Field(
-        default=None,
-        description="How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.",
-    )
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class AttestMetricInput(BaseModel):
-    """Input for claiming that a measurement still stands"""
-
-    id: str = Field(
-        description="The ID of the metric to attest — a bare uuid, its evidence primary key"
-    )
-    at: datetime | None = Field(
-        default=None,
-        description="When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.",
-    )
-    confidence: float | None = Field(
-        default=None,
-        description="How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.",
-    )
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class AttestLinkInput(BaseModel):
-    """Input for claiming that a link claim still stands"""
-
-    id: str = Field(description="The ID of the claim to attest — its `Link` primary key")
-    at: datetime | None = Field(
-        default=None,
-        description="When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.",
-    )
-    confidence: float | None = Field(
-        default=None,
-        description="How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.",
-    )
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class RetractStructureInput(BaseModel):
-    """Input for retracting a structure claim — a Standing(stands=false), not a deletion"""
-
-    id: ID = Field(
-        description="The ID of the structure to retract — a bare uuid, its evidence primary key"
-    )
-    at: datetime | None = Field(
-        default=None,
-        description="When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.",
-    )
-    confidence: float | None = Field(
-        default=None,
-        description="How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.",
-    )
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class CommentOnStructureInput(BaseModel):
-    """Input for remarking on an external datum, minting its structure if new"""
-
-    identifier: str = Field(description="The structure identifier of the datum, e.g. '@mikro/roi'")
-    object: str = Field(description="The id of the external object on its service")
-    descendants: tuple["DescendantInput", ...] = Field(
-        description="The rich body of the remark — a tree of LEAF/MENTION/PARAGRAPH nodes"
-    )
-    parent: ID | None = Field(
-        default=None,
-        description="The comment this replies to. Must be on the same structure's thread",
-    )
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class DescendantInput(BaseModel):
-    """One node of a comment's rich body — shape-compatible with lok's komment descendants"""
-
-    kind: DescendantKind = Field(
-        description="LEAF, MENTION or PARAGRAPH — see `core.enums.DescendantKind`"
-    )
-    children: tuple["DescendantInput", ...] | None = Field(
-        default=None, description="The children of this node. Always empty for leafs"
-    )
-    text: str | None = Field(default=None, description="The text of a leaf")
-    bold: bool | None = None
-    italic: bool | None = None
-    underline: bool | None = None
-    code: bool | None = None
-    user: str | None = Field(
-        default=None,
-        description="The mentioned subject id — `Assertion.subject`'s vocabulary. Named `user` for shape-compatibility with lok's tree",
-    )
-    size: str | None = Field(default=None, description="The size of a paragraph")
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class RetractCommentInput(BaseModel):
-    """Input for claiming a remark no longer stands — withdrawn or resolved; the assertion records whose position it is"""
-
-    id: str = Field(description="The ID of the comment to retract")
-    at: datetime | None = Field(
-        default=None,
-        description="When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.",
-    )
-    confidence: float | None = Field(
-        default=None,
-        description="How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.",
-    )
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class AttestCommentInput(BaseModel):
-    """Input for claiming a remark stands again — reopening, as new evidence"""
-
-    id: str = Field(description="The ID of the comment to attest")
-    at: datetime | None = Field(
-        default=None,
-        description="When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.",
-    )
-    confidence: float | None = Field(
-        default=None,
-        description="How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.",
-    )
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class AssertMetricValueInput(BaseModel):
-    """Input for creating a new metric"""
-
-    key: str
-    value: Any
-    value_kind: PropertyType = Field(
-        validation_alias=AliasChoices("value_kind", "valueKind"),
-        serialization_alias="valueKind",
-        description="What type of value this is. Required: it decides which column the value is stored in and which measurement term it is recorded under, and nothing infers it. Two callers may declare the same key differently — a float `confidence` and a category-label `confidence` are two terms, and both are recorded.",
-    )
-    confidence: float | None = Field(
-        default=None,
-        description="How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.",
-    )
-    confidence_type: str | None = Field(
-        validation_alias=AliasChoices("confidence_type", "confidenceType"),
-        serialization_alias="confidenceType",
-        default=None,
-        description="What kind of number `confidence` is — a method's own score, a p-value. Measurement-only",
-    )
-    unit: str | None = None
-    observed_at: datetime | None = Field(
-        validation_alias=AliasChoices("observed_at", "observedAt"),
-        serialization_alias="observedAt",
-        default=None,
-        description="When the world was observed. Defaults to when it was claimed.",
-    )
     derived_from: Annotated[tuple[str, ...] | None, GraphQLDefault("[]")] = Field(
         validation_alias=AliasChoices("derived_from", "derivedFrom"),
         serialization_alias="derivedFrom",
@@ -1165,10 +340,9 @@ class AssertMetricValueInput(BaseModel):
         description='The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.',
     )
     'The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.\nDefault: []'
-    identifier: str = Field(
-        description="The schema identifier for this metric (e.g. '@mikro/roi_volume')"
+    term: str = Field(
+        description="The organization's word for what is being claimed — a term's `key`, e.g. 'AIS'. Not a category id and not a graph: a claim names a word, and every view that declares that word will hold what you write. The word is created if the organization has not used it before; a view that declares no category for it simply will not draw it."
     )
-    object: str = Field(description="The unique ID of the object this metric references")
     model_config = ConfigDict(
         frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
     )
@@ -1216,27 +390,8 @@ class AssertMetricValueForStructureInput(BaseModel):
     )
 
 
-class RetractMetricInput(BaseModel):
-    """Input for retracting a metric claim — a Standing(stands=false), not a deletion"""
-
-    id: str = Field(
-        description="The ID of the metric to retract — a bare uuid, its evidence primary key"
-    )
-    at: datetime | None = Field(
-        default=None,
-        description="When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.",
-    )
-    confidence: float | None = Field(
-        default=None,
-        description="How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.",
-    )
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class SupersedeMetricValueInput(BaseModel):
-    """Input for superseding a metric value"""
+class AssertMetricValueInput(BaseModel):
+    """Input for creating a new metric"""
 
     key: str
     value: Any
@@ -1269,202 +424,11 @@ class SupersedeMetricValueInput(BaseModel):
         description='The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.',
     )
     'The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.\nDefault: []'
-    id: str = Field(description="The ID of the metric to update")
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    identifier: str = Field(
+        description="The schema identifier for this metric (e.g. '@mikro/roi_volume')"
     )
-
-
-class AssertMeasurementExistsInput(BaseModel):
-    """Input for creating a new measurement edge"""
-
-    source_id: str = Field(
-        validation_alias=AliasChoices("source_id", "sourceId"),
-        serialization_alias="sourceId",
-        description="The ID of the source entity/structure",
-    )
-    target_id: str = Field(
-        validation_alias=AliasChoices("target_id", "targetId"),
-        serialization_alias="targetId",
-        description="The ID of the target entity/structure",
-    )
-    supporting_evidence: Annotated[
-        tuple[StructureReferenceInput, ...] | None, GraphQLDefault("[]")
-    ] = Field(
-        validation_alias=AliasChoices("supporting_evidence", "supportingEvidence"),
-        serialization_alias="supportingEvidence",
-        default=None,
-        description="List of evidence structures with measurements",
-    )
-    "List of evidence structures with measurements\nDefault: []"
-    observed_at: datetime | None = Field(
-        validation_alias=AliasChoices("observed_at", "observedAt"),
-        serialization_alias="observedAt",
-        default=None,
-        description="When the world was in this state — world time, the axis a scientist means by 'when'. Distinct from when it is claimed, which the assertion records; left unset, the two are equal. A point, not an interval: a duration is a metric.",
-    )
-    confidence: float | None = Field(
-        default=None,
-        description="How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.",
-    )
-    derived_from: Annotated[tuple[str, ...] | None, GraphQLDefault("[]")] = Field(
-        validation_alias=AliasChoices("derived_from", "derivedFrom"),
-        serialization_alias="derivedFrom",
-        default=None,
-        description='The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.',
-    )
-    'The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.\nDefault: []'
-    term: str = Field(
-        description="The organization's word for what is being claimed — a term's `key`, e.g. 'AIS'. Not a category id and not a graph: a claim names a word, and every view that declares that word will hold what you write. The word is created if the organization has not used it before; a view that declares no category for it simply will not draw it."
-    )
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class RetractMeasurementInput(BaseModel):
-    """Input for retracting a measurement claim — a Standing(stands=false), not a deletion"""
-
-    id: str = Field(
-        description="The ID of the measurement claim to retract — its `Link` primary key"
-    )
-    at: datetime | None = Field(
-        default=None,
-        description="When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.",
-    )
-    confidence: float | None = Field(
-        default=None,
-        description="How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.",
-    )
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class AssertRelationExistsInput(BaseModel):
-    """Input for creating a new relation between two entities with supporting evidence"""
-
-    source_id: str = Field(
-        validation_alias=AliasChoices("source_id", "sourceId"),
-        serialization_alias="sourceId",
-        description="The ID of the source entity/structure",
-    )
-    target_id: str = Field(
-        validation_alias=AliasChoices("target_id", "targetId"),
-        serialization_alias="targetId",
-        description="The ID of the target entity/structure",
-    )
-    supporting_evidence: Annotated[
-        tuple[StructureReferenceInput, ...] | None, GraphQLDefault("[]")
-    ] = Field(
-        validation_alias=AliasChoices("supporting_evidence", "supportingEvidence"),
-        serialization_alias="supportingEvidence",
-        default=None,
-        description="List of evidence structures with measurements",
-    )
-    "List of evidence structures with measurements\nDefault: []"
-    observed_at: datetime | None = Field(
-        validation_alias=AliasChoices("observed_at", "observedAt"),
-        serialization_alias="observedAt",
-        default=None,
-        description="When the world was in this state — world time, the axis a scientist means by 'when'. Distinct from when it is claimed, which the assertion records; left unset, the two are equal. A point, not an interval: a duration is a metric.",
-    )
-    confidence: float | None = Field(
-        default=None,
-        description="How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.",
-    )
-    derived_from: Annotated[tuple[str, ...] | None, GraphQLDefault("[]")] = Field(
-        validation_alias=AliasChoices("derived_from", "derivedFrom"),
-        serialization_alias="derivedFrom",
-        default=None,
-        description='The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.',
-    )
-    'The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.\nDefault: []'
-    term: str = Field(
-        description="The organization's word for what is being claimed — a term's `key`, e.g. 'AIS'. Not a category id and not a graph: a claim names a word, and every view that declares that word will hold what you write. The word is created if the organization has not used it before; a view that declares no category for it simply will not draw it."
-    )
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class RetractRelationInput(BaseModel):
-    """Input for retracting a relation claim — a Standing(stands=false), not a deletion"""
-
-    id: ID = Field(description="The ID of the relation claim to retract — its `Link` primary key")
-    at: datetime | None = Field(
-        default=None,
-        description="When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.",
-    )
-    confidence: float | None = Field(
-        default=None,
-        description="How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.",
-    )
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class AssertStructureRelationExistsInput(BaseModel):
-    """Input for creating a new structure relation"""
-
-    source_id: str = Field(
-        validation_alias=AliasChoices("source_id", "sourceId"),
-        serialization_alias="sourceId",
-        description="The ID of the source entity/structure",
-    )
-    target_id: str = Field(
-        validation_alias=AliasChoices("target_id", "targetId"),
-        serialization_alias="targetId",
-        description="The ID of the target entity/structure",
-    )
-    supporting_evidence: Annotated[
-        tuple[StructureReferenceInput, ...] | None, GraphQLDefault("[]")
-    ] = Field(
-        validation_alias=AliasChoices("supporting_evidence", "supportingEvidence"),
-        serialization_alias="supportingEvidence",
-        default=None,
-        description="List of evidence structures with measurements",
-    )
-    "List of evidence structures with measurements\nDefault: []"
-    observed_at: datetime | None = Field(
-        validation_alias=AliasChoices("observed_at", "observedAt"),
-        serialization_alias="observedAt",
-        default=None,
-        description="When the world was in this state — world time, the axis a scientist means by 'when'. Distinct from when it is claimed, which the assertion records; left unset, the two are equal. A point, not an interval: a duration is a metric.",
-    )
-    confidence: float | None = Field(
-        default=None,
-        description="How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.",
-    )
-    derived_from: Annotated[tuple[str, ...] | None, GraphQLDefault("[]")] = Field(
-        validation_alias=AliasChoices("derived_from", "derivedFrom"),
-        serialization_alias="derivedFrom",
-        default=None,
-        description='The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.',
-    )
-    'The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.\nDefault: []'
-    term: str = Field(
-        description="The organization's word for what is being claimed — a term's `key`, e.g. 'AIS'. Not a category id and not a graph: a claim names a word, and every view that declares that word will hold what you write. The word is created if the organization has not used it before; a view that declares no category for it simply will not draw it."
-    )
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class RetractStructureRelationInput(BaseModel):
-    """Input for retracting a structure relation claim — a Standing(stands=false), not a deletion"""
-
-    id: str = Field(
-        description="The ID of the structure relation claim to retract — its `Link` primary key"
-    )
-    at: datetime | None = Field(
-        default=None,
-        description="When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.",
-    )
-    confidence: float | None = Field(
-        default=None,
-        description="How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.",
+    object: str = Field(
+        description="The unique ID of the object this metric references"
     )
     model_config = ConfigDict(
         frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
@@ -1477,17 +441,21 @@ class AssertNaturalEventExistsInput(BaseModel):
     term: str = Field(
         description="The organization's word for what is being claimed — a term's `key`, e.g. 'AIS'. Not a category id and not a graph: a claim names a word, and every view that declares that word will hold what you write. The word is created if the organization has not used it before; a view that declares no category for it simply will not draw it."
     )
-    inputs: Annotated[tuple["RoleMappingInput", ...] | None, GraphQLDefault("[]")] = Field(
-        default=None, description="List of entity IDs that are inputs to this event"
+    inputs: Annotated[tuple["RoleMappingInput", ...] | None, GraphQLDefault("[]")] = (
+        Field(
+            default=None, description="List of entity IDs that are inputs to this event"
+        )
     )
     "List of entity IDs that are inputs to this event\nDefault: []"
-    outputs: Annotated[tuple["RoleMappingInput", ...] | None, GraphQLDefault("[]")] = Field(
-        default=None,
-        description="List of entity IDs that are outputs of this event",
+    outputs: Annotated[tuple["RoleMappingInput", ...] | None, GraphQLDefault("[]")] = (
+        Field(
+            default=None,
+            description="List of entity IDs that are outputs of this event",
+        )
     )
     "List of entity IDs that are outputs of this event\nDefault: []"
     supporting_evidence: Annotated[
-        tuple[StructureReferenceInput, ...] | None, GraphQLDefault("[]")
+        tuple["StructureReferenceInput", ...] | None, GraphQLDefault("[]")
     ] = Field(
         validation_alias=AliasChoices("supporting_evidence", "supportingEvidence"),
         serialization_alias="supportingEvidence",
@@ -1512,138 +480,6 @@ class AssertNaturalEventExistsInput(BaseModel):
         description='The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.',
     )
     'The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.\nDefault: []'
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class RoleMappingInput(BaseModel):
-    """How a participant maps onto a declared event role"""
-
-    role: str = Field(description="The role name")
-    entity_id: str = Field(
-        validation_alias=AliasChoices("entity_id", "entityId"),
-        serialization_alias="entityId",
-        description="The ID of the entity assigned to this role",
-    )
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class RetractNaturalEventInput(BaseModel):
-    """Input for retracting a natural event claim — a Standing(stands=false), not a deletion"""
-
-    id: str = Field(description="The ID of the natural event to retract")
-    at: datetime | None = Field(
-        default=None,
-        description="When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.",
-    )
-    confidence: float | None = Field(
-        default=None,
-        description="How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.",
-    )
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class AttestNaturalEventInput(BaseModel):
-    """Input for claiming that a natural event exists"""
-
-    id: str = Field(
-        description="The uuid of the node being attested. The same id `retract*` returns, so the two round-trip."
-    )
-    at: datetime | None = Field(
-        default=None,
-        description="When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.",
-    )
-    confidence: float | None = Field(
-        default=None,
-        description="How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.",
-    )
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class AssertProtocolEventExistsInput(BaseModel):
-    """Input for creating a new protocol event instance"""
-
-    term: str = Field(
-        description="The organization's word for what is being claimed — a term's `key`, e.g. 'AIS'. Not a category id and not a graph: a claim names a word, and every view that declares that word will hold what you write. The word is created if the organization has not used it before; a view that declares no category for it simply will not draw it."
-    )
-    inputs: Annotated[tuple[RoleMappingInput, ...] | None, GraphQLDefault("[]")] = Field(
-        default=None, description="List of entity IDs that are inputs to this event"
-    )
-    "List of entity IDs that are inputs to this event\nDefault: []"
-    outputs: Annotated[tuple[RoleMappingInput, ...] | None, GraphQLDefault("[]")] = Field(
-        default=None,
-        description="List of entity IDs that are outputs of this event",
-    )
-    "List of entity IDs that are outputs of this event\nDefault: []"
-    supporting_evidence: Annotated[
-        tuple[StructureReferenceInput, ...] | None, GraphQLDefault("[]")
-    ] = Field(
-        validation_alias=AliasChoices("supporting_evidence", "supportingEvidence"),
-        serialization_alias="supportingEvidence",
-        default=None,
-        description="List of evidence structures with measurements",
-    )
-    "List of evidence structures with measurements\nDefault: []"
-    observed_at: datetime | None = Field(
-        validation_alias=AliasChoices("observed_at", "observedAt"),
-        serialization_alias="observedAt",
-        default=None,
-        description="When the world was in this state — world time, the axis a scientist means by 'when'. Distinct from when it is claimed, which the assertion records; left unset, the two are equal. A point, not an interval: a duration is a metric.",
-    )
-    confidence: float | None = Field(
-        default=None,
-        description="How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.",
-    )
-    derived_from: Annotated[tuple[str, ...] | None, GraphQLDefault("[]")] = Field(
-        validation_alias=AliasChoices("derived_from", "derivedFrom"),
-        serialization_alias="derivedFrom",
-        default=None,
-        description='The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.',
-    )
-    'The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.\nDefault: []'
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class RetractProtocolEventInput(BaseModel):
-    """Input for retracting a protocol event claim — a Standing(stands=false), not a deletion"""
-
-    id: str = Field(description="The ID of the protocol event to retract")
-    at: datetime | None = Field(
-        default=None,
-        description="When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.",
-    )
-    confidence: float | None = Field(
-        default=None,
-        description="How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.",
-    )
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class AttestProtocolEventInput(BaseModel):
-    """Input for claiming that a protocol event exists"""
-
-    id: str = Field(
-        description="The uuid of the node being attested. The same id `retract*` returns, so the two round-trip."
-    )
-    at: datetime | None = Field(
-        default=None,
-        description="When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.",
-    )
-    confidence: float | None = Field(
-        default=None,
-        description="How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.",
-    )
     model_config = ConfigDict(
         frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
     )
@@ -1698,6 +534,1627 @@ class AssertParticipationsInput(BaseModel):
     )
 
 
+class AssertProtocolEventExistsInput(BaseModel):
+    """Input for creating a new protocol event instance"""
+
+    term: str = Field(
+        description="The organization's word for what is being claimed — a term's `key`, e.g. 'AIS'. Not a category id and not a graph: a claim names a word, and every view that declares that word will hold what you write. The word is created if the organization has not used it before; a view that declares no category for it simply will not draw it."
+    )
+    inputs: Annotated[tuple["RoleMappingInput", ...] | None, GraphQLDefault("[]")] = (
+        Field(
+            default=None, description="List of entity IDs that are inputs to this event"
+        )
+    )
+    "List of entity IDs that are inputs to this event\nDefault: []"
+    outputs: Annotated[tuple["RoleMappingInput", ...] | None, GraphQLDefault("[]")] = (
+        Field(
+            default=None,
+            description="List of entity IDs that are outputs of this event",
+        )
+    )
+    "List of entity IDs that are outputs of this event\nDefault: []"
+    supporting_evidence: Annotated[
+        tuple["StructureReferenceInput", ...] | None, GraphQLDefault("[]")
+    ] = Field(
+        validation_alias=AliasChoices("supporting_evidence", "supportingEvidence"),
+        serialization_alias="supportingEvidence",
+        default=None,
+        description="List of evidence structures with measurements",
+    )
+    "List of evidence structures with measurements\nDefault: []"
+    observed_at: datetime | None = Field(
+        validation_alias=AliasChoices("observed_at", "observedAt"),
+        serialization_alias="observedAt",
+        default=None,
+        description="When the world was in this state — world time, the axis a scientist means by 'when'. Distinct from when it is claimed, which the assertion records; left unset, the two are equal. A point, not an interval: a duration is a metric.",
+    )
+    confidence: float | None = Field(
+        default=None,
+        description="How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.",
+    )
+    derived_from: Annotated[tuple[str, ...] | None, GraphQLDefault("[]")] = Field(
+        validation_alias=AliasChoices("derived_from", "derivedFrom"),
+        serialization_alias="derivedFrom",
+        default=None,
+        description='The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.',
+    )
+    'The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.\nDefault: []'
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class AssertRelationExistsInput(BaseModel):
+    """Input for creating a new relation between two entities with supporting evidence"""
+
+    source_id: str = Field(
+        validation_alias=AliasChoices("source_id", "sourceId"),
+        serialization_alias="sourceId",
+        description="The ID of the source entity/structure",
+    )
+    target_id: str = Field(
+        validation_alias=AliasChoices("target_id", "targetId"),
+        serialization_alias="targetId",
+        description="The ID of the target entity/structure",
+    )
+    supporting_evidence: Annotated[
+        tuple["StructureReferenceInput", ...] | None, GraphQLDefault("[]")
+    ] = Field(
+        validation_alias=AliasChoices("supporting_evidence", "supportingEvidence"),
+        serialization_alias="supportingEvidence",
+        default=None,
+        description="List of evidence structures with measurements",
+    )
+    "List of evidence structures with measurements\nDefault: []"
+    observed_at: datetime | None = Field(
+        validation_alias=AliasChoices("observed_at", "observedAt"),
+        serialization_alias="observedAt",
+        default=None,
+        description="When the world was in this state — world time, the axis a scientist means by 'when'. Distinct from when it is claimed, which the assertion records; left unset, the two are equal. A point, not an interval: a duration is a metric.",
+    )
+    confidence: float | None = Field(
+        default=None,
+        description="How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.",
+    )
+    derived_from: Annotated[tuple[str, ...] | None, GraphQLDefault("[]")] = Field(
+        validation_alias=AliasChoices("derived_from", "derivedFrom"),
+        serialization_alias="derivedFrom",
+        default=None,
+        description='The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.',
+    )
+    'The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.\nDefault: []'
+    term: str = Field(
+        description="The organization's word for what is being claimed — a term's `key`, e.g. 'AIS'. Not a category id and not a graph: a claim names a word, and every view that declares that word will hold what you write. The word is created if the organization has not used it before; a view that declares no category for it simply will not draw it."
+    )
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class AssertSameInstanceInput(BaseModel):
+    """Input for claiming that several recorded instances are one thing"""
+
+    instances: tuple[str, ...] = Field(
+        description="Two or more instance ids that name the same thing — entities or events alike. Every pair among them is claimed, under one assertion."
+    )
+    observed_at: datetime | None = Field(
+        validation_alias=AliasChoices("observed_at", "observedAt"),
+        serialization_alias="observedAt",
+        default=None,
+        description="When the world was in this state — world time, the axis a scientist means by 'when'. Distinct from when it is claimed, which the assertion records; left unset, the two are equal. A point, not an interval: a duration is a metric.",
+    )
+    confidence: float | None = Field(
+        default=None,
+        description="How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.",
+    )
+    derived_from: Annotated[tuple[str, ...] | None, GraphQLDefault("[]")] = Field(
+        validation_alias=AliasChoices("derived_from", "derivedFrom"),
+        serialization_alias="derivedFrom",
+        default=None,
+        description='The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.',
+    )
+    'The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.\nDefault: []'
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class AssertStructureExistsInput(BaseModel):
+    """Input for claiming that an external datum exists"""
+
+    object: str = Field(
+        description="The unique ID of the object this structure references"
+    )
+    metrics: Annotated[tuple["MetricInput", ...] | None, GraphQLDefault("[]")] = Field(
+        default=None, description="List of measurements associated with this structure"
+    )
+    "List of measurements associated with this structure\nDefault: []"
+    derived_from: Annotated[tuple[str, ...] | None, GraphQLDefault("[]")] = Field(
+        validation_alias=AliasChoices("derived_from", "derivedFrom"),
+        serialization_alias="derivedFrom",
+        default=None,
+        description='The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.',
+    )
+    'The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.\nDefault: []'
+    identifier: str = Field(description="The structure identifier, e.g. '@mikro/roi'")
+    observed_at: datetime | None = Field(
+        validation_alias=AliasChoices("observed_at", "observedAt"),
+        serialization_alias="observedAt",
+        default=None,
+        description="When the world was in this state — world time, the axis a scientist means by 'when'. Distinct from when it is claimed, which the assertion records; left unset, the two are equal. A point, not an interval: a duration is a metric.",
+    )
+    confidence: float | None = Field(
+        default=None,
+        description="How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.",
+    )
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class AssertStructureRelationExistsInput(BaseModel):
+    """Input for creating a new structure relation"""
+
+    source_id: str = Field(
+        validation_alias=AliasChoices("source_id", "sourceId"),
+        serialization_alias="sourceId",
+        description="The ID of the source entity/structure",
+    )
+    target_id: str = Field(
+        validation_alias=AliasChoices("target_id", "targetId"),
+        serialization_alias="targetId",
+        description="The ID of the target entity/structure",
+    )
+    supporting_evidence: Annotated[
+        tuple["StructureReferenceInput", ...] | None, GraphQLDefault("[]")
+    ] = Field(
+        validation_alias=AliasChoices("supporting_evidence", "supportingEvidence"),
+        serialization_alias="supportingEvidence",
+        default=None,
+        description="List of evidence structures with measurements",
+    )
+    "List of evidence structures with measurements\nDefault: []"
+    observed_at: datetime | None = Field(
+        validation_alias=AliasChoices("observed_at", "observedAt"),
+        serialization_alias="observedAt",
+        default=None,
+        description="When the world was in this state — world time, the axis a scientist means by 'when'. Distinct from when it is claimed, which the assertion records; left unset, the two are equal. A point, not an interval: a duration is a metric.",
+    )
+    confidence: float | None = Field(
+        default=None,
+        description="How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.",
+    )
+    derived_from: Annotated[tuple[str, ...] | None, GraphQLDefault("[]")] = Field(
+        validation_alias=AliasChoices("derived_from", "derivedFrom"),
+        serialization_alias="derivedFrom",
+        default=None,
+        description='The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.',
+    )
+    'The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.\nDefault: []'
+    term: str = Field(
+        description="The organization's word for what is being claimed — a term's `key`, e.g. 'AIS'. Not a category id and not a graph: a claim names a word, and every view that declares that word will hold what you write. The word is created if the organization has not used it before; a view that declares no category for it simply will not draw it."
+    )
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class AttestCommentInput(BaseModel):
+    """Input for claiming a remark stands again — reopening, as new evidence"""
+
+    id: str = Field(description="The ID of the comment to attest")
+    at: datetime | None = Field(
+        default=None,
+        description="When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.",
+    )
+    confidence: float | None = Field(
+        default=None,
+        description="How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.",
+    )
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class AttestEntityInput(BaseModel):
+    """Input for claiming that an entity exists"""
+
+    id: str = Field(
+        description="The uuid of the node being attested. The same id `retract*` returns, so the two round-trip."
+    )
+    at: datetime | None = Field(
+        default=None,
+        description="When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.",
+    )
+    confidence: float | None = Field(
+        default=None,
+        description="How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.",
+    )
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class AttestLinkInput(BaseModel):
+    """Input for claiming that a link claim still stands"""
+
+    id: str = Field(
+        description="The ID of the claim to attest — its `Link` primary key"
+    )
+    at: datetime | None = Field(
+        default=None,
+        description="When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.",
+    )
+    confidence: float | None = Field(
+        default=None,
+        description="How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.",
+    )
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class AttestMetricInput(BaseModel):
+    """Input for claiming that a measurement still stands"""
+
+    id: str = Field(
+        description="The ID of the metric to attest — a bare uuid, its evidence primary key"
+    )
+    at: datetime | None = Field(
+        default=None,
+        description="When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.",
+    )
+    confidence: float | None = Field(
+        default=None,
+        description="How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.",
+    )
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class AttestNaturalEventInput(BaseModel):
+    """Input for claiming that a natural event exists"""
+
+    id: str = Field(
+        description="The uuid of the node being attested. The same id `retract*` returns, so the two round-trip."
+    )
+    at: datetime | None = Field(
+        default=None,
+        description="When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.",
+    )
+    confidence: float | None = Field(
+        default=None,
+        description="How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.",
+    )
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class AttestProtocolEventInput(BaseModel):
+    """Input for claiming that a protocol event exists"""
+
+    id: str = Field(
+        description="The uuid of the node being attested. The same id `retract*` returns, so the two round-trip."
+    )
+    at: datetime | None = Field(
+        default=None,
+        description="When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.",
+    )
+    confidence: float | None = Field(
+        default=None,
+        description="How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.",
+    )
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class AttestStructureInput(BaseModel):
+    """Input for claiming that a structure still stands"""
+
+    id: str = Field(
+        description="The ID of the structure to attest — a bare uuid, its evidence primary key"
+    )
+    at: datetime | None = Field(
+        default=None,
+        description="When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.",
+    )
+    confidence: float | None = Field(
+        default=None,
+        description="How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.",
+    )
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class CategoryDefinitionInput(BaseModel):
+    """What a category means: a union of clauses over classification claims — flat form for one clause, anyOf for several, never both (RFC 0007)"""
+
+    rules: tuple["ClaimRuleInput", ...] = Field(
+        description="A claim counts when any rule matches"
+    )
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class CategoryNodePositionInput(BaseModel):
+    """Input for specifying the position of a node in the graph visualization"""
+
+    category: str = Field(description="The category of the node")
+    position_x: float = Field(
+        validation_alias=AliasChoices("position_x", "positionX"),
+        serialization_alias="positionX",
+        description="The x-coordinate of the node position",
+    )
+    position_y: float = Field(
+        validation_alias=AliasChoices("position_y", "positionY"),
+        serialization_alias="positionY",
+        description="The y-coordinate of the node position",
+    )
+    width: float | None = Field(
+        default=None,
+        description="Optional width for the node (for visualization purposes)",
+    )
+    height: float | None = Field(
+        default=None,
+        description="Optional height for the node (for visualization purposes)",
+    )
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class ClaimConditionGroupInput(BaseModel):
+    """An exception: a conjunction that, when it holds whole, blocks its rule"""
+
+    when: tuple["ClaimConditionInput", ...] = Field(
+        description="All of these must hold for the exception to apply"
+    )
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class ClaimConditionInput(BaseModel):
+    """One condition: (field, operator, value) — IS/IN/NOT_IN on WORD/SUBJECT/APP/ACTION/KIND/KEY, BEFORE/SINCE on ASSERTED_AT/OBSERVED_AT, AT_LEAST/BELOW on CONFIDENCE (RFC 0010, 0015, 0016)"""
+
+    field: ClaimField = Field(description="What this condition looks at")
+    operator: ClaimOperator = Field(
+        description="How it compares. BEFORE/SINCE are inclusive"
+    )
+    value: Any = Field(
+        description="One string for IS, a non-empty string list for IN/NOT_IN, a datetime for BEFORE/SINCE, a number in [0, 1] for AT_LEAST/BELOW. For field KIND: kinds from CLASSIFICATION, EXISTENCE, SAMENESS, EVIDENCE, MEASUREMENT. For field KEY: metric keys"
+    )
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class ClaimRuleInput(BaseModel):
+    """One rule: matches when all `when` conditions hold and no `unless` group does"""
+
+    when: tuple[ClaimConditionInput, ...] = Field(description="All of these must hold")
+    unless: tuple[ClaimConditionGroupInput, ...] | None = Field(
+        default=None,
+        description="Exceptions: the rule does not match when any group holds whole",
+    )
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class ClassificationInput(BaseModel):
+    """One claim that a node is of a word, inside a batch"""
+
+    node: str = Field(description="The node being classified")
+    term: str = Field(
+        description="The organization's word for what is being claimed — a term's `key`, e.g. 'AIS'. Not a category id and not a graph: a claim names a word, and every view that declares that word will hold what you write. The word is created if the organization has not used it before; a view that declares no category for it simply will not draw it."
+    )
+    observed_at: datetime | None = Field(
+        validation_alias=AliasChoices("observed_at", "observedAt"),
+        serialization_alias="observedAt",
+        default=None,
+        description="When the world was in this state — world time, the axis a scientist means by 'when'. Distinct from when it is claimed, which the assertion records; left unset, the two are equal. A point, not an interval: a duration is a metric.",
+    )
+    confidence: float | None = Field(
+        default=None,
+        description="How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.",
+    )
+    derived_from: Annotated[tuple[str, ...] | None, GraphQLDefault("[]")] = Field(
+        validation_alias=AliasChoices("derived_from", "derivedFrom"),
+        serialization_alias="derivedFrom",
+        default=None,
+        description='The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.',
+    )
+    'The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.\nDefault: []'
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class ClassifyNodesInput(BaseModel):
+    """Input for claiming that several nodes are of a word, as one act"""
+
+    classifications: tuple[ClassificationInput, ...] = Field(
+        description="The claims to record"
+    )
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class CommentOnStructureInput(BaseModel):
+    """Input for remarking on an external datum, minting its structure if new"""
+
+    identifier: str = Field(
+        description="The structure identifier of the datum, e.g. '@mikro/roi'"
+    )
+    object: str = Field(description="The id of the external object on its service")
+    descendants: tuple["DescendantInput", ...] = Field(
+        description="The rich body of the remark — a tree of LEAF/MENTION/PARAGRAPH nodes"
+    )
+    parent: ID | None = Field(
+        default=None,
+        description="The comment this replies to. Must be on the same structure's thread",
+    )
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class CreateEntityCategoryInput(BaseModel):
+    """Input for creating a new entity definition in the graph schema"""
+
+    key: str = Field(description="The label of the node participating in the event")
+    description: str | None = Field(
+        default=None, description="Description of this node role"
+    )
+    ontology_references: Annotated[
+        tuple["OntologyReferenceInput", ...] | None, GraphQLDefault("[]")
+    ] = Field(
+        validation_alias=AliasChoices("ontology_references", "ontologyReferences"),
+        serialization_alias="ontologyReferences",
+        default=None,
+        description="Ontology references for this event",
+    )
+    "Ontology references for this event\nDefault: []"
+    color: tuple[int, ...] | None = Field(
+        default=None,
+        description="Optional RGBA color for this node role (e.g. [255, 0, 0, 128])",
+    )
+    image: str | None = Field(
+        default=None,
+        description="Optional media store ID for an image representing this node role",
+    )
+    label: str | None = Field(
+        default=None,
+        description="Optional human-readable label for this node role (defaults to 'key' if not provided)",
+    )
+    pin: bool | None = Field(
+        default=None, description="Whether to pin this node role in the UI"
+    )
+    instance_kind: str | None = Field(
+        validation_alias=AliasChoices("instance_kind", "instanceKind"),
+        serialization_alias="instanceKind",
+        default=None,
+        description="Optional instance kind for this entity category (e.g. 'neuron', 'synapse', 'behavior'). This is used for further categorization and filtering of entities within the graph.",
+    )
+    property_definitions: Annotated[
+        tuple["PropertyDefinitionInput", ...] | None, GraphQLDefault("[]")
+    ] = Field(
+        validation_alias=AliasChoices("property_definitions", "propertyDefinitions"),
+        serialization_alias="propertyDefinitions",
+        default=None,
+        description="Property definitions",
+    )
+    "Property definitions\nDefault: []"
+    definition: CategoryDefinitionInput | None = Field(
+        default=None,
+        description="What this category *means*: a predicate over classification claims (RFC 0007). Omitted means primitive — membership is whatever was asserted under this word",
+    )
+    graph: str = Field(description="The graph id this entity will belong to")
+    backfill: Annotated[bool | None, GraphQLDefault("False")] = Field(
+        default=None,
+        description="Draw the evidence this word already admits. Claims made under it before this category existed are in the organization's evidence base; with this on they are projected into the graph now, instead of waiting for the next reproject. Off by default because the work is proportional to the graph's evidence and happens before this mutation returns.",
+    )
+    "Draw the evidence this word already admits. Claims made under it before this category existed are in the organization's evidence base; with this on they are projected into the graph now, instead of waiting for the next reproject. Off by default because the work is proportional to the graph's evidence and happens before this mutation returns.\nDefault: False"
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class CreateGraphInput(BaseModel):
+    """Input for creating a new graph from a schema definition"""
+
+    name: str = Field(description="Name of the graph")
+    description: str | None = Field(
+        default=None, description="Description of the graph"
+    )
+    definition: "GraphDefinitionInput | None" = Field(
+        default=None, description="The complete graph schema definition"
+    )
+    sameness_rule: "SamenessRuleInput | None" = Field(
+        validation_alias=AliasChoices("sameness_rule", "samenessRule"),
+        serialization_alias="samenessRule",
+        default=None,
+        description="Whose sameness claims this view counts (RFC 0024). Omitted means everyone",
+    )
+    backfill: Annotated[bool | None, GraphQLDefault("False")] = Field(
+        default=None,
+        description="Draw the evidence this graph's words already admit. A graph is a view over the organization's evidence, so a new one can be a view over history: with this on, every node and edge already claimed under a word this schema declares is projected as the graph is created. Off by default because the work is proportional to the organization's evidence and happens before this mutation returns.",
+    )
+    "Draw the evidence this graph's words already admit. A graph is a view over the organization's evidence, so a new one can be a view over history: with this on, every node and edge already claimed under a word this schema declares is projected as the graph is created. Off by default because the work is proportional to the organization's evidence and happens before this mutation returns.\nDefault: False"
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class CreateMeasurementCategoryInput(BaseModel):
+    """Input for creating a new measurement definition in the graph schema"""
+
+    key: str = Field(description="Relation type name/key")
+    description: str | None = Field(
+        default=None, description="Description of this node role"
+    )
+    ontology_references: Annotated[
+        tuple["OntologyReferenceInput", ...] | None, GraphQLDefault("[]")
+    ] = Field(
+        validation_alias=AliasChoices("ontology_references", "ontologyReferences"),
+        serialization_alias="ontologyReferences",
+        default=None,
+        description="Ontology references for this event",
+    )
+    "Ontology references for this event\nDefault: []"
+    color: tuple[int, ...] | None = Field(
+        default=None,
+        description="Optional RGBA color for this node role (e.g. [255, 0, 0, 128])",
+    )
+    image: str | None = Field(
+        default=None,
+        description="Optional media store ID for an image representing this node role",
+    )
+    label: str | None = Field(
+        default=None,
+        description="Optional human-readable label for this node role (defaults to 'key' if not provided)",
+    )
+    pin: bool | None = Field(
+        default=None, description="Whether to pin this node role in the UI"
+    )
+    source: "StructureDescriptorInput" = Field(description="Source entity type(s)")
+    target: "EntityDescriptorInput" = Field(description="Target entity type(s)")
+    cardinality: Annotated[Cardinality | None, GraphQLDefault("ONE_TO_ONE")] = Field(
+        default=None, description="Relation cardinality"
+    )
+    "Relation cardinality\nDefault: ONE_TO_ONE"
+    properties: Annotated[
+        tuple["PropertyDefinitionInput", ...] | None, GraphQLDefault("[]")
+    ] = Field(default=None, description="Derived property definitions")
+    "Derived property definitions\nDefault: []"
+    definition: CategoryDefinitionInput | None = Field(
+        default=None,
+        description="This measurement category's complete rule (RFC 0012): which measurement claims count and whose standings fold. Omitted means primitive",
+    )
+    graph: str = Field(
+        description="The graph id this measurement category will belong to"
+    )
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class CreateNaturalEventCategoryInput(BaseModel):
+    """Input for creating a new natural event definition in the graph schema"""
+
+    key: str = Field(description="The label of the node participating in the event")
+    description: str | None = Field(
+        default=None, description="Description of this node role"
+    )
+    ontology_references: Annotated[
+        tuple["OntologyReferenceInput", ...] | None, GraphQLDefault("[]")
+    ] = Field(
+        validation_alias=AliasChoices("ontology_references", "ontologyReferences"),
+        serialization_alias="ontologyReferences",
+        default=None,
+        description="Ontology references for this event",
+    )
+    "Ontology references for this event\nDefault: []"
+    color: tuple[int, ...] | None = Field(
+        default=None,
+        description="Optional RGBA color for this node role (e.g. [255, 0, 0, 128])",
+    )
+    image: str | None = Field(
+        default=None,
+        description="Optional media store ID for an image representing this node role",
+    )
+    label: str | None = Field(
+        default=None,
+        description="Optional human-readable label for this node role (defaults to 'key' if not provided)",
+    )
+    pin: bool | None = Field(
+        default=None, description="Whether to pin this node role in the UI"
+    )
+    kind: EventKind = Field(
+        description="Whether the event arises in the system itself (INTRINSIC, e.g. mitosis) or is applied from outside (EXTRINSIC, e.g. a protocol step)"
+    )
+    inputs: Annotated[tuple["EventRoleInput", ...] | None, GraphQLDefault("[]")] = (
+        Field(default=None, description="Input node roles")
+    )
+    "Input node roles\nDefault: []"
+    outputs: Annotated[tuple["EventRoleInput", ...] | None, GraphQLDefault("[]")] = (
+        Field(default=None, description="Output node roles")
+    )
+    "Output node roles\nDefault: []"
+    properties: Annotated[
+        tuple["PropertyDefinitionInput", ...] | None, GraphQLDefault("[]")
+    ] = Field(default=None, description="Property definitions")
+    "Property definitions\nDefault: []"
+    definition: CategoryDefinitionInput | None = Field(
+        default=None,
+        description="This event category's complete rule (RFC 0009): which classification claims admit an event, whose existence standings count, and whose participation claims draw its edges. Omitted means primitive",
+    )
+    graph: str = Field(description="The graph id this event will belong to")
+    backfill: Annotated[bool | None, GraphQLDefault("False")] = Field(
+        default=None,
+        description="Draw the evidence this word already admits. Claims made under it before this category existed are in the organization's evidence base; with this on they are projected into the graph now, instead of waiting for the next reproject. Off by default because the work is proportional to the graph's evidence and happens before this mutation returns.",
+    )
+    "Draw the evidence this word already admits. Claims made under it before this category existed are in the organization's evidence base; with this on they are projected into the graph now, instead of waiting for the next reproject. Off by default because the work is proportional to the graph's evidence and happens before this mutation returns.\nDefault: False"
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class CreateProtocolEventCategoryInput(BaseModel):
+    """Input for creating a new protocol event definition in the graph schema"""
+
+    key: str = Field(description="The label of the node participating in the event")
+    description: str | None = Field(
+        default=None, description="Description of this node role"
+    )
+    ontology_references: Annotated[
+        tuple["OntologyReferenceInput", ...] | None, GraphQLDefault("[]")
+    ] = Field(
+        validation_alias=AliasChoices("ontology_references", "ontologyReferences"),
+        serialization_alias="ontologyReferences",
+        default=None,
+        description="Ontology references for this event",
+    )
+    "Ontology references for this event\nDefault: []"
+    color: tuple[int, ...] | None = Field(
+        default=None,
+        description="Optional RGBA color for this node role (e.g. [255, 0, 0, 128])",
+    )
+    image: str | None = Field(
+        default=None,
+        description="Optional media store ID for an image representing this node role",
+    )
+    label: str | None = Field(
+        default=None,
+        description="Optional human-readable label for this node role (defaults to 'key' if not provided)",
+    )
+    pin: bool | None = Field(
+        default=None, description="Whether to pin this node role in the UI"
+    )
+    kind: EventKind = Field(
+        description="Whether the event arises in the system itself (INTRINSIC, e.g. mitosis) or is applied from outside (EXTRINSIC, e.g. a protocol step)"
+    )
+    inputs: Annotated[tuple["EventRoleInput", ...] | None, GraphQLDefault("[]")] = (
+        Field(default=None, description="Input node roles")
+    )
+    "Input node roles\nDefault: []"
+    outputs: Annotated[tuple["EventRoleInput", ...] | None, GraphQLDefault("[]")] = (
+        Field(default=None, description="Output node roles")
+    )
+    "Output node roles\nDefault: []"
+    properties: Annotated[
+        tuple["PropertyDefinitionInput", ...] | None, GraphQLDefault("[]")
+    ] = Field(default=None, description="Property definitions")
+    "Property definitions\nDefault: []"
+    definition: CategoryDefinitionInput | None = Field(
+        default=None,
+        description="This event category's complete rule (RFC 0009): which classification claims admit an event, whose existence standings count, and whose participation claims draw its edges. Omitted means primitive",
+    )
+    protocol: str = Field(description="The protocol this event definition belongs to")
+    graph: str = Field(description="The graph id this event will belong to")
+    backfill: Annotated[bool | None, GraphQLDefault("False")] = Field(
+        default=None,
+        description="Draw the evidence this word already admits. Claims made under it before this category existed are in the organization's evidence base; with this on they are projected into the graph now, instead of waiting for the next reproject. Off by default because the work is proportional to the graph's evidence and happens before this mutation returns.",
+    )
+    "Draw the evidence this word already admits. Claims made under it before this category existed are in the organization's evidence base; with this on they are projected into the graph now, instead of waiting for the next reproject. Off by default because the work is proportional to the graph's evidence and happens before this mutation returns.\nDefault: False"
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class CreateRelationCategoryInput(BaseModel):
+    """Input for creating a new relation definition in the graph schema"""
+
+    key: str = Field(description="The label of the node participating in the event")
+    description: str | None = Field(
+        default=None, description="Description of this node role"
+    )
+    ontology_references: Annotated[
+        tuple["OntologyReferenceInput", ...] | None, GraphQLDefault("[]")
+    ] = Field(
+        validation_alias=AliasChoices("ontology_references", "ontologyReferences"),
+        serialization_alias="ontologyReferences",
+        default=None,
+        description="Ontology references for this event",
+    )
+    "Ontology references for this event\nDefault: []"
+    color: tuple[int, ...] | None = Field(
+        default=None,
+        description="Optional RGBA color for this node role (e.g. [255, 0, 0, 128])",
+    )
+    image: str | None = Field(
+        default=None,
+        description="Optional media store ID for an image representing this node role",
+    )
+    label: str | None = Field(
+        default=None,
+        description="Optional human-readable label for this node role (defaults to 'key' if not provided)",
+    )
+    pin: bool | None = Field(
+        default=None, description="Whether to pin this node role in the UI"
+    )
+    instance_kind: str | None = Field(
+        validation_alias=AliasChoices("instance_kind", "instanceKind"),
+        serialization_alias="instanceKind",
+        default=None,
+        description="Optional instance kind for this entity category (e.g. 'neuron', 'synapse', 'behavior'). This is used for further categorization and filtering of entities within the graph.",
+    )
+    property_definitions: Annotated[
+        tuple["PropertyDefinitionInput", ...] | None, GraphQLDefault("[]")
+    ] = Field(
+        validation_alias=AliasChoices("property_definitions", "propertyDefinitions"),
+        serialization_alias="propertyDefinitions",
+        default=None,
+        description="Property definitions",
+    )
+    "Property definitions\nDefault: []"
+    definition: CategoryDefinitionInput | None = Field(
+        default=None,
+        description="What this category *means*: a predicate over classification claims (RFC 0007). Omitted means primitive — membership is whatever was asserted under this word",
+    )
+    graph: str = Field(description="The graph id this entity will belong to")
+    backfill: Annotated[bool | None, GraphQLDefault("False")] = Field(
+        default=None,
+        description="Draw the evidence this word already admits. Claims made under it before this category existed are in the organization's evidence base; with this on they are projected into the graph now, instead of waiting for the next reproject. Off by default because the work is proportional to the graph's evidence and happens before this mutation returns.",
+    )
+    "Draw the evidence this word already admits. Claims made under it before this category existed are in the organization's evidence base; with this on they are projected into the graph now, instead of waiting for the next reproject. Off by default because the work is proportional to the graph's evidence and happens before this mutation returns.\nDefault: False"
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class CreateStructureRelationCategoryInput(BaseModel):
+    """Input for creating a new structure relation definition in the graph schema"""
+
+    key: str = Field(description="Relation type name/key")
+    description: str | None = Field(
+        default=None, description="Description of this node role"
+    )
+    ontology_references: Annotated[
+        tuple["OntologyReferenceInput", ...] | None, GraphQLDefault("[]")
+    ] = Field(
+        validation_alias=AliasChoices("ontology_references", "ontologyReferences"),
+        serialization_alias="ontologyReferences",
+        default=None,
+        description="Ontology references for this event",
+    )
+    "Ontology references for this event\nDefault: []"
+    color: tuple[int, ...] | None = Field(
+        default=None,
+        description="Optional RGBA color for this node role (e.g. [255, 0, 0, 128])",
+    )
+    image: str | None = Field(
+        default=None,
+        description="Optional media store ID for an image representing this node role",
+    )
+    label: str | None = Field(
+        default=None,
+        description="Optional human-readable label for this node role (defaults to 'key' if not provided)",
+    )
+    pin: bool | None = Field(
+        default=None, description="Whether to pin this node role in the UI"
+    )
+    properties: Annotated[
+        tuple["PropertyDefinitionInput", ...] | None, GraphQLDefault("[]")
+    ] = Field(default=None, description="Derived property definitions")
+    "Derived property definitions\nDefault: []"
+    source: "StructureDescriptorInput" = Field(description="Source entity type(s)")
+    target: "StructureDescriptorInput" = Field(description="Target entity type(s)")
+    cardinality: Annotated[Cardinality | None, GraphQLDefault("ONE_TO_ONE")] = Field(
+        default=None, description="Relation cardinality"
+    )
+    "Relation cardinality\nDefault: ONE_TO_ONE"
+    definition: CategoryDefinitionInput | None = Field(
+        default=None,
+        description="This structure-relation category's complete rule (RFC 0012): which structure-relation claims count — by word, annotator, app and window — and whose standings fold. Omitted means primitive",
+    )
+    graph: str = Field(description="The graph id this entity will belong to")
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class CreateTermInput(BaseModel):
+    """Input for declaring one of the organization's words"""
+
+    kind: TermKind = Field(
+        description="What sort of thing this word names. Part of its identity."
+    )
+    key: str = Field(description="The word itself, e.g. 'AIS'")
+    label: str | None = Field(default=None, description="Human-readable name")
+    description: str | None = Field(default=None, description="What this word means")
+    purl: str | None = Field(
+        default=None,
+        description="Persistent URL, where this corresponds to a published ontology term",
+    )
+    color: tuple[int, ...] | None = Field(
+        default=None, description="Optional RGBA colour"
+    )
+    image: str | None = Field(
+        default=None, description="Optional media store ID for an illustrative image"
+    )
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class DeleteEntityCategoryInput(BaseModel):
+    """Input for deleting an existing entity definition in the graph schema"""
+
+    id: ID = Field(description="The ID of the structure category to delete")
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class DeleteGraphInput(BaseModel):
+    """Input for deleting a graph"""
+
+    id: str = Field(description="The ID of the graph to delete")
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class DeleteMeasurementCategoryInput(BaseModel):
+    """Input for deleting an existing measurement definition in the graph schema"""
+
+    id: str = Field(description="The ID of the measurement category to delete")
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class DeleteMetricKindInput(BaseModel):
+    """Input for deleting an existing metric definition in the graph schema"""
+
+    id: str = Field(description="The ID of the metric kind to retire")
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class DeleteNaturalEventCategoryInput(BaseModel):
+    """Input for deleting an existing natural event definition in the graph schema"""
+
+    id: str = Field(description="The ID of the event category to delete")
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class DeleteProtocolEventCategoryInput(BaseModel):
+    """Input for deleting an existing protocol event definition in the graph schema"""
+
+    id: str = Field(description="The ID of the event category to delete")
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class DeleteRelationCategoryInput(BaseModel):
+    """Input for deleting an existing relation definition in the graph schema"""
+
+    id: str = Field(description="The ID of the relation category to delete")
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class DeleteStructureKindInput(BaseModel):
+    """Input for deleting an existing structure definition in the graph schema"""
+
+    id: str = Field(description="The ID of the structure kind to retire")
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class DeleteStructureRelationCategoryInput(BaseModel):
+    """Input for deleting an existing structure relation definition in the graph schema"""
+
+    id: str = Field(description="The ID of the structure relation category to delete")
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class DeleteTermInput(BaseModel):
+    """Input for retiring one of the organization's words"""
+
+    id: str = Field(description="The ID of the term to delete")
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class DerivationRuleInput(BaseModel):
+    """Configuration for property derivation rules"""
+
+    source_node: str | None = Field(
+        validation_alias=AliasChoices("source_node", "sourceNode"),
+        serialization_alias="sourceNode",
+        default=None,
+        description="The label of the describing structure to read from",
+    )
+    key: str | None = Field(
+        default=None, description="The property key on the source node"
+    )
+    source_value_kind: ValueKind | None = Field(
+        validation_alias=AliasChoices("source_value_kind", "sourceValueKind"),
+        serialization_alias="sourceValueKind",
+        default=None,
+        description="Which value kind of the source key to read, when the key has terms in more than one. Distinct from the property's own `value_kind`, which is the aggregation's result type: COUNT yields INT over STRING sources. Leave unset when the key is unambiguous. INT and FLOAT are read together either way.",
+    )
+    aggregation: AggregationFunction | None = Field(
+        default=None,
+        description="Aggregation function (MEAN, SUM, MAX, MIN, COUNT, etc.)",
+    )
+    evidence: "MetricEvidenceInput | None" = Field(
+        default=None,
+        description="This property's own metric rule: a rule list over SUBJECT/APP/ACTION/KEY/ASSERTED_AT/OBSERVED_AT/CONFIDENCE — any rule admits, all its `when` conditions must hold, `unless` groups subtract. When present it replaces the owning category's rules as the metric scope (classification annotators and measurement producers are usually different populations, so intersecting them would routinely produce nothing); when absent, the category's MEASUREMENT rules apply, and a primitive category folds everything.",
+    )
+    subject_priority: Annotated[tuple[str, ...] | None, GraphQLDefault("[]")] = Field(
+        validation_alias=AliasChoices("subject_priority", "subjectPriority"),
+        serialization_alias="subjectPriority",
+        default=None,
+        description="Subjects in descending order of trust, for PRIORITY_LATEST. The first subject with any measurement wins; subjects not listed are considered only if none of the listed ones have measured.",
+    )
+    "Subjects in descending order of trust, for PRIORITY_LATEST. The first subject with any measurement wins; subjects not listed are considered only if none of the listed ones have measured.\nDefault: []"
+    tool_priority: Annotated[tuple[str, ...] | None, GraphQLDefault("[]")] = Field(
+        validation_alias=AliasChoices("tool_priority", "toolPriority"),
+        serialization_alias="toolPriority",
+        default=None,
+        description="App ids in descending order of trust, for LATEST_ASSERTION_TOOL.",
+    )
+    "App ids in descending order of trust, for LATEST_ASSERTION_TOOL.\nDefault: []"
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class DescendantInput(BaseModel):
+    """One node of a comment's rich body — shape-compatible with lok's komment descendants"""
+
+    kind: DescendantKind = Field(
+        description="LEAF, MENTION or PARAGRAPH — see `core.enums.DescendantKind`"
+    )
+    children: tuple["DescendantInput", ...] | None = Field(
+        default=None, description="The children of this node. Always empty for leafs"
+    )
+    text: str | None = Field(default=None, description="The text of a leaf")
+    bold: bool | None = None
+    italic: bool | None = None
+    underline: bool | None = None
+    code: bool | None = None
+    user: str | None = Field(
+        default=None,
+        description="The mentioned subject id — `Assertion.subject`'s vocabulary. Named `user` for shape-compatibility with lok's tree",
+    )
+    size: str | None = Field(default=None, description="The size of a paragraph")
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class EntityCategoryFilter(BaseModel):
+    """No documentation"""
+
+    graph: "GraphFilter | None" = None
+    id: ID | None = None
+    label: str | None = None
+    and_: "EntityCategoryFilter | None" = Field(
+        validation_alias=AliasChoices("and_", "AND"),
+        serialization_alias="AND",
+        default=None,
+    )
+    or_: "EntityCategoryFilter | None" = Field(
+        validation_alias=AliasChoices("or_", "OR"),
+        serialization_alias="OR",
+        default=None,
+    )
+    not_: "EntityCategoryFilter | None" = Field(
+        validation_alias=AliasChoices("not_", "NOT"),
+        serialization_alias="NOT",
+        default=None,
+    )
+    distinct: bool | None = Field(
+        validation_alias=AliasChoices("distinct", "DISTINCT"),
+        serialization_alias="DISTINCT",
+        default=None,
+    )
+    ids: tuple[ID, ...] | None = Field(
+        default=None, description="Filter by list of IDs"
+    )
+    pinned: bool | None = Field(default=None, description="Filter by list of IDs")
+    search: str | None = Field(default=None, description="Filter by list of IDs")
+    matches_descriptor: "EntityDescriptorInput | None" = Field(
+        validation_alias=AliasChoices("matches_descriptor", "matchesDescriptor"),
+        serialization_alias="matchesDescriptor",
+        default=None,
+        description="Filter by list of IDs",
+    )
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class EntityDefinitionInput(BaseModel):
+    """Definition of an entity type in the graph schema"""
+
+    key: str = Field(description="The label of the node participating in the event")
+    description: str | None = Field(
+        default=None, description="Description of this node role"
+    )
+    ontology_references: Annotated[
+        tuple["OntologyReferenceInput", ...] | None, GraphQLDefault("[]")
+    ] = Field(
+        validation_alias=AliasChoices("ontology_references", "ontologyReferences"),
+        serialization_alias="ontologyReferences",
+        default=None,
+        description="Ontology references for this event",
+    )
+    "Ontology references for this event\nDefault: []"
+    color: tuple[int, ...] | None = Field(
+        default=None,
+        description="Optional RGBA color for this node role (e.g. [255, 0, 0, 128])",
+    )
+    image: str | None = Field(
+        default=None,
+        description="Optional media store ID for an image representing this node role",
+    )
+    label: str | None = Field(
+        default=None,
+        description="Optional human-readable label for this node role (defaults to 'key' if not provided)",
+    )
+    pin: bool | None = Field(
+        default=None, description="Whether to pin this node role in the UI"
+    )
+    instance_kind: str | None = Field(
+        validation_alias=AliasChoices("instance_kind", "instanceKind"),
+        serialization_alias="instanceKind",
+        default=None,
+        description="Optional instance kind for this entity category (e.g. 'neuron', 'synapse', 'behavior'). This is used for further categorization and filtering of entities within the graph.",
+    )
+    property_definitions: Annotated[
+        tuple["PropertyDefinitionInput", ...] | None, GraphQLDefault("[]")
+    ] = Field(
+        validation_alias=AliasChoices("property_definitions", "propertyDefinitions"),
+        serialization_alias="propertyDefinitions",
+        default=None,
+        description="Property definitions",
+    )
+    "Property definitions\nDefault: []"
+    definition: CategoryDefinitionInput | None = Field(
+        default=None,
+        description="What this category *means*: a predicate over classification claims (RFC 0007). Omitted means primitive — membership is whatever was asserted under this word",
+    )
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class EntityDescriptorInput(BaseModel):
+    """Filters that select which entity categories a descriptor matches"""
+
+    keys: tuple[str, ...] | None = Field(
+        default=None, description="Filter by entity key/label"
+    )
+    ontology_terms: tuple[str, ...] | None = Field(
+        validation_alias=AliasChoices("ontology_terms", "ontologyTerms"),
+        serialization_alias="ontologyTerms",
+        default=None,
+        description="Filter by ontology references on the entity (format: 'PREFIX:TERM_ID')",
+    )
+    default_category_key: str | None = Field(
+        validation_alias=AliasChoices("default_category_key", "defaultCategoryKey"),
+        serialization_alias="defaultCategoryKey",
+        default=None,
+        description="Default category to link to if no entities match the filters",
+    )
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class EventDefinitionInput(BaseModel):
+    """Definition of an event type in the graph schema"""
+
+    key: str = Field(description="The label of the node participating in the event")
+    description: str | None = Field(
+        default=None, description="Description of this node role"
+    )
+    ontology_references: Annotated[
+        tuple["OntologyReferenceInput", ...] | None, GraphQLDefault("[]")
+    ] = Field(
+        validation_alias=AliasChoices("ontology_references", "ontologyReferences"),
+        serialization_alias="ontologyReferences",
+        default=None,
+        description="Ontology references for this event",
+    )
+    "Ontology references for this event\nDefault: []"
+    color: tuple[int, ...] | None = Field(
+        default=None,
+        description="Optional RGBA color for this node role (e.g. [255, 0, 0, 128])",
+    )
+    image: str | None = Field(
+        default=None,
+        description="Optional media store ID for an image representing this node role",
+    )
+    label: str | None = Field(
+        default=None,
+        description="Optional human-readable label for this node role (defaults to 'key' if not provided)",
+    )
+    pin: bool | None = Field(
+        default=None, description="Whether to pin this node role in the UI"
+    )
+    kind: EventKind = Field(
+        description="Whether the event arises in the system itself (INTRINSIC, e.g. mitosis) or is applied from outside (EXTRINSIC, e.g. a protocol step)"
+    )
+    inputs: Annotated[tuple["EventRoleInput", ...] | None, GraphQLDefault("[]")] = (
+        Field(default=None, description="Input node roles")
+    )
+    "Input node roles\nDefault: []"
+    outputs: Annotated[tuple["EventRoleInput", ...] | None, GraphQLDefault("[]")] = (
+        Field(default=None, description="Output node roles")
+    )
+    "Output node roles\nDefault: []"
+    properties: Annotated[
+        tuple["PropertyDefinitionInput", ...] | None, GraphQLDefault("[]")
+    ] = Field(default=None, description="Property definitions")
+    "Property definitions\nDefault: []"
+    definition: CategoryDefinitionInput | None = Field(
+        default=None,
+        description="This event category's complete rule (RFC 0009): which classification claims admit an event, whose existence standings count, and whose participation claims draw its edges. Omitted means primitive",
+    )
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class EventRoleInput(BaseModel):
+    """One declared role on an event category"""
+
+    key: str = Field(description="The label of the node participating in the event")
+    role: str = Field(description="What type of role does this node play in the event")
+    descriptor: EntityDescriptorInput = Field(
+        description="Optional filters to apply when linking entities to structures for this role"
+    )
+    ontology_references: Annotated[
+        tuple["OntologyReferenceInput", ...] | None, GraphQLDefault("[]")
+    ] = Field(
+        validation_alias=AliasChoices("ontology_references", "ontologyReferences"),
+        serialization_alias="ontologyReferences",
+        default=None,
+        description="Ontology references for this role",
+    )
+    "Ontology references for this role\nDefault: []"
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class GraphDefinitionInput(BaseModel):
+    """A complete graph schema definition"""
+
+    system_version: Annotated[str | None, GraphQLDefault("0.0.1")] = Field(
+        validation_alias=AliasChoices("system_version", "systemVersion"),
+        serialization_alias="systemVersion",
+        default=None,
+        description="Semantic version for this schema definition (e.g., '1.0.0')",
+    )
+    "Semantic version for this schema definition (e.g., '1.0.0')\nDefault: 0.0.1"
+    extensions: "GraphExtensionsInput" = Field(
+        description="The graph extensions containing all type definitions"
+    )
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class GraphExtensionsInput(BaseModel):
+    """The categories a graph schema declares"""
+
+    entities: Annotated[
+        tuple[EntityDefinitionInput, ...] | None, GraphQLDefault("[]")
+    ] = Field(default=None, description="Entity definitions")
+    "Entity definitions\nDefault: []"
+    relations: Annotated[
+        tuple["RelationDefinitionInput", ...] | None, GraphQLDefault("[]")
+    ] = Field(default=None, description="Relation definitions")
+    "Relation definitions\nDefault: []"
+    structure_relations: Annotated[
+        tuple["StructureRelationDefinitionInput", ...] | None, GraphQLDefault("[]")
+    ] = Field(
+        validation_alias=AliasChoices("structure_relations", "structureRelations"),
+        serialization_alias="structureRelations",
+        default=None,
+        description="Structure relation definitions",
+    )
+    "Structure relation definitions\nDefault: []"
+    measurements: Annotated[
+        tuple["MeasurementDefinitionInput", ...] | None, GraphQLDefault("[]")
+    ] = Field(default=None, description="Measurement definitions")
+    "Measurement definitions\nDefault: []"
+    events: Annotated[tuple[EventDefinitionInput, ...] | None, GraphQLDefault("[]")] = (
+        Field(default=None, description="Event definitions")
+    )
+    "Event definitions\nDefault: []"
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class GraphFilter(BaseModel):
+    """No documentation"""
+
+    id: ID | None = None
+    name: str | None = None
+    description: str | None = None
+    and_: "GraphFilter | None" = Field(
+        validation_alias=AliasChoices("and_", "AND"),
+        serialization_alias="AND",
+        default=None,
+    )
+    or_: "GraphFilter | None" = Field(
+        validation_alias=AliasChoices("or_", "OR"),
+        serialization_alias="OR",
+        default=None,
+    )
+    not_: "GraphFilter | None" = Field(
+        validation_alias=AliasChoices("not_", "NOT"),
+        serialization_alias="NOT",
+        default=None,
+    )
+    distinct: bool | None = Field(
+        validation_alias=AliasChoices("distinct", "DISTINCT"),
+        serialization_alias="DISTINCT",
+        default=None,
+    )
+    pinned: bool | None = Field(default=None, description="Filter by list of IDs")
+    ids: tuple[ID, ...] | None = Field(
+        default=None, description="Filter by list of IDs"
+    )
+    search: str | None = Field(default=None, description="Filter by list of IDs")
+    is_archived: bool | None = Field(
+        validation_alias=AliasChoices("is_archived", "isArchived"),
+        serialization_alias="isArchived",
+        default=None,
+        description="Only archived graphs, or only live ones. Omitted shows both",
+    )
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class MeasurementCategoryFilter(BaseModel):
+    """No documentation"""
+
+    graph: GraphFilter | None = None
+    id: ID | None = None
+    label: str | None = None
+    and_: "MeasurementCategoryFilter | None" = Field(
+        validation_alias=AliasChoices("and_", "AND"),
+        serialization_alias="AND",
+        default=None,
+    )
+    or_: "MeasurementCategoryFilter | None" = Field(
+        validation_alias=AliasChoices("or_", "OR"),
+        serialization_alias="OR",
+        default=None,
+    )
+    not_: "MeasurementCategoryFilter | None" = Field(
+        validation_alias=AliasChoices("not_", "NOT"),
+        serialization_alias="NOT",
+        default=None,
+    )
+    distinct: bool | None = Field(
+        validation_alias=AliasChoices("distinct", "DISTINCT"),
+        serialization_alias="DISTINCT",
+        default=None,
+    )
+    ids: tuple[ID, ...] | None = Field(
+        default=None, description="Filter by list of IDs"
+    )
+    pinned: bool | None = Field(default=None, description="Filter by list of IDs")
+    search: str | None = Field(default=None, description="Filter by list of IDs")
+    source_identifier: str | None = Field(
+        validation_alias=AliasChoices("source_identifier", "sourceIdentifier"),
+        serialization_alias="sourceIdentifier",
+        default=None,
+        description="Filter by the structure identifier this measurement's source selects",
+    )
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class MeasurementDefinitionInput(BaseModel):
+    """Declares a measurement category in a graph schema"""
+
+    key: str = Field(description="Relation type name/key")
+    description: str | None = Field(
+        default=None, description="Description of this node role"
+    )
+    ontology_references: Annotated[
+        tuple["OntologyReferenceInput", ...] | None, GraphQLDefault("[]")
+    ] = Field(
+        validation_alias=AliasChoices("ontology_references", "ontologyReferences"),
+        serialization_alias="ontologyReferences",
+        default=None,
+        description="Ontology references for this event",
+    )
+    "Ontology references for this event\nDefault: []"
+    color: tuple[int, ...] | None = Field(
+        default=None,
+        description="Optional RGBA color for this node role (e.g. [255, 0, 0, 128])",
+    )
+    image: str | None = Field(
+        default=None,
+        description="Optional media store ID for an image representing this node role",
+    )
+    label: str | None = Field(
+        default=None,
+        description="Optional human-readable label for this node role (defaults to 'key' if not provided)",
+    )
+    pin: bool | None = Field(
+        default=None, description="Whether to pin this node role in the UI"
+    )
+    source: "StructureDescriptorInput" = Field(description="Source entity type(s)")
+    target: EntityDescriptorInput = Field(description="Target entity type(s)")
+    cardinality: Annotated[Cardinality | None, GraphQLDefault("ONE_TO_ONE")] = Field(
+        default=None, description="Relation cardinality"
+    )
+    "Relation cardinality\nDefault: ONE_TO_ONE"
+    properties: Annotated[
+        tuple["PropertyDefinitionInput", ...] | None, GraphQLDefault("[]")
+    ] = Field(default=None, description="Derived property definitions")
+    "Derived property definitions\nDefault: []"
+    definition: CategoryDefinitionInput | None = Field(
+        default=None,
+        description="This measurement category's complete rule (RFC 0012): which measurement claims count and whose standings fold. Omitted means primitive",
+    )
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class MetricEvidenceInput(BaseModel):
+    """A property's own metric rule: the definition's rule list over metric rows — no WORD or KIND, KEY allowed anywhere"""
+
+    rules: tuple[ClaimRuleInput, ...] = Field(
+        description="A metric counts when any rule matches"
+    )
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class MetricInput(BaseModel):
+    """One measured value about a structure"""
+
+    key: str
+    value: Any
+    value_kind: PropertyType = Field(
+        validation_alias=AliasChoices("value_kind", "valueKind"),
+        serialization_alias="valueKind",
+        description="What type of value this is. Required: it decides which column the value is stored in and which measurement term it is recorded under, and nothing infers it. Two callers may declare the same key differently — a float `confidence` and a category-label `confidence` are two terms, and both are recorded.",
+    )
+    confidence: float | None = Field(
+        default=None,
+        description="How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.",
+    )
+    confidence_type: str | None = Field(
+        validation_alias=AliasChoices("confidence_type", "confidenceType"),
+        serialization_alias="confidenceType",
+        default=None,
+        description="What kind of number `confidence` is — a method's own score, a p-value. Measurement-only",
+    )
+    unit: str | None = None
+    observed_at: datetime | None = Field(
+        validation_alias=AliasChoices("observed_at", "observedAt"),
+        serialization_alias="observedAt",
+        default=None,
+        description="When the world was observed. Defaults to when it was claimed.",
+    )
+    derived_from: Annotated[tuple[str, ...] | None, GraphQLDefault("[]")] = Field(
+        validation_alias=AliasChoices("derived_from", "derivedFrom"),
+        serialization_alias="derivedFrom",
+        default=None,
+        description='The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.',
+    )
+    'The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.\nDefault: []'
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class MetricKindFilter(BaseModel):
+    """No documentation"""
+
+    and_: "MetricKindFilter | None" = Field(
+        validation_alias=AliasChoices("and_", "AND"),
+        serialization_alias="AND",
+        default=None,
+    )
+    or_: "MetricKindFilter | None" = Field(
+        validation_alias=AliasChoices("or_", "OR"),
+        serialization_alias="OR",
+        default=None,
+    )
+    not_: "MetricKindFilter | None" = Field(
+        validation_alias=AliasChoices("not_", "NOT"),
+        serialization_alias="NOT",
+        default=None,
+    )
+    distinct: bool | None = Field(
+        validation_alias=AliasChoices("distinct", "DISTINCT"),
+        serialization_alias="DISTINCT",
+        default=None,
+    )
+    ids: tuple[ID, ...] | None = Field(
+        default=None, description="Filter by list of IDs"
+    )
+    search: str | None = Field(default=None, description="Search label and key")
+    value_kind: ValueKind | None = Field(
+        validation_alias=AliasChoices("value_kind", "valueKind"),
+        serialization_alias="valueKind",
+        default=None,
+        description="Filter by the kind of value this measurement carries",
+    )
+    structure_kind: ID | None = Field(
+        validation_alias=AliasChoices("structure_kind", "structureKind"),
+        serialization_alias="structureKind",
+        default=None,
+        description="Filter by the structure kind this describes",
+    )
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class NaturalEventCategoryFilter(BaseModel):
+    """No documentation"""
+
+    graph: GraphFilter | None = None
+    id: ID | None = None
+    label: str | None = None
+    and_: "NaturalEventCategoryFilter | None" = Field(
+        validation_alias=AliasChoices("and_", "AND"),
+        serialization_alias="AND",
+        default=None,
+    )
+    or_: "NaturalEventCategoryFilter | None" = Field(
+        validation_alias=AliasChoices("or_", "OR"),
+        serialization_alias="OR",
+        default=None,
+    )
+    not_: "NaturalEventCategoryFilter | None" = Field(
+        validation_alias=AliasChoices("not_", "NOT"),
+        serialization_alias="NOT",
+        default=None,
+    )
+    distinct: bool | None = Field(
+        validation_alias=AliasChoices("distinct", "DISTINCT"),
+        serialization_alias="DISTINCT",
+        default=None,
+    )
+    ids: tuple[ID, ...] | None = Field(
+        default=None, description="Filter by list of IDs"
+    )
+    pinned: bool | None = Field(default=None, description="Filter by list of IDs")
+    search: str | None = Field(default=None, description="Filter by list of IDs")
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class NodeFilters(BaseModel):
+    """Filter options for querying nodes"""
+
+    ids: tuple[ID, ...] | None = Field(
+        default=None, description="Filter by specific node IDs"
+    )
+    search: str | None = Field(
+        default=None,
+        description="Substring match on the claim's term key or label. A column of the log, not a derived property",
+    )
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class NodeOrder(BaseModel):
+    """Ordering options for node queries"""
+
+    created_at: Ordering | None = Field(
+        validation_alias=AliasChoices("created_at", "createdAt"),
+        serialization_alias="createdAt",
+        default=None,
+        description="Order by when the row was stored — arrival time. Prefer `seq`, the log's order",
+    )
+    seq: Ordering | None = Field(
+        default=None,
+        description="Order by the act's position in the log (`Assertion.seq`) — the log's own total order (RFC 0025)",
+    )
+    observed_at: Ordering | None = Field(
+        validation_alias=AliasChoices("observed_at", "observedAt"),
+        serialization_alias="observedAt",
+        default=None,
+        description="Order by world time — when the claim says the world was so (RFC 0015)",
+    )
+    id: Ordering | None = Field(default=None, description="Order by node ID")
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class NodePaginationInput(BaseModel):
+    """Pagination options for querying nodes"""
+
+    offset: Annotated[int | None, GraphQLDefault("0")] = Field(
+        default=None, description="Number of items to skip"
+    )
+    "Number of items to skip\nDefault: 0"
+    limit: Annotated[int | None, GraphQLDefault("100")] = Field(
+        default=None, description="Maximum number of items to return"
+    )
+    "Maximum number of items to return\nDefault: 100"
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class OffsetPaginationInput(BaseModel):
+    """No documentation"""
+
+    offset: Annotated[int | None, GraphQLDefault("0")] = None
+    "Default: 0"
+    limit: int | None = None
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class OntologyReferenceInput(BaseModel):
+    """A reference to a published ontology term"""
+
+    prefix: str = Field(
+        description="The ontology prefix (e.g. 'OBI'). Must be defined in graph prefixes."
+    )
+    uri: str = Field(description="The full URI for the ontology term")
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
 class ParticipantInput(BaseModel):
     """One entity's part in an event, inside a batch"""
 
@@ -1734,6 +2191,285 @@ class ParticipantInput(BaseModel):
     )
 
 
+class PropertyDefinitionInput(BaseModel):
+    """Definition of a property on an entity, structure, or relation"""
+
+    label: str | None = Field(
+        default=None,
+        description="Optional human-readable label for this property (defaults to 'key' if not provided)",
+    )
+    key: str = Field(description="Property key/name")
+    value_kind: ValueKind = Field(
+        validation_alias=AliasChoices("value_kind", "valueKind"),
+        serialization_alias="valueKind",
+    )
+    unit: str | None = Field(default=None, description="Unit of measurement")
+    description: str | None = Field(
+        default=None, description="Description of this property"
+    )
+    derivation: Annotated[DerivationType | None, GraphQLDefault("LATEST")] = Field(
+        default=None,
+        description="Derivation type: LATEST, PRIORITY_LATEST, ROLLUP, LATEST_ASSERTION_TOOL",
+    )
+    "Derivation type: LATEST, PRIORITY_LATEST, ROLLUP, LATEST_ASSERTION_TOOL\nDefault: LATEST"
+    rule: DerivationRuleInput | None = Field(
+        default=None, description="Rule configuration for ROLLUP derivation"
+    )
+    index: Annotated[bool | None, GraphQLDefault("False")] = Field(
+        default=None,
+        description="Whether to create an index on this property for faster queries",
+    )
+    "Whether to create an index on this property for faster queries\nDefault: False"
+    searchable: Annotated[bool | None, GraphQLDefault("False")] = Field(
+        default=None, description="Whether this property should be full-text searchable"
+    )
+    "Whether this property should be full-text searchable\nDefault: False"
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class PropertyMatch(BaseModel):
+    """A property match condition for filtering structures"""
+
+    key: str = Field(description="The property matching")
+    operator: WhereOperator = Field(description="The operator to use")
+    value: str = Field(description="The value to filter against")
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class ProtocolEventCategoryFilter(BaseModel):
+    """No documentation"""
+
+    graph: GraphFilter | None = None
+    id: ID | None = None
+    label: str | None = None
+    and_: "ProtocolEventCategoryFilter | None" = Field(
+        validation_alias=AliasChoices("and_", "AND"),
+        serialization_alias="AND",
+        default=None,
+    )
+    or_: "ProtocolEventCategoryFilter | None" = Field(
+        validation_alias=AliasChoices("or_", "OR"),
+        serialization_alias="OR",
+        default=None,
+    )
+    not_: "ProtocolEventCategoryFilter | None" = Field(
+        validation_alias=AliasChoices("not_", "NOT"),
+        serialization_alias="NOT",
+        default=None,
+    )
+    distinct: bool | None = Field(
+        validation_alias=AliasChoices("distinct", "DISTINCT"),
+        serialization_alias="DISTINCT",
+        default=None,
+    )
+    ids: tuple[ID, ...] | None = Field(
+        default=None, description="Filter by list of IDs"
+    )
+    pinned: bool | None = Field(default=None, description="Filter by list of IDs")
+    search: str | None = Field(default=None, description="Filter by list of IDs")
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class RelationCategoryFilter(BaseModel):
+    """No documentation"""
+
+    graph: GraphFilter | None = None
+    id: ID | None = None
+    label: str | None = None
+    and_: "RelationCategoryFilter | None" = Field(
+        validation_alias=AliasChoices("and_", "AND"),
+        serialization_alias="AND",
+        default=None,
+    )
+    or_: "RelationCategoryFilter | None" = Field(
+        validation_alias=AliasChoices("or_", "OR"),
+        serialization_alias="OR",
+        default=None,
+    )
+    not_: "RelationCategoryFilter | None" = Field(
+        validation_alias=AliasChoices("not_", "NOT"),
+        serialization_alias="NOT",
+        default=None,
+    )
+    distinct: bool | None = Field(
+        validation_alias=AliasChoices("distinct", "DISTINCT"),
+        serialization_alias="DISTINCT",
+        default=None,
+    )
+    ids: tuple[ID, ...] | None = Field(
+        default=None, description="Filter by list of IDs"
+    )
+    pinned: bool | None = Field(default=None, description="Filter by list of IDs")
+    search: str | None = Field(default=None, description="Filter by list of IDs")
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class RelationDefinitionInput(BaseModel):
+    """Definition of a relation type in the graph schema"""
+
+    key: str = Field(description="Relation type name/key")
+    description: str | None = Field(
+        default=None, description="Description of this node role"
+    )
+    ontology_references: Annotated[
+        tuple[OntologyReferenceInput, ...] | None, GraphQLDefault("[]")
+    ] = Field(
+        validation_alias=AliasChoices("ontology_references", "ontologyReferences"),
+        serialization_alias="ontologyReferences",
+        default=None,
+        description="Ontology references for this event",
+    )
+    "Ontology references for this event\nDefault: []"
+    color: tuple[int, ...] | None = Field(
+        default=None,
+        description="Optional RGBA color for this node role (e.g. [255, 0, 0, 128])",
+    )
+    image: str | None = Field(
+        default=None,
+        description="Optional media store ID for an image representing this node role",
+    )
+    label: str | None = Field(
+        default=None,
+        description="Optional human-readable label for this node role (defaults to 'key' if not provided)",
+    )
+    pin: bool | None = Field(
+        default=None, description="Whether to pin this node role in the UI"
+    )
+    source: EntityDescriptorInput = Field(description="Source entity type(s)")
+    target: EntityDescriptorInput = Field(description="Target entity type(s)")
+    cardinality: Annotated[Cardinality | None, GraphQLDefault("ONE_TO_ONE")] = Field(
+        default=None, description="Relation cardinality"
+    )
+    "Relation cardinality\nDefault: ONE_TO_ONE"
+    properties: Annotated[
+        tuple[PropertyDefinitionInput, ...] | None, GraphQLDefault("[]")
+    ] = Field(default=None, description="Derived property definitions")
+    "Derived property definitions\nDefault: []"
+    definition: CategoryDefinitionInput | None = Field(
+        default=None,
+        description="This relation category's complete rule (RFC 0009): which relation claims draw its edges — by word, annotator, app and window — and whose standings count for them. Omitted means primitive: any claim naming its word draws",
+    )
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class RetractCommentInput(BaseModel):
+    """Input for claiming a remark no longer stands — withdrawn or resolved; the assertion records whose position it is"""
+
+    id: str = Field(description="The ID of the comment to retract")
+    at: datetime | None = Field(
+        default=None,
+        description="When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.",
+    )
+    confidence: float | None = Field(
+        default=None,
+        description="How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.",
+    )
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class RetractEntityInput(BaseModel):
+    """Input for retracting an entity claim"""
+
+    id: ID = Field(description="The ID of the entity to retract")
+    at: datetime | None = Field(
+        default=None,
+        description="When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.",
+    )
+    confidence: float | None = Field(
+        default=None,
+        description="How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.",
+    )
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class RetractLinksInput(BaseModel):
+    """Input for retracting several link claims as one act"""
+
+    ids: tuple[str, ...] = Field(
+        description="The `Link` primary keys of the claims to retract"
+    )
+    at: datetime | None = Field(
+        default=None,
+        description="When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.",
+    )
+    confidence: float | None = Field(
+        default=None,
+        description="How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.",
+    )
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class RetractMeasurementInput(BaseModel):
+    """Input for retracting a measurement claim — a Standing(stands=false), not a deletion"""
+
+    id: str = Field(
+        description="The ID of the measurement claim to retract — its `Link` primary key"
+    )
+    at: datetime | None = Field(
+        default=None,
+        description="When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.",
+    )
+    confidence: float | None = Field(
+        default=None,
+        description="How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.",
+    )
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class RetractMetricInput(BaseModel):
+    """Input for retracting a metric claim — a Standing(stands=false), not a deletion"""
+
+    id: str = Field(
+        description="The ID of the metric to retract — a bare uuid, its evidence primary key"
+    )
+    at: datetime | None = Field(
+        default=None,
+        description="When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.",
+    )
+    confidence: float | None = Field(
+        default=None,
+        description="How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.",
+    )
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class RetractNaturalEventInput(BaseModel):
+    """Input for retracting a natural event claim — a Standing(stands=false), not a deletion"""
+
+    id: str = Field(description="The ID of the natural event to retract")
+    at: datetime | None = Field(
+        default=None,
+        description="When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.",
+    )
+    confidence: float | None = Field(
+        default=None,
+        description="How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.",
+    )
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
 class RetractParticipationInput(BaseModel):
     """Input for retracting one participation claim"""
 
@@ -1751,48 +2487,10 @@ class RetractParticipationInput(BaseModel):
     )
 
 
-class ClassifyNodesInput(BaseModel):
-    """Input for claiming that several nodes are of a word, as one act"""
+class RetractProtocolEventInput(BaseModel):
+    """Input for retracting a protocol event claim — a Standing(stands=false), not a deletion"""
 
-    classifications: tuple["ClassificationInput", ...] = Field(description="The claims to record")
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class ClassificationInput(BaseModel):
-    """One claim that a node is of a word, inside a batch"""
-
-    node: str = Field(description="The node being classified")
-    term: str = Field(
-        description="The organization's word for what is being claimed — a term's `key`, e.g. 'AIS'. Not a category id and not a graph: a claim names a word, and every view that declares that word will hold what you write. The word is created if the organization has not used it before; a view that declares no category for it simply will not draw it."
-    )
-    observed_at: datetime | None = Field(
-        validation_alias=AliasChoices("observed_at", "observedAt"),
-        serialization_alias="observedAt",
-        default=None,
-        description="When the world was in this state — world time, the axis a scientist means by 'when'. Distinct from when it is claimed, which the assertion records; left unset, the two are equal. A point, not an interval: a duration is a metric.",
-    )
-    confidence: float | None = Field(
-        default=None,
-        description="How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.",
-    )
-    derived_from: Annotated[tuple[str, ...] | None, GraphQLDefault("[]")] = Field(
-        validation_alias=AliasChoices("derived_from", "derivedFrom"),
-        serialization_alias="derivedFrom",
-        default=None,
-        description='The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.',
-    )
-    'The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.\nDefault: []'
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class RetractLinksInput(BaseModel):
-    """Input for retracting several link claims as one act"""
-
-    ids: tuple[str, ...] = Field(description="The `Link` primary keys of the claims to retract")
+    id: str = Field(description="The ID of the protocol event to retract")
     at: datetime | None = Field(
         default=None,
         description="When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.",
@@ -1806,29 +2504,20 @@ class RetractLinksInput(BaseModel):
     )
 
 
-class AssertSameInstanceInput(BaseModel):
-    """Input for claiming that several recorded instances are one thing"""
+class RetractRelationInput(BaseModel):
+    """Input for retracting a relation claim — a Standing(stands=false), not a deletion"""
 
-    instances: tuple[str, ...] = Field(
-        description="Two or more instance ids that name the same thing — entities or events alike. Every pair among them is claimed, under one assertion."
+    id: ID = Field(
+        description="The ID of the relation claim to retract — its `Link` primary key"
     )
-    observed_at: datetime | None = Field(
-        validation_alias=AliasChoices("observed_at", "observedAt"),
-        serialization_alias="observedAt",
+    at: datetime | None = Field(
         default=None,
-        description="When the world was in this state — world time, the axis a scientist means by 'when'. Distinct from when it is claimed, which the assertion records; left unset, the two are equal. A point, not an interval: a duration is a metric.",
+        description="When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.",
     )
     confidence: float | None = Field(
         default=None,
         description="How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.",
     )
-    derived_from: Annotated[tuple[str, ...] | None, GraphQLDefault("[]")] = Field(
-        validation_alias=AliasChoices("derived_from", "derivedFrom"),
-        serialization_alias="derivedFrom",
-        default=None,
-        description='The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.',
-    )
-    'The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.\nDefault: []'
     model_config = ConfigDict(
         frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
     )
@@ -1851,484 +2540,53 @@ class RetractSameInstanceInput(BaseModel):
     )
 
 
-class CreateGraphInput(BaseModel):
-    """Input for creating a new graph from a schema definition"""
+class RetractStructureInput(BaseModel):
+    """Input for retracting a structure claim — a Standing(stands=false), not a deletion"""
 
-    name: str = Field(description="Name of the graph")
-    description: str | None = Field(default=None, description="Description of the graph")
-    definition: "GraphDefinitionInput | None" = Field(
-        default=None, description="The complete graph schema definition"
+    id: ID = Field(
+        description="The ID of the structure to retract — a bare uuid, its evidence primary key"
     )
-    sameness_rule: "SamenessRuleInput | None" = Field(
-        validation_alias=AliasChoices("sameness_rule", "samenessRule"),
-        serialization_alias="samenessRule",
+    at: datetime | None = Field(
         default=None,
-        description="Whose sameness claims this view counts (RFC 0024). Omitted means everyone",
+        description="When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.",
     )
-    backfill: Annotated[bool | None, GraphQLDefault("False")] = Field(
+    confidence: float | None = Field(
         default=None,
-        description="Draw the evidence this graph's words already admit. A graph is a view over the organization's evidence, so a new one can be a view over history: with this on, every node and edge already claimed under a word this schema declares is projected as the graph is created. Off by default because the work is proportional to the organization's evidence and happens before this mutation returns.",
-    )
-    "Draw the evidence this graph's words already admit. A graph is a view over the organization's evidence, so a new one can be a view over history: with this on, every node and edge already claimed under a word this schema declares is projected as the graph is created. Off by default because the work is proportional to the organization's evidence and happens before this mutation returns.\nDefault: False"
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class GraphDefinitionInput(BaseModel):
-    """A complete graph schema definition"""
-
-    system_version: Annotated[str | None, GraphQLDefault("0.0.1")] = Field(
-        validation_alias=AliasChoices("system_version", "systemVersion"),
-        serialization_alias="systemVersion",
-        default=None,
-        description="Semantic version for this schema definition (e.g., '1.0.0')",
-    )
-    "Semantic version for this schema definition (e.g., '1.0.0')\nDefault: 0.0.1"
-    extensions: "GraphExtensionsInput" = Field(
-        description="The graph extensions containing all type definitions"
+        description="How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.",
     )
     model_config = ConfigDict(
         frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
     )
 
 
-class GraphExtensionsInput(BaseModel):
-    """The categories a graph schema declares"""
+class RetractStructureRelationInput(BaseModel):
+    """Input for retracting a structure relation claim — a Standing(stands=false), not a deletion"""
 
-    entities: Annotated[tuple["EntityDefinitionInput", ...] | None, GraphQLDefault("[]")] = Field(
-        default=None, description="Entity definitions"
+    id: str = Field(
+        description="The ID of the structure relation claim to retract — its `Link` primary key"
     )
-    "Entity definitions\nDefault: []"
-    relations: Annotated[tuple["RelationDefinitionInput", ...] | None, GraphQLDefault("[]")] = (
-        Field(default=None, description="Relation definitions")
-    )
-    "Relation definitions\nDefault: []"
-    structure_relations: Annotated[
-        tuple["StructureRelationDefinitionInput", ...] | None, GraphQLDefault("[]")
-    ] = Field(
-        validation_alias=AliasChoices("structure_relations", "structureRelations"),
-        serialization_alias="structureRelations",
+    at: datetime | None = Field(
         default=None,
-        description="Structure relation definitions",
+        description="When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.",
     )
-    "Structure relation definitions\nDefault: []"
-    measurements: Annotated[
-        tuple["MeasurementDefinitionInput", ...] | None, GraphQLDefault("[]")
-    ] = Field(default=None, description="Measurement definitions")
-    "Measurement definitions\nDefault: []"
-    events: Annotated[tuple["EventDefinitionInput", ...] | None, GraphQLDefault("[]")] = Field(
-        default=None, description="Event definitions"
-    )
-    "Event definitions\nDefault: []"
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class EntityDefinitionInput(BaseModel):
-    """Definition of an entity type in the graph schema"""
-
-    key: str = Field(description="The label of the node participating in the event")
-    description: str | None = Field(default=None, description="Description of this node role")
-    ontology_references: Annotated[
-        tuple["OntologyReferenceInput", ...] | None, GraphQLDefault("[]")
-    ] = Field(
-        validation_alias=AliasChoices("ontology_references", "ontologyReferences"),
-        serialization_alias="ontologyReferences",
+    confidence: float | None = Field(
         default=None,
-        description="Ontology references for this event",
-    )
-    "Ontology references for this event\nDefault: []"
-    color: tuple[int, ...] | None = Field(
-        default=None,
-        description="Optional RGBA color for this node role (e.g. [255, 0, 0, 128])",
-    )
-    image: str | None = Field(
-        default=None,
-        description="Optional media store ID for an image representing this node role",
-    )
-    label: str | None = Field(
-        default=None,
-        description="Optional human-readable label for this node role (defaults to 'key' if not provided)",
-    )
-    pin: bool | None = Field(default=None, description="Whether to pin this node role in the UI")
-    instance_kind: str | None = Field(
-        validation_alias=AliasChoices("instance_kind", "instanceKind"),
-        serialization_alias="instanceKind",
-        default=None,
-        description="Optional instance kind for this entity category (e.g. 'neuron', 'synapse', 'behavior'). This is used for further categorization and filtering of entities within the graph.",
-    )
-    property_definitions: Annotated[
-        tuple["PropertyDefinitionInput", ...] | None, GraphQLDefault("[]")
-    ] = Field(
-        validation_alias=AliasChoices("property_definitions", "propertyDefinitions"),
-        serialization_alias="propertyDefinitions",
-        default=None,
-        description="Property definitions",
-    )
-    "Property definitions\nDefault: []"
-    definition: "CategoryDefinitionInput | None" = Field(
-        default=None,
-        description="What this category *means*: a predicate over classification claims (RFC 0007). Omitted means primitive — membership is whatever was asserted under this word",
+        description="How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.",
     )
     model_config = ConfigDict(
         frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
     )
 
 
-class OntologyReferenceInput(BaseModel):
-    """A reference to a published ontology term"""
+class RoleMappingInput(BaseModel):
+    """How a participant maps onto a declared event role"""
 
-    prefix: str = Field(
-        description="The ontology prefix (e.g. 'OBI'). Must be defined in graph prefixes."
+    role: str = Field(description="The role name")
+    entity_id: str = Field(
+        validation_alias=AliasChoices("entity_id", "entityId"),
+        serialization_alias="entityId",
+        description="The ID of the entity assigned to this role",
     )
-    uri: str = Field(description="The full URI for the ontology term")
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class PropertyDefinitionInput(BaseModel):
-    """Definition of a property on an entity, structure, or relation"""
-
-    label: str | None = Field(
-        default=None,
-        description="Optional human-readable label for this property (defaults to 'key' if not provided)",
-    )
-    key: str = Field(description="Property key/name")
-    value_kind: ValueKind = Field(
-        validation_alias=AliasChoices("value_kind", "valueKind"),
-        serialization_alias="valueKind",
-    )
-    unit: str | None = Field(default=None, description="Unit of measurement")
-    description: str | None = Field(default=None, description="Description of this property")
-    derivation: Annotated[DerivationType | None, GraphQLDefault("LATEST")] = Field(
-        default=None,
-        description="Derivation type: LATEST, PRIORITY_LATEST, ROLLUP, LATEST_ASSERTION_TOOL",
-    )
-    "Derivation type: LATEST, PRIORITY_LATEST, ROLLUP, LATEST_ASSERTION_TOOL\nDefault: LATEST"
-    rule: "DerivationRuleInput | None" = Field(
-        default=None, description="Rule configuration for ROLLUP derivation"
-    )
-    index: Annotated[bool | None, GraphQLDefault("False")] = Field(
-        default=None,
-        description="Whether to create an index on this property for faster queries",
-    )
-    "Whether to create an index on this property for faster queries\nDefault: False"
-    searchable: Annotated[bool | None, GraphQLDefault("False")] = Field(
-        default=None, description="Whether this property should be full-text searchable"
-    )
-    "Whether this property should be full-text searchable\nDefault: False"
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class DerivationRuleInput(BaseModel):
-    """Configuration for property derivation rules"""
-
-    source_node: str | None = Field(
-        validation_alias=AliasChoices("source_node", "sourceNode"),
-        serialization_alias="sourceNode",
-        default=None,
-        description="The label of the describing structure to read from",
-    )
-    key: str | None = Field(default=None, description="The property key on the source node")
-    source_value_kind: ValueKind | None = Field(
-        validation_alias=AliasChoices("source_value_kind", "sourceValueKind"),
-        serialization_alias="sourceValueKind",
-        default=None,
-        description="Which value kind of the source key to read, when the key has terms in more than one. Distinct from the property's own `value_kind`, which is the aggregation's result type: COUNT yields INT over STRING sources. Leave unset when the key is unambiguous. INT and FLOAT are read together either way.",
-    )
-    aggregation: AggregationFunction | None = Field(
-        default=None,
-        description="Aggregation function (MEAN, SUM, MAX, MIN, COUNT, etc.)",
-    )
-    evidence: "MetricEvidenceInput | None" = Field(
-        default=None,
-        description="This property's own metric rule: a rule list over SUBJECT/APP/ACTION/KEY/ASSERTED_AT/OBSERVED_AT/CONFIDENCE — any rule admits, all its `when` conditions must hold, `unless` groups subtract. When present it replaces the owning category's rules as the metric scope (classification annotators and measurement producers are usually different populations, so intersecting them would routinely produce nothing); when absent, the category's MEASUREMENT rules apply, and a primitive category folds everything.",
-    )
-    subject_priority: Annotated[tuple[str, ...] | None, GraphQLDefault("[]")] = Field(
-        validation_alias=AliasChoices("subject_priority", "subjectPriority"),
-        serialization_alias="subjectPriority",
-        default=None,
-        description="Subjects in descending order of trust, for PRIORITY_LATEST. The first subject with any measurement wins; subjects not listed are considered only if none of the listed ones have measured.",
-    )
-    "Subjects in descending order of trust, for PRIORITY_LATEST. The first subject with any measurement wins; subjects not listed are considered only if none of the listed ones have measured.\nDefault: []"
-    tool_priority: Annotated[tuple[str, ...] | None, GraphQLDefault("[]")] = Field(
-        validation_alias=AliasChoices("tool_priority", "toolPriority"),
-        serialization_alias="toolPriority",
-        default=None,
-        description="App ids in descending order of trust, for LATEST_ASSERTION_TOOL.",
-    )
-    "App ids in descending order of trust, for LATEST_ASSERTION_TOOL.\nDefault: []"
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class MetricEvidenceInput(BaseModel):
-    """A property's own metric rule: the definition's rule list over metric rows — no WORD or KIND, KEY allowed anywhere"""
-
-    rules: tuple["ClaimRuleInput", ...] = Field(description="A metric counts when any rule matches")
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class ClaimRuleInput(BaseModel):
-    """One rule: matches when all `when` conditions hold and no `unless` group does"""
-
-    when: tuple["ClaimConditionInput", ...] = Field(description="All of these must hold")
-    unless: tuple["ClaimConditionGroupInput", ...] | None = Field(
-        default=None,
-        description="Exceptions: the rule does not match when any group holds whole",
-    )
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class ClaimConditionInput(BaseModel):
-    """One condition: (field, operator, value) — IS/IN/NOT_IN on WORD/SUBJECT/APP/ACTION/KIND/KEY, BEFORE/SINCE on ASSERTED_AT/OBSERVED_AT, AT_LEAST/BELOW on CONFIDENCE (RFC 0010, 0015, 0016)"""
-
-    field: ClaimField = Field(description="What this condition looks at")
-    operator: ClaimOperator = Field(description="How it compares. BEFORE/SINCE are inclusive")
-    value: Any = Field(
-        description="One string for IS, a non-empty string list for IN/NOT_IN, a datetime for BEFORE/SINCE, a number in [0, 1] for AT_LEAST/BELOW. For field KIND: kinds from CLASSIFICATION, EXISTENCE, SAMENESS, EVIDENCE, MEASUREMENT. For field KEY: metric keys"
-    )
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class ClaimConditionGroupInput(BaseModel):
-    """An exception: a conjunction that, when it holds whole, blocks its rule"""
-
-    when: tuple[ClaimConditionInput, ...] = Field(
-        description="All of these must hold for the exception to apply"
-    )
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class CategoryDefinitionInput(BaseModel):
-    """What a category means: a union of clauses over classification claims — flat form for one clause, anyOf for several, never both (RFC 0007)"""
-
-    rules: tuple[ClaimRuleInput, ...] = Field(description="A claim counts when any rule matches")
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class RelationDefinitionInput(BaseModel):
-    """Definition of a relation type in the graph schema"""
-
-    key: str = Field(description="Relation type name/key")
-    description: str | None = Field(default=None, description="Description of this node role")
-    ontology_references: Annotated[
-        tuple[OntologyReferenceInput, ...] | None, GraphQLDefault("[]")
-    ] = Field(
-        validation_alias=AliasChoices("ontology_references", "ontologyReferences"),
-        serialization_alias="ontologyReferences",
-        default=None,
-        description="Ontology references for this event",
-    )
-    "Ontology references for this event\nDefault: []"
-    color: tuple[int, ...] | None = Field(
-        default=None,
-        description="Optional RGBA color for this node role (e.g. [255, 0, 0, 128])",
-    )
-    image: str | None = Field(
-        default=None,
-        description="Optional media store ID for an image representing this node role",
-    )
-    label: str | None = Field(
-        default=None,
-        description="Optional human-readable label for this node role (defaults to 'key' if not provided)",
-    )
-    pin: bool | None = Field(default=None, description="Whether to pin this node role in the UI")
-    source: EntityDescriptorInput = Field(description="Source entity type(s)")
-    target: EntityDescriptorInput = Field(description="Target entity type(s)")
-    cardinality: Annotated[Cardinality | None, GraphQLDefault("ONE_TO_ONE")] = Field(
-        default=None, description="Relation cardinality"
-    )
-    "Relation cardinality\nDefault: ONE_TO_ONE"
-    properties: Annotated[tuple[PropertyDefinitionInput, ...] | None, GraphQLDefault("[]")] = Field(
-        default=None, description="Derived property definitions"
-    )
-    "Derived property definitions\nDefault: []"
-    definition: CategoryDefinitionInput | None = Field(
-        default=None,
-        description="This relation category's complete rule (RFC 0009): which relation claims draw its edges — by word, annotator, app and window — and whose standings count for them. Omitted means primitive: any claim naming its word draws",
-    )
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class StructureRelationDefinitionInput(BaseModel):
-    """Declares a structure relation category in a graph schema"""
-
-    key: str = Field(description="Relation type name/key")
-    description: str | None = Field(default=None, description="Description of this node role")
-    ontology_references: Annotated[
-        tuple[OntologyReferenceInput, ...] | None, GraphQLDefault("[]")
-    ] = Field(
-        validation_alias=AliasChoices("ontology_references", "ontologyReferences"),
-        serialization_alias="ontologyReferences",
-        default=None,
-        description="Ontology references for this event",
-    )
-    "Ontology references for this event\nDefault: []"
-    color: tuple[int, ...] | None = Field(
-        default=None,
-        description="Optional RGBA color for this node role (e.g. [255, 0, 0, 128])",
-    )
-    image: str | None = Field(
-        default=None,
-        description="Optional media store ID for an image representing this node role",
-    )
-    label: str | None = Field(
-        default=None,
-        description="Optional human-readable label for this node role (defaults to 'key' if not provided)",
-    )
-    pin: bool | None = Field(default=None, description="Whether to pin this node role in the UI")
-    properties: Annotated[tuple[PropertyDefinitionInput, ...] | None, GraphQLDefault("[]")] = Field(
-        default=None, description="Derived property definitions"
-    )
-    "Derived property definitions\nDefault: []"
-    source: StructureDescriptorInput = Field(description="Source entity type(s)")
-    target: StructureDescriptorInput = Field(description="Target entity type(s)")
-    cardinality: Annotated[Cardinality | None, GraphQLDefault("ONE_TO_ONE")] = Field(
-        default=None, description="Relation cardinality"
-    )
-    "Relation cardinality\nDefault: ONE_TO_ONE"
-    definition: CategoryDefinitionInput | None = Field(
-        default=None,
-        description="This structure-relation category's complete rule (RFC 0012): which structure-relation claims count — by word, annotator, app and window — and whose standings fold. Omitted means primitive",
-    )
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class MeasurementDefinitionInput(BaseModel):
-    """Declares a measurement category in a graph schema"""
-
-    key: str = Field(description="Relation type name/key")
-    description: str | None = Field(default=None, description="Description of this node role")
-    ontology_references: Annotated[
-        tuple[OntologyReferenceInput, ...] | None, GraphQLDefault("[]")
-    ] = Field(
-        validation_alias=AliasChoices("ontology_references", "ontologyReferences"),
-        serialization_alias="ontologyReferences",
-        default=None,
-        description="Ontology references for this event",
-    )
-    "Ontology references for this event\nDefault: []"
-    color: tuple[int, ...] | None = Field(
-        default=None,
-        description="Optional RGBA color for this node role (e.g. [255, 0, 0, 128])",
-    )
-    image: str | None = Field(
-        default=None,
-        description="Optional media store ID for an image representing this node role",
-    )
-    label: str | None = Field(
-        default=None,
-        description="Optional human-readable label for this node role (defaults to 'key' if not provided)",
-    )
-    pin: bool | None = Field(default=None, description="Whether to pin this node role in the UI")
-    source: StructureDescriptorInput = Field(description="Source entity type(s)")
-    target: EntityDescriptorInput = Field(description="Target entity type(s)")
-    cardinality: Annotated[Cardinality | None, GraphQLDefault("ONE_TO_ONE")] = Field(
-        default=None, description="Relation cardinality"
-    )
-    "Relation cardinality\nDefault: ONE_TO_ONE"
-    properties: Annotated[tuple[PropertyDefinitionInput, ...] | None, GraphQLDefault("[]")] = Field(
-        default=None, description="Derived property definitions"
-    )
-    "Derived property definitions\nDefault: []"
-    definition: CategoryDefinitionInput | None = Field(
-        default=None,
-        description="This measurement category's complete rule (RFC 0012): which measurement claims count and whose standings fold. Omitted means primitive",
-    )
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class EventDefinitionInput(BaseModel):
-    """Definition of an event type in the graph schema"""
-
-    key: str = Field(description="The label of the node participating in the event")
-    description: str | None = Field(default=None, description="Description of this node role")
-    ontology_references: Annotated[
-        tuple[OntologyReferenceInput, ...] | None, GraphQLDefault("[]")
-    ] = Field(
-        validation_alias=AliasChoices("ontology_references", "ontologyReferences"),
-        serialization_alias="ontologyReferences",
-        default=None,
-        description="Ontology references for this event",
-    )
-    "Ontology references for this event\nDefault: []"
-    color: tuple[int, ...] | None = Field(
-        default=None,
-        description="Optional RGBA color for this node role (e.g. [255, 0, 0, 128])",
-    )
-    image: str | None = Field(
-        default=None,
-        description="Optional media store ID for an image representing this node role",
-    )
-    label: str | None = Field(
-        default=None,
-        description="Optional human-readable label for this node role (defaults to 'key' if not provided)",
-    )
-    pin: bool | None = Field(default=None, description="Whether to pin this node role in the UI")
-    kind: EventKind = Field(
-        description="Whether the event arises in the system itself (INTRINSIC, e.g. mitosis) or is applied from outside (EXTRINSIC, e.g. a protocol step)"
-    )
-    inputs: Annotated[tuple["EventRoleInput", ...] | None, GraphQLDefault("[]")] = Field(
-        default=None, description="Input node roles"
-    )
-    "Input node roles\nDefault: []"
-    outputs: Annotated[tuple["EventRoleInput", ...] | None, GraphQLDefault("[]")] = Field(
-        default=None, description="Output node roles"
-    )
-    "Output node roles\nDefault: []"
-    properties: Annotated[tuple[PropertyDefinitionInput, ...] | None, GraphQLDefault("[]")] = Field(
-        default=None, description="Property definitions"
-    )
-    "Property definitions\nDefault: []"
-    definition: CategoryDefinitionInput | None = Field(
-        default=None,
-        description="This event category's complete rule (RFC 0009): which classification claims admit an event, whose existence standings count, and whose participation claims draw its edges. Omitted means primitive",
-    )
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class EventRoleInput(BaseModel):
-    """One declared role on an event category"""
-
-    key: str = Field(description="The label of the node participating in the event")
-    role: str = Field(description="What type of role does this node play in the event")
-    descriptor: EntityDescriptorInput = Field(
-        description="Optional filters to apply when linking entities to structures for this role"
-    )
-    ontology_references: Annotated[
-        tuple[OntologyReferenceInput, ...] | None, GraphQLDefault("[]")
-    ] = Field(
-        validation_alias=AliasChoices("ontology_references", "ontologyReferences"),
-        serialization_alias="ontologyReferences",
-        default=None,
-        description="Ontology references for this role",
-    )
-    "Ontology references for this role\nDefault: []"
     model_config = ConfigDict(
         frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
     )
@@ -2347,96 +2605,188 @@ class SamenessRuleInput(BaseModel):
     )
 
 
-class UpdateGraphInput(BaseModel):
-    """Input for updating an existing graph"""
+class StructureDescriptorInput(BaseModel):
+    """Input for creating a new structure relation definition in the graph schema"""
 
-    id: str = Field(description="The ID of the graph to update")
-    name: str | None = Field(default=None, description="New graph name")
-    description: str | None = Field(default=None, description="New graph description")
-    archived: bool | None = Field(default=None, description="Optional archived flag update")
-    pin: bool | None = Field(
+    default_category_key: str | None = Field(
+        validation_alias=AliasChoices("default_category_key", "defaultCategoryKey"),
+        serialization_alias="defaultCategoryKey",
         default=None,
-        description="Optional pin flag update for the user making the request",
+        description="Default category to link to if no entities match the filters",
     )
-    sameness_rule: SamenessRuleInput | None = Field(
-        validation_alias=AliasChoices("sameness_rule", "samenessRule"),
-        serialization_alias="samenessRule",
+    identifiers: tuple[str, ...] | None = Field(
         default=None,
-        description="Replace whose sameness claims this view counts (RFC 0024); an empty rule list means everyone. Omitted means unchanged. Changing it refolds the view's individuals — the projection is rebuilt",
+        description="Structure identifiers to filter by (e.g. '@mikro/roi')",
     )
     model_config = ConfigDict(
         frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
     )
 
 
-class UpdateGraphVisualInput(BaseModel):
-    """Input for updating the visual properties of a graph element"""
+class StructureFilter(BaseModel):
+    """Filter options for querying structures"""
 
-    id: str = Field(description="The ID of the graph element to update")
-    node_positions: Annotated[
-        tuple["CategoryNodePositionInput", ...] | None, GraphQLDefault("[]")
-    ] = Field(
-        validation_alias=AliasChoices("node_positions", "nodePositions"),
-        serialization_alias="nodePositions",
+    ids: tuple[ID, ...] | None = Field(
+        default=None, description="Filter by specific structure IDs"
+    )
+    has_property: str | None = Field(
+        validation_alias=AliasChoices("has_property", "hasProperty"),
+        serialization_alias="hasProperty",
         default=None,
-        description="List of node positions to update",
+        description="Filter structures that have a metric under this key",
     )
-    "List of node positions to update\nDefault: []"
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class CategoryNodePositionInput(BaseModel):
-    """Input for specifying the position of a node in the graph visualization"""
-
-    category: str = Field(description="The category of the node")
-    position_x: float = Field(
-        validation_alias=AliasChoices("position_x", "positionX"),
-        serialization_alias="positionX",
-        description="The x-coordinate of the node position",
-    )
-    position_y: float = Field(
-        validation_alias=AliasChoices("position_y", "positionY"),
-        serialization_alias="positionY",
-        description="The y-coordinate of the node position",
-    )
-    width: float | None = Field(
+    search: str | None = Field(
         default=None,
-        description="Optional width for the node (for visualization purposes)",
+        description="Substring match on the structure's `object`, not its properties",
     )
-    height: float | None = Field(
+    matches: tuple[PropertyMatch, ...] | None = Field(
         default=None,
-        description="Optional height for the node (for visualization purposes)",
+        description="Filter structures whose metrics match these conditions",
     )
     model_config = ConfigDict(
         frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
     )
 
 
-class DeleteGraphInput(BaseModel):
-    """Input for deleting a graph"""
+class StructureKindFilter(BaseModel):
+    """No documentation"""
 
-    id: str = Field(description="The ID of the graph to delete")
+    and_: "StructureKindFilter | None" = Field(
+        validation_alias=AliasChoices("and_", "AND"),
+        serialization_alias="AND",
+        default=None,
+    )
+    or_: "StructureKindFilter | None" = Field(
+        validation_alias=AliasChoices("or_", "OR"),
+        serialization_alias="OR",
+        default=None,
+    )
+    not_: "StructureKindFilter | None" = Field(
+        validation_alias=AliasChoices("not_", "NOT"),
+        serialization_alias="NOT",
+        default=None,
+    )
+    distinct: bool | None = Field(
+        validation_alias=AliasChoices("distinct", "DISTINCT"),
+        serialization_alias="DISTINCT",
+        default=None,
+    )
+    ids: tuple[ID, ...] | None = Field(
+        default=None, description="Filter by list of IDs"
+    )
+    search: str | None = Field(default=None, description="Search label and identifier")
+    identifiers: tuple[str, ...] | None = Field(
+        default=None, description="Filter by structure identifiers"
+    )
+    matches_descriptor: StructureDescriptorInput | None = Field(
+        validation_alias=AliasChoices("matches_descriptor", "matchesDescriptor"),
+        serialization_alias="matchesDescriptor",
+        default=None,
+        description="Filter by whether the kind matches a descriptor",
+    )
     model_config = ConfigDict(
         frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
     )
 
 
-class ArchiveGraphInput(BaseModel):
-    """Input for archiving a graph"""
+class StructureOrder(BaseModel):
+    """Ordering options for structure queries"""
 
-    id: str = Field(description="The ID of the graph to archive")
+    created_at: Ordering | None = Field(
+        validation_alias=AliasChoices("created_at", "createdAt"),
+        serialization_alias="createdAt",
+        default=None,
+        description="Order by when the row was stored — arrival time. Prefer `seq`, the log's order",
+    )
+    seq: Ordering | None = Field(
+        default=None,
+        description="Order by the act's position in the log (`Assertion.seq`) — the log's own total order (RFC 0025)",
+    )
+    observed_at: Ordering | None = Field(
+        validation_alias=AliasChoices("observed_at", "observedAt"),
+        serialization_alias="observedAt",
+        default=None,
+        description="Order by world time — when the claim says the world was so (RFC 0015)",
+    )
+    id: Ordering | None = Field(default=None, description="Order by structure ID")
     model_config = ConfigDict(
         frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
     )
 
 
-class CreateEntityCategoryInput(BaseModel):
-    """Input for creating a new entity definition in the graph schema"""
+class StructurePaginationInput(BaseModel):
+    """Pagination options for querying structures"""
 
-    key: str = Field(description="The label of the node participating in the event")
-    description: str | None = Field(default=None, description="Description of this node role")
+    offset: Annotated[int | None, GraphQLDefault("0")] = Field(
+        default=None, description="Number of items to skip"
+    )
+    "Number of items to skip\nDefault: 0"
+    limit: Annotated[int | None, GraphQLDefault("100")] = Field(
+        default=None, description="Maximum number of items to return"
+    )
+    "Maximum number of items to return\nDefault: 100"
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class StructureReferenceInput(BaseModel):
+    """A reference to a structure by identifier and object"""
+
+    identifier: str = Field(description="Schema identifier, e.g. '@mikro/roi'")
+    object: str = Field(
+        description="The unique ID of the object this structure references"
+    )
+    metrics: Annotated[tuple[MetricInput, ...] | None, GraphQLDefault("[]")] = None
+    "Default: []"
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class StructureRelationCategoryFilter(BaseModel):
+    """No documentation"""
+
+    graph: GraphFilter | None = None
+    id: ID | None = None
+    label: str | None = None
+    and_: "StructureRelationCategoryFilter | None" = Field(
+        validation_alias=AliasChoices("and_", "AND"),
+        serialization_alias="AND",
+        default=None,
+    )
+    or_: "StructureRelationCategoryFilter | None" = Field(
+        validation_alias=AliasChoices("or_", "OR"),
+        serialization_alias="OR",
+        default=None,
+    )
+    not_: "StructureRelationCategoryFilter | None" = Field(
+        validation_alias=AliasChoices("not_", "NOT"),
+        serialization_alias="NOT",
+        default=None,
+    )
+    distinct: bool | None = Field(
+        validation_alias=AliasChoices("distinct", "DISTINCT"),
+        serialization_alias="DISTINCT",
+        default=None,
+    )
+    ids: tuple[ID, ...] | None = Field(
+        default=None, description="Filter by list of IDs"
+    )
+    pinned: bool | None = Field(default=None, description="Filter by list of IDs")
+    search: str | None = Field(default=None, description="Filter by list of IDs")
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class StructureRelationDefinitionInput(BaseModel):
+    """Declares a structure relation category in a graph schema"""
+
+    key: str = Field(description="Relation type name/key")
+    description: str | None = Field(
+        default=None, description="Description of this node role"
+    )
     ontology_references: Annotated[
         tuple[OntologyReferenceInput, ...] | None, GraphQLDefault("[]")
     ] = Field(
@@ -2458,41 +2808,107 @@ class CreateEntityCategoryInput(BaseModel):
         default=None,
         description="Optional human-readable label for this node role (defaults to 'key' if not provided)",
     )
-    pin: bool | None = Field(default=None, description="Whether to pin this node role in the UI")
-    instance_kind: str | None = Field(
-        validation_alias=AliasChoices("instance_kind", "instanceKind"),
-        serialization_alias="instanceKind",
-        default=None,
-        description="Optional instance kind for this entity category (e.g. 'neuron', 'synapse', 'behavior'). This is used for further categorization and filtering of entities within the graph.",
+    pin: bool | None = Field(
+        default=None, description="Whether to pin this node role in the UI"
     )
-    property_definitions: Annotated[
+    properties: Annotated[
         tuple[PropertyDefinitionInput, ...] | None, GraphQLDefault("[]")
-    ] = Field(
-        validation_alias=AliasChoices("property_definitions", "propertyDefinitions"),
-        serialization_alias="propertyDefinitions",
-        default=None,
-        description="Property definitions",
+    ] = Field(default=None, description="Derived property definitions")
+    "Derived property definitions\nDefault: []"
+    source: StructureDescriptorInput = Field(description="Source entity type(s)")
+    target: StructureDescriptorInput = Field(description="Target entity type(s)")
+    cardinality: Annotated[Cardinality | None, GraphQLDefault("ONE_TO_ONE")] = Field(
+        default=None, description="Relation cardinality"
     )
-    "Property definitions\nDefault: []"
+    "Relation cardinality\nDefault: ONE_TO_ONE"
     definition: CategoryDefinitionInput | None = Field(
         default=None,
-        description="What this category *means*: a predicate over classification claims (RFC 0007). Omitted means primitive — membership is whatever was asserted under this word",
+        description="This structure-relation category's complete rule (RFC 0012): which structure-relation claims count — by word, annotator, app and window — and whose standings fold. Omitted means primitive",
     )
-    graph: str = Field(description="The graph id this entity will belong to")
-    backfill: Annotated[bool | None, GraphQLDefault("False")] = Field(
-        default=None,
-        description="Draw the evidence this word already admits. Claims made under it before this category existed are in the organization's evidence base; with this on they are projected into the graph now, instead of waiting for the next reproject. Off by default because the work is proportional to the graph's evidence and happens before this mutation returns.",
-    )
-    "Draw the evidence this word already admits. Claims made under it before this category existed are in the organization's evidence base; with this on they are projected into the graph now, instead of waiting for the next reproject. Off by default because the work is proportional to the graph's evidence and happens before this mutation returns.\nDefault: False"
     model_config = ConfigDict(
         frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
     )
 
 
-class DeleteEntityCategoryInput(BaseModel):
-    """Input for deleting an existing entity definition in the graph schema"""
+class SupersedeMetricValueInput(BaseModel):
+    """Input for superseding a metric value"""
 
-    id: ID = Field(description="The ID of the structure category to delete")
+    key: str
+    value: Any
+    value_kind: PropertyType = Field(
+        validation_alias=AliasChoices("value_kind", "valueKind"),
+        serialization_alias="valueKind",
+        description="What type of value this is. Required: it decides which column the value is stored in and which measurement term it is recorded under, and nothing infers it. Two callers may declare the same key differently — a float `confidence` and a category-label `confidence` are two terms, and both are recorded.",
+    )
+    confidence: float | None = Field(
+        default=None,
+        description="How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.",
+    )
+    confidence_type: str | None = Field(
+        validation_alias=AliasChoices("confidence_type", "confidenceType"),
+        serialization_alias="confidenceType",
+        default=None,
+        description="What kind of number `confidence` is — a method's own score, a p-value. Measurement-only",
+    )
+    unit: str | None = None
+    observed_at: datetime | None = Field(
+        validation_alias=AliasChoices("observed_at", "observedAt"),
+        serialization_alias="observedAt",
+        default=None,
+        description="When the world was observed. Defaults to when it was claimed.",
+    )
+    derived_from: Annotated[tuple[str, ...] | None, GraphQLDefault("[]")] = Field(
+        validation_alias=AliasChoices("derived_from", "derivedFrom"),
+        serialization_alias="derivedFrom",
+        default=None,
+        description='The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.',
+    )
+    'The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.\nDefault: []'
+    id: str = Field(description="The ID of the metric to update")
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class TermFilter(BaseModel):
+    """No documentation"""
+
+    and_: "TermFilter | None" = Field(
+        validation_alias=AliasChoices("and_", "AND"),
+        serialization_alias="AND",
+        default=None,
+    )
+    or_: "TermFilter | None" = Field(
+        validation_alias=AliasChoices("or_", "OR"),
+        serialization_alias="OR",
+        default=None,
+    )
+    not_: "TermFilter | None" = Field(
+        validation_alias=AliasChoices("not_", "NOT"),
+        serialization_alias="NOT",
+        default=None,
+    )
+    distinct: bool | None = Field(
+        validation_alias=AliasChoices("distinct", "DISTINCT"),
+        serialization_alias="DISTINCT",
+        default=None,
+    )
+    ids: tuple[ID, ...] | None = Field(
+        default=None, description="Filter by list of IDs"
+    )
+    search: str | None = Field(
+        default=None, description="Search key, label and description"
+    )
+    kinds: tuple[TermKind, ...] | None = Field(
+        default=None, description="Filter by what sort of thing the word names"
+    )
+    keys: tuple[str, ...] | None = Field(
+        default=None, description="Filter by the words themselves"
+    )
+    declared: bool | None = Field(
+        default=None,
+        description="Filter to terms at least one graph declares a category for",
+    )
     model_config = ConfigDict(
         frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
     )
@@ -2505,7 +2921,9 @@ class UpdateEntityCategoryInput(BaseModel):
     key: str | None = Field(
         default=None, description="The label of the node participating in the event"
     )
-    description: str | None = Field(default=None, description="Description of this node role")
+    description: str | None = Field(
+        default=None, description="Description of this node role"
+    )
     ontology_references: tuple[OntologyReferenceInput, ...] | None = Field(
         validation_alias=AliasChoices("ontology_references", "ontologyReferences"),
         serialization_alias="ontologyReferences",
@@ -2524,7 +2942,9 @@ class UpdateEntityCategoryInput(BaseModel):
         default=None,
         description="Optional human-readable label for this node role (defaults to 'key' if not provided)",
     )
-    pin: bool | None = Field(default=None, description="Whether to pin this node role in the UI")
+    pin: bool | None = Field(
+        default=None, description="Whether to pin this node role in the UI"
+    )
     instance_kind: str | None = Field(
         validation_alias=AliasChoices("instance_kind", "instanceKind"),
         serialization_alias="instanceKind",
@@ -2553,21 +2973,358 @@ class UpdateEntityCategoryInput(BaseModel):
     )
 
 
-class CreateTermInput(BaseModel):
-    """Input for declaring one of the organization's words"""
+class UpdateGraphInput(BaseModel):
+    """Input for updating an existing graph"""
 
-    kind: TermKind = Field(description="What sort of thing this word names. Part of its identity.")
-    key: str = Field(description="The word itself, e.g. 'AIS'")
-    label: str | None = Field(default=None, description="Human-readable name")
-    description: str | None = Field(default=None, description="What this word means")
-    purl: str | None = Field(
+    id: str = Field(description="The ID of the graph to update")
+    name: str | None = Field(default=None, description="New graph name")
+    description: str | None = Field(default=None, description="New graph description")
+    archived: bool | None = Field(
+        default=None, description="Optional archived flag update"
+    )
+    pin: bool | None = Field(
         default=None,
-        description="Persistent URL, where this corresponds to a published ontology term",
+        description="Optional pin flag update for the user making the request",
     )
-    color: tuple[int, ...] | None = Field(default=None, description="Optional RGBA colour")
+    sameness_rule: SamenessRuleInput | None = Field(
+        validation_alias=AliasChoices("sameness_rule", "samenessRule"),
+        serialization_alias="samenessRule",
+        default=None,
+        description="Replace whose sameness claims this view counts (RFC 0024); an empty rule list means everyone. Omitted means unchanged. Changing it refolds the view's individuals — the projection is rebuilt",
+    )
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class UpdateGraphVisualInput(BaseModel):
+    """Input for updating the visual properties of a graph element"""
+
+    id: str = Field(description="The ID of the graph element to update")
+    node_positions: Annotated[
+        tuple[CategoryNodePositionInput, ...] | None, GraphQLDefault("[]")
+    ] = Field(
+        validation_alias=AliasChoices("node_positions", "nodePositions"),
+        serialization_alias="nodePositions",
+        default=None,
+        description="List of node positions to update",
+    )
+    "List of node positions to update\nDefault: []"
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class UpdateMeasurementCategoryInput(BaseModel):
+    """Input for updating an existing measurement definition in the graph schema"""
+
+    id: str = Field(description="The ID of the measurement category to update")
+    key: str | None = Field(
+        default=None, description="The label of the node participating in the event"
+    )
+    description: str | None = Field(
+        default=None, description="Description of this node role"
+    )
+    ontology_references: tuple[OntologyReferenceInput, ...] | None = Field(
+        validation_alias=AliasChoices("ontology_references", "ontologyReferences"),
+        serialization_alias="ontologyReferences",
+        default=None,
+        description="Ontology references for this event",
+    )
+    color: tuple[int, ...] | None = Field(
+        default=None,
+        description="Optional RGBA color for this node role (e.g. [255, 0, 0, 128])",
+    )
     image: str | None = Field(
-        default=None, description="Optional media store ID for an illustrative image"
+        default=None,
+        description="Optional media store ID for an image representing this node role",
     )
+    label: str | None = Field(
+        default=None,
+        description="Optional human-readable label for this node role (defaults to 'key' if not provided)",
+    )
+    pin: bool | None = Field(
+        default=None, description="Whether to pin this node role in the UI"
+    )
+    definition: CategoryDefinitionInput | None = Field(
+        default=None,
+        description="New rule for this category (RFC 0012). Omitted means unchanged; to make it primitive again, use clearDefinition",
+    )
+    clear_definition: Annotated[bool | None, GraphQLDefault("False")] = Field(
+        validation_alias=AliasChoices("clear_definition", "clearDefinition"),
+        serialization_alias="clearDefinition",
+        default=None,
+        description="Reset the category to primitive — any claim naming its word counts, standings organization grain",
+    )
+    "Reset the category to primitive — any claim naming its word counts, standings organization grain\nDefault: False"
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class UpdateMetricKindInput(BaseModel):
+    """Input for updating an existing metric definition in the graph schema"""
+
+    id: str = Field(description="The ID of the definition to update")
+    key: str | None = Field(
+        default=None, description="The label of the node participating in the event"
+    )
+    description: str | None = Field(
+        default=None, description="Description of this node role"
+    )
+    ontology_references: tuple[OntologyReferenceInput, ...] | None = Field(
+        validation_alias=AliasChoices("ontology_references", "ontologyReferences"),
+        serialization_alias="ontologyReferences",
+        default=None,
+        description="Ontology references for this event",
+    )
+    color: tuple[int, ...] | None = Field(
+        default=None,
+        description="Optional RGBA color for this node role (e.g. [255, 0, 0, 128])",
+    )
+    image: str | None = Field(
+        default=None,
+        description="Optional media store ID for an image representing this node role",
+    )
+    label: str | None = Field(
+        default=None,
+        description="Optional human-readable label for this node role (defaults to 'key' if not provided)",
+    )
+    pin: bool | None = Field(
+        default=None, description="Whether to pin this node role in the UI"
+    )
+    identifier: str | None = Field(
+        default=None,
+        description="Read by nothing: a metric kind is identified by `(organization, structure_kind, key, value_kind)`. `update_metric_kind` writes label, description and colour only",
+    )
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class UpdateNaturalEventCategoryInput(BaseModel):
+    """Input for updating an existing natural event definition in the graph schema"""
+
+    id: str = Field(description="The ID of the natural event category to update")
+    key: str | None = Field(
+        default=None, description="The label of the node participating in the event"
+    )
+    description: str | None = Field(
+        default=None, description="Description of this node role"
+    )
+    ontology_references: tuple[OntologyReferenceInput, ...] | None = Field(
+        validation_alias=AliasChoices("ontology_references", "ontologyReferences"),
+        serialization_alias="ontologyReferences",
+        default=None,
+        description="Ontology references for this event",
+    )
+    color: tuple[int, ...] | None = Field(
+        default=None,
+        description="Optional RGBA color for this node role (e.g. [255, 0, 0, 128])",
+    )
+    image: str | None = Field(
+        default=None,
+        description="Optional media store ID for an image representing this node role",
+    )
+    label: str | None = Field(
+        default=None,
+        description="Optional human-readable label for this node role (defaults to 'key' if not provided)",
+    )
+    pin: bool | None = Field(
+        default=None, description="Whether to pin this node role in the UI"
+    )
+    definition: CategoryDefinitionInput | None = Field(
+        default=None,
+        description="New rule for this category (RFC 0009). Omitted means unchanged; to make it primitive again, use clearDefinition",
+    )
+    clear_definition: Annotated[bool | None, GraphQLDefault("False")] = Field(
+        validation_alias=AliasChoices("clear_definition", "clearDefinition"),
+        serialization_alias="clearDefinition",
+        default=None,
+        description="Reset the category to primitive — any claim naming its word counts, standings organization grain",
+    )
+    "Reset the category to primitive — any claim naming its word counts, standings organization grain\nDefault: False"
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class UpdateProtocolEventCategoryInput(BaseModel):
+    """Input for updating an existing protocol event definition in the graph schema"""
+
+    id: str = Field(description="The ID of the protocol event category to update")
+    key: str | None = Field(
+        default=None, description="The label of the node participating in the event"
+    )
+    description: str | None = Field(
+        default=None, description="Description of this node role"
+    )
+    ontology_references: tuple[OntologyReferenceInput, ...] | None = Field(
+        validation_alias=AliasChoices("ontology_references", "ontologyReferences"),
+        serialization_alias="ontologyReferences",
+        default=None,
+        description="Ontology references for this event",
+    )
+    color: tuple[int, ...] | None = Field(
+        default=None,
+        description="Optional RGBA color for this node role (e.g. [255, 0, 0, 128])",
+    )
+    image: str | None = Field(
+        default=None,
+        description="Optional media store ID for an image representing this node role",
+    )
+    label: str | None = Field(
+        default=None,
+        description="Optional human-readable label for this node role (defaults to 'key' if not provided)",
+    )
+    pin: bool | None = Field(
+        default=None, description="Whether to pin this node role in the UI"
+    )
+    definition: CategoryDefinitionInput | None = Field(
+        default=None,
+        description="New rule for this category (RFC 0012). Omitted means unchanged; to make it primitive again, use clearDefinition",
+    )
+    clear_definition: Annotated[bool | None, GraphQLDefault("False")] = Field(
+        validation_alias=AliasChoices("clear_definition", "clearDefinition"),
+        serialization_alias="clearDefinition",
+        default=None,
+        description="Reset the category to primitive — any claim naming its word counts, standings organization grain",
+    )
+    "Reset the category to primitive — any claim naming its word counts, standings organization grain\nDefault: False"
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class UpdateRelationCategoryInput(BaseModel):
+    """Input for updating an existing relation definition in the graph schema"""
+
+    id: str = Field(description="The ID of the relation category to update")
+    key: str | None = Field(
+        default=None, description="The label of the node participating in the event"
+    )
+    description: str | None = Field(
+        default=None, description="Description of this node role"
+    )
+    ontology_references: tuple[OntologyReferenceInput, ...] | None = Field(
+        validation_alias=AliasChoices("ontology_references", "ontologyReferences"),
+        serialization_alias="ontologyReferences",
+        default=None,
+        description="Ontology references for this event",
+    )
+    color: tuple[int, ...] | None = Field(
+        default=None,
+        description="Optional RGBA color for this node role (e.g. [255, 0, 0, 128])",
+    )
+    image: str | None = Field(
+        default=None,
+        description="Optional media store ID for an image representing this node role",
+    )
+    label: str | None = Field(
+        default=None,
+        description="Optional human-readable label for this node role (defaults to 'key' if not provided)",
+    )
+    pin: bool | None = Field(
+        default=None, description="Whether to pin this node role in the UI"
+    )
+    definition: CategoryDefinitionInput | None = Field(
+        default=None,
+        description="New rule for this category (RFC 0009). Omitted means unchanged; to make it primitive again, use clearDefinition",
+    )
+    clear_definition: Annotated[bool | None, GraphQLDefault("False")] = Field(
+        validation_alias=AliasChoices("clear_definition", "clearDefinition"),
+        serialization_alias="clearDefinition",
+        default=None,
+        description="Reset the category to primitive — any claim naming its word counts, standings organization grain",
+    )
+    "Reset the category to primitive — any claim naming its word counts, standings organization grain\nDefault: False"
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class UpdateStructureKindInput(BaseModel):
+    """Input for updating an existing structure definition in the graph schema"""
+
+    id: str = Field(description="The ID of the definition to update")
+    key: str | None = Field(
+        default=None, description="The label of the node participating in the event"
+    )
+    description: str | None = Field(
+        default=None, description="Description of this node role"
+    )
+    ontology_references: tuple[OntologyReferenceInput, ...] | None = Field(
+        validation_alias=AliasChoices("ontology_references", "ontologyReferences"),
+        serialization_alias="ontologyReferences",
+        default=None,
+        description="Ontology references for this event",
+    )
+    color: tuple[int, ...] | None = Field(
+        default=None,
+        description="Optional RGBA color for this node role (e.g. [255, 0, 0, 128])",
+    )
+    image: str | None = Field(
+        default=None,
+        description="Optional media store ID for an image representing this node role",
+    )
+    label: str | None = Field(
+        default=None,
+        description="Optional human-readable label for this node role (defaults to 'key' if not provided)",
+    )
+    pin: bool | None = Field(
+        default=None, description="Whether to pin this node role in the UI"
+    )
+    identifier: str | None = Field(
+        default=None,
+        description="Read by nothing: `(organization, identifier)` is a structure kind's identity and cannot be reassigned. `update_structure_kind` writes label, description and colour only",
+    )
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class UpdateStructureRelationCategoryInput(BaseModel):
+    """Input for updating an existing structure relation definition in the graph schema"""
+
+    id: str = Field(description="The ID of the structure relation category to update")
+    key: str | None = Field(
+        default=None, description="The label of the node participating in the event"
+    )
+    description: str | None = Field(
+        default=None, description="Description of this node role"
+    )
+    ontology_references: tuple[OntologyReferenceInput, ...] | None = Field(
+        validation_alias=AliasChoices("ontology_references", "ontologyReferences"),
+        serialization_alias="ontologyReferences",
+        default=None,
+        description="Ontology references for this event",
+    )
+    color: tuple[int, ...] | None = Field(
+        default=None,
+        description="Optional RGBA color for this node role (e.g. [255, 0, 0, 128])",
+    )
+    image: str | None = Field(
+        default=None,
+        description="Optional media store ID for an image representing this node role",
+    )
+    label: str | None = Field(
+        default=None,
+        description="Optional human-readable label for this node role (defaults to 'key' if not provided)",
+    )
+    pin: bool | None = Field(
+        default=None, description="Whether to pin this node role in the UI"
+    )
+    definition: CategoryDefinitionInput | None = Field(
+        default=None,
+        description="New rule for this category (RFC 0012). Omitted means unchanged; to make it primitive again, use clearDefinition",
+    )
+    clear_definition: Annotated[bool | None, GraphQLDefault("False")] = Field(
+        validation_alias=AliasChoices("clear_definition", "clearDefinition"),
+        serialization_alias="clearDefinition",
+        default=None,
+        description="Reset the category to primitive — any claim naming its word counts, standings organization grain",
+    )
+    "Reset the category to primitive — any claim naming its word counts, standings organization grain\nDefault: False"
     model_config = ConfigDict(
         frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
     )
@@ -2583,7 +3340,9 @@ class UpdateTermInput(BaseModel):
         default=None,
         description="Persistent URL, where this corresponds to a published ontology term",
     )
-    color: tuple[int, ...] | None = Field(default=None, description="Optional RGBA colour")
+    color: tuple[int, ...] | None = Field(
+        default=None, description="Optional RGBA colour"
+    )
     image: str | None = Field(
         default=None, description="Optional media store ID for an illustrative image"
     )
@@ -2592,626 +3351,17 @@ class UpdateTermInput(BaseModel):
     )
 
 
-class DeleteTermInput(BaseModel):
-    """Input for retiring one of the organization's words"""
+class VocabularyPaginationInput(BaseModel):
+    """Pagination options for querying the organization's vocabulary"""
 
-    id: str = Field(description="The ID of the term to delete")
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    offset: Annotated[int | None, GraphQLDefault("0")] = Field(
+        default=None, description="Number of items to skip"
     )
-
-
-class DeleteStructureKindInput(BaseModel):
-    """Input for deleting an existing structure definition in the graph schema"""
-
-    id: str = Field(description="The ID of the structure kind to retire")
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    "Number of items to skip\nDefault: 0"
+    limit: Annotated[int | None, GraphQLDefault("100")] = Field(
+        default=None, description="Maximum number of items to return"
     )
-
-
-class UpdateStructureKindInput(BaseModel):
-    """Input for updating an existing structure definition in the graph schema"""
-
-    id: str = Field(description="The ID of the definition to update")
-    key: str | None = Field(
-        default=None, description="The label of the node participating in the event"
-    )
-    description: str | None = Field(default=None, description="Description of this node role")
-    ontology_references: tuple[OntologyReferenceInput, ...] | None = Field(
-        validation_alias=AliasChoices("ontology_references", "ontologyReferences"),
-        serialization_alias="ontologyReferences",
-        default=None,
-        description="Ontology references for this event",
-    )
-    color: tuple[int, ...] | None = Field(
-        default=None,
-        description="Optional RGBA color for this node role (e.g. [255, 0, 0, 128])",
-    )
-    image: str | None = Field(
-        default=None,
-        description="Optional media store ID for an image representing this node role",
-    )
-    label: str | None = Field(
-        default=None,
-        description="Optional human-readable label for this node role (defaults to 'key' if not provided)",
-    )
-    pin: bool | None = Field(default=None, description="Whether to pin this node role in the UI")
-    identifier: str | None = Field(
-        default=None,
-        description="Read by nothing: `(organization, identifier)` is a structure kind's identity and cannot be reassigned. `update_structure_kind` writes label, description and colour only",
-    )
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class CreateStructureRelationCategoryInput(BaseModel):
-    """Input for creating a new structure relation definition in the graph schema"""
-
-    key: str = Field(description="Relation type name/key")
-    description: str | None = Field(default=None, description="Description of this node role")
-    ontology_references: Annotated[
-        tuple[OntologyReferenceInput, ...] | None, GraphQLDefault("[]")
-    ] = Field(
-        validation_alias=AliasChoices("ontology_references", "ontologyReferences"),
-        serialization_alias="ontologyReferences",
-        default=None,
-        description="Ontology references for this event",
-    )
-    "Ontology references for this event\nDefault: []"
-    color: tuple[int, ...] | None = Field(
-        default=None,
-        description="Optional RGBA color for this node role (e.g. [255, 0, 0, 128])",
-    )
-    image: str | None = Field(
-        default=None,
-        description="Optional media store ID for an image representing this node role",
-    )
-    label: str | None = Field(
-        default=None,
-        description="Optional human-readable label for this node role (defaults to 'key' if not provided)",
-    )
-    pin: bool | None = Field(default=None, description="Whether to pin this node role in the UI")
-    properties: Annotated[tuple[PropertyDefinitionInput, ...] | None, GraphQLDefault("[]")] = Field(
-        default=None, description="Derived property definitions"
-    )
-    "Derived property definitions\nDefault: []"
-    source: StructureDescriptorInput = Field(description="Source entity type(s)")
-    target: StructureDescriptorInput = Field(description="Target entity type(s)")
-    cardinality: Annotated[Cardinality | None, GraphQLDefault("ONE_TO_ONE")] = Field(
-        default=None, description="Relation cardinality"
-    )
-    "Relation cardinality\nDefault: ONE_TO_ONE"
-    definition: CategoryDefinitionInput | None = Field(
-        default=None,
-        description="This structure-relation category's complete rule (RFC 0012): which structure-relation claims count — by word, annotator, app and window — and whose standings fold. Omitted means primitive",
-    )
-    graph: str = Field(description="The graph id this entity will belong to")
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class DeleteStructureRelationCategoryInput(BaseModel):
-    """Input for deleting an existing structure relation definition in the graph schema"""
-
-    id: str = Field(description="The ID of the structure relation category to delete")
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class UpdateStructureRelationCategoryInput(BaseModel):
-    """Input for updating an existing structure relation definition in the graph schema"""
-
-    id: str = Field(description="The ID of the structure relation category to update")
-    key: str | None = Field(
-        default=None, description="The label of the node participating in the event"
-    )
-    description: str | None = Field(default=None, description="Description of this node role")
-    ontology_references: tuple[OntologyReferenceInput, ...] | None = Field(
-        validation_alias=AliasChoices("ontology_references", "ontologyReferences"),
-        serialization_alias="ontologyReferences",
-        default=None,
-        description="Ontology references for this event",
-    )
-    color: tuple[int, ...] | None = Field(
-        default=None,
-        description="Optional RGBA color for this node role (e.g. [255, 0, 0, 128])",
-    )
-    image: str | None = Field(
-        default=None,
-        description="Optional media store ID for an image representing this node role",
-    )
-    label: str | None = Field(
-        default=None,
-        description="Optional human-readable label for this node role (defaults to 'key' if not provided)",
-    )
-    pin: bool | None = Field(default=None, description="Whether to pin this node role in the UI")
-    definition: CategoryDefinitionInput | None = Field(
-        default=None,
-        description="New rule for this category (RFC 0012). Omitted means unchanged; to make it primitive again, use clearDefinition",
-    )
-    clear_definition: Annotated[bool | None, GraphQLDefault("False")] = Field(
-        validation_alias=AliasChoices("clear_definition", "clearDefinition"),
-        serialization_alias="clearDefinition",
-        default=None,
-        description="Reset the category to primitive — any claim naming its word counts, standings organization grain",
-    )
-    "Reset the category to primitive — any claim naming its word counts, standings organization grain\nDefault: False"
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class DeleteMetricKindInput(BaseModel):
-    """Input for deleting an existing metric definition in the graph schema"""
-
-    id: str = Field(description="The ID of the metric kind to retire")
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class UpdateMetricKindInput(BaseModel):
-    """Input for updating an existing metric definition in the graph schema"""
-
-    id: str = Field(description="The ID of the definition to update")
-    key: str | None = Field(
-        default=None, description="The label of the node participating in the event"
-    )
-    description: str | None = Field(default=None, description="Description of this node role")
-    ontology_references: tuple[OntologyReferenceInput, ...] | None = Field(
-        validation_alias=AliasChoices("ontology_references", "ontologyReferences"),
-        serialization_alias="ontologyReferences",
-        default=None,
-        description="Ontology references for this event",
-    )
-    color: tuple[int, ...] | None = Field(
-        default=None,
-        description="Optional RGBA color for this node role (e.g. [255, 0, 0, 128])",
-    )
-    image: str | None = Field(
-        default=None,
-        description="Optional media store ID for an image representing this node role",
-    )
-    label: str | None = Field(
-        default=None,
-        description="Optional human-readable label for this node role (defaults to 'key' if not provided)",
-    )
-    pin: bool | None = Field(default=None, description="Whether to pin this node role in the UI")
-    identifier: str | None = Field(
-        default=None,
-        description="Read by nothing: a metric kind is identified by `(organization, structure_kind, key, value_kind)`. `update_metric_kind` writes label, description and colour only",
-    )
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class CreateMeasurementCategoryInput(BaseModel):
-    """Input for creating a new measurement definition in the graph schema"""
-
-    key: str = Field(description="Relation type name/key")
-    description: str | None = Field(default=None, description="Description of this node role")
-    ontology_references: Annotated[
-        tuple[OntologyReferenceInput, ...] | None, GraphQLDefault("[]")
-    ] = Field(
-        validation_alias=AliasChoices("ontology_references", "ontologyReferences"),
-        serialization_alias="ontologyReferences",
-        default=None,
-        description="Ontology references for this event",
-    )
-    "Ontology references for this event\nDefault: []"
-    color: tuple[int, ...] | None = Field(
-        default=None,
-        description="Optional RGBA color for this node role (e.g. [255, 0, 0, 128])",
-    )
-    image: str | None = Field(
-        default=None,
-        description="Optional media store ID for an image representing this node role",
-    )
-    label: str | None = Field(
-        default=None,
-        description="Optional human-readable label for this node role (defaults to 'key' if not provided)",
-    )
-    pin: bool | None = Field(default=None, description="Whether to pin this node role in the UI")
-    source: StructureDescriptorInput = Field(description="Source entity type(s)")
-    target: EntityDescriptorInput = Field(description="Target entity type(s)")
-    cardinality: Annotated[Cardinality | None, GraphQLDefault("ONE_TO_ONE")] = Field(
-        default=None, description="Relation cardinality"
-    )
-    "Relation cardinality\nDefault: ONE_TO_ONE"
-    properties: Annotated[tuple[PropertyDefinitionInput, ...] | None, GraphQLDefault("[]")] = Field(
-        default=None, description="Derived property definitions"
-    )
-    "Derived property definitions\nDefault: []"
-    definition: CategoryDefinitionInput | None = Field(
-        default=None,
-        description="This measurement category's complete rule (RFC 0012): which measurement claims count and whose standings fold. Omitted means primitive",
-    )
-    graph: str = Field(description="The graph id this measurement category will belong to")
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class DeleteMeasurementCategoryInput(BaseModel):
-    """Input for deleting an existing measurement definition in the graph schema"""
-
-    id: str = Field(description="The ID of the measurement category to delete")
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class UpdateMeasurementCategoryInput(BaseModel):
-    """Input for updating an existing measurement definition in the graph schema"""
-
-    id: str = Field(description="The ID of the measurement category to update")
-    key: str | None = Field(
-        default=None, description="The label of the node participating in the event"
-    )
-    description: str | None = Field(default=None, description="Description of this node role")
-    ontology_references: tuple[OntologyReferenceInput, ...] | None = Field(
-        validation_alias=AliasChoices("ontology_references", "ontologyReferences"),
-        serialization_alias="ontologyReferences",
-        default=None,
-        description="Ontology references for this event",
-    )
-    color: tuple[int, ...] | None = Field(
-        default=None,
-        description="Optional RGBA color for this node role (e.g. [255, 0, 0, 128])",
-    )
-    image: str | None = Field(
-        default=None,
-        description="Optional media store ID for an image representing this node role",
-    )
-    label: str | None = Field(
-        default=None,
-        description="Optional human-readable label for this node role (defaults to 'key' if not provided)",
-    )
-    pin: bool | None = Field(default=None, description="Whether to pin this node role in the UI")
-    definition: CategoryDefinitionInput | None = Field(
-        default=None,
-        description="New rule for this category (RFC 0012). Omitted means unchanged; to make it primitive again, use clearDefinition",
-    )
-    clear_definition: Annotated[bool | None, GraphQLDefault("False")] = Field(
-        validation_alias=AliasChoices("clear_definition", "clearDefinition"),
-        serialization_alias="clearDefinition",
-        default=None,
-        description="Reset the category to primitive — any claim naming its word counts, standings organization grain",
-    )
-    "Reset the category to primitive — any claim naming its word counts, standings organization grain\nDefault: False"
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class CreateRelationCategoryInput(BaseModel):
-    """Input for creating a new relation definition in the graph schema"""
-
-    key: str = Field(description="The label of the node participating in the event")
-    description: str | None = Field(default=None, description="Description of this node role")
-    ontology_references: Annotated[
-        tuple[OntologyReferenceInput, ...] | None, GraphQLDefault("[]")
-    ] = Field(
-        validation_alias=AliasChoices("ontology_references", "ontologyReferences"),
-        serialization_alias="ontologyReferences",
-        default=None,
-        description="Ontology references for this event",
-    )
-    "Ontology references for this event\nDefault: []"
-    color: tuple[int, ...] | None = Field(
-        default=None,
-        description="Optional RGBA color for this node role (e.g. [255, 0, 0, 128])",
-    )
-    image: str | None = Field(
-        default=None,
-        description="Optional media store ID for an image representing this node role",
-    )
-    label: str | None = Field(
-        default=None,
-        description="Optional human-readable label for this node role (defaults to 'key' if not provided)",
-    )
-    pin: bool | None = Field(default=None, description="Whether to pin this node role in the UI")
-    instance_kind: str | None = Field(
-        validation_alias=AliasChoices("instance_kind", "instanceKind"),
-        serialization_alias="instanceKind",
-        default=None,
-        description="Optional instance kind for this entity category (e.g. 'neuron', 'synapse', 'behavior'). This is used for further categorization and filtering of entities within the graph.",
-    )
-    property_definitions: Annotated[
-        tuple[PropertyDefinitionInput, ...] | None, GraphQLDefault("[]")
-    ] = Field(
-        validation_alias=AliasChoices("property_definitions", "propertyDefinitions"),
-        serialization_alias="propertyDefinitions",
-        default=None,
-        description="Property definitions",
-    )
-    "Property definitions\nDefault: []"
-    definition: CategoryDefinitionInput | None = Field(
-        default=None,
-        description="What this category *means*: a predicate over classification claims (RFC 0007). Omitted means primitive — membership is whatever was asserted under this word",
-    )
-    graph: str = Field(description="The graph id this entity will belong to")
-    backfill: Annotated[bool | None, GraphQLDefault("False")] = Field(
-        default=None,
-        description="Draw the evidence this word already admits. Claims made under it before this category existed are in the organization's evidence base; with this on they are projected into the graph now, instead of waiting for the next reproject. Off by default because the work is proportional to the graph's evidence and happens before this mutation returns.",
-    )
-    "Draw the evidence this word already admits. Claims made under it before this category existed are in the organization's evidence base; with this on they are projected into the graph now, instead of waiting for the next reproject. Off by default because the work is proportional to the graph's evidence and happens before this mutation returns.\nDefault: False"
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class DeleteRelationCategoryInput(BaseModel):
-    """Input for deleting an existing relation definition in the graph schema"""
-
-    id: str = Field(description="The ID of the relation category to delete")
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class UpdateRelationCategoryInput(BaseModel):
-    """Input for updating an existing relation definition in the graph schema"""
-
-    id: str = Field(description="The ID of the relation category to update")
-    key: str | None = Field(
-        default=None, description="The label of the node participating in the event"
-    )
-    description: str | None = Field(default=None, description="Description of this node role")
-    ontology_references: tuple[OntologyReferenceInput, ...] | None = Field(
-        validation_alias=AliasChoices("ontology_references", "ontologyReferences"),
-        serialization_alias="ontologyReferences",
-        default=None,
-        description="Ontology references for this event",
-    )
-    color: tuple[int, ...] | None = Field(
-        default=None,
-        description="Optional RGBA color for this node role (e.g. [255, 0, 0, 128])",
-    )
-    image: str | None = Field(
-        default=None,
-        description="Optional media store ID for an image representing this node role",
-    )
-    label: str | None = Field(
-        default=None,
-        description="Optional human-readable label for this node role (defaults to 'key' if not provided)",
-    )
-    pin: bool | None = Field(default=None, description="Whether to pin this node role in the UI")
-    definition: CategoryDefinitionInput | None = Field(
-        default=None,
-        description="New rule for this category (RFC 0009). Omitted means unchanged; to make it primitive again, use clearDefinition",
-    )
-    clear_definition: Annotated[bool | None, GraphQLDefault("False")] = Field(
-        validation_alias=AliasChoices("clear_definition", "clearDefinition"),
-        serialization_alias="clearDefinition",
-        default=None,
-        description="Reset the category to primitive — any claim naming its word counts, standings organization grain",
-    )
-    "Reset the category to primitive — any claim naming its word counts, standings organization grain\nDefault: False"
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class CreateNaturalEventCategoryInput(BaseModel):
-    """Input for creating a new natural event definition in the graph schema"""
-
-    key: str = Field(description="The label of the node participating in the event")
-    description: str | None = Field(default=None, description="Description of this node role")
-    ontology_references: Annotated[
-        tuple[OntologyReferenceInput, ...] | None, GraphQLDefault("[]")
-    ] = Field(
-        validation_alias=AliasChoices("ontology_references", "ontologyReferences"),
-        serialization_alias="ontologyReferences",
-        default=None,
-        description="Ontology references for this event",
-    )
-    "Ontology references for this event\nDefault: []"
-    color: tuple[int, ...] | None = Field(
-        default=None,
-        description="Optional RGBA color for this node role (e.g. [255, 0, 0, 128])",
-    )
-    image: str | None = Field(
-        default=None,
-        description="Optional media store ID for an image representing this node role",
-    )
-    label: str | None = Field(
-        default=None,
-        description="Optional human-readable label for this node role (defaults to 'key' if not provided)",
-    )
-    pin: bool | None = Field(default=None, description="Whether to pin this node role in the UI")
-    kind: EventKind = Field(
-        description="Whether the event arises in the system itself (INTRINSIC, e.g. mitosis) or is applied from outside (EXTRINSIC, e.g. a protocol step)"
-    )
-    inputs: Annotated[tuple[EventRoleInput, ...] | None, GraphQLDefault("[]")] = Field(
-        default=None, description="Input node roles"
-    )
-    "Input node roles\nDefault: []"
-    outputs: Annotated[tuple[EventRoleInput, ...] | None, GraphQLDefault("[]")] = Field(
-        default=None, description="Output node roles"
-    )
-    "Output node roles\nDefault: []"
-    properties: Annotated[tuple[PropertyDefinitionInput, ...] | None, GraphQLDefault("[]")] = Field(
-        default=None, description="Property definitions"
-    )
-    "Property definitions\nDefault: []"
-    definition: CategoryDefinitionInput | None = Field(
-        default=None,
-        description="This event category's complete rule (RFC 0009): which classification claims admit an event, whose existence standings count, and whose participation claims draw its edges. Omitted means primitive",
-    )
-    graph: str = Field(description="The graph id this event will belong to")
-    backfill: Annotated[bool | None, GraphQLDefault("False")] = Field(
-        default=None,
-        description="Draw the evidence this word already admits. Claims made under it before this category existed are in the organization's evidence base; with this on they are projected into the graph now, instead of waiting for the next reproject. Off by default because the work is proportional to the graph's evidence and happens before this mutation returns.",
-    )
-    "Draw the evidence this word already admits. Claims made under it before this category existed are in the organization's evidence base; with this on they are projected into the graph now, instead of waiting for the next reproject. Off by default because the work is proportional to the graph's evidence and happens before this mutation returns.\nDefault: False"
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class DeleteNaturalEventCategoryInput(BaseModel):
-    """Input for deleting an existing natural event definition in the graph schema"""
-
-    id: str = Field(description="The ID of the event category to delete")
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class UpdateNaturalEventCategoryInput(BaseModel):
-    """Input for updating an existing natural event definition in the graph schema"""
-
-    id: str = Field(description="The ID of the natural event category to update")
-    key: str | None = Field(
-        default=None, description="The label of the node participating in the event"
-    )
-    description: str | None = Field(default=None, description="Description of this node role")
-    ontology_references: tuple[OntologyReferenceInput, ...] | None = Field(
-        validation_alias=AliasChoices("ontology_references", "ontologyReferences"),
-        serialization_alias="ontologyReferences",
-        default=None,
-        description="Ontology references for this event",
-    )
-    color: tuple[int, ...] | None = Field(
-        default=None,
-        description="Optional RGBA color for this node role (e.g. [255, 0, 0, 128])",
-    )
-    image: str | None = Field(
-        default=None,
-        description="Optional media store ID for an image representing this node role",
-    )
-    label: str | None = Field(
-        default=None,
-        description="Optional human-readable label for this node role (defaults to 'key' if not provided)",
-    )
-    pin: bool | None = Field(default=None, description="Whether to pin this node role in the UI")
-    definition: CategoryDefinitionInput | None = Field(
-        default=None,
-        description="New rule for this category (RFC 0009). Omitted means unchanged; to make it primitive again, use clearDefinition",
-    )
-    clear_definition: Annotated[bool | None, GraphQLDefault("False")] = Field(
-        validation_alias=AliasChoices("clear_definition", "clearDefinition"),
-        serialization_alias="clearDefinition",
-        default=None,
-        description="Reset the category to primitive — any claim naming its word counts, standings organization grain",
-    )
-    "Reset the category to primitive — any claim naming its word counts, standings organization grain\nDefault: False"
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class CreateProtocolEventCategoryInput(BaseModel):
-    """Input for creating a new protocol event definition in the graph schema"""
-
-    key: str = Field(description="The label of the node participating in the event")
-    description: str | None = Field(default=None, description="Description of this node role")
-    ontology_references: Annotated[
-        tuple[OntologyReferenceInput, ...] | None, GraphQLDefault("[]")
-    ] = Field(
-        validation_alias=AliasChoices("ontology_references", "ontologyReferences"),
-        serialization_alias="ontologyReferences",
-        default=None,
-        description="Ontology references for this event",
-    )
-    "Ontology references for this event\nDefault: []"
-    color: tuple[int, ...] | None = Field(
-        default=None,
-        description="Optional RGBA color for this node role (e.g. [255, 0, 0, 128])",
-    )
-    image: str | None = Field(
-        default=None,
-        description="Optional media store ID for an image representing this node role",
-    )
-    label: str | None = Field(
-        default=None,
-        description="Optional human-readable label for this node role (defaults to 'key' if not provided)",
-    )
-    pin: bool | None = Field(default=None, description="Whether to pin this node role in the UI")
-    kind: EventKind = Field(
-        description="Whether the event arises in the system itself (INTRINSIC, e.g. mitosis) or is applied from outside (EXTRINSIC, e.g. a protocol step)"
-    )
-    inputs: Annotated[tuple[EventRoleInput, ...] | None, GraphQLDefault("[]")] = Field(
-        default=None, description="Input node roles"
-    )
-    "Input node roles\nDefault: []"
-    outputs: Annotated[tuple[EventRoleInput, ...] | None, GraphQLDefault("[]")] = Field(
-        default=None, description="Output node roles"
-    )
-    "Output node roles\nDefault: []"
-    properties: Annotated[tuple[PropertyDefinitionInput, ...] | None, GraphQLDefault("[]")] = Field(
-        default=None, description="Property definitions"
-    )
-    "Property definitions\nDefault: []"
-    definition: CategoryDefinitionInput | None = Field(
-        default=None,
-        description="This event category's complete rule (RFC 0009): which classification claims admit an event, whose existence standings count, and whose participation claims draw its edges. Omitted means primitive",
-    )
-    protocol: str = Field(description="The protocol this event definition belongs to")
-    graph: str = Field(description="The graph id this event will belong to")
-    backfill: Annotated[bool | None, GraphQLDefault("False")] = Field(
-        default=None,
-        description="Draw the evidence this word already admits. Claims made under it before this category existed are in the organization's evidence base; with this on they are projected into the graph now, instead of waiting for the next reproject. Off by default because the work is proportional to the graph's evidence and happens before this mutation returns.",
-    )
-    "Draw the evidence this word already admits. Claims made under it before this category existed are in the organization's evidence base; with this on they are projected into the graph now, instead of waiting for the next reproject. Off by default because the work is proportional to the graph's evidence and happens before this mutation returns.\nDefault: False"
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class DeleteProtocolEventCategoryInput(BaseModel):
-    """Input for deleting an existing protocol event definition in the graph schema"""
-
-    id: str = Field(description="The ID of the event category to delete")
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
-class UpdateProtocolEventCategoryInput(BaseModel):
-    """Input for updating an existing protocol event definition in the graph schema"""
-
-    id: str = Field(description="The ID of the protocol event category to update")
-    key: str | None = Field(
-        default=None, description="The label of the node participating in the event"
-    )
-    description: str | None = Field(default=None, description="Description of this node role")
-    ontology_references: tuple[OntologyReferenceInput, ...] | None = Field(
-        validation_alias=AliasChoices("ontology_references", "ontologyReferences"),
-        serialization_alias="ontologyReferences",
-        default=None,
-        description="Ontology references for this event",
-    )
-    color: tuple[int, ...] | None = Field(
-        default=None,
-        description="Optional RGBA color for this node role (e.g. [255, 0, 0, 128])",
-    )
-    image: str | None = Field(
-        default=None,
-        description="Optional media store ID for an image representing this node role",
-    )
-    label: str | None = Field(
-        default=None,
-        description="Optional human-readable label for this node role (defaults to 'key' if not provided)",
-    )
-    pin: bool | None = Field(default=None, description="Whether to pin this node role in the UI")
-    definition: CategoryDefinitionInput | None = Field(
-        default=None,
-        description="New rule for this category (RFC 0012). Omitted means unchanged; to make it primitive again, use clearDefinition",
-    )
-    clear_definition: Annotated[bool | None, GraphQLDefault("False")] = Field(
-        validation_alias=AliasChoices("clear_definition", "clearDefinition"),
-        serialization_alias="clearDefinition",
-        default=None,
-        description="Reset the category to primitive — any claim naming its word counts, standings organization grain",
-    )
-    "Reset the category to primitive — any claim naming its word counts, standings organization grain\nDefault: False"
+    "Maximum number of items to return\nDefault: 100"
     model_config = ConfigDict(
         frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
     )
@@ -3245,14 +3395,6 @@ class CategoryRefCatch(CategoryRefBase):
     "The label this view draws the category's nodes or edges under — its name in the projection namespace. One view's rename of the word; never what a node *is* (that is the claim's kind)"
 
 
-class CategoryRefMeasurementCategory(CategoryRefBase, MeasurementCategoryTrait, BaseModel):
-    """A measurement category definition"""
-
-    typename: Literal["MeasurementCategory"] = Field(
-        alias="__typename", default="MeasurementCategory", exclude=True
-    )
-
-
 class CategoryRefEntityCategory(CategoryRefBase, EntityCategoryTrait, BaseModel):
     """An entity category definition"""
 
@@ -3261,19 +3403,33 @@ class CategoryRefEntityCategory(CategoryRefBase, EntityCategoryTrait, BaseModel)
     )
 
 
-class CategoryRefProtocolEventCategory(CategoryRefBase, ProtocolEventCategoryTrait, BaseModel):
-    """A relation category definition"""
+class CategoryRefMeasurementCategory(
+    CategoryRefBase, MeasurementCategoryTrait, BaseModel
+):
+    """A measurement category definition"""
 
-    typename: Literal["ProtocolEventCategory"] = Field(
-        alias="__typename", default="ProtocolEventCategory", exclude=True
+    typename: Literal["MeasurementCategory"] = Field(
+        alias="__typename", default="MeasurementCategory", exclude=True
     )
 
 
-class CategoryRefNaturalEventCategory(CategoryRefBase, NaturalEventCategoryTrait, BaseModel):
+class CategoryRefNaturalEventCategory(
+    CategoryRefBase, NaturalEventCategoryTrait, BaseModel
+):
     """A relation category definition"""
 
     typename: Literal["NaturalEventCategory"] = Field(
         alias="__typename", default="NaturalEventCategory", exclude=True
+    )
+
+
+class CategoryRefProtocolEventCategory(
+    CategoryRefBase, ProtocolEventCategoryTrait, BaseModel
+):
+    """A relation category definition"""
+
+    typename: Literal["ProtocolEventCategory"] = Field(
+        alias="__typename", default="ProtocolEventCategory", exclude=True
     )
 
 
@@ -3383,9 +3539,7 @@ class LinkRef(LinkTrait, BaseModel):
     class Meta:
         """Meta class for LinkRef"""
 
-        document = (
-            "fragment LinkRef on Link {\n  id\n  kind\n  sourceRef\n  targetRef\n  __typename\n}"
-        )
+        document = "fragment LinkRef on Link {\n  id\n  kind\n  sourceRef\n  targetRef\n  __typename\n}"
         name = "LinkRef"
         type = "Link"
 
@@ -3393,7 +3547,9 @@ class LinkRef(LinkTrait, BaseModel):
 class Metric(MetricTrait, BaseModel):
     """A measured value about a structure — a claim, not a graph node"""
 
-    typename: Literal["Metric"] = Field(alias="__typename", default="Metric", exclude=True)
+    typename: Literal["Metric"] = Field(
+        alias="__typename", default="Metric", exclude=True
+    )
     id: ID
     "This claim's durable identity — the `Metric` primary key, a bare uuid"
     kind_id: str | None = Field(default=None, alias="kindId")
@@ -3425,7 +3581,9 @@ class Metric(MetricTrait, BaseModel):
 class Structure(StructureTrait, BaseModel):
     """An individual with an external identity — an ROI, an image, a file. A claim about the world, never a graph node (RFC 0023)"""
 
-    typename: Literal["Structure"] = Field(alias="__typename", default="Structure", exclude=True)
+    typename: Literal["Structure"] = Field(
+        alias="__typename", default="Structure", exclude=True
+    )
     id: ID
     "This claim's durable identity — the `Structure` primary key, a bare uuid"
     identifier: StructureIdentifier
@@ -3447,7 +3605,9 @@ class Structure(StructureTrait, BaseModel):
 class Assertion(AssertionTrait, BaseModel):
     """Who claimed something, with what tool, and when — one row of the append-only log"""
 
-    typename: Literal["Assertion"] = Field(alias="__typename", default="Assertion", exclude=True)
+    typename: Literal["Assertion"] = Field(
+        alias="__typename", default="Assertion", exclude=True
+    )
     id: ID
     "The assertion's durable identity"
     subject: str
@@ -3540,7 +3700,9 @@ class MetricKindStructureKind(StructureKindTrait, BaseModel):
 class MetricKind(MetricKindTrait, BaseModel):
     """A kind of measurement that can be made about a structure kind"""
 
-    typename: Literal["MetricKind"] = Field(alias="__typename", default="MetricKind", exclude=True)
+    typename: Literal["MetricKind"] = Field(
+        alias="__typename", default="MetricKind", exclude=True
+    )
     id: ID
     "Database ID of the kind"
     key: str
@@ -3572,7 +3734,9 @@ class MetricKind(MetricKindTrait, BaseModel):
 class MediaStore(HasPresignedDownloadAccessor, BaseModel):
     """No documentation"""
 
-    typename: Literal["MediaStore"] = Field(alias="__typename", default="MediaStore", exclude=True)
+    typename: Literal["MediaStore"] = Field(
+        alias="__typename", default="MediaStore", exclude=True
+    )
     id: ID
     key: str
     presigned_url: str = Field(alias="presignedUrl")
@@ -3582,9 +3746,7 @@ class MediaStore(HasPresignedDownloadAccessor, BaseModel):
     class Meta:
         """Meta class for MediaStore"""
 
-        document = (
-            "fragment MediaStore on MediaStore {\n  id\n  key\n  presignedUrl\n  __typename\n}"
-        )
+        document = "fragment MediaStore on MediaStore {\n  id\n  key\n  presignedUrl\n  __typename\n}"
         name = "MediaStore"
         type = "MediaStore"
 
@@ -3612,7 +3774,9 @@ class NodeRefCatch(NodeRefBase):
 class NodeRefEntity(NodeRefBase, EntityTrait, BaseModel):
     """An entity in the knowledge graph with derived properties"""
 
-    typename: Literal["Entity"] = Field(alias="__typename", default="Entity", exclude=True)
+    typename: Literal["Entity"] = Field(
+        alias="__typename", default="Entity", exclude=True
+    )
 
 
 class NodeRefNaturalEvent(NodeRefBase, BaseModel):
@@ -3669,7 +3833,9 @@ class GraphProjection(ProjectionTrait, BaseModel):
 class ListGraph(GraphTrait, BaseModel):
     """One view over the organization's evidence log"""
 
-    typename: Literal["Graph"] = Field(alias="__typename", default="Graph", exclude=True)
+    typename: Literal["Graph"] = Field(
+        alias="__typename", default="Graph", exclude=True
+    )
     id: ID
     "Database ID of the graph"
     name: str
@@ -3716,7 +3882,9 @@ class EntityViewRichProperties(BaseModel):
 class EntityView(EntityTrait, BaseModel):
     """An entity in the knowledge graph with derived properties"""
 
-    typename: Literal["Entity"] = Field(alias="__typename", default="Entity", exclude=True)
+    typename: Literal["Entity"] = Field(
+        alias="__typename", default="Entity", exclude=True
+    )
     id: ID
     "This node's durable identity — a bare uuid, world-unique and stable across reprojects. In a view it is the individual's representative: the lowest of `members`, which may differ from the member id you asked for"
     label: str
@@ -3729,7 +3897,9 @@ class EntityView(EntityTrait, BaseModel):
     "When this entity stopped being valid. . When did it stop existing?"
     properties: Any
     "The current derived properties for this entity"
-    rich_properties: tuple[EntityViewRichProperties, ...] = Field(alias="richProperties")
+    rich_properties: tuple[EntityViewRichProperties, ...] = Field(
+        alias="richProperties"
+    )
     "List of properties derived for this entity — the union over its categories in this view. Empty when this reading has no category — a property definition is one view's rule, and a claim no view draws has none"
     model_config = ConfigDict(frozen=True)
 
@@ -3744,7 +3914,9 @@ class EntityView(EntityTrait, BaseModel):
 class EdgeDrawingGraph(GraphTrait, BaseModel):
     """One view over the organization's evidence log"""
 
-    typename: Literal["Graph"] = Field(alias="__typename", default="Graph", exclude=True)
+    typename: Literal["Graph"] = Field(
+        alias="__typename", default="Graph", exclude=True
+    )
     id: ID
     "Database ID of the graph"
     name: str
@@ -3756,6 +3928,16 @@ class EdgeDrawingCategoryBase(CategoryTrait, BaseModel):
     """Base interface for structure categories"""
 
     model_config = ConfigDict(frozen=True)
+
+
+class EdgeDrawingCategoryBaseEntityCategory(
+    CategoryRefEntityCategory, EdgeDrawingCategoryBase, EntityCategoryTrait, BaseModel
+):
+    """An entity category definition"""
+
+    typename: Literal["EntityCategory"] = Field(
+        alias="__typename", default="EntityCategory", exclude=True
+    )
 
 
 class EdgeDrawingCategoryBaseMeasurementCategory(
@@ -3771,13 +3953,16 @@ class EdgeDrawingCategoryBaseMeasurementCategory(
     )
 
 
-class EdgeDrawingCategoryBaseEntityCategory(
-    CategoryRefEntityCategory, EdgeDrawingCategoryBase, EntityCategoryTrait, BaseModel
+class EdgeDrawingCategoryBaseNaturalEventCategory(
+    CategoryRefNaturalEventCategory,
+    EdgeDrawingCategoryBase,
+    NaturalEventCategoryTrait,
+    BaseModel,
 ):
-    """An entity category definition"""
+    """A relation category definition"""
 
-    typename: Literal["EntityCategory"] = Field(
-        alias="__typename", default="EntityCategory", exclude=True
+    typename: Literal["NaturalEventCategory"] = Field(
+        alias="__typename", default="NaturalEventCategory", exclude=True
     )
 
 
@@ -3791,19 +3976,6 @@ class EdgeDrawingCategoryBaseProtocolEventCategory(
 
     typename: Literal["ProtocolEventCategory"] = Field(
         alias="__typename", default="ProtocolEventCategory", exclude=True
-    )
-
-
-class EdgeDrawingCategoryBaseNaturalEventCategory(
-    CategoryRefNaturalEventCategory,
-    EdgeDrawingCategoryBase,
-    NaturalEventCategoryTrait,
-    BaseModel,
-):
-    """A relation category definition"""
-
-    typename: Literal["NaturalEventCategory"] = Field(
-        alias="__typename", default="NaturalEventCategory", exclude=True
     )
 
 
@@ -3849,10 +4021,10 @@ class EdgeDrawing(BaseModel):
     "The view this drawing belongs to"
     category: (
         Annotated[
-            EdgeDrawingCategoryBaseMeasurementCategory
-            | EdgeDrawingCategoryBaseEntityCategory
-            | EdgeDrawingCategoryBaseProtocolEventCategory
+            EdgeDrawingCategoryBaseEntityCategory
+            | EdgeDrawingCategoryBaseMeasurementCategory
             | EdgeDrawingCategoryBaseNaturalEventCategory
+            | EdgeDrawingCategoryBaseProtocolEventCategory
             | EdgeDrawingCategoryBaseRelationCategory
             | EdgeDrawingCategoryBaseStructureRelationCategory,
             Field(discriminator="typename"),
@@ -3873,7 +4045,9 @@ class EdgeDrawing(BaseModel):
 class EventRole(BaseModel):
     """Input type for defining roles in an event category"""
 
-    typename: Literal["EventRole"] = Field(alias="__typename", default="EventRole", exclude=True)
+    typename: Literal["EventRole"] = Field(
+        alias="__typename", default="EventRole", exclude=True
+    )
     key: str
     "The label of the node participating in the event"
     role: str
@@ -3893,7 +4067,9 @@ class EventRole(BaseModel):
 class StructureWithMetrics(Structure, StructureTrait, BaseModel):
     """An individual with an external identity — an ROI, an image, a file. A claim about the world, never a graph node (RFC 0023)"""
 
-    typename: Literal["Structure"] = Field(alias="__typename", default="Structure", exclude=True)
+    typename: Literal["Structure"] = Field(
+        alias="__typename", default="Structure", exclude=True
+    )
     metrics: tuple[Metric, ...]
     "Every un-retracted measurement of this structure, in observation order"
     model_config = ConfigDict(frozen=True)
@@ -3929,7 +4105,9 @@ class AssertedMetric(AssertedTrait, BaseModel):
 class CommentParent(BaseModel):
     """A remark somebody made about a structure — a claim, as the log has it"""
 
-    typename: Literal["Comment"] = Field(alias="__typename", default="Comment", exclude=True)
+    typename: Literal["Comment"] = Field(
+        alias="__typename", default="Comment", exclude=True
+    )
     id: ID
     "The claim's durable identity — a bare uuid"
     model_config = ConfigDict(frozen=True)
@@ -3938,7 +4116,9 @@ class CommentParent(BaseModel):
 class Comment(BaseModel):
     """A remark somebody made about a structure — a claim, as the log has it"""
 
-    typename: Literal["Comment"] = Field(alias="__typename", default="Comment", exclude=True)
+    typename: Literal["Comment"] = Field(
+        alias="__typename", default="Comment", exclude=True
+    )
     id: ID
     "The claim's durable identity — a bare uuid"
     created_at: datetime = Field(alias="createdAt")
@@ -3966,7 +4146,9 @@ class Comment(BaseModel):
 class Standing(StandingTrait, BaseModel):
     """Somebody's position on whether a claim still holds"""
 
-    typename: Literal["Standing"] = Field(alias="__typename", default="Standing", exclude=True)
+    typename: Literal["Standing"] = Field(
+        alias="__typename", default="Standing", exclude=True
+    )
     id: ID
     "This position's own identity"
     stands: bool
@@ -3988,7 +4170,9 @@ class Standing(StandingTrait, BaseModel):
 class InstanceRef(InstanceTrait, BaseModel):
     """A claimed individual — an entity or an event, as the log has it"""
 
-    typename: Literal["Instance"] = Field(alias="__typename", default="Instance", exclude=True)
+    typename: Literal["Instance"] = Field(
+        alias="__typename", default="Instance", exclude=True
+    )
     id: ID
     "The claim's durable identity — a bare uuid, world-unique and stable across reprojects"
     kind: InstanceKind
@@ -4054,7 +4238,9 @@ class Term(TermRef, TermTrait, BaseModel):
 class CategoryBaseGraph(GraphTrait, BaseModel):
     """One view over the organization's evidence log"""
 
-    typename: Literal["Graph"] = Field(alias="__typename", default="Graph", exclude=True)
+    typename: Literal["Graph"] = Field(
+        alias="__typename", default="Graph", exclude=True
+    )
     id: ID
     "Database ID of the graph"
     name: str
@@ -4102,6 +4288,16 @@ class CategoryBaseCatch(CategoryBaseBase):
     "The organization's word this category declares. Claims name the term, not this row — so a category is what the word means *here*, and another graph declaring the same word sees the same claims."
 
 
+class CategoryBaseEntityCategory(
+    CategoryRefEntityCategory, CategoryBaseBase, EntityCategoryTrait, BaseModel
+):
+    """An entity category definition"""
+
+    typename: Literal["EntityCategory"] = Field(
+        alias="__typename", default="EntityCategory", exclude=True
+    )
+
+
 class CategoryBaseMeasurementCategory(
     CategoryRefMeasurementCategory,
     CategoryBaseBase,
@@ -4115,13 +4311,16 @@ class CategoryBaseMeasurementCategory(
     )
 
 
-class CategoryBaseEntityCategory(
-    CategoryRefEntityCategory, CategoryBaseBase, EntityCategoryTrait, BaseModel
+class CategoryBaseNaturalEventCategory(
+    CategoryRefNaturalEventCategory,
+    CategoryBaseBase,
+    NaturalEventCategoryTrait,
+    BaseModel,
 ):
-    """An entity category definition"""
+    """A relation category definition"""
 
-    typename: Literal["EntityCategory"] = Field(
-        alias="__typename", default="EntityCategory", exclude=True
+    typename: Literal["NaturalEventCategory"] = Field(
+        alias="__typename", default="NaturalEventCategory", exclude=True
     )
 
 
@@ -4135,19 +4334,6 @@ class CategoryBaseProtocolEventCategory(
 
     typename: Literal["ProtocolEventCategory"] = Field(
         alias="__typename", default="ProtocolEventCategory", exclude=True
-    )
-
-
-class CategoryBaseNaturalEventCategory(
-    CategoryRefNaturalEventCategory,
-    CategoryBaseBase,
-    NaturalEventCategoryTrait,
-    BaseModel,
-):
-    """A relation category definition"""
-
-    typename: Literal["NaturalEventCategory"] = Field(
-        alias="__typename", default="NaturalEventCategory", exclude=True
     )
 
 
@@ -4177,7 +4363,9 @@ class CategoryBaseStructureRelationCategory(
 class NodeDrawingGraph(GraphTrait, BaseModel):
     """One view over the organization's evidence log"""
 
-    typename: Literal["Graph"] = Field(alias="__typename", default="Graph", exclude=True)
+    typename: Literal["Graph"] = Field(
+        alias="__typename", default="Graph", exclude=True
+    )
     id: ID
     "Database ID of the graph"
     name: str
@@ -4189,6 +4377,16 @@ class NodeDrawingCategoryBase(CategoryTrait, BaseModel):
     """Base interface for structure categories"""
 
     model_config = ConfigDict(frozen=True)
+
+
+class NodeDrawingCategoryBaseEntityCategory(
+    CategoryRefEntityCategory, NodeDrawingCategoryBase, EntityCategoryTrait, BaseModel
+):
+    """An entity category definition"""
+
+    typename: Literal["EntityCategory"] = Field(
+        alias="__typename", default="EntityCategory", exclude=True
+    )
 
 
 class NodeDrawingCategoryBaseMeasurementCategory(
@@ -4204,13 +4402,16 @@ class NodeDrawingCategoryBaseMeasurementCategory(
     )
 
 
-class NodeDrawingCategoryBaseEntityCategory(
-    CategoryRefEntityCategory, NodeDrawingCategoryBase, EntityCategoryTrait, BaseModel
+class NodeDrawingCategoryBaseNaturalEventCategory(
+    CategoryRefNaturalEventCategory,
+    NodeDrawingCategoryBase,
+    NaturalEventCategoryTrait,
+    BaseModel,
 ):
-    """An entity category definition"""
+    """A relation category definition"""
 
-    typename: Literal["EntityCategory"] = Field(
-        alias="__typename", default="EntityCategory", exclude=True
+    typename: Literal["NaturalEventCategory"] = Field(
+        alias="__typename", default="NaturalEventCategory", exclude=True
     )
 
 
@@ -4224,19 +4425,6 @@ class NodeDrawingCategoryBaseProtocolEventCategory(
 
     typename: Literal["ProtocolEventCategory"] = Field(
         alias="__typename", default="ProtocolEventCategory", exclude=True
-    )
-
-
-class NodeDrawingCategoryBaseNaturalEventCategory(
-    CategoryRefNaturalEventCategory,
-    NodeDrawingCategoryBase,
-    NaturalEventCategoryTrait,
-    BaseModel,
-):
-    """A relation category definition"""
-
-    typename: Literal["NaturalEventCategory"] = Field(
-        alias="__typename", default="NaturalEventCategory", exclude=True
     )
 
 
@@ -4278,13 +4466,19 @@ class NodeDrawingNodeBase(NodeTrait, BaseModel):
     model_config = ConfigDict(frozen=True)
 
 
-class NodeDrawingNodeBaseEntity(NodeRefEntity, NodeDrawingNodeBase, EntityTrait, BaseModel):
+class NodeDrawingNodeBaseEntity(
+    NodeRefEntity, NodeDrawingNodeBase, EntityTrait, BaseModel
+):
     """An entity in the knowledge graph with derived properties"""
 
-    typename: Literal["Entity"] = Field(alias="__typename", default="Entity", exclude=True)
+    typename: Literal["Entity"] = Field(
+        alias="__typename", default="Entity", exclude=True
+    )
 
 
-class NodeDrawingNodeBaseNaturalEvent(NodeRefNaturalEvent, NodeDrawingNodeBase, BaseModel):
+class NodeDrawingNodeBaseNaturalEvent(
+    NodeRefNaturalEvent, NodeDrawingNodeBase, BaseModel
+):
     """A natural event in the knowledge graph"""
 
     typename: Literal["NaturalEvent"] = Field(
@@ -4292,7 +4486,9 @@ class NodeDrawingNodeBaseNaturalEvent(NodeRefNaturalEvent, NodeDrawingNodeBase, 
     )
 
 
-class NodeDrawingNodeBaseProtocolEvent(NodeRefProtocolEvent, NodeDrawingNodeBase, BaseModel):
+class NodeDrawingNodeBaseProtocolEvent(
+    NodeRefProtocolEvent, NodeDrawingNodeBase, BaseModel
+):
     """A protocol event in the graph"""
 
     typename: Literal["ProtocolEvent"] = Field(
@@ -4316,10 +4512,10 @@ class NodeDrawing(BaseModel):
     "The view this drawing belongs to"
     category: (
         Annotated[
-            NodeDrawingCategoryBaseMeasurementCategory
-            | NodeDrawingCategoryBaseEntityCategory
-            | NodeDrawingCategoryBaseProtocolEventCategory
+            NodeDrawingCategoryBaseEntityCategory
+            | NodeDrawingCategoryBaseMeasurementCategory
             | NodeDrawingCategoryBaseNaturalEventCategory
+            | NodeDrawingCategoryBaseProtocolEventCategory
             | NodeDrawingCategoryBaseRelationCategory
             | NodeDrawingCategoryBaseStructureRelationCategory,
             Field(discriminator="typename"),
@@ -4390,7 +4586,9 @@ class AssertedComment(AssertedTrait, BaseModel):
 class Instance(InstanceRef, InstanceTrait, BaseModel):
     """A claimed individual — an entity or an event, as the log has it"""
 
-    typename: Literal["Instance"] = Field(alias="__typename", default="Instance", exclude=True)
+    typename: Literal["Instance"] = Field(
+        alias="__typename", default="Instance", exclude=True
+    )
     created_at: datetime = Field(alias="createdAt")
     "When the claim was recorded"
     component: tuple[ID, ...]
@@ -4549,7 +4747,9 @@ class EntityCategory(CategoryBaseEntityCategory, EntityCategoryTrait, BaseModel)
     "Width for visualization (optional)"
     height: float | None = Field(default=None)
     "Height for visualization (optional)"
-    property_definitions: tuple[PropertyDefinition, ...] = Field(alias="propertyDefinitions")
+    property_definitions: tuple[PropertyDefinition, ...] = Field(
+        alias="propertyDefinitions"
+    )
     "The graph this category belongs to"
     model_config = ConfigDict(frozen=True)
 
@@ -4571,7 +4771,9 @@ class RelationCategory(CategoryBaseRelationCategory, RelationCategoryTrait, Base
     "Which nodes this edge category admits as its source"
     target_descriptor: EntityDescriptor = Field(alias="targetDescriptor")
     "Which nodes this edge category admits as its target"
-    property_definitions: tuple[PropertyDefinition, ...] = Field(alias="propertyDefinitions")
+    property_definitions: tuple[PropertyDefinition, ...] = Field(
+        alias="propertyDefinitions"
+    )
     "List of property definitions for this entity category"
     model_config = ConfigDict(frozen=True)
 
@@ -4583,7 +4785,9 @@ class RelationCategory(CategoryBaseRelationCategory, RelationCategoryTrait, Base
         type = "RelationCategory"
 
 
-class MeasurementCategory(CategoryBaseMeasurementCategory, MeasurementCategoryTrait, BaseModel):
+class MeasurementCategory(
+    CategoryBaseMeasurementCategory, MeasurementCategoryTrait, BaseModel
+):
     """A measurement category definition"""
 
     typename: Literal["MeasurementCategory"] = Field(
@@ -4593,7 +4797,9 @@ class MeasurementCategory(CategoryBaseMeasurementCategory, MeasurementCategoryTr
     "Which nodes this edge category admits as its source"
     target_descriptor: EntityDescriptor = Field(alias="targetDescriptor")
     "Which nodes this edge category admits as its target"
-    property_definitions: tuple[PropertyDefinition, ...] = Field(alias="propertyDefinitions")
+    property_definitions: tuple[PropertyDefinition, ...] = Field(
+        alias="propertyDefinitions"
+    )
     "List of property definitions for this entity category"
     model_config = ConfigDict(frozen=True)
 
@@ -4617,7 +4823,9 @@ class StructureRelationCategory(
     "Which nodes this edge category admits as its source"
     target_descriptor: StructureDescriptor = Field(alias="targetDescriptor")
     "Which nodes this edge category admits as its target"
-    property_definitions: tuple[PropertyDefinition, ...] = Field(alias="propertyDefinitions")
+    property_definitions: tuple[PropertyDefinition, ...] = Field(
+        alias="propertyDefinitions"
+    )
     "List of property definitions for this entity category"
     model_config = ConfigDict(frozen=True)
 
@@ -4629,7 +4837,9 @@ class StructureRelationCategory(
         type = "StructureRelationCategory"
 
 
-class NaturalEventCategory(CategoryBaseNaturalEventCategory, NaturalEventCategoryTrait, BaseModel):
+class NaturalEventCategory(
+    CategoryBaseNaturalEventCategory, NaturalEventCategoryTrait, BaseModel
+):
     """A relation category definition"""
 
     typename: Literal["NaturalEventCategory"] = Field(
@@ -4778,16 +4988,22 @@ class AssertedInstances(AssertedTrait, HasDrawings, BaseModel):
 class Graph(ListGraph, GraphTrait, BaseModel):
     """One view over the organization's evidence log"""
 
-    typename: Literal["Graph"] = Field(alias="__typename", default="Graph", exclude=True)
+    typename: Literal["Graph"] = Field(
+        alias="__typename", default="Graph", exclude=True
+    )
     purl: str | None = Field(default=None)
     "Persistent URL for this graph"
     projection: GraphProjection
     "Where this view's drawing stands relative to the organization's log: the assertion seq it is caught up to, how far behind it is, and whether its derived properties are current under the active schema. Compare a write's `assertion.seq` with `projectedThroughSeq` to know whether this view has drawn it. See `graph_engine/watermark.py` for why the cursor is safe."
     entity_categories: tuple[EntityCategory, ...] = Field(alias="entityCategories")
     "List of entity categories defined in this graph"
-    relation_categories: tuple[RelationCategory, ...] = Field(alias="relationCategories")
+    relation_categories: tuple[RelationCategory, ...] = Field(
+        alias="relationCategories"
+    )
     "List of relation categories defined in this graph"
-    measurement_categories: tuple[MeasurementCategory, ...] = Field(alias="measurementCategories")
+    measurement_categories: tuple[MeasurementCategory, ...] = Field(
+        alias="measurementCategories"
+    )
     "List of measurement categories defined in this graph"
     structure_relation_categories: tuple[StructureRelationCategory, ...] = Field(
         alias="structureRelationCategories"
@@ -4917,7 +5133,9 @@ class DeleteRelationCategoryMutation(BaseModel):
 class CreateMeasurementCategoryMutation(BaseModel):
     """No documentation found for this operation."""
 
-    create_measurement_category: MeasurementCategory = Field(alias="createMeasurementCategory")
+    create_measurement_category: MeasurementCategory = Field(
+        alias="createMeasurementCategory"
+    )
     "Create a new measurement category in the graph"
 
     class Arguments(BaseModel):
@@ -4934,7 +5152,9 @@ class CreateMeasurementCategoryMutation(BaseModel):
 class UpdateMeasurementCategoryMutation(BaseModel):
     """No documentation found for this operation."""
 
-    update_measurement_category: MeasurementCategory = Field(alias="updateMeasurementCategory")
+    update_measurement_category: MeasurementCategory = Field(
+        alias="updateMeasurementCategory"
+    )
     "Update an existing measurement category in the graph"
 
     class Arguments(BaseModel):
@@ -5006,7 +5226,9 @@ class UpdateStructureRelationCategoryMutation(BaseModel):
 class DeleteStructureRelationCategoryMutation(BaseModel):
     """No documentation found for this operation."""
 
-    delete_structure_relation_category: ID = Field(alias="deleteStructureRelationCategory")
+    delete_structure_relation_category: ID = Field(
+        alias="deleteStructureRelationCategory"
+    )
     "Delete a structure relation category from the graph"
 
     class Arguments(BaseModel):
@@ -5023,7 +5245,9 @@ class DeleteStructureRelationCategoryMutation(BaseModel):
 class CreateNaturalEventCategoryMutation(BaseModel):
     """No documentation found for this operation."""
 
-    create_natural_event_category: NaturalEventCategory = Field(alias="createNaturalEventCategory")
+    create_natural_event_category: NaturalEventCategory = Field(
+        alias="createNaturalEventCategory"
+    )
     "Create a new natural event category in the graph"
 
     class Arguments(BaseModel):
@@ -5040,7 +5264,9 @@ class CreateNaturalEventCategoryMutation(BaseModel):
 class UpdateNaturalEventCategoryMutation(BaseModel):
     """No documentation found for this operation."""
 
-    update_natural_event_category: NaturalEventCategory = Field(alias="updateNaturalEventCategory")
+    update_natural_event_category: NaturalEventCategory = Field(
+        alias="updateNaturalEventCategory"
+    )
     "Update an existing natural event category in the graph"
 
     class Arguments(BaseModel):
@@ -5147,7 +5373,9 @@ class AssertEntityExistsMutation(BaseModel):
 class AssertNaturalEventExistsMutation(BaseModel):
     """No documentation found for this operation."""
 
-    assert_natural_event_exists: AssertedNaturalEvent = Field(alias="assertNaturalEventExists")
+    assert_natural_event_exists: AssertedNaturalEvent = Field(
+        alias="assertNaturalEventExists"
+    )
     "Claim that a natural event happened, under one of the organization's words"
 
     class Arguments(BaseModel):
@@ -5164,7 +5392,9 @@ class AssertNaturalEventExistsMutation(BaseModel):
 class AssertProtocolEventExistsMutation(BaseModel):
     """No documentation found for this operation."""
 
-    assert_protocol_event_exists: AssertedProtocolEvent = Field(alias="assertProtocolEventExists")
+    assert_protocol_event_exists: AssertedProtocolEvent = Field(
+        alias="assertProtocolEventExists"
+    )
     "Claim that a protocol step happened, under one of the organization's words"
 
     class Arguments(BaseModel):
@@ -5249,7 +5479,9 @@ class AssertMetricValueMutation(BaseModel):
 class AssertMetricValueForStructureMutation(BaseModel):
     """No documentation found for this operation."""
 
-    assert_metric_value_for_structure: AssertedMetric = Field(alias="assertMetricValueForStructure")
+    assert_metric_value_for_structure: AssertedMetric = Field(
+        alias="assertMetricValueForStructure"
+    )
     "Record a measurement against a structure that already exists, named by its evidence id"
 
     class Arguments(BaseModel):
@@ -5300,7 +5532,9 @@ class AssertRelationExistsMutation(BaseModel):
 class AssertMeasurementExistsMutation(BaseModel):
     """No documentation found for this operation."""
 
-    assert_measurement_exists: AssertedMeasurement = Field(alias="assertMeasurementExists")
+    assert_measurement_exists: AssertedMeasurement = Field(
+        alias="assertMeasurementExists"
+    )
     "Assert that a structure measures an entity, under one of the organization's words. Drawings are always empty: a measurement has no AGE edge"
 
     class Arguments(BaseModel):
@@ -5468,9 +5702,7 @@ class DeleteGraphMutation(BaseModel):
     class Meta:
         """Meta class for DeleteGraph"""
 
-        document = (
-            "mutation DeleteGraph($input: DeleteGraphInput!) {\n  deleteGraph(input: $input)\n}"
-        )
+        document = "mutation DeleteGraph($input: DeleteGraphInput!) {\n  deleteGraph(input: $input)\n}"
 
 
 class AttestEntityMutation(BaseModel):
@@ -5719,7 +5951,9 @@ class RetractMeasurementMutation(BaseModel):
 class RetractStructureRelationMutation(BaseModel):
     """No documentation found for this operation."""
 
-    retract_structure_relation: AssertedStructureRelation = Field(alias="retractStructureRelation")
+    retract_structure_relation: AssertedStructureRelation = Field(
+        alias="retractStructureRelation"
+    )
     "Retract a structure relation assertion without destroying it"
 
     class Arguments(BaseModel):
@@ -6009,7 +6243,9 @@ class GetRelationCategoryQuery(BaseModel):
 class ListRelationCategoriesQuery(BaseModel):
     """No documentation found for this operation."""
 
-    relation_categories: tuple[RelationCategory, ...] = Field(alias="relationCategories")
+    relation_categories: tuple[RelationCategory, ...] = Field(
+        alias="relationCategories"
+    )
     "List all relation categories"
 
     class Arguments(BaseModel):
@@ -6075,7 +6311,9 @@ class GetMeasurementCategoryQuery(BaseModel):
 class ListMeasurementCategoriesQuery(BaseModel):
     """No documentation found for this operation."""
 
-    measurement_categories: tuple[MeasurementCategory, ...] = Field(alias="measurementCategories")
+    measurement_categories: tuple[MeasurementCategory, ...] = Field(
+        alias="measurementCategories"
+    )
     "List all measurement categories"
 
     class Arguments(BaseModel):
@@ -6160,7 +6398,9 @@ class ListStructureRelationCategoriesQuery(BaseModel):
         document = "fragment CategoryRef on Category {\n  id\n  key\n  label\n  ageName\n  __typename\n}\n\nfragment MediaStore on MediaStore {\n  id\n  key\n  presignedUrl\n  __typename\n}\n\nfragment TermRef on Term {\n  id\n  key\n  kind\n  __typename\n}\n\nfragment CategoryBase on Category {\n  ...CategoryRef\n  description\n  purl\n  color\n  pinned\n  image {\n    ...MediaStore\n    __typename\n  }\n  graph {\n    id\n    name\n    __typename\n  }\n  term {\n    ...TermRef\n    __typename\n  }\n  __typename\n}\n\nfragment PropertyDefinition on PropertyDefinition {\n  key\n  label\n  valueKind\n  unit\n  description\n  derivation\n  index\n  searchable\n  __typename\n}\n\nfragment StructureDescriptor on StructureDescriptor {\n  defaultCategoryKey\n  __typename\n}\n\nfragment StructureRelationCategory on StructureRelationCategory {\n  ...CategoryBase\n  sourceDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  targetDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nquery ListStructureRelationCategories($filters: StructureRelationCategoryFilter, $pagination: OffsetPaginationInput) {\n  structureRelationCategories(filters: $filters, pagination: $pagination) {\n    ...StructureRelationCategory\n    __typename\n  }\n}"
 
 
-class SearchStructureRelationCategoriesQueryOptions(StructureRelationCategoryTrait, BaseModel):
+class SearchStructureRelationCategoriesQueryOptions(
+    StructureRelationCategoryTrait, BaseModel
+):
     """A relation category definition"""
 
     typename: Literal["StructureRelationCategory"] = Field(
@@ -6262,7 +6502,9 @@ class SearchNaturalEventCategoriesQuery(BaseModel):
 class GetProtocolEventCategoryQuery(BaseModel):
     """No documentation found for this operation."""
 
-    protocol_event_category: ProtocolEventCategory = Field(alias="protocolEventCategory")
+    protocol_event_category: ProtocolEventCategory = Field(
+        alias="protocolEventCategory"
+    )
     "Get a single protocol event category by ID"
 
     class Arguments(BaseModel):
@@ -6535,7 +6777,9 @@ class GetCommentsForQuery(BaseModel):
 class SearchStructuresQueryOptions(StructureTrait, BaseModel):
     """An individual with an external identity — an ROI, an image, a file. A claim about the world, never a graph node (RFC 0023)"""
 
-    typename: Literal["Structure"] = Field(alias="__typename", default="Structure", exclude=True)
+    typename: Literal["Structure"] = Field(
+        alias="__typename", default="Structure", exclude=True
+    )
     value: ID
     "This claim's durable identity — the `Structure` primary key, a bare uuid"
     label: str
@@ -6599,7 +6843,9 @@ class ListGraphsQuery(BaseModel):
 class SearchGraphsQueryOptions(GraphTrait, BaseModel):
     """One view over the organization's evidence log"""
 
-    typename: Literal["Graph"] = Field(alias="__typename", default="Graph", exclude=True)
+    typename: Literal["Graph"] = Field(
+        alias="__typename", default="Graph", exclude=True
+    )
     value: ID
     "Database ID of the graph"
     label: str
@@ -6631,13 +6877,19 @@ class GetNodeQueryNodeBase(NodeTrait, BaseModel):
     model_config = ConfigDict(frozen=True)
 
 
-class GetNodeQueryNodeBaseEntity(NodeRefEntity, GetNodeQueryNodeBase, EntityTrait, BaseModel):
+class GetNodeQueryNodeBaseEntity(
+    NodeRefEntity, GetNodeQueryNodeBase, EntityTrait, BaseModel
+):
     """An entity in the knowledge graph with derived properties"""
 
-    typename: Literal["Entity"] = Field(alias="__typename", default="Entity", exclude=True)
+    typename: Literal["Entity"] = Field(
+        alias="__typename", default="Entity", exclude=True
+    )
 
 
-class GetNodeQueryNodeBaseNaturalEvent(NodeRefNaturalEvent, GetNodeQueryNodeBase, BaseModel):
+class GetNodeQueryNodeBaseNaturalEvent(
+    NodeRefNaturalEvent, GetNodeQueryNodeBase, BaseModel
+):
     """A natural event in the knowledge graph"""
 
     typename: Literal["NaturalEvent"] = Field(
@@ -6645,7 +6897,9 @@ class GetNodeQueryNodeBaseNaturalEvent(NodeRefNaturalEvent, GetNodeQueryNodeBase
     )
 
 
-class GetNodeQueryNodeBaseProtocolEvent(NodeRefProtocolEvent, GetNodeQueryNodeBase, BaseModel):
+class GetNodeQueryNodeBaseProtocolEvent(
+    NodeRefProtocolEvent, GetNodeQueryNodeBase, BaseModel
+):
     """A protocol event in the graph"""
 
     typename: Literal["ProtocolEvent"] = Field(
@@ -6692,13 +6946,19 @@ class ListNodesQueryNodesBase(NodeTrait, BaseModel):
     model_config = ConfigDict(frozen=True)
 
 
-class ListNodesQueryNodesBaseEntity(NodeRefEntity, ListNodesQueryNodesBase, EntityTrait, BaseModel):
+class ListNodesQueryNodesBaseEntity(
+    NodeRefEntity, ListNodesQueryNodesBase, EntityTrait, BaseModel
+):
     """An entity in the knowledge graph with derived properties"""
 
-    typename: Literal["Entity"] = Field(alias="__typename", default="Entity", exclude=True)
+    typename: Literal["Entity"] = Field(
+        alias="__typename", default="Entity", exclude=True
+    )
 
 
-class ListNodesQueryNodesBaseNaturalEvent(NodeRefNaturalEvent, ListNodesQueryNodesBase, BaseModel):
+class ListNodesQueryNodesBaseNaturalEvent(
+    NodeRefNaturalEvent, ListNodesQueryNodesBase, BaseModel
+):
     """A natural event in the knowledge graph"""
 
     typename: Literal["NaturalEvent"] = Field(
@@ -6938,7 +7198,9 @@ class ListMetricKindsQuery(BaseModel):
 class SearchMetricKindsQueryOptions(MetricKindTrait, BaseModel):
     """A kind of measurement that can be made about a structure kind"""
 
-    typename: Literal["MetricKind"] = Field(alias="__typename", default="MetricKind", exclude=True)
+    typename: Literal["MetricKind"] = Field(
+        alias="__typename", default="MetricKind", exclude=True
+    )
     value: ID
     "Database ID of the kind"
     label: str
@@ -6964,6979 +7226,6674 @@ class SearchMetricKindsQuery(BaseModel):
         document = "query SearchMetricKinds($search: String, $values: [ID!]) {\n  options: metricKinds(\n    filters: {search: $search, ids: $values}\n    pagination: {limit: 10}\n  ) {\n    value: id\n    label: key\n    __typename\n  }\n}"
 
 
-async def acreate_entity_category(
-    key: str,
-    ontology_references: Iterable[OntologyReferenceInput],
-    property_definitions: Iterable[PropertyDefinitionInput],
-    graph: str,
-    backfill: bool,
-    description: str | None | UnsetType = UNSET,
-    color: Iterable[int] | None | UnsetType = UNSET,
-    image: str | None | UnsetType = UNSET,
-    label: str | None | UnsetType = UNSET,
-    pin: bool | None | UnsetType = UNSET,
-    instance_kind: str | None | UnsetType = UNSET,
-    definition: CategoryDefinitionInput | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> EntityCategory:
-    """CreateEntityCategory
-     A Category is one view's rule for a word: what it means HERE, how it is drawn, and which
-     properties are derived onto it. Creating one never records a claim.
+class KraphApi:
+    """Every operation of this API as a method. Generated by turms.
 
-    Args:
-        key: The label of the node participating in the event
-        description: Description of this node role
-        ontology_references: Ontology references for this event
-        color: Optional RGBA color for this node role (e.g. [255, 0, 0, 128])
-        image: Optional media store ID for an image representing this node role
-        label: Optional human-readable label for this node role (defaults to 'key' if not provided)
-        pin: Whether to pin this node role in the UI
-        instance_kind: Optional instance kind for this entity category (e.g. 'neuron', 'synapse', 'behavior'). This is used for further categorization and filtering of entities within the graph.
-        property_definitions: Property definitions
-        definition: What this category *means*: a predicate over classification claims (RFC 0007). Omitted means primitive — membership is whatever was asserted under this word
-        graph: The graph id this entity will belong to
-        backfill: Draw the evidence this word already admits. Claims made under it before this category existed are in the organization's evidence base; with this on they are projected into the graph now, instead of waiting for the next reproject. Off by default because the work is proportional to the graph's evidence and happens before this mutation returns.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        EntityCategory
+    Each method hands its operation to ``execute``, ``aexecute``, ``subscribe``, ``asubscribe`` of ``self``, which the class this one is mixed into (or a base of it) provides.
     """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["key"] = key
-    if description is not UNSET:
-        _input["description"] = description
-    _input["ontologyReferences"] = ontology_references
-    if color is not UNSET:
-        _input["color"] = color
-    if image is not UNSET:
-        _input["image"] = image
-    if label is not UNSET:
-        _input["label"] = label
-    if pin is not UNSET:
-        _input["pin"] = pin
-    if instance_kind is not UNSET:
-        _input["instanceKind"] = instance_kind
-    _input["propertyDefinitions"] = property_definitions
-    if definition is not UNSET:
-        _input["definition"] = definition
-    _input["graph"] = graph
-    _input["backfill"] = backfill
-    variables["input"] = _input
-    return (
-        await aexecute(CreateEntityCategoryMutation, variables, rath=rath)
-    ).create_entity_category
 
+    async def acreate_entity_category(
+        self,
+        key: str,
+        ontology_references: Iterable[OntologyReferenceInput],
+        property_definitions: Iterable[PropertyDefinitionInput],
+        graph: str,
+        backfill: bool,
+        description: str | None | UnsetType = UNSET,
+        color: Iterable[int] | None | UnsetType = UNSET,
+        image: str | None | UnsetType = UNSET,
+        label: str | None | UnsetType = UNSET,
+        pin: bool | None | UnsetType = UNSET,
+        instance_kind: str | None | UnsetType = UNSET,
+        definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+    ) -> EntityCategory:
+        """CreateEntityCategory
+         A Category is one view's rule for a word: what it means HERE, how it is drawn, and which
+         properties are derived onto it. Creating one never records a claim.
 
-def create_entity_category(
-    key: str,
-    ontology_references: Iterable[OntologyReferenceInput],
-    property_definitions: Iterable[PropertyDefinitionInput],
-    graph: str,
-    backfill: bool,
-    description: str | None | UnsetType = UNSET,
-    color: Iterable[int] | None | UnsetType = UNSET,
-    image: str | None | UnsetType = UNSET,
-    label: str | None | UnsetType = UNSET,
-    pin: bool | None | UnsetType = UNSET,
-    instance_kind: str | None | UnsetType = UNSET,
-    definition: CategoryDefinitionInput | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> EntityCategory:
-    """CreateEntityCategory
-     A Category is one view's rule for a word: what it means HERE, how it is drawn, and which
-     properties are derived onto it. Creating one never records a claim.
+        Args:
+            key: The label of the node participating in the event
+            description: Description of this node role
+            ontology_references: Ontology references for this event
+            color: Optional RGBA color for this node role (e.g. [255, 0, 0, 128])
+            image: Optional media store ID for an image representing this node role
+            label: Optional human-readable label for this node role (defaults to 'key' if not provided)
+            pin: Whether to pin this node role in the UI
+            instance_kind: Optional instance kind for this entity category (e.g. 'neuron', 'synapse', 'behavior'). This is used for further categorization and filtering of entities within the graph.
+            property_definitions: Property definitions
+            definition: What this category *means*: a predicate over classification claims (RFC 0007). Omitted means primitive — membership is whatever was asserted under this word
+            graph: The graph id this entity will belong to
+            backfill: Draw the evidence this word already admits. Claims made under it before this category existed are in the organization's evidence base; with this on they are projected into the graph now, instead of waiting for the next reproject. Off by default because the work is proportional to the graph's evidence and happens before this mutation returns.
 
-    Args:
-        key: The label of the node participating in the event
-        description: Description of this node role
-        ontology_references: Ontology references for this event
-        color: Optional RGBA color for this node role (e.g. [255, 0, 0, 128])
-        image: Optional media store ID for an image representing this node role
-        label: Optional human-readable label for this node role (defaults to 'key' if not provided)
-        pin: Whether to pin this node role in the UI
-        instance_kind: Optional instance kind for this entity category (e.g. 'neuron', 'synapse', 'behavior'). This is used for further categorization and filtering of entities within the graph.
-        property_definitions: Property definitions
-        definition: What this category *means*: a predicate over classification claims (RFC 0007). Omitted means primitive — membership is whatever was asserted under this word
-        graph: The graph id this entity will belong to
-        backfill: Draw the evidence this word already admits. Claims made under it before this category existed are in the organization's evidence base; with this on they are projected into the graph now, instead of waiting for the next reproject. Off by default because the work is proportional to the graph's evidence and happens before this mutation returns.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        EntityCategory
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["key"] = key
-    if description is not UNSET:
-        _input["description"] = description
-    _input["ontologyReferences"] = ontology_references
-    if color is not UNSET:
-        _input["color"] = color
-    if image is not UNSET:
-        _input["image"] = image
-    if label is not UNSET:
-        _input["label"] = label
-    if pin is not UNSET:
-        _input["pin"] = pin
-    if instance_kind is not UNSET:
-        _input["instanceKind"] = instance_kind
-    _input["propertyDefinitions"] = property_definitions
-    if definition is not UNSET:
-        _input["definition"] = definition
-    _input["graph"] = graph
-    _input["backfill"] = backfill
-    variables["input"] = _input
-    return execute(CreateEntityCategoryMutation, variables, rath=rath).create_entity_category
-
-
-async def aupdate_entity_category(
-    id: IDCoercible,
-    clear_definition: bool,
-    key: str | None | UnsetType = UNSET,
-    description: str | None | UnsetType = UNSET,
-    ontology_references: Iterable[OntologyReferenceInput] | None | UnsetType = UNSET,
-    color: Iterable[int] | None | UnsetType = UNSET,
-    image: str | None | UnsetType = UNSET,
-    label: str | None | UnsetType = UNSET,
-    pin: bool | None | UnsetType = UNSET,
-    instance_kind: str | None | UnsetType = UNSET,
-    property_definitions: Iterable[PropertyDefinitionInput] | None | UnsetType = UNSET,
-    definition: CategoryDefinitionInput | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> EntityCategory:
-    """UpdateEntityCategory
-
-    Update an existing entity category in the graph
-
-    Args:
-        id: The ID of the definition to update
-        key: The label of the node participating in the event
-        description: Description of this node role
-        ontology_references: Ontology references for this event
-        color: Optional RGBA color for this node role (e.g. [255, 0, 0, 128])
-        image: Optional media store ID for an image representing this node role
-        label: Optional human-readable label for this node role (defaults to 'key' if not provided)
-        pin: Whether to pin this node role in the UI
-        instance_kind: Optional instance kind for this entity category (e.g. 'neuron', 'synapse', 'behavior'). This is used for further categorization and filtering of entities within the graph.
-        property_definitions: Property definitions
-        definition: New meaning for this category (RFC 0007). Omitted means unchanged; to make the category primitive again, use clearDefinition
-        clear_definition: Reset the category to primitive — membership becomes whatever was asserted under its word
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        EntityCategory
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    if key is not UNSET:
+        Returns:
+            EntityCategory
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
         _input["key"] = key
-    if description is not UNSET:
-        _input["description"] = description
-    if ontology_references is not UNSET:
+        if description is not UNSET:
+            _input["description"] = description
         _input["ontologyReferences"] = ontology_references
-    if color is not UNSET:
-        _input["color"] = color
-    if image is not UNSET:
-        _input["image"] = image
-    if label is not UNSET:
-        _input["label"] = label
-    if pin is not UNSET:
-        _input["pin"] = pin
-    if instance_kind is not UNSET:
-        _input["instanceKind"] = instance_kind
-    if property_definitions is not UNSET:
+        if color is not UNSET:
+            _input["color"] = color
+        if image is not UNSET:
+            _input["image"] = image
+        if label is not UNSET:
+            _input["label"] = label
+        if pin is not UNSET:
+            _input["pin"] = pin
+        if instance_kind is not UNSET:
+            _input["instanceKind"] = instance_kind
         _input["propertyDefinitions"] = property_definitions
-    if definition is not UNSET:
-        _input["definition"] = definition
-    _input["clearDefinition"] = clear_definition
-    variables["input"] = _input
-    return (
-        await aexecute(UpdateEntityCategoryMutation, variables, rath=rath)
-    ).update_entity_category
+        if definition is not UNSET:
+            _input["definition"] = definition
+        _input["graph"] = graph
+        _input["backfill"] = backfill
+        variables["input"] = _input
+        return (
+            await self.aexecute(CreateEntityCategoryMutation, variables)
+        ).create_entity_category
 
+    def create_entity_category(
+        self,
+        key: str,
+        ontology_references: Iterable[OntologyReferenceInput],
+        property_definitions: Iterable[PropertyDefinitionInput],
+        graph: str,
+        backfill: bool,
+        description: str | None | UnsetType = UNSET,
+        color: Iterable[int] | None | UnsetType = UNSET,
+        image: str | None | UnsetType = UNSET,
+        label: str | None | UnsetType = UNSET,
+        pin: bool | None | UnsetType = UNSET,
+        instance_kind: str | None | UnsetType = UNSET,
+        definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+    ) -> EntityCategory:
+        """CreateEntityCategory
+         A Category is one view's rule for a word: what it means HERE, how it is drawn, and which
+         properties are derived onto it. Creating one never records a claim.
 
-def update_entity_category(
-    id: IDCoercible,
-    clear_definition: bool,
-    key: str | None | UnsetType = UNSET,
-    description: str | None | UnsetType = UNSET,
-    ontology_references: Iterable[OntologyReferenceInput] | None | UnsetType = UNSET,
-    color: Iterable[int] | None | UnsetType = UNSET,
-    image: str | None | UnsetType = UNSET,
-    label: str | None | UnsetType = UNSET,
-    pin: bool | None | UnsetType = UNSET,
-    instance_kind: str | None | UnsetType = UNSET,
-    property_definitions: Iterable[PropertyDefinitionInput] | None | UnsetType = UNSET,
-    definition: CategoryDefinitionInput | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> EntityCategory:
-    """UpdateEntityCategory
+        Args:
+            key: The label of the node participating in the event
+            description: Description of this node role
+            ontology_references: Ontology references for this event
+            color: Optional RGBA color for this node role (e.g. [255, 0, 0, 128])
+            image: Optional media store ID for an image representing this node role
+            label: Optional human-readable label for this node role (defaults to 'key' if not provided)
+            pin: Whether to pin this node role in the UI
+            instance_kind: Optional instance kind for this entity category (e.g. 'neuron', 'synapse', 'behavior'). This is used for further categorization and filtering of entities within the graph.
+            property_definitions: Property definitions
+            definition: What this category *means*: a predicate over classification claims (RFC 0007). Omitted means primitive — membership is whatever was asserted under this word
+            graph: The graph id this entity will belong to
+            backfill: Draw the evidence this word already admits. Claims made under it before this category existed are in the organization's evidence base; with this on they are projected into the graph now, instead of waiting for the next reproject. Off by default because the work is proportional to the graph's evidence and happens before this mutation returns.
 
-    Update an existing entity category in the graph
-
-    Args:
-        id: The ID of the definition to update
-        key: The label of the node participating in the event
-        description: Description of this node role
-        ontology_references: Ontology references for this event
-        color: Optional RGBA color for this node role (e.g. [255, 0, 0, 128])
-        image: Optional media store ID for an image representing this node role
-        label: Optional human-readable label for this node role (defaults to 'key' if not provided)
-        pin: Whether to pin this node role in the UI
-        instance_kind: Optional instance kind for this entity category (e.g. 'neuron', 'synapse', 'behavior'). This is used for further categorization and filtering of entities within the graph.
-        property_definitions: Property definitions
-        definition: New meaning for this category (RFC 0007). Omitted means unchanged; to make the category primitive again, use clearDefinition
-        clear_definition: Reset the category to primitive — membership becomes whatever was asserted under its word
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        EntityCategory
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    if key is not UNSET:
+        Returns:
+            EntityCategory
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
         _input["key"] = key
-    if description is not UNSET:
-        _input["description"] = description
-    if ontology_references is not UNSET:
+        if description is not UNSET:
+            _input["description"] = description
         _input["ontologyReferences"] = ontology_references
-    if color is not UNSET:
-        _input["color"] = color
-    if image is not UNSET:
-        _input["image"] = image
-    if label is not UNSET:
-        _input["label"] = label
-    if pin is not UNSET:
-        _input["pin"] = pin
-    if instance_kind is not UNSET:
-        _input["instanceKind"] = instance_kind
-    if property_definitions is not UNSET:
+        if color is not UNSET:
+            _input["color"] = color
+        if image is not UNSET:
+            _input["image"] = image
+        if label is not UNSET:
+            _input["label"] = label
+        if pin is not UNSET:
+            _input["pin"] = pin
+        if instance_kind is not UNSET:
+            _input["instanceKind"] = instance_kind
         _input["propertyDefinitions"] = property_definitions
-    if definition is not UNSET:
-        _input["definition"] = definition
-    _input["clearDefinition"] = clear_definition
-    variables["input"] = _input
-    return execute(UpdateEntityCategoryMutation, variables, rath=rath).update_entity_category
+        if definition is not UNSET:
+            _input["definition"] = definition
+        _input["graph"] = graph
+        _input["backfill"] = backfill
+        variables["input"] = _input
+        return self.execute(
+            CreateEntityCategoryMutation, variables
+        ).create_entity_category
 
+    async def aupdate_entity_category(
+        self,
+        id: IDCoercible,
+        clear_definition: bool,
+        key: str | None | UnsetType = UNSET,
+        description: str | None | UnsetType = UNSET,
+        ontology_references: (
+            Iterable[OntologyReferenceInput] | None | UnsetType
+        ) = UNSET,
+        color: Iterable[int] | None | UnsetType = UNSET,
+        image: str | None | UnsetType = UNSET,
+        label: str | None | UnsetType = UNSET,
+        pin: bool | None | UnsetType = UNSET,
+        instance_kind: str | None | UnsetType = UNSET,
+        property_definitions: (
+            Iterable[PropertyDefinitionInput] | None | UnsetType
+        ) = UNSET,
+        definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+    ) -> EntityCategory:
+        """UpdateEntityCategory
 
-async def adelete_entity_category(id: IDCoercible, rath: KraphRath | None = None) -> ID:
-    """DeleteEntityCategory
+        Update an existing entity category in the graph
 
-    Delete an entity category from the graph
+        Args:
+            id: The ID of the definition to update
+            key: The label of the node participating in the event
+            description: Description of this node role
+            ontology_references: Ontology references for this event
+            color: Optional RGBA color for this node role (e.g. [255, 0, 0, 128])
+            image: Optional media store ID for an image representing this node role
+            label: Optional human-readable label for this node role (defaults to 'key' if not provided)
+            pin: Whether to pin this node role in the UI
+            instance_kind: Optional instance kind for this entity category (e.g. 'neuron', 'synapse', 'behavior'). This is used for further categorization and filtering of entities within the graph.
+            property_definitions: Property definitions
+            definition: New meaning for this category (RFC 0007). Omitted means unchanged; to make the category primitive again, use clearDefinition
+            clear_definition: Reset the category to primitive — membership becomes whatever was asserted under its word
 
-    Args:
-        id: The ID of the structure category to delete
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
+        Returns:
+            EntityCategory
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        if key is not UNSET:
+            _input["key"] = key
+        if description is not UNSET:
+            _input["description"] = description
+        if ontology_references is not UNSET:
+            _input["ontologyReferences"] = ontology_references
+        if color is not UNSET:
+            _input["color"] = color
+        if image is not UNSET:
+            _input["image"] = image
+        if label is not UNSET:
+            _input["label"] = label
+        if pin is not UNSET:
+            _input["pin"] = pin
+        if instance_kind is not UNSET:
+            _input["instanceKind"] = instance_kind
+        if property_definitions is not UNSET:
+            _input["propertyDefinitions"] = property_definitions
+        if definition is not UNSET:
+            _input["definition"] = definition
+        _input["clearDefinition"] = clear_definition
+        variables["input"] = _input
+        return (
+            await self.aexecute(UpdateEntityCategoryMutation, variables)
+        ).update_entity_category
 
-    Returns:
-        ID
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    variables["input"] = _input
-    return (
-        await aexecute(DeleteEntityCategoryMutation, variables, rath=rath)
-    ).delete_entity_category
+    def update_entity_category(
+        self,
+        id: IDCoercible,
+        clear_definition: bool,
+        key: str | None | UnsetType = UNSET,
+        description: str | None | UnsetType = UNSET,
+        ontology_references: (
+            Iterable[OntologyReferenceInput] | None | UnsetType
+        ) = UNSET,
+        color: Iterable[int] | None | UnsetType = UNSET,
+        image: str | None | UnsetType = UNSET,
+        label: str | None | UnsetType = UNSET,
+        pin: bool | None | UnsetType = UNSET,
+        instance_kind: str | None | UnsetType = UNSET,
+        property_definitions: (
+            Iterable[PropertyDefinitionInput] | None | UnsetType
+        ) = UNSET,
+        definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+    ) -> EntityCategory:
+        """UpdateEntityCategory
 
+        Update an existing entity category in the graph
 
-def delete_entity_category(id: IDCoercible, rath: KraphRath | None = None) -> ID:
-    """DeleteEntityCategory
+        Args:
+            id: The ID of the definition to update
+            key: The label of the node participating in the event
+            description: Description of this node role
+            ontology_references: Ontology references for this event
+            color: Optional RGBA color for this node role (e.g. [255, 0, 0, 128])
+            image: Optional media store ID for an image representing this node role
+            label: Optional human-readable label for this node role (defaults to 'key' if not provided)
+            pin: Whether to pin this node role in the UI
+            instance_kind: Optional instance kind for this entity category (e.g. 'neuron', 'synapse', 'behavior'). This is used for further categorization and filtering of entities within the graph.
+            property_definitions: Property definitions
+            definition: New meaning for this category (RFC 0007). Omitted means unchanged; to make the category primitive again, use clearDefinition
+            clear_definition: Reset the category to primitive — membership becomes whatever was asserted under its word
 
-    Delete an entity category from the graph
+        Returns:
+            EntityCategory
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        if key is not UNSET:
+            _input["key"] = key
+        if description is not UNSET:
+            _input["description"] = description
+        if ontology_references is not UNSET:
+            _input["ontologyReferences"] = ontology_references
+        if color is not UNSET:
+            _input["color"] = color
+        if image is not UNSET:
+            _input["image"] = image
+        if label is not UNSET:
+            _input["label"] = label
+        if pin is not UNSET:
+            _input["pin"] = pin
+        if instance_kind is not UNSET:
+            _input["instanceKind"] = instance_kind
+        if property_definitions is not UNSET:
+            _input["propertyDefinitions"] = property_definitions
+        if definition is not UNSET:
+            _input["definition"] = definition
+        _input["clearDefinition"] = clear_definition
+        variables["input"] = _input
+        return self.execute(
+            UpdateEntityCategoryMutation, variables
+        ).update_entity_category
 
-    Args:
-        id: The ID of the structure category to delete
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
+    async def adelete_entity_category(self, id: IDCoercible) -> ID:
+        """DeleteEntityCategory
 
-    Returns:
-        ID
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    variables["input"] = _input
-    return execute(DeleteEntityCategoryMutation, variables, rath=rath).delete_entity_category
+        Delete an entity category from the graph
 
+        Args:
+            id: The ID of the structure category to delete
 
-async def acreate_relation_category(
-    key: str,
-    ontology_references: Iterable[OntologyReferenceInput],
-    property_definitions: Iterable[PropertyDefinitionInput],
-    graph: str,
-    backfill: bool,
-    description: str | None | UnsetType = UNSET,
-    color: Iterable[int] | None | UnsetType = UNSET,
-    image: str | None | UnsetType = UNSET,
-    label: str | None | UnsetType = UNSET,
-    pin: bool | None | UnsetType = UNSET,
-    instance_kind: str | None | UnsetType = UNSET,
-    definition: CategoryDefinitionInput | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> RelationCategory:
-    """CreateRelationCategory
+        Returns:
+            ID
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        variables["input"] = _input
+        return (
+            await self.aexecute(DeleteEntityCategoryMutation, variables)
+        ).delete_entity_category
 
-    Create a new relation category in the graph
+    def delete_entity_category(self, id: IDCoercible) -> ID:
+        """DeleteEntityCategory
 
-    Args:
-        key: The label of the node participating in the event
-        description: Description of this node role
-        ontology_references: Ontology references for this event
-        color: Optional RGBA color for this node role (e.g. [255, 0, 0, 128])
-        image: Optional media store ID for an image representing this node role
-        label: Optional human-readable label for this node role (defaults to 'key' if not provided)
-        pin: Whether to pin this node role in the UI
-        instance_kind: Optional instance kind for this entity category (e.g. 'neuron', 'synapse', 'behavior'). This is used for further categorization and filtering of entities within the graph.
-        property_definitions: Property definitions
-        definition: What this category *means*: a predicate over classification claims (RFC 0007). Omitted means primitive — membership is whatever was asserted under this word
-        graph: The graph id this entity will belong to
-        backfill: Draw the evidence this word already admits. Claims made under it before this category existed are in the organization's evidence base; with this on they are projected into the graph now, instead of waiting for the next reproject. Off by default because the work is proportional to the graph's evidence and happens before this mutation returns.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
+        Delete an entity category from the graph
 
-    Returns:
-        RelationCategory
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["key"] = key
-    if description is not UNSET:
-        _input["description"] = description
-    _input["ontologyReferences"] = ontology_references
-    if color is not UNSET:
-        _input["color"] = color
-    if image is not UNSET:
-        _input["image"] = image
-    if label is not UNSET:
-        _input["label"] = label
-    if pin is not UNSET:
-        _input["pin"] = pin
-    if instance_kind is not UNSET:
-        _input["instanceKind"] = instance_kind
-    _input["propertyDefinitions"] = property_definitions
-    if definition is not UNSET:
-        _input["definition"] = definition
-    _input["graph"] = graph
-    _input["backfill"] = backfill
-    variables["input"] = _input
-    return (
-        await aexecute(CreateRelationCategoryMutation, variables, rath=rath)
-    ).create_relation_category
+        Args:
+            id: The ID of the structure category to delete
 
+        Returns:
+            ID
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        variables["input"] = _input
+        return self.execute(
+            DeleteEntityCategoryMutation, variables
+        ).delete_entity_category
 
-def create_relation_category(
-    key: str,
-    ontology_references: Iterable[OntologyReferenceInput],
-    property_definitions: Iterable[PropertyDefinitionInput],
-    graph: str,
-    backfill: bool,
-    description: str | None | UnsetType = UNSET,
-    color: Iterable[int] | None | UnsetType = UNSET,
-    image: str | None | UnsetType = UNSET,
-    label: str | None | UnsetType = UNSET,
-    pin: bool | None | UnsetType = UNSET,
-    instance_kind: str | None | UnsetType = UNSET,
-    definition: CategoryDefinitionInput | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> RelationCategory:
-    """CreateRelationCategory
+    async def acreate_relation_category(
+        self,
+        key: str,
+        ontology_references: Iterable[OntologyReferenceInput],
+        property_definitions: Iterable[PropertyDefinitionInput],
+        graph: str,
+        backfill: bool,
+        description: str | None | UnsetType = UNSET,
+        color: Iterable[int] | None | UnsetType = UNSET,
+        image: str | None | UnsetType = UNSET,
+        label: str | None | UnsetType = UNSET,
+        pin: bool | None | UnsetType = UNSET,
+        instance_kind: str | None | UnsetType = UNSET,
+        definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+    ) -> RelationCategory:
+        """CreateRelationCategory
 
-    Create a new relation category in the graph
+        Create a new relation category in the graph
 
-    Args:
-        key: The label of the node participating in the event
-        description: Description of this node role
-        ontology_references: Ontology references for this event
-        color: Optional RGBA color for this node role (e.g. [255, 0, 0, 128])
-        image: Optional media store ID for an image representing this node role
-        label: Optional human-readable label for this node role (defaults to 'key' if not provided)
-        pin: Whether to pin this node role in the UI
-        instance_kind: Optional instance kind for this entity category (e.g. 'neuron', 'synapse', 'behavior'). This is used for further categorization and filtering of entities within the graph.
-        property_definitions: Property definitions
-        definition: What this category *means*: a predicate over classification claims (RFC 0007). Omitted means primitive — membership is whatever was asserted under this word
-        graph: The graph id this entity will belong to
-        backfill: Draw the evidence this word already admits. Claims made under it before this category existed are in the organization's evidence base; with this on they are projected into the graph now, instead of waiting for the next reproject. Off by default because the work is proportional to the graph's evidence and happens before this mutation returns.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
+        Args:
+            key: The label of the node participating in the event
+            description: Description of this node role
+            ontology_references: Ontology references for this event
+            color: Optional RGBA color for this node role (e.g. [255, 0, 0, 128])
+            image: Optional media store ID for an image representing this node role
+            label: Optional human-readable label for this node role (defaults to 'key' if not provided)
+            pin: Whether to pin this node role in the UI
+            instance_kind: Optional instance kind for this entity category (e.g. 'neuron', 'synapse', 'behavior'). This is used for further categorization and filtering of entities within the graph.
+            property_definitions: Property definitions
+            definition: What this category *means*: a predicate over classification claims (RFC 0007). Omitted means primitive — membership is whatever was asserted under this word
+            graph: The graph id this entity will belong to
+            backfill: Draw the evidence this word already admits. Claims made under it before this category existed are in the organization's evidence base; with this on they are projected into the graph now, instead of waiting for the next reproject. Off by default because the work is proportional to the graph's evidence and happens before this mutation returns.
 
-    Returns:
-        RelationCategory
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["key"] = key
-    if description is not UNSET:
-        _input["description"] = description
-    _input["ontologyReferences"] = ontology_references
-    if color is not UNSET:
-        _input["color"] = color
-    if image is not UNSET:
-        _input["image"] = image
-    if label is not UNSET:
-        _input["label"] = label
-    if pin is not UNSET:
-        _input["pin"] = pin
-    if instance_kind is not UNSET:
-        _input["instanceKind"] = instance_kind
-    _input["propertyDefinitions"] = property_definitions
-    if definition is not UNSET:
-        _input["definition"] = definition
-    _input["graph"] = graph
-    _input["backfill"] = backfill
-    variables["input"] = _input
-    return execute(CreateRelationCategoryMutation, variables, rath=rath).create_relation_category
-
-
-async def aupdate_relation_category(
-    id: str,
-    clear_definition: bool,
-    key: str | None | UnsetType = UNSET,
-    description: str | None | UnsetType = UNSET,
-    ontology_references: Iterable[OntologyReferenceInput] | None | UnsetType = UNSET,
-    color: Iterable[int] | None | UnsetType = UNSET,
-    image: str | None | UnsetType = UNSET,
-    label: str | None | UnsetType = UNSET,
-    pin: bool | None | UnsetType = UNSET,
-    definition: CategoryDefinitionInput | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> RelationCategory:
-    """UpdateRelationCategory
-
-    Update an existing relation category in the graph
-
-    Args:
-        id: The ID of the relation category to update
-        key: The label of the node participating in the event
-        description: Description of this node role
-        ontology_references: Ontology references for this event
-        color: Optional RGBA color for this node role (e.g. [255, 0, 0, 128])
-        image: Optional media store ID for an image representing this node role
-        label: Optional human-readable label for this node role (defaults to 'key' if not provided)
-        pin: Whether to pin this node role in the UI
-        definition: New rule for this category (RFC 0009). Omitted means unchanged; to make it primitive again, use clearDefinition
-        clear_definition: Reset the category to primitive — any claim naming its word counts, standings organization grain
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        RelationCategory
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    if key is not UNSET:
+        Returns:
+            RelationCategory
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
         _input["key"] = key
-    if description is not UNSET:
-        _input["description"] = description
-    if ontology_references is not UNSET:
+        if description is not UNSET:
+            _input["description"] = description
         _input["ontologyReferences"] = ontology_references
-    if color is not UNSET:
-        _input["color"] = color
-    if image is not UNSET:
-        _input["image"] = image
-    if label is not UNSET:
-        _input["label"] = label
-    if pin is not UNSET:
-        _input["pin"] = pin
-    if definition is not UNSET:
-        _input["definition"] = definition
-    _input["clearDefinition"] = clear_definition
-    variables["input"] = _input
-    return (
-        await aexecute(UpdateRelationCategoryMutation, variables, rath=rath)
-    ).update_relation_category
+        if color is not UNSET:
+            _input["color"] = color
+        if image is not UNSET:
+            _input["image"] = image
+        if label is not UNSET:
+            _input["label"] = label
+        if pin is not UNSET:
+            _input["pin"] = pin
+        if instance_kind is not UNSET:
+            _input["instanceKind"] = instance_kind
+        _input["propertyDefinitions"] = property_definitions
+        if definition is not UNSET:
+            _input["definition"] = definition
+        _input["graph"] = graph
+        _input["backfill"] = backfill
+        variables["input"] = _input
+        return (
+            await self.aexecute(CreateRelationCategoryMutation, variables)
+        ).create_relation_category
 
+    def create_relation_category(
+        self,
+        key: str,
+        ontology_references: Iterable[OntologyReferenceInput],
+        property_definitions: Iterable[PropertyDefinitionInput],
+        graph: str,
+        backfill: bool,
+        description: str | None | UnsetType = UNSET,
+        color: Iterable[int] | None | UnsetType = UNSET,
+        image: str | None | UnsetType = UNSET,
+        label: str | None | UnsetType = UNSET,
+        pin: bool | None | UnsetType = UNSET,
+        instance_kind: str | None | UnsetType = UNSET,
+        definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+    ) -> RelationCategory:
+        """CreateRelationCategory
 
-def update_relation_category(
-    id: str,
-    clear_definition: bool,
-    key: str | None | UnsetType = UNSET,
-    description: str | None | UnsetType = UNSET,
-    ontology_references: Iterable[OntologyReferenceInput] | None | UnsetType = UNSET,
-    color: Iterable[int] | None | UnsetType = UNSET,
-    image: str | None | UnsetType = UNSET,
-    label: str | None | UnsetType = UNSET,
-    pin: bool | None | UnsetType = UNSET,
-    definition: CategoryDefinitionInput | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> RelationCategory:
-    """UpdateRelationCategory
+        Create a new relation category in the graph
 
-    Update an existing relation category in the graph
+        Args:
+            key: The label of the node participating in the event
+            description: Description of this node role
+            ontology_references: Ontology references for this event
+            color: Optional RGBA color for this node role (e.g. [255, 0, 0, 128])
+            image: Optional media store ID for an image representing this node role
+            label: Optional human-readable label for this node role (defaults to 'key' if not provided)
+            pin: Whether to pin this node role in the UI
+            instance_kind: Optional instance kind for this entity category (e.g. 'neuron', 'synapse', 'behavior'). This is used for further categorization and filtering of entities within the graph.
+            property_definitions: Property definitions
+            definition: What this category *means*: a predicate over classification claims (RFC 0007). Omitted means primitive — membership is whatever was asserted under this word
+            graph: The graph id this entity will belong to
+            backfill: Draw the evidence this word already admits. Claims made under it before this category existed are in the organization's evidence base; with this on they are projected into the graph now, instead of waiting for the next reproject. Off by default because the work is proportional to the graph's evidence and happens before this mutation returns.
 
-    Args:
-        id: The ID of the relation category to update
-        key: The label of the node participating in the event
-        description: Description of this node role
-        ontology_references: Ontology references for this event
-        color: Optional RGBA color for this node role (e.g. [255, 0, 0, 128])
-        image: Optional media store ID for an image representing this node role
-        label: Optional human-readable label for this node role (defaults to 'key' if not provided)
-        pin: Whether to pin this node role in the UI
-        definition: New rule for this category (RFC 0009). Omitted means unchanged; to make it primitive again, use clearDefinition
-        clear_definition: Reset the category to primitive — any claim naming its word counts, standings organization grain
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        RelationCategory
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    if key is not UNSET:
+        Returns:
+            RelationCategory
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
         _input["key"] = key
-    if description is not UNSET:
-        _input["description"] = description
-    if ontology_references is not UNSET:
+        if description is not UNSET:
+            _input["description"] = description
         _input["ontologyReferences"] = ontology_references
-    if color is not UNSET:
-        _input["color"] = color
-    if image is not UNSET:
-        _input["image"] = image
-    if label is not UNSET:
-        _input["label"] = label
-    if pin is not UNSET:
-        _input["pin"] = pin
-    if definition is not UNSET:
-        _input["definition"] = definition
-    _input["clearDefinition"] = clear_definition
-    variables["input"] = _input
-    return execute(UpdateRelationCategoryMutation, variables, rath=rath).update_relation_category
+        if color is not UNSET:
+            _input["color"] = color
+        if image is not UNSET:
+            _input["image"] = image
+        if label is not UNSET:
+            _input["label"] = label
+        if pin is not UNSET:
+            _input["pin"] = pin
+        if instance_kind is not UNSET:
+            _input["instanceKind"] = instance_kind
+        _input["propertyDefinitions"] = property_definitions
+        if definition is not UNSET:
+            _input["definition"] = definition
+        _input["graph"] = graph
+        _input["backfill"] = backfill
+        variables["input"] = _input
+        return self.execute(
+            CreateRelationCategoryMutation, variables
+        ).create_relation_category
 
+    async def aupdate_relation_category(
+        self,
+        id: str,
+        clear_definition: bool,
+        key: str | None | UnsetType = UNSET,
+        description: str | None | UnsetType = UNSET,
+        ontology_references: (
+            Iterable[OntologyReferenceInput] | None | UnsetType
+        ) = UNSET,
+        color: Iterable[int] | None | UnsetType = UNSET,
+        image: str | None | UnsetType = UNSET,
+        label: str | None | UnsetType = UNSET,
+        pin: bool | None | UnsetType = UNSET,
+        definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+    ) -> RelationCategory:
+        """UpdateRelationCategory
 
-async def adelete_relation_category(id: str, rath: KraphRath | None = None) -> ID:
-    """DeleteRelationCategory
+        Update an existing relation category in the graph
 
-    Delete a relation category from the graph
+        Args:
+            id: The ID of the relation category to update
+            key: The label of the node participating in the event
+            description: Description of this node role
+            ontology_references: Ontology references for this event
+            color: Optional RGBA color for this node role (e.g. [255, 0, 0, 128])
+            image: Optional media store ID for an image representing this node role
+            label: Optional human-readable label for this node role (defaults to 'key' if not provided)
+            pin: Whether to pin this node role in the UI
+            definition: New rule for this category (RFC 0009). Omitted means unchanged; to make it primitive again, use clearDefinition
+            clear_definition: Reset the category to primitive — any claim naming its word counts, standings organization grain
 
-    Args:
-        id: The ID of the relation category to delete
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
+        Returns:
+            RelationCategory
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        if key is not UNSET:
+            _input["key"] = key
+        if description is not UNSET:
+            _input["description"] = description
+        if ontology_references is not UNSET:
+            _input["ontologyReferences"] = ontology_references
+        if color is not UNSET:
+            _input["color"] = color
+        if image is not UNSET:
+            _input["image"] = image
+        if label is not UNSET:
+            _input["label"] = label
+        if pin is not UNSET:
+            _input["pin"] = pin
+        if definition is not UNSET:
+            _input["definition"] = definition
+        _input["clearDefinition"] = clear_definition
+        variables["input"] = _input
+        return (
+            await self.aexecute(UpdateRelationCategoryMutation, variables)
+        ).update_relation_category
 
-    Returns:
-        ID
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    variables["input"] = _input
-    return (
-        await aexecute(DeleteRelationCategoryMutation, variables, rath=rath)
-    ).delete_relation_category
+    def update_relation_category(
+        self,
+        id: str,
+        clear_definition: bool,
+        key: str | None | UnsetType = UNSET,
+        description: str | None | UnsetType = UNSET,
+        ontology_references: (
+            Iterable[OntologyReferenceInput] | None | UnsetType
+        ) = UNSET,
+        color: Iterable[int] | None | UnsetType = UNSET,
+        image: str | None | UnsetType = UNSET,
+        label: str | None | UnsetType = UNSET,
+        pin: bool | None | UnsetType = UNSET,
+        definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+    ) -> RelationCategory:
+        """UpdateRelationCategory
 
+        Update an existing relation category in the graph
 
-def delete_relation_category(id: str, rath: KraphRath | None = None) -> ID:
-    """DeleteRelationCategory
+        Args:
+            id: The ID of the relation category to update
+            key: The label of the node participating in the event
+            description: Description of this node role
+            ontology_references: Ontology references for this event
+            color: Optional RGBA color for this node role (e.g. [255, 0, 0, 128])
+            image: Optional media store ID for an image representing this node role
+            label: Optional human-readable label for this node role (defaults to 'key' if not provided)
+            pin: Whether to pin this node role in the UI
+            definition: New rule for this category (RFC 0009). Omitted means unchanged; to make it primitive again, use clearDefinition
+            clear_definition: Reset the category to primitive — any claim naming its word counts, standings organization grain
 
-    Delete a relation category from the graph
+        Returns:
+            RelationCategory
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        if key is not UNSET:
+            _input["key"] = key
+        if description is not UNSET:
+            _input["description"] = description
+        if ontology_references is not UNSET:
+            _input["ontologyReferences"] = ontology_references
+        if color is not UNSET:
+            _input["color"] = color
+        if image is not UNSET:
+            _input["image"] = image
+        if label is not UNSET:
+            _input["label"] = label
+        if pin is not UNSET:
+            _input["pin"] = pin
+        if definition is not UNSET:
+            _input["definition"] = definition
+        _input["clearDefinition"] = clear_definition
+        variables["input"] = _input
+        return self.execute(
+            UpdateRelationCategoryMutation, variables
+        ).update_relation_category
 
-    Args:
-        id: The ID of the relation category to delete
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
+    async def adelete_relation_category(self, id: str) -> ID:
+        """DeleteRelationCategory
 
-    Returns:
-        ID
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    variables["input"] = _input
-    return execute(DeleteRelationCategoryMutation, variables, rath=rath).delete_relation_category
+        Delete a relation category from the graph
 
+        Args:
+            id: The ID of the relation category to delete
 
-async def acreate_measurement_category(
-    key: str,
-    ontology_references: Iterable[OntologyReferenceInput],
-    source: StructureDescriptorInput,
-    target: EntityDescriptorInput,
-    cardinality: Cardinality,
-    properties: Iterable[PropertyDefinitionInput],
-    graph: str,
-    description: str | None | UnsetType = UNSET,
-    color: Iterable[int] | None | UnsetType = UNSET,
-    image: str | None | UnsetType = UNSET,
-    label: str | None | UnsetType = UNSET,
-    pin: bool | None | UnsetType = UNSET,
-    definition: CategoryDefinitionInput | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> MeasurementCategory:
-    """CreateMeasurementCategory
+        Returns:
+            ID
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        variables["input"] = _input
+        return (
+            await self.aexecute(DeleteRelationCategoryMutation, variables)
+        ).delete_relation_category
 
-    Create a new measurement category in the graph
+    def delete_relation_category(self, id: str) -> ID:
+        """DeleteRelationCategory
 
-    Args:
-        key: Relation type name/key
-        description: Description of this node role
-        ontology_references: Ontology references for this event
-        color: Optional RGBA color for this node role (e.g. [255, 0, 0, 128])
-        image: Optional media store ID for an image representing this node role
-        label: Optional human-readable label for this node role (defaults to 'key' if not provided)
-        pin: Whether to pin this node role in the UI
-        source: Source entity type(s)
-        target: Target entity type(s)
-        cardinality: Relation cardinality
-        properties: Derived property definitions
-        definition: This measurement category's complete rule (RFC 0012): which measurement claims count and whose standings fold. Omitted means primitive
-        graph: The graph id this measurement category will belong to
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
+        Delete a relation category from the graph
 
-    Returns:
-        MeasurementCategory
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["key"] = key
-    if description is not UNSET:
-        _input["description"] = description
-    _input["ontologyReferences"] = ontology_references
-    if color is not UNSET:
-        _input["color"] = color
-    if image is not UNSET:
-        _input["image"] = image
-    if label is not UNSET:
-        _input["label"] = label
-    if pin is not UNSET:
-        _input["pin"] = pin
-    _input["source"] = source
-    _input["target"] = target
-    _input["cardinality"] = cardinality
-    _input["properties"] = properties
-    if definition is not UNSET:
-        _input["definition"] = definition
-    _input["graph"] = graph
-    variables["input"] = _input
-    return (
-        await aexecute(CreateMeasurementCategoryMutation, variables, rath=rath)
-    ).create_measurement_category
+        Args:
+            id: The ID of the relation category to delete
 
+        Returns:
+            ID
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        variables["input"] = _input
+        return self.execute(
+            DeleteRelationCategoryMutation, variables
+        ).delete_relation_category
 
-def create_measurement_category(
-    key: str,
-    ontology_references: Iterable[OntologyReferenceInput],
-    source: StructureDescriptorInput,
-    target: EntityDescriptorInput,
-    cardinality: Cardinality,
-    properties: Iterable[PropertyDefinitionInput],
-    graph: str,
-    description: str | None | UnsetType = UNSET,
-    color: Iterable[int] | None | UnsetType = UNSET,
-    image: str | None | UnsetType = UNSET,
-    label: str | None | UnsetType = UNSET,
-    pin: bool | None | UnsetType = UNSET,
-    definition: CategoryDefinitionInput | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> MeasurementCategory:
-    """CreateMeasurementCategory
+    async def acreate_measurement_category(
+        self,
+        key: str,
+        ontology_references: Iterable[OntologyReferenceInput],
+        source: StructureDescriptorInput,
+        target: EntityDescriptorInput,
+        cardinality: Cardinality,
+        properties: Iterable[PropertyDefinitionInput],
+        graph: str,
+        description: str | None | UnsetType = UNSET,
+        color: Iterable[int] | None | UnsetType = UNSET,
+        image: str | None | UnsetType = UNSET,
+        label: str | None | UnsetType = UNSET,
+        pin: bool | None | UnsetType = UNSET,
+        definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+    ) -> MeasurementCategory:
+        """CreateMeasurementCategory
 
-    Create a new measurement category in the graph
+        Create a new measurement category in the graph
 
-    Args:
-        key: Relation type name/key
-        description: Description of this node role
-        ontology_references: Ontology references for this event
-        color: Optional RGBA color for this node role (e.g. [255, 0, 0, 128])
-        image: Optional media store ID for an image representing this node role
-        label: Optional human-readable label for this node role (defaults to 'key' if not provided)
-        pin: Whether to pin this node role in the UI
-        source: Source entity type(s)
-        target: Target entity type(s)
-        cardinality: Relation cardinality
-        properties: Derived property definitions
-        definition: This measurement category's complete rule (RFC 0012): which measurement claims count and whose standings fold. Omitted means primitive
-        graph: The graph id this measurement category will belong to
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
+        Args:
+            key: Relation type name/key
+            description: Description of this node role
+            ontology_references: Ontology references for this event
+            color: Optional RGBA color for this node role (e.g. [255, 0, 0, 128])
+            image: Optional media store ID for an image representing this node role
+            label: Optional human-readable label for this node role (defaults to 'key' if not provided)
+            pin: Whether to pin this node role in the UI
+            source: Source entity type(s)
+            target: Target entity type(s)
+            cardinality: Relation cardinality
+            properties: Derived property definitions
+            definition: This measurement category's complete rule (RFC 0012): which measurement claims count and whose standings fold. Omitted means primitive
+            graph: The graph id this measurement category will belong to
 
-    Returns:
-        MeasurementCategory
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["key"] = key
-    if description is not UNSET:
-        _input["description"] = description
-    _input["ontologyReferences"] = ontology_references
-    if color is not UNSET:
-        _input["color"] = color
-    if image is not UNSET:
-        _input["image"] = image
-    if label is not UNSET:
-        _input["label"] = label
-    if pin is not UNSET:
-        _input["pin"] = pin
-    _input["source"] = source
-    _input["target"] = target
-    _input["cardinality"] = cardinality
-    _input["properties"] = properties
-    if definition is not UNSET:
-        _input["definition"] = definition
-    _input["graph"] = graph
-    variables["input"] = _input
-    return execute(
-        CreateMeasurementCategoryMutation, variables, rath=rath
-    ).create_measurement_category
-
-
-async def aupdate_measurement_category(
-    id: str,
-    clear_definition: bool,
-    key: str | None | UnsetType = UNSET,
-    description: str | None | UnsetType = UNSET,
-    ontology_references: Iterable[OntologyReferenceInput] | None | UnsetType = UNSET,
-    color: Iterable[int] | None | UnsetType = UNSET,
-    image: str | None | UnsetType = UNSET,
-    label: str | None | UnsetType = UNSET,
-    pin: bool | None | UnsetType = UNSET,
-    definition: CategoryDefinitionInput | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> MeasurementCategory:
-    """UpdateMeasurementCategory
-
-    Update an existing measurement category in the graph
-
-    Args:
-        id: The ID of the measurement category to update
-        key: The label of the node participating in the event
-        description: Description of this node role
-        ontology_references: Ontology references for this event
-        color: Optional RGBA color for this node role (e.g. [255, 0, 0, 128])
-        image: Optional media store ID for an image representing this node role
-        label: Optional human-readable label for this node role (defaults to 'key' if not provided)
-        pin: Whether to pin this node role in the UI
-        definition: New rule for this category (RFC 0012). Omitted means unchanged; to make it primitive again, use clearDefinition
-        clear_definition: Reset the category to primitive — any claim naming its word counts, standings organization grain
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        MeasurementCategory
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    if key is not UNSET:
+        Returns:
+            MeasurementCategory
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
         _input["key"] = key
-    if description is not UNSET:
-        _input["description"] = description
-    if ontology_references is not UNSET:
+        if description is not UNSET:
+            _input["description"] = description
         _input["ontologyReferences"] = ontology_references
-    if color is not UNSET:
-        _input["color"] = color
-    if image is not UNSET:
-        _input["image"] = image
-    if label is not UNSET:
-        _input["label"] = label
-    if pin is not UNSET:
-        _input["pin"] = pin
-    if definition is not UNSET:
-        _input["definition"] = definition
-    _input["clearDefinition"] = clear_definition
-    variables["input"] = _input
-    return (
-        await aexecute(UpdateMeasurementCategoryMutation, variables, rath=rath)
-    ).update_measurement_category
+        if color is not UNSET:
+            _input["color"] = color
+        if image is not UNSET:
+            _input["image"] = image
+        if label is not UNSET:
+            _input["label"] = label
+        if pin is not UNSET:
+            _input["pin"] = pin
+        _input["source"] = source
+        _input["target"] = target
+        _input["cardinality"] = cardinality
+        _input["properties"] = properties
+        if definition is not UNSET:
+            _input["definition"] = definition
+        _input["graph"] = graph
+        variables["input"] = _input
+        return (
+            await self.aexecute(CreateMeasurementCategoryMutation, variables)
+        ).create_measurement_category
 
+    def create_measurement_category(
+        self,
+        key: str,
+        ontology_references: Iterable[OntologyReferenceInput],
+        source: StructureDescriptorInput,
+        target: EntityDescriptorInput,
+        cardinality: Cardinality,
+        properties: Iterable[PropertyDefinitionInput],
+        graph: str,
+        description: str | None | UnsetType = UNSET,
+        color: Iterable[int] | None | UnsetType = UNSET,
+        image: str | None | UnsetType = UNSET,
+        label: str | None | UnsetType = UNSET,
+        pin: bool | None | UnsetType = UNSET,
+        definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+    ) -> MeasurementCategory:
+        """CreateMeasurementCategory
 
-def update_measurement_category(
-    id: str,
-    clear_definition: bool,
-    key: str | None | UnsetType = UNSET,
-    description: str | None | UnsetType = UNSET,
-    ontology_references: Iterable[OntologyReferenceInput] | None | UnsetType = UNSET,
-    color: Iterable[int] | None | UnsetType = UNSET,
-    image: str | None | UnsetType = UNSET,
-    label: str | None | UnsetType = UNSET,
-    pin: bool | None | UnsetType = UNSET,
-    definition: CategoryDefinitionInput | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> MeasurementCategory:
-    """UpdateMeasurementCategory
+        Create a new measurement category in the graph
 
-    Update an existing measurement category in the graph
+        Args:
+            key: Relation type name/key
+            description: Description of this node role
+            ontology_references: Ontology references for this event
+            color: Optional RGBA color for this node role (e.g. [255, 0, 0, 128])
+            image: Optional media store ID for an image representing this node role
+            label: Optional human-readable label for this node role (defaults to 'key' if not provided)
+            pin: Whether to pin this node role in the UI
+            source: Source entity type(s)
+            target: Target entity type(s)
+            cardinality: Relation cardinality
+            properties: Derived property definitions
+            definition: This measurement category's complete rule (RFC 0012): which measurement claims count and whose standings fold. Omitted means primitive
+            graph: The graph id this measurement category will belong to
 
-    Args:
-        id: The ID of the measurement category to update
-        key: The label of the node participating in the event
-        description: Description of this node role
-        ontology_references: Ontology references for this event
-        color: Optional RGBA color for this node role (e.g. [255, 0, 0, 128])
-        image: Optional media store ID for an image representing this node role
-        label: Optional human-readable label for this node role (defaults to 'key' if not provided)
-        pin: Whether to pin this node role in the UI
-        definition: New rule for this category (RFC 0012). Omitted means unchanged; to make it primitive again, use clearDefinition
-        clear_definition: Reset the category to primitive — any claim naming its word counts, standings organization grain
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        MeasurementCategory
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    if key is not UNSET:
+        Returns:
+            MeasurementCategory
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
         _input["key"] = key
-    if description is not UNSET:
-        _input["description"] = description
-    if ontology_references is not UNSET:
+        if description is not UNSET:
+            _input["description"] = description
         _input["ontologyReferences"] = ontology_references
-    if color is not UNSET:
-        _input["color"] = color
-    if image is not UNSET:
-        _input["image"] = image
-    if label is not UNSET:
-        _input["label"] = label
-    if pin is not UNSET:
-        _input["pin"] = pin
-    if definition is not UNSET:
-        _input["definition"] = definition
-    _input["clearDefinition"] = clear_definition
-    variables["input"] = _input
-    return execute(
-        UpdateMeasurementCategoryMutation, variables, rath=rath
-    ).update_measurement_category
+        if color is not UNSET:
+            _input["color"] = color
+        if image is not UNSET:
+            _input["image"] = image
+        if label is not UNSET:
+            _input["label"] = label
+        if pin is not UNSET:
+            _input["pin"] = pin
+        _input["source"] = source
+        _input["target"] = target
+        _input["cardinality"] = cardinality
+        _input["properties"] = properties
+        if definition is not UNSET:
+            _input["definition"] = definition
+        _input["graph"] = graph
+        variables["input"] = _input
+        return self.execute(
+            CreateMeasurementCategoryMutation, variables
+        ).create_measurement_category
 
+    async def aupdate_measurement_category(
+        self,
+        id: str,
+        clear_definition: bool,
+        key: str | None | UnsetType = UNSET,
+        description: str | None | UnsetType = UNSET,
+        ontology_references: (
+            Iterable[OntologyReferenceInput] | None | UnsetType
+        ) = UNSET,
+        color: Iterable[int] | None | UnsetType = UNSET,
+        image: str | None | UnsetType = UNSET,
+        label: str | None | UnsetType = UNSET,
+        pin: bool | None | UnsetType = UNSET,
+        definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+    ) -> MeasurementCategory:
+        """UpdateMeasurementCategory
 
-async def adelete_measurement_category(id: str, rath: KraphRath | None = None) -> ID:
-    """DeleteMeasurementCategory
+        Update an existing measurement category in the graph
 
-    Delete a measurement category from the graph
+        Args:
+            id: The ID of the measurement category to update
+            key: The label of the node participating in the event
+            description: Description of this node role
+            ontology_references: Ontology references for this event
+            color: Optional RGBA color for this node role (e.g. [255, 0, 0, 128])
+            image: Optional media store ID for an image representing this node role
+            label: Optional human-readable label for this node role (defaults to 'key' if not provided)
+            pin: Whether to pin this node role in the UI
+            definition: New rule for this category (RFC 0012). Omitted means unchanged; to make it primitive again, use clearDefinition
+            clear_definition: Reset the category to primitive — any claim naming its word counts, standings organization grain
 
-    Args:
-        id: The ID of the measurement category to delete
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
+        Returns:
+            MeasurementCategory
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        if key is not UNSET:
+            _input["key"] = key
+        if description is not UNSET:
+            _input["description"] = description
+        if ontology_references is not UNSET:
+            _input["ontologyReferences"] = ontology_references
+        if color is not UNSET:
+            _input["color"] = color
+        if image is not UNSET:
+            _input["image"] = image
+        if label is not UNSET:
+            _input["label"] = label
+        if pin is not UNSET:
+            _input["pin"] = pin
+        if definition is not UNSET:
+            _input["definition"] = definition
+        _input["clearDefinition"] = clear_definition
+        variables["input"] = _input
+        return (
+            await self.aexecute(UpdateMeasurementCategoryMutation, variables)
+        ).update_measurement_category
 
-    Returns:
-        ID
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    variables["input"] = _input
-    return (
-        await aexecute(DeleteMeasurementCategoryMutation, variables, rath=rath)
-    ).delete_measurement_category
+    def update_measurement_category(
+        self,
+        id: str,
+        clear_definition: bool,
+        key: str | None | UnsetType = UNSET,
+        description: str | None | UnsetType = UNSET,
+        ontology_references: (
+            Iterable[OntologyReferenceInput] | None | UnsetType
+        ) = UNSET,
+        color: Iterable[int] | None | UnsetType = UNSET,
+        image: str | None | UnsetType = UNSET,
+        label: str | None | UnsetType = UNSET,
+        pin: bool | None | UnsetType = UNSET,
+        definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+    ) -> MeasurementCategory:
+        """UpdateMeasurementCategory
 
+        Update an existing measurement category in the graph
 
-def delete_measurement_category(id: str, rath: KraphRath | None = None) -> ID:
-    """DeleteMeasurementCategory
+        Args:
+            id: The ID of the measurement category to update
+            key: The label of the node participating in the event
+            description: Description of this node role
+            ontology_references: Ontology references for this event
+            color: Optional RGBA color for this node role (e.g. [255, 0, 0, 128])
+            image: Optional media store ID for an image representing this node role
+            label: Optional human-readable label for this node role (defaults to 'key' if not provided)
+            pin: Whether to pin this node role in the UI
+            definition: New rule for this category (RFC 0012). Omitted means unchanged; to make it primitive again, use clearDefinition
+            clear_definition: Reset the category to primitive — any claim naming its word counts, standings organization grain
 
-    Delete a measurement category from the graph
+        Returns:
+            MeasurementCategory
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        if key is not UNSET:
+            _input["key"] = key
+        if description is not UNSET:
+            _input["description"] = description
+        if ontology_references is not UNSET:
+            _input["ontologyReferences"] = ontology_references
+        if color is not UNSET:
+            _input["color"] = color
+        if image is not UNSET:
+            _input["image"] = image
+        if label is not UNSET:
+            _input["label"] = label
+        if pin is not UNSET:
+            _input["pin"] = pin
+        if definition is not UNSET:
+            _input["definition"] = definition
+        _input["clearDefinition"] = clear_definition
+        variables["input"] = _input
+        return self.execute(
+            UpdateMeasurementCategoryMutation, variables
+        ).update_measurement_category
 
-    Args:
-        id: The ID of the measurement category to delete
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
+    async def adelete_measurement_category(self, id: str) -> ID:
+        """DeleteMeasurementCategory
 
-    Returns:
-        ID
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    variables["input"] = _input
-    return execute(
-        DeleteMeasurementCategoryMutation, variables, rath=rath
-    ).delete_measurement_category
+        Delete a measurement category from the graph
 
+        Args:
+            id: The ID of the measurement category to delete
 
-async def acreate_structure_relation_category(
-    key: str,
-    ontology_references: Iterable[OntologyReferenceInput],
-    properties: Iterable[PropertyDefinitionInput],
-    source: StructureDescriptorInput,
-    target: StructureDescriptorInput,
-    cardinality: Cardinality,
-    graph: str,
-    description: str | None | UnsetType = UNSET,
-    color: Iterable[int] | None | UnsetType = UNSET,
-    image: str | None | UnsetType = UNSET,
-    label: str | None | UnsetType = UNSET,
-    pin: bool | None | UnsetType = UNSET,
-    definition: CategoryDefinitionInput | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> StructureRelationCategory:
-    """CreateStructureRelationCategory
+        Returns:
+            ID
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        variables["input"] = _input
+        return (
+            await self.aexecute(DeleteMeasurementCategoryMutation, variables)
+        ).delete_measurement_category
 
-    Create a new structure relation category in the graph
+    def delete_measurement_category(self, id: str) -> ID:
+        """DeleteMeasurementCategory
 
-    Args:
-        key: Relation type name/key
-        description: Description of this node role
-        ontology_references: Ontology references for this event
-        color: Optional RGBA color for this node role (e.g. [255, 0, 0, 128])
-        image: Optional media store ID for an image representing this node role
-        label: Optional human-readable label for this node role (defaults to 'key' if not provided)
-        pin: Whether to pin this node role in the UI
-        properties: Derived property definitions
-        source: Source entity type(s)
-        target: Target entity type(s)
-        cardinality: Relation cardinality
-        definition: This structure-relation category's complete rule (RFC 0012): which structure-relation claims count — by word, annotator, app and window — and whose standings fold. Omitted means primitive
-        graph: The graph id this entity will belong to
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
+        Delete a measurement category from the graph
 
-    Returns:
-        StructureRelationCategory
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["key"] = key
-    if description is not UNSET:
-        _input["description"] = description
-    _input["ontologyReferences"] = ontology_references
-    if color is not UNSET:
-        _input["color"] = color
-    if image is not UNSET:
-        _input["image"] = image
-    if label is not UNSET:
-        _input["label"] = label
-    if pin is not UNSET:
-        _input["pin"] = pin
-    _input["properties"] = properties
-    _input["source"] = source
-    _input["target"] = target
-    _input["cardinality"] = cardinality
-    if definition is not UNSET:
-        _input["definition"] = definition
-    _input["graph"] = graph
-    variables["input"] = _input
-    return (
-        await aexecute(CreateStructureRelationCategoryMutation, variables, rath=rath)
-    ).create_structure_relation_category
+        Args:
+            id: The ID of the measurement category to delete
 
+        Returns:
+            ID
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        variables["input"] = _input
+        return self.execute(
+            DeleteMeasurementCategoryMutation, variables
+        ).delete_measurement_category
 
-def create_structure_relation_category(
-    key: str,
-    ontology_references: Iterable[OntologyReferenceInput],
-    properties: Iterable[PropertyDefinitionInput],
-    source: StructureDescriptorInput,
-    target: StructureDescriptorInput,
-    cardinality: Cardinality,
-    graph: str,
-    description: str | None | UnsetType = UNSET,
-    color: Iterable[int] | None | UnsetType = UNSET,
-    image: str | None | UnsetType = UNSET,
-    label: str | None | UnsetType = UNSET,
-    pin: bool | None | UnsetType = UNSET,
-    definition: CategoryDefinitionInput | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> StructureRelationCategory:
-    """CreateStructureRelationCategory
+    async def acreate_structure_relation_category(
+        self,
+        key: str,
+        ontology_references: Iterable[OntologyReferenceInput],
+        properties: Iterable[PropertyDefinitionInput],
+        source: StructureDescriptorInput,
+        target: StructureDescriptorInput,
+        cardinality: Cardinality,
+        graph: str,
+        description: str | None | UnsetType = UNSET,
+        color: Iterable[int] | None | UnsetType = UNSET,
+        image: str | None | UnsetType = UNSET,
+        label: str | None | UnsetType = UNSET,
+        pin: bool | None | UnsetType = UNSET,
+        definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+    ) -> StructureRelationCategory:
+        """CreateStructureRelationCategory
 
-    Create a new structure relation category in the graph
+        Create a new structure relation category in the graph
 
-    Args:
-        key: Relation type name/key
-        description: Description of this node role
-        ontology_references: Ontology references for this event
-        color: Optional RGBA color for this node role (e.g. [255, 0, 0, 128])
-        image: Optional media store ID for an image representing this node role
-        label: Optional human-readable label for this node role (defaults to 'key' if not provided)
-        pin: Whether to pin this node role in the UI
-        properties: Derived property definitions
-        source: Source entity type(s)
-        target: Target entity type(s)
-        cardinality: Relation cardinality
-        definition: This structure-relation category's complete rule (RFC 0012): which structure-relation claims count — by word, annotator, app and window — and whose standings fold. Omitted means primitive
-        graph: The graph id this entity will belong to
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
+        Args:
+            key: Relation type name/key
+            description: Description of this node role
+            ontology_references: Ontology references for this event
+            color: Optional RGBA color for this node role (e.g. [255, 0, 0, 128])
+            image: Optional media store ID for an image representing this node role
+            label: Optional human-readable label for this node role (defaults to 'key' if not provided)
+            pin: Whether to pin this node role in the UI
+            properties: Derived property definitions
+            source: Source entity type(s)
+            target: Target entity type(s)
+            cardinality: Relation cardinality
+            definition: This structure-relation category's complete rule (RFC 0012): which structure-relation claims count — by word, annotator, app and window — and whose standings fold. Omitted means primitive
+            graph: The graph id this entity will belong to
 
-    Returns:
-        StructureRelationCategory
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["key"] = key
-    if description is not UNSET:
-        _input["description"] = description
-    _input["ontologyReferences"] = ontology_references
-    if color is not UNSET:
-        _input["color"] = color
-    if image is not UNSET:
-        _input["image"] = image
-    if label is not UNSET:
-        _input["label"] = label
-    if pin is not UNSET:
-        _input["pin"] = pin
-    _input["properties"] = properties
-    _input["source"] = source
-    _input["target"] = target
-    _input["cardinality"] = cardinality
-    if definition is not UNSET:
-        _input["definition"] = definition
-    _input["graph"] = graph
-    variables["input"] = _input
-    return execute(
-        CreateStructureRelationCategoryMutation, variables, rath=rath
-    ).create_structure_relation_category
-
-
-async def aupdate_structure_relation_category(
-    id: str,
-    clear_definition: bool,
-    key: str | None | UnsetType = UNSET,
-    description: str | None | UnsetType = UNSET,
-    ontology_references: Iterable[OntologyReferenceInput] | None | UnsetType = UNSET,
-    color: Iterable[int] | None | UnsetType = UNSET,
-    image: str | None | UnsetType = UNSET,
-    label: str | None | UnsetType = UNSET,
-    pin: bool | None | UnsetType = UNSET,
-    definition: CategoryDefinitionInput | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> StructureRelationCategory:
-    """UpdateStructureRelationCategory
-
-    Update an existing structure relation category in the graph
-
-    Args:
-        id: The ID of the structure relation category to update
-        key: The label of the node participating in the event
-        description: Description of this node role
-        ontology_references: Ontology references for this event
-        color: Optional RGBA color for this node role (e.g. [255, 0, 0, 128])
-        image: Optional media store ID for an image representing this node role
-        label: Optional human-readable label for this node role (defaults to 'key' if not provided)
-        pin: Whether to pin this node role in the UI
-        definition: New rule for this category (RFC 0012). Omitted means unchanged; to make it primitive again, use clearDefinition
-        clear_definition: Reset the category to primitive — any claim naming its word counts, standings organization grain
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        StructureRelationCategory
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    if key is not UNSET:
+        Returns:
+            StructureRelationCategory
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
         _input["key"] = key
-    if description is not UNSET:
-        _input["description"] = description
-    if ontology_references is not UNSET:
+        if description is not UNSET:
+            _input["description"] = description
         _input["ontologyReferences"] = ontology_references
-    if color is not UNSET:
-        _input["color"] = color
-    if image is not UNSET:
-        _input["image"] = image
-    if label is not UNSET:
-        _input["label"] = label
-    if pin is not UNSET:
-        _input["pin"] = pin
-    if definition is not UNSET:
-        _input["definition"] = definition
-    _input["clearDefinition"] = clear_definition
-    variables["input"] = _input
-    return (
-        await aexecute(UpdateStructureRelationCategoryMutation, variables, rath=rath)
-    ).update_structure_relation_category
+        if color is not UNSET:
+            _input["color"] = color
+        if image is not UNSET:
+            _input["image"] = image
+        if label is not UNSET:
+            _input["label"] = label
+        if pin is not UNSET:
+            _input["pin"] = pin
+        _input["properties"] = properties
+        _input["source"] = source
+        _input["target"] = target
+        _input["cardinality"] = cardinality
+        if definition is not UNSET:
+            _input["definition"] = definition
+        _input["graph"] = graph
+        variables["input"] = _input
+        return (
+            await self.aexecute(CreateStructureRelationCategoryMutation, variables)
+        ).create_structure_relation_category
 
+    def create_structure_relation_category(
+        self,
+        key: str,
+        ontology_references: Iterable[OntologyReferenceInput],
+        properties: Iterable[PropertyDefinitionInput],
+        source: StructureDescriptorInput,
+        target: StructureDescriptorInput,
+        cardinality: Cardinality,
+        graph: str,
+        description: str | None | UnsetType = UNSET,
+        color: Iterable[int] | None | UnsetType = UNSET,
+        image: str | None | UnsetType = UNSET,
+        label: str | None | UnsetType = UNSET,
+        pin: bool | None | UnsetType = UNSET,
+        definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+    ) -> StructureRelationCategory:
+        """CreateStructureRelationCategory
 
-def update_structure_relation_category(
-    id: str,
-    clear_definition: bool,
-    key: str | None | UnsetType = UNSET,
-    description: str | None | UnsetType = UNSET,
-    ontology_references: Iterable[OntologyReferenceInput] | None | UnsetType = UNSET,
-    color: Iterable[int] | None | UnsetType = UNSET,
-    image: str | None | UnsetType = UNSET,
-    label: str | None | UnsetType = UNSET,
-    pin: bool | None | UnsetType = UNSET,
-    definition: CategoryDefinitionInput | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> StructureRelationCategory:
-    """UpdateStructureRelationCategory
+        Create a new structure relation category in the graph
 
-    Update an existing structure relation category in the graph
+        Args:
+            key: Relation type name/key
+            description: Description of this node role
+            ontology_references: Ontology references for this event
+            color: Optional RGBA color for this node role (e.g. [255, 0, 0, 128])
+            image: Optional media store ID for an image representing this node role
+            label: Optional human-readable label for this node role (defaults to 'key' if not provided)
+            pin: Whether to pin this node role in the UI
+            properties: Derived property definitions
+            source: Source entity type(s)
+            target: Target entity type(s)
+            cardinality: Relation cardinality
+            definition: This structure-relation category's complete rule (RFC 0012): which structure-relation claims count — by word, annotator, app and window — and whose standings fold. Omitted means primitive
+            graph: The graph id this entity will belong to
 
-    Args:
-        id: The ID of the structure relation category to update
-        key: The label of the node participating in the event
-        description: Description of this node role
-        ontology_references: Ontology references for this event
-        color: Optional RGBA color for this node role (e.g. [255, 0, 0, 128])
-        image: Optional media store ID for an image representing this node role
-        label: Optional human-readable label for this node role (defaults to 'key' if not provided)
-        pin: Whether to pin this node role in the UI
-        definition: New rule for this category (RFC 0012). Omitted means unchanged; to make it primitive again, use clearDefinition
-        clear_definition: Reset the category to primitive — any claim naming its word counts, standings organization grain
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        StructureRelationCategory
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    if key is not UNSET:
+        Returns:
+            StructureRelationCategory
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
         _input["key"] = key
-    if description is not UNSET:
-        _input["description"] = description
-    if ontology_references is not UNSET:
+        if description is not UNSET:
+            _input["description"] = description
         _input["ontologyReferences"] = ontology_references
-    if color is not UNSET:
-        _input["color"] = color
-    if image is not UNSET:
-        _input["image"] = image
-    if label is not UNSET:
-        _input["label"] = label
-    if pin is not UNSET:
-        _input["pin"] = pin
-    if definition is not UNSET:
-        _input["definition"] = definition
-    _input["clearDefinition"] = clear_definition
-    variables["input"] = _input
-    return execute(
-        UpdateStructureRelationCategoryMutation, variables, rath=rath
-    ).update_structure_relation_category
+        if color is not UNSET:
+            _input["color"] = color
+        if image is not UNSET:
+            _input["image"] = image
+        if label is not UNSET:
+            _input["label"] = label
+        if pin is not UNSET:
+            _input["pin"] = pin
+        _input["properties"] = properties
+        _input["source"] = source
+        _input["target"] = target
+        _input["cardinality"] = cardinality
+        if definition is not UNSET:
+            _input["definition"] = definition
+        _input["graph"] = graph
+        variables["input"] = _input
+        return self.execute(
+            CreateStructureRelationCategoryMutation, variables
+        ).create_structure_relation_category
 
+    async def aupdate_structure_relation_category(
+        self,
+        id: str,
+        clear_definition: bool,
+        key: str | None | UnsetType = UNSET,
+        description: str | None | UnsetType = UNSET,
+        ontology_references: (
+            Iterable[OntologyReferenceInput] | None | UnsetType
+        ) = UNSET,
+        color: Iterable[int] | None | UnsetType = UNSET,
+        image: str | None | UnsetType = UNSET,
+        label: str | None | UnsetType = UNSET,
+        pin: bool | None | UnsetType = UNSET,
+        definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+    ) -> StructureRelationCategory:
+        """UpdateStructureRelationCategory
 
-async def adelete_structure_relation_category(id: str, rath: KraphRath | None = None) -> ID:
-    """DeleteStructureRelationCategory
+        Update an existing structure relation category in the graph
 
-    Delete a structure relation category from the graph
+        Args:
+            id: The ID of the structure relation category to update
+            key: The label of the node participating in the event
+            description: Description of this node role
+            ontology_references: Ontology references for this event
+            color: Optional RGBA color for this node role (e.g. [255, 0, 0, 128])
+            image: Optional media store ID for an image representing this node role
+            label: Optional human-readable label for this node role (defaults to 'key' if not provided)
+            pin: Whether to pin this node role in the UI
+            definition: New rule for this category (RFC 0012). Omitted means unchanged; to make it primitive again, use clearDefinition
+            clear_definition: Reset the category to primitive — any claim naming its word counts, standings organization grain
 
-    Args:
-        id: The ID of the structure relation category to delete
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
+        Returns:
+            StructureRelationCategory
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        if key is not UNSET:
+            _input["key"] = key
+        if description is not UNSET:
+            _input["description"] = description
+        if ontology_references is not UNSET:
+            _input["ontologyReferences"] = ontology_references
+        if color is not UNSET:
+            _input["color"] = color
+        if image is not UNSET:
+            _input["image"] = image
+        if label is not UNSET:
+            _input["label"] = label
+        if pin is not UNSET:
+            _input["pin"] = pin
+        if definition is not UNSET:
+            _input["definition"] = definition
+        _input["clearDefinition"] = clear_definition
+        variables["input"] = _input
+        return (
+            await self.aexecute(UpdateStructureRelationCategoryMutation, variables)
+        ).update_structure_relation_category
 
-    Returns:
-        ID
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    variables["input"] = _input
-    return (
-        await aexecute(DeleteStructureRelationCategoryMutation, variables, rath=rath)
-    ).delete_structure_relation_category
+    def update_structure_relation_category(
+        self,
+        id: str,
+        clear_definition: bool,
+        key: str | None | UnsetType = UNSET,
+        description: str | None | UnsetType = UNSET,
+        ontology_references: (
+            Iterable[OntologyReferenceInput] | None | UnsetType
+        ) = UNSET,
+        color: Iterable[int] | None | UnsetType = UNSET,
+        image: str | None | UnsetType = UNSET,
+        label: str | None | UnsetType = UNSET,
+        pin: bool | None | UnsetType = UNSET,
+        definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+    ) -> StructureRelationCategory:
+        """UpdateStructureRelationCategory
 
+        Update an existing structure relation category in the graph
 
-def delete_structure_relation_category(id: str, rath: KraphRath | None = None) -> ID:
-    """DeleteStructureRelationCategory
+        Args:
+            id: The ID of the structure relation category to update
+            key: The label of the node participating in the event
+            description: Description of this node role
+            ontology_references: Ontology references for this event
+            color: Optional RGBA color for this node role (e.g. [255, 0, 0, 128])
+            image: Optional media store ID for an image representing this node role
+            label: Optional human-readable label for this node role (defaults to 'key' if not provided)
+            pin: Whether to pin this node role in the UI
+            definition: New rule for this category (RFC 0012). Omitted means unchanged; to make it primitive again, use clearDefinition
+            clear_definition: Reset the category to primitive — any claim naming its word counts, standings organization grain
 
-    Delete a structure relation category from the graph
+        Returns:
+            StructureRelationCategory
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        if key is not UNSET:
+            _input["key"] = key
+        if description is not UNSET:
+            _input["description"] = description
+        if ontology_references is not UNSET:
+            _input["ontologyReferences"] = ontology_references
+        if color is not UNSET:
+            _input["color"] = color
+        if image is not UNSET:
+            _input["image"] = image
+        if label is not UNSET:
+            _input["label"] = label
+        if pin is not UNSET:
+            _input["pin"] = pin
+        if definition is not UNSET:
+            _input["definition"] = definition
+        _input["clearDefinition"] = clear_definition
+        variables["input"] = _input
+        return self.execute(
+            UpdateStructureRelationCategoryMutation, variables
+        ).update_structure_relation_category
 
-    Args:
-        id: The ID of the structure relation category to delete
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
+    async def adelete_structure_relation_category(self, id: str) -> ID:
+        """DeleteStructureRelationCategory
 
-    Returns:
-        ID
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    variables["input"] = _input
-    return execute(
-        DeleteStructureRelationCategoryMutation, variables, rath=rath
-    ).delete_structure_relation_category
+        Delete a structure relation category from the graph
 
+        Args:
+            id: The ID of the structure relation category to delete
 
-async def acreate_natural_event_category(
-    key: str,
-    ontology_references: Iterable[OntologyReferenceInput],
-    kind: EventKind,
-    inputs: Iterable[EventRoleInput],
-    outputs: Iterable[EventRoleInput],
-    properties: Iterable[PropertyDefinitionInput],
-    graph: str,
-    backfill: bool,
-    description: str | None | UnsetType = UNSET,
-    color: Iterable[int] | None | UnsetType = UNSET,
-    image: str | None | UnsetType = UNSET,
-    label: str | None | UnsetType = UNSET,
-    pin: bool | None | UnsetType = UNSET,
-    definition: CategoryDefinitionInput | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> NaturalEventCategory:
-    """CreateNaturalEventCategory
+        Returns:
+            ID
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        variables["input"] = _input
+        return (
+            await self.aexecute(DeleteStructureRelationCategoryMutation, variables)
+        ).delete_structure_relation_category
 
-    Create a new natural event category in the graph
+    def delete_structure_relation_category(self, id: str) -> ID:
+        """DeleteStructureRelationCategory
 
-    Args:
-        key: The label of the node participating in the event
-        description: Description of this node role
-        ontology_references: Ontology references for this event
-        color: Optional RGBA color for this node role (e.g. [255, 0, 0, 128])
-        image: Optional media store ID for an image representing this node role
-        label: Optional human-readable label for this node role (defaults to 'key' if not provided)
-        pin: Whether to pin this node role in the UI
-        kind: Whether the event arises in the system itself (INTRINSIC, e.g. mitosis) or is applied from outside (EXTRINSIC, e.g. a protocol step)
-        inputs: Input node roles
-        outputs: Output node roles
-        properties: Property definitions
-        definition: This event category's complete rule (RFC 0009): which classification claims admit an event, whose existence standings count, and whose participation claims draw its edges. Omitted means primitive
-        graph: The graph id this event will belong to
-        backfill: Draw the evidence this word already admits. Claims made under it before this category existed are in the organization's evidence base; with this on they are projected into the graph now, instead of waiting for the next reproject. Off by default because the work is proportional to the graph's evidence and happens before this mutation returns.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
+        Delete a structure relation category from the graph
 
-    Returns:
-        NaturalEventCategory
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["key"] = key
-    if description is not UNSET:
-        _input["description"] = description
-    _input["ontologyReferences"] = ontology_references
-    if color is not UNSET:
-        _input["color"] = color
-    if image is not UNSET:
-        _input["image"] = image
-    if label is not UNSET:
-        _input["label"] = label
-    if pin is not UNSET:
-        _input["pin"] = pin
-    _input["kind"] = kind
-    _input["inputs"] = inputs
-    _input["outputs"] = outputs
-    _input["properties"] = properties
-    if definition is not UNSET:
-        _input["definition"] = definition
-    _input["graph"] = graph
-    _input["backfill"] = backfill
-    variables["input"] = _input
-    return (
-        await aexecute(CreateNaturalEventCategoryMutation, variables, rath=rath)
-    ).create_natural_event_category
+        Args:
+            id: The ID of the structure relation category to delete
 
+        Returns:
+            ID
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        variables["input"] = _input
+        return self.execute(
+            DeleteStructureRelationCategoryMutation, variables
+        ).delete_structure_relation_category
 
-def create_natural_event_category(
-    key: str,
-    ontology_references: Iterable[OntologyReferenceInput],
-    kind: EventKind,
-    inputs: Iterable[EventRoleInput],
-    outputs: Iterable[EventRoleInput],
-    properties: Iterable[PropertyDefinitionInput],
-    graph: str,
-    backfill: bool,
-    description: str | None | UnsetType = UNSET,
-    color: Iterable[int] | None | UnsetType = UNSET,
-    image: str | None | UnsetType = UNSET,
-    label: str | None | UnsetType = UNSET,
-    pin: bool | None | UnsetType = UNSET,
-    definition: CategoryDefinitionInput | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> NaturalEventCategory:
-    """CreateNaturalEventCategory
+    async def acreate_natural_event_category(
+        self,
+        key: str,
+        ontology_references: Iterable[OntologyReferenceInput],
+        kind: EventKind,
+        inputs: Iterable[EventRoleInput],
+        outputs: Iterable[EventRoleInput],
+        properties: Iterable[PropertyDefinitionInput],
+        graph: str,
+        backfill: bool,
+        description: str | None | UnsetType = UNSET,
+        color: Iterable[int] | None | UnsetType = UNSET,
+        image: str | None | UnsetType = UNSET,
+        label: str | None | UnsetType = UNSET,
+        pin: bool | None | UnsetType = UNSET,
+        definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+    ) -> NaturalEventCategory:
+        """CreateNaturalEventCategory
 
-    Create a new natural event category in the graph
+        Create a new natural event category in the graph
 
-    Args:
-        key: The label of the node participating in the event
-        description: Description of this node role
-        ontology_references: Ontology references for this event
-        color: Optional RGBA color for this node role (e.g. [255, 0, 0, 128])
-        image: Optional media store ID for an image representing this node role
-        label: Optional human-readable label for this node role (defaults to 'key' if not provided)
-        pin: Whether to pin this node role in the UI
-        kind: Whether the event arises in the system itself (INTRINSIC, e.g. mitosis) or is applied from outside (EXTRINSIC, e.g. a protocol step)
-        inputs: Input node roles
-        outputs: Output node roles
-        properties: Property definitions
-        definition: This event category's complete rule (RFC 0009): which classification claims admit an event, whose existence standings count, and whose participation claims draw its edges. Omitted means primitive
-        graph: The graph id this event will belong to
-        backfill: Draw the evidence this word already admits. Claims made under it before this category existed are in the organization's evidence base; with this on they are projected into the graph now, instead of waiting for the next reproject. Off by default because the work is proportional to the graph's evidence and happens before this mutation returns.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
+        Args:
+            key: The label of the node participating in the event
+            description: Description of this node role
+            ontology_references: Ontology references for this event
+            color: Optional RGBA color for this node role (e.g. [255, 0, 0, 128])
+            image: Optional media store ID for an image representing this node role
+            label: Optional human-readable label for this node role (defaults to 'key' if not provided)
+            pin: Whether to pin this node role in the UI
+            kind: Whether the event arises in the system itself (INTRINSIC, e.g. mitosis) or is applied from outside (EXTRINSIC, e.g. a protocol step)
+            inputs: Input node roles
+            outputs: Output node roles
+            properties: Property definitions
+            definition: This event category's complete rule (RFC 0009): which classification claims admit an event, whose existence standings count, and whose participation claims draw its edges. Omitted means primitive
+            graph: The graph id this event will belong to
+            backfill: Draw the evidence this word already admits. Claims made under it before this category existed are in the organization's evidence base; with this on they are projected into the graph now, instead of waiting for the next reproject. Off by default because the work is proportional to the graph's evidence and happens before this mutation returns.
 
-    Returns:
-        NaturalEventCategory
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["key"] = key
-    if description is not UNSET:
-        _input["description"] = description
-    _input["ontologyReferences"] = ontology_references
-    if color is not UNSET:
-        _input["color"] = color
-    if image is not UNSET:
-        _input["image"] = image
-    if label is not UNSET:
-        _input["label"] = label
-    if pin is not UNSET:
-        _input["pin"] = pin
-    _input["kind"] = kind
-    _input["inputs"] = inputs
-    _input["outputs"] = outputs
-    _input["properties"] = properties
-    if definition is not UNSET:
-        _input["definition"] = definition
-    _input["graph"] = graph
-    _input["backfill"] = backfill
-    variables["input"] = _input
-    return execute(
-        CreateNaturalEventCategoryMutation, variables, rath=rath
-    ).create_natural_event_category
-
-
-async def aupdate_natural_event_category(
-    id: str,
-    clear_definition: bool,
-    key: str | None | UnsetType = UNSET,
-    description: str | None | UnsetType = UNSET,
-    ontology_references: Iterable[OntologyReferenceInput] | None | UnsetType = UNSET,
-    color: Iterable[int] | None | UnsetType = UNSET,
-    image: str | None | UnsetType = UNSET,
-    label: str | None | UnsetType = UNSET,
-    pin: bool | None | UnsetType = UNSET,
-    definition: CategoryDefinitionInput | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> NaturalEventCategory:
-    """UpdateNaturalEventCategory
-
-    Update an existing natural event category in the graph
-
-    Args:
-        id: The ID of the natural event category to update
-        key: The label of the node participating in the event
-        description: Description of this node role
-        ontology_references: Ontology references for this event
-        color: Optional RGBA color for this node role (e.g. [255, 0, 0, 128])
-        image: Optional media store ID for an image representing this node role
-        label: Optional human-readable label for this node role (defaults to 'key' if not provided)
-        pin: Whether to pin this node role in the UI
-        definition: New rule for this category (RFC 0009). Omitted means unchanged; to make it primitive again, use clearDefinition
-        clear_definition: Reset the category to primitive — any claim naming its word counts, standings organization grain
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        NaturalEventCategory
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    if key is not UNSET:
+        Returns:
+            NaturalEventCategory
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
         _input["key"] = key
-    if description is not UNSET:
-        _input["description"] = description
-    if ontology_references is not UNSET:
+        if description is not UNSET:
+            _input["description"] = description
         _input["ontologyReferences"] = ontology_references
-    if color is not UNSET:
-        _input["color"] = color
-    if image is not UNSET:
-        _input["image"] = image
-    if label is not UNSET:
-        _input["label"] = label
-    if pin is not UNSET:
-        _input["pin"] = pin
-    if definition is not UNSET:
-        _input["definition"] = definition
-    _input["clearDefinition"] = clear_definition
-    variables["input"] = _input
-    return (
-        await aexecute(UpdateNaturalEventCategoryMutation, variables, rath=rath)
-    ).update_natural_event_category
+        if color is not UNSET:
+            _input["color"] = color
+        if image is not UNSET:
+            _input["image"] = image
+        if label is not UNSET:
+            _input["label"] = label
+        if pin is not UNSET:
+            _input["pin"] = pin
+        _input["kind"] = kind
+        _input["inputs"] = inputs
+        _input["outputs"] = outputs
+        _input["properties"] = properties
+        if definition is not UNSET:
+            _input["definition"] = definition
+        _input["graph"] = graph
+        _input["backfill"] = backfill
+        variables["input"] = _input
+        return (
+            await self.aexecute(CreateNaturalEventCategoryMutation, variables)
+        ).create_natural_event_category
 
+    def create_natural_event_category(
+        self,
+        key: str,
+        ontology_references: Iterable[OntologyReferenceInput],
+        kind: EventKind,
+        inputs: Iterable[EventRoleInput],
+        outputs: Iterable[EventRoleInput],
+        properties: Iterable[PropertyDefinitionInput],
+        graph: str,
+        backfill: bool,
+        description: str | None | UnsetType = UNSET,
+        color: Iterable[int] | None | UnsetType = UNSET,
+        image: str | None | UnsetType = UNSET,
+        label: str | None | UnsetType = UNSET,
+        pin: bool | None | UnsetType = UNSET,
+        definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+    ) -> NaturalEventCategory:
+        """CreateNaturalEventCategory
 
-def update_natural_event_category(
-    id: str,
-    clear_definition: bool,
-    key: str | None | UnsetType = UNSET,
-    description: str | None | UnsetType = UNSET,
-    ontology_references: Iterable[OntologyReferenceInput] | None | UnsetType = UNSET,
-    color: Iterable[int] | None | UnsetType = UNSET,
-    image: str | None | UnsetType = UNSET,
-    label: str | None | UnsetType = UNSET,
-    pin: bool | None | UnsetType = UNSET,
-    definition: CategoryDefinitionInput | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> NaturalEventCategory:
-    """UpdateNaturalEventCategory
+        Create a new natural event category in the graph
 
-    Update an existing natural event category in the graph
+        Args:
+            key: The label of the node participating in the event
+            description: Description of this node role
+            ontology_references: Ontology references for this event
+            color: Optional RGBA color for this node role (e.g. [255, 0, 0, 128])
+            image: Optional media store ID for an image representing this node role
+            label: Optional human-readable label for this node role (defaults to 'key' if not provided)
+            pin: Whether to pin this node role in the UI
+            kind: Whether the event arises in the system itself (INTRINSIC, e.g. mitosis) or is applied from outside (EXTRINSIC, e.g. a protocol step)
+            inputs: Input node roles
+            outputs: Output node roles
+            properties: Property definitions
+            definition: This event category's complete rule (RFC 0009): which classification claims admit an event, whose existence standings count, and whose participation claims draw its edges. Omitted means primitive
+            graph: The graph id this event will belong to
+            backfill: Draw the evidence this word already admits. Claims made under it before this category existed are in the organization's evidence base; with this on they are projected into the graph now, instead of waiting for the next reproject. Off by default because the work is proportional to the graph's evidence and happens before this mutation returns.
 
-    Args:
-        id: The ID of the natural event category to update
-        key: The label of the node participating in the event
-        description: Description of this node role
-        ontology_references: Ontology references for this event
-        color: Optional RGBA color for this node role (e.g. [255, 0, 0, 128])
-        image: Optional media store ID for an image representing this node role
-        label: Optional human-readable label for this node role (defaults to 'key' if not provided)
-        pin: Whether to pin this node role in the UI
-        definition: New rule for this category (RFC 0009). Omitted means unchanged; to make it primitive again, use clearDefinition
-        clear_definition: Reset the category to primitive — any claim naming its word counts, standings organization grain
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        NaturalEventCategory
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    if key is not UNSET:
+        Returns:
+            NaturalEventCategory
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
         _input["key"] = key
-    if description is not UNSET:
-        _input["description"] = description
-    if ontology_references is not UNSET:
+        if description is not UNSET:
+            _input["description"] = description
         _input["ontologyReferences"] = ontology_references
-    if color is not UNSET:
-        _input["color"] = color
-    if image is not UNSET:
-        _input["image"] = image
-    if label is not UNSET:
-        _input["label"] = label
-    if pin is not UNSET:
-        _input["pin"] = pin
-    if definition is not UNSET:
-        _input["definition"] = definition
-    _input["clearDefinition"] = clear_definition
-    variables["input"] = _input
-    return execute(
-        UpdateNaturalEventCategoryMutation, variables, rath=rath
-    ).update_natural_event_category
+        if color is not UNSET:
+            _input["color"] = color
+        if image is not UNSET:
+            _input["image"] = image
+        if label is not UNSET:
+            _input["label"] = label
+        if pin is not UNSET:
+            _input["pin"] = pin
+        _input["kind"] = kind
+        _input["inputs"] = inputs
+        _input["outputs"] = outputs
+        _input["properties"] = properties
+        if definition is not UNSET:
+            _input["definition"] = definition
+        _input["graph"] = graph
+        _input["backfill"] = backfill
+        variables["input"] = _input
+        return self.execute(
+            CreateNaturalEventCategoryMutation, variables
+        ).create_natural_event_category
 
+    async def aupdate_natural_event_category(
+        self,
+        id: str,
+        clear_definition: bool,
+        key: str | None | UnsetType = UNSET,
+        description: str | None | UnsetType = UNSET,
+        ontology_references: (
+            Iterable[OntologyReferenceInput] | None | UnsetType
+        ) = UNSET,
+        color: Iterable[int] | None | UnsetType = UNSET,
+        image: str | None | UnsetType = UNSET,
+        label: str | None | UnsetType = UNSET,
+        pin: bool | None | UnsetType = UNSET,
+        definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+    ) -> NaturalEventCategory:
+        """UpdateNaturalEventCategory
 
-async def adelete_natural_event_category(id: str, rath: KraphRath | None = None) -> ID:
-    """DeleteNaturalEventCategory
+        Update an existing natural event category in the graph
 
-    Delete a natural event category from the graph
+        Args:
+            id: The ID of the natural event category to update
+            key: The label of the node participating in the event
+            description: Description of this node role
+            ontology_references: Ontology references for this event
+            color: Optional RGBA color for this node role (e.g. [255, 0, 0, 128])
+            image: Optional media store ID for an image representing this node role
+            label: Optional human-readable label for this node role (defaults to 'key' if not provided)
+            pin: Whether to pin this node role in the UI
+            definition: New rule for this category (RFC 0009). Omitted means unchanged; to make it primitive again, use clearDefinition
+            clear_definition: Reset the category to primitive — any claim naming its word counts, standings organization grain
 
-    Args:
-        id: The ID of the event category to delete
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
+        Returns:
+            NaturalEventCategory
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        if key is not UNSET:
+            _input["key"] = key
+        if description is not UNSET:
+            _input["description"] = description
+        if ontology_references is not UNSET:
+            _input["ontologyReferences"] = ontology_references
+        if color is not UNSET:
+            _input["color"] = color
+        if image is not UNSET:
+            _input["image"] = image
+        if label is not UNSET:
+            _input["label"] = label
+        if pin is not UNSET:
+            _input["pin"] = pin
+        if definition is not UNSET:
+            _input["definition"] = definition
+        _input["clearDefinition"] = clear_definition
+        variables["input"] = _input
+        return (
+            await self.aexecute(UpdateNaturalEventCategoryMutation, variables)
+        ).update_natural_event_category
 
-    Returns:
-        ID
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    variables["input"] = _input
-    return (
-        await aexecute(DeleteNaturalEventCategoryMutation, variables, rath=rath)
-    ).delete_natural_event_category
+    def update_natural_event_category(
+        self,
+        id: str,
+        clear_definition: bool,
+        key: str | None | UnsetType = UNSET,
+        description: str | None | UnsetType = UNSET,
+        ontology_references: (
+            Iterable[OntologyReferenceInput] | None | UnsetType
+        ) = UNSET,
+        color: Iterable[int] | None | UnsetType = UNSET,
+        image: str | None | UnsetType = UNSET,
+        label: str | None | UnsetType = UNSET,
+        pin: bool | None | UnsetType = UNSET,
+        definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+    ) -> NaturalEventCategory:
+        """UpdateNaturalEventCategory
 
+        Update an existing natural event category in the graph
 
-def delete_natural_event_category(id: str, rath: KraphRath | None = None) -> ID:
-    """DeleteNaturalEventCategory
+        Args:
+            id: The ID of the natural event category to update
+            key: The label of the node participating in the event
+            description: Description of this node role
+            ontology_references: Ontology references for this event
+            color: Optional RGBA color for this node role (e.g. [255, 0, 0, 128])
+            image: Optional media store ID for an image representing this node role
+            label: Optional human-readable label for this node role (defaults to 'key' if not provided)
+            pin: Whether to pin this node role in the UI
+            definition: New rule for this category (RFC 0009). Omitted means unchanged; to make it primitive again, use clearDefinition
+            clear_definition: Reset the category to primitive — any claim naming its word counts, standings organization grain
 
-    Delete a natural event category from the graph
+        Returns:
+            NaturalEventCategory
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        if key is not UNSET:
+            _input["key"] = key
+        if description is not UNSET:
+            _input["description"] = description
+        if ontology_references is not UNSET:
+            _input["ontologyReferences"] = ontology_references
+        if color is not UNSET:
+            _input["color"] = color
+        if image is not UNSET:
+            _input["image"] = image
+        if label is not UNSET:
+            _input["label"] = label
+        if pin is not UNSET:
+            _input["pin"] = pin
+        if definition is not UNSET:
+            _input["definition"] = definition
+        _input["clearDefinition"] = clear_definition
+        variables["input"] = _input
+        return self.execute(
+            UpdateNaturalEventCategoryMutation, variables
+        ).update_natural_event_category
 
-    Args:
-        id: The ID of the event category to delete
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
+    async def adelete_natural_event_category(self, id: str) -> ID:
+        """DeleteNaturalEventCategory
 
-    Returns:
-        ID
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    variables["input"] = _input
-    return execute(
-        DeleteNaturalEventCategoryMutation, variables, rath=rath
-    ).delete_natural_event_category
+        Delete a natural event category from the graph
 
+        Args:
+            id: The ID of the event category to delete
 
-async def acreate_protocol_event_category(
-    key: str,
-    ontology_references: Iterable[OntologyReferenceInput],
-    kind: EventKind,
-    inputs: Iterable[EventRoleInput],
-    outputs: Iterable[EventRoleInput],
-    properties: Iterable[PropertyDefinitionInput],
-    protocol: str,
-    graph: str,
-    backfill: bool,
-    description: str | None | UnsetType = UNSET,
-    color: Iterable[int] | None | UnsetType = UNSET,
-    image: str | None | UnsetType = UNSET,
-    label: str | None | UnsetType = UNSET,
-    pin: bool | None | UnsetType = UNSET,
-    definition: CategoryDefinitionInput | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> ProtocolEventCategory:
-    """CreateProtocolEventCategory
+        Returns:
+            ID
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        variables["input"] = _input
+        return (
+            await self.aexecute(DeleteNaturalEventCategoryMutation, variables)
+        ).delete_natural_event_category
 
-    Create a new protocol event category in the graph
+    def delete_natural_event_category(self, id: str) -> ID:
+        """DeleteNaturalEventCategory
 
-    Args:
-        key: The label of the node participating in the event
-        description: Description of this node role
-        ontology_references: Ontology references for this event
-        color: Optional RGBA color for this node role (e.g. [255, 0, 0, 128])
-        image: Optional media store ID for an image representing this node role
-        label: Optional human-readable label for this node role (defaults to 'key' if not provided)
-        pin: Whether to pin this node role in the UI
-        kind: Whether the event arises in the system itself (INTRINSIC, e.g. mitosis) or is applied from outside (EXTRINSIC, e.g. a protocol step)
-        inputs: Input node roles
-        outputs: Output node roles
-        properties: Property definitions
-        definition: This event category's complete rule (RFC 0009): which classification claims admit an event, whose existence standings count, and whose participation claims draw its edges. Omitted means primitive
-        protocol: The protocol this event definition belongs to
-        graph: The graph id this event will belong to
-        backfill: Draw the evidence this word already admits. Claims made under it before this category existed are in the organization's evidence base; with this on they are projected into the graph now, instead of waiting for the next reproject. Off by default because the work is proportional to the graph's evidence and happens before this mutation returns.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
+        Delete a natural event category from the graph
 
-    Returns:
-        ProtocolEventCategory
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["key"] = key
-    if description is not UNSET:
-        _input["description"] = description
-    _input["ontologyReferences"] = ontology_references
-    if color is not UNSET:
-        _input["color"] = color
-    if image is not UNSET:
-        _input["image"] = image
-    if label is not UNSET:
-        _input["label"] = label
-    if pin is not UNSET:
-        _input["pin"] = pin
-    _input["kind"] = kind
-    _input["inputs"] = inputs
-    _input["outputs"] = outputs
-    _input["properties"] = properties
-    if definition is not UNSET:
-        _input["definition"] = definition
-    _input["protocol"] = protocol
-    _input["graph"] = graph
-    _input["backfill"] = backfill
-    variables["input"] = _input
-    return (
-        await aexecute(CreateProtocolEventCategoryMutation, variables, rath=rath)
-    ).create_protocol_event_category
+        Args:
+            id: The ID of the event category to delete
 
+        Returns:
+            ID
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        variables["input"] = _input
+        return self.execute(
+            DeleteNaturalEventCategoryMutation, variables
+        ).delete_natural_event_category
 
-def create_protocol_event_category(
-    key: str,
-    ontology_references: Iterable[OntologyReferenceInput],
-    kind: EventKind,
-    inputs: Iterable[EventRoleInput],
-    outputs: Iterable[EventRoleInput],
-    properties: Iterable[PropertyDefinitionInput],
-    protocol: str,
-    graph: str,
-    backfill: bool,
-    description: str | None | UnsetType = UNSET,
-    color: Iterable[int] | None | UnsetType = UNSET,
-    image: str | None | UnsetType = UNSET,
-    label: str | None | UnsetType = UNSET,
-    pin: bool | None | UnsetType = UNSET,
-    definition: CategoryDefinitionInput | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> ProtocolEventCategory:
-    """CreateProtocolEventCategory
+    async def acreate_protocol_event_category(
+        self,
+        key: str,
+        ontology_references: Iterable[OntologyReferenceInput],
+        kind: EventKind,
+        inputs: Iterable[EventRoleInput],
+        outputs: Iterable[EventRoleInput],
+        properties: Iterable[PropertyDefinitionInput],
+        protocol: str,
+        graph: str,
+        backfill: bool,
+        description: str | None | UnsetType = UNSET,
+        color: Iterable[int] | None | UnsetType = UNSET,
+        image: str | None | UnsetType = UNSET,
+        label: str | None | UnsetType = UNSET,
+        pin: bool | None | UnsetType = UNSET,
+        definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+    ) -> ProtocolEventCategory:
+        """CreateProtocolEventCategory
 
-    Create a new protocol event category in the graph
+        Create a new protocol event category in the graph
 
-    Args:
-        key: The label of the node participating in the event
-        description: Description of this node role
-        ontology_references: Ontology references for this event
-        color: Optional RGBA color for this node role (e.g. [255, 0, 0, 128])
-        image: Optional media store ID for an image representing this node role
-        label: Optional human-readable label for this node role (defaults to 'key' if not provided)
-        pin: Whether to pin this node role in the UI
-        kind: Whether the event arises in the system itself (INTRINSIC, e.g. mitosis) or is applied from outside (EXTRINSIC, e.g. a protocol step)
-        inputs: Input node roles
-        outputs: Output node roles
-        properties: Property definitions
-        definition: This event category's complete rule (RFC 0009): which classification claims admit an event, whose existence standings count, and whose participation claims draw its edges. Omitted means primitive
-        protocol: The protocol this event definition belongs to
-        graph: The graph id this event will belong to
-        backfill: Draw the evidence this word already admits. Claims made under it before this category existed are in the organization's evidence base; with this on they are projected into the graph now, instead of waiting for the next reproject. Off by default because the work is proportional to the graph's evidence and happens before this mutation returns.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
+        Args:
+            key: The label of the node participating in the event
+            description: Description of this node role
+            ontology_references: Ontology references for this event
+            color: Optional RGBA color for this node role (e.g. [255, 0, 0, 128])
+            image: Optional media store ID for an image representing this node role
+            label: Optional human-readable label for this node role (defaults to 'key' if not provided)
+            pin: Whether to pin this node role in the UI
+            kind: Whether the event arises in the system itself (INTRINSIC, e.g. mitosis) or is applied from outside (EXTRINSIC, e.g. a protocol step)
+            inputs: Input node roles
+            outputs: Output node roles
+            properties: Property definitions
+            definition: This event category's complete rule (RFC 0009): which classification claims admit an event, whose existence standings count, and whose participation claims draw its edges. Omitted means primitive
+            protocol: The protocol this event definition belongs to
+            graph: The graph id this event will belong to
+            backfill: Draw the evidence this word already admits. Claims made under it before this category existed are in the organization's evidence base; with this on they are projected into the graph now, instead of waiting for the next reproject. Off by default because the work is proportional to the graph's evidence and happens before this mutation returns.
 
-    Returns:
-        ProtocolEventCategory
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["key"] = key
-    if description is not UNSET:
-        _input["description"] = description
-    _input["ontologyReferences"] = ontology_references
-    if color is not UNSET:
-        _input["color"] = color
-    if image is not UNSET:
-        _input["image"] = image
-    if label is not UNSET:
-        _input["label"] = label
-    if pin is not UNSET:
-        _input["pin"] = pin
-    _input["kind"] = kind
-    _input["inputs"] = inputs
-    _input["outputs"] = outputs
-    _input["properties"] = properties
-    if definition is not UNSET:
-        _input["definition"] = definition
-    _input["protocol"] = protocol
-    _input["graph"] = graph
-    _input["backfill"] = backfill
-    variables["input"] = _input
-    return execute(
-        CreateProtocolEventCategoryMutation, variables, rath=rath
-    ).create_protocol_event_category
-
-
-async def aupdate_protocol_event_category(
-    id: str,
-    clear_definition: bool,
-    key: str | None | UnsetType = UNSET,
-    description: str | None | UnsetType = UNSET,
-    ontology_references: Iterable[OntologyReferenceInput] | None | UnsetType = UNSET,
-    color: Iterable[int] | None | UnsetType = UNSET,
-    image: str | None | UnsetType = UNSET,
-    label: str | None | UnsetType = UNSET,
-    pin: bool | None | UnsetType = UNSET,
-    definition: CategoryDefinitionInput | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> ProtocolEventCategory:
-    """UpdateProtocolEventCategory
-
-    Update an existing protocol event category in the graph
-
-    Args:
-        id: The ID of the protocol event category to update
-        key: The label of the node participating in the event
-        description: Description of this node role
-        ontology_references: Ontology references for this event
-        color: Optional RGBA color for this node role (e.g. [255, 0, 0, 128])
-        image: Optional media store ID for an image representing this node role
-        label: Optional human-readable label for this node role (defaults to 'key' if not provided)
-        pin: Whether to pin this node role in the UI
-        definition: New rule for this category (RFC 0012). Omitted means unchanged; to make it primitive again, use clearDefinition
-        clear_definition: Reset the category to primitive — any claim naming its word counts, standings organization grain
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        ProtocolEventCategory
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    if key is not UNSET:
+        Returns:
+            ProtocolEventCategory
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
         _input["key"] = key
-    if description is not UNSET:
-        _input["description"] = description
-    if ontology_references is not UNSET:
+        if description is not UNSET:
+            _input["description"] = description
         _input["ontologyReferences"] = ontology_references
-    if color is not UNSET:
-        _input["color"] = color
-    if image is not UNSET:
-        _input["image"] = image
-    if label is not UNSET:
-        _input["label"] = label
-    if pin is not UNSET:
-        _input["pin"] = pin
-    if definition is not UNSET:
-        _input["definition"] = definition
-    _input["clearDefinition"] = clear_definition
-    variables["input"] = _input
-    return (
-        await aexecute(UpdateProtocolEventCategoryMutation, variables, rath=rath)
-    ).update_protocol_event_category
+        if color is not UNSET:
+            _input["color"] = color
+        if image is not UNSET:
+            _input["image"] = image
+        if label is not UNSET:
+            _input["label"] = label
+        if pin is not UNSET:
+            _input["pin"] = pin
+        _input["kind"] = kind
+        _input["inputs"] = inputs
+        _input["outputs"] = outputs
+        _input["properties"] = properties
+        if definition is not UNSET:
+            _input["definition"] = definition
+        _input["protocol"] = protocol
+        _input["graph"] = graph
+        _input["backfill"] = backfill
+        variables["input"] = _input
+        return (
+            await self.aexecute(CreateProtocolEventCategoryMutation, variables)
+        ).create_protocol_event_category
 
+    def create_protocol_event_category(
+        self,
+        key: str,
+        ontology_references: Iterable[OntologyReferenceInput],
+        kind: EventKind,
+        inputs: Iterable[EventRoleInput],
+        outputs: Iterable[EventRoleInput],
+        properties: Iterable[PropertyDefinitionInput],
+        protocol: str,
+        graph: str,
+        backfill: bool,
+        description: str | None | UnsetType = UNSET,
+        color: Iterable[int] | None | UnsetType = UNSET,
+        image: str | None | UnsetType = UNSET,
+        label: str | None | UnsetType = UNSET,
+        pin: bool | None | UnsetType = UNSET,
+        definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+    ) -> ProtocolEventCategory:
+        """CreateProtocolEventCategory
 
-def update_protocol_event_category(
-    id: str,
-    clear_definition: bool,
-    key: str | None | UnsetType = UNSET,
-    description: str | None | UnsetType = UNSET,
-    ontology_references: Iterable[OntologyReferenceInput] | None | UnsetType = UNSET,
-    color: Iterable[int] | None | UnsetType = UNSET,
-    image: str | None | UnsetType = UNSET,
-    label: str | None | UnsetType = UNSET,
-    pin: bool | None | UnsetType = UNSET,
-    definition: CategoryDefinitionInput | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> ProtocolEventCategory:
-    """UpdateProtocolEventCategory
+        Create a new protocol event category in the graph
 
-    Update an existing protocol event category in the graph
+        Args:
+            key: The label of the node participating in the event
+            description: Description of this node role
+            ontology_references: Ontology references for this event
+            color: Optional RGBA color for this node role (e.g. [255, 0, 0, 128])
+            image: Optional media store ID for an image representing this node role
+            label: Optional human-readable label for this node role (defaults to 'key' if not provided)
+            pin: Whether to pin this node role in the UI
+            kind: Whether the event arises in the system itself (INTRINSIC, e.g. mitosis) or is applied from outside (EXTRINSIC, e.g. a protocol step)
+            inputs: Input node roles
+            outputs: Output node roles
+            properties: Property definitions
+            definition: This event category's complete rule (RFC 0009): which classification claims admit an event, whose existence standings count, and whose participation claims draw its edges. Omitted means primitive
+            protocol: The protocol this event definition belongs to
+            graph: The graph id this event will belong to
+            backfill: Draw the evidence this word already admits. Claims made under it before this category existed are in the organization's evidence base; with this on they are projected into the graph now, instead of waiting for the next reproject. Off by default because the work is proportional to the graph's evidence and happens before this mutation returns.
 
-    Args:
-        id: The ID of the protocol event category to update
-        key: The label of the node participating in the event
-        description: Description of this node role
-        ontology_references: Ontology references for this event
-        color: Optional RGBA color for this node role (e.g. [255, 0, 0, 128])
-        image: Optional media store ID for an image representing this node role
-        label: Optional human-readable label for this node role (defaults to 'key' if not provided)
-        pin: Whether to pin this node role in the UI
-        definition: New rule for this category (RFC 0012). Omitted means unchanged; to make it primitive again, use clearDefinition
-        clear_definition: Reset the category to primitive — any claim naming its word counts, standings organization grain
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        ProtocolEventCategory
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    if key is not UNSET:
+        Returns:
+            ProtocolEventCategory
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
         _input["key"] = key
-    if description is not UNSET:
-        _input["description"] = description
-    if ontology_references is not UNSET:
+        if description is not UNSET:
+            _input["description"] = description
         _input["ontologyReferences"] = ontology_references
-    if color is not UNSET:
-        _input["color"] = color
-    if image is not UNSET:
-        _input["image"] = image
-    if label is not UNSET:
-        _input["label"] = label
-    if pin is not UNSET:
-        _input["pin"] = pin
-    if definition is not UNSET:
-        _input["definition"] = definition
-    _input["clearDefinition"] = clear_definition
-    variables["input"] = _input
-    return execute(
-        UpdateProtocolEventCategoryMutation, variables, rath=rath
-    ).update_protocol_event_category
-
-
-async def adelete_protocol_event_category(id: str, rath: KraphRath | None = None) -> ID:
-    """DeleteProtocolEventCategory
-
-    Delete a protocol event category from the graph
-
-    Args:
-        id: The ID of the event category to delete
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        ID
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    variables["input"] = _input
-    return (
-        await aexecute(DeleteProtocolEventCategoryMutation, variables, rath=rath)
-    ).delete_protocol_event_category
-
-
-def delete_protocol_event_category(id: str, rath: KraphRath | None = None) -> ID:
-    """DeleteProtocolEventCategory
-
-    Delete a protocol event category from the graph
-
-    Args:
-        id: The ID of the event category to delete
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        ID
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    variables["input"] = _input
-    return execute(
-        DeleteProtocolEventCategoryMutation, variables, rath=rath
-    ).delete_protocol_event_category
-
-
-async def aassert_entity_exists(
-    term: str,
-    supporting_evidence: Iterable[StructureReferenceInput],
-    derived_from: Iterable[str],
-    same_as: Iterable[str],
-    observed_at: datetime | None | UnsetType = UNSET,
-    confidence: float | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> AssertedEntity:
-    """AssertEntityExists
-     ---- existence: instances -----------------------------------------------------------------
-     A write names a WORD (`term`), never a graph and never a category id.
-
-    Args:
-        term: The organization's word for what is being claimed — a term's `key`, e.g. 'AIS'. Not a category id and not a graph: a claim names a word, and every view that declares that word will hold what you write. The word is created if the organization has not used it before; a view that declares no category for it simply will not draw it.
-        supporting_evidence: List of evidence structures with measurements
-        observed_at: When the world was in this state — world time, the axis a scientist means by 'when'. Distinct from when it is claimed, which the assertion records; left unset, the two are equal. A point, not an interval: a duration is a metric.
-        confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-        derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
-        same_as: Instances this new one is the same as. Saying "this is AIS 6" mints a fresh instance and claims it is the same as the one already known as AIS 6 — all under **one assertion**, because it is one act. Sameness is an equivalence with no primary, so which id you send is immaterial; entities only, never structures.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedEntity
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["term"] = term
-    _input["supportingEvidence"] = supporting_evidence
-    if observed_at is not UNSET:
-        _input["observedAt"] = observed_at
-    if confidence is not UNSET:
-        _input["confidence"] = confidence
-    _input["derivedFrom"] = derived_from
-    _input["sameAs"] = same_as
-    variables["input"] = _input
-    return (await aexecute(AssertEntityExistsMutation, variables, rath=rath)).assert_entity_exists
-
-
-def assert_entity_exists(
-    term: str,
-    supporting_evidence: Iterable[StructureReferenceInput],
-    derived_from: Iterable[str],
-    same_as: Iterable[str],
-    observed_at: datetime | None | UnsetType = UNSET,
-    confidence: float | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> AssertedEntity:
-    """AssertEntityExists
-     ---- existence: instances -----------------------------------------------------------------
-     A write names a WORD (`term`), never a graph and never a category id.
-
-    Args:
-        term: The organization's word for what is being claimed — a term's `key`, e.g. 'AIS'. Not a category id and not a graph: a claim names a word, and every view that declares that word will hold what you write. The word is created if the organization has not used it before; a view that declares no category for it simply will not draw it.
-        supporting_evidence: List of evidence structures with measurements
-        observed_at: When the world was in this state — world time, the axis a scientist means by 'when'. Distinct from when it is claimed, which the assertion records; left unset, the two are equal. A point, not an interval: a duration is a metric.
-        confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-        derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
-        same_as: Instances this new one is the same as. Saying "this is AIS 6" mints a fresh instance and claims it is the same as the one already known as AIS 6 — all under **one assertion**, because it is one act. Sameness is an equivalence with no primary, so which id you send is immaterial; entities only, never structures.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedEntity
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["term"] = term
-    _input["supportingEvidence"] = supporting_evidence
-    if observed_at is not UNSET:
-        _input["observedAt"] = observed_at
-    if confidence is not UNSET:
-        _input["confidence"] = confidence
-    _input["derivedFrom"] = derived_from
-    _input["sameAs"] = same_as
-    variables["input"] = _input
-    return execute(AssertEntityExistsMutation, variables, rath=rath).assert_entity_exists
-
-
-async def aassert_natural_event_exists(
-    term: str,
-    inputs: Iterable[RoleMappingInput],
-    outputs: Iterable[RoleMappingInput],
-    supporting_evidence: Iterable[StructureReferenceInput],
-    derived_from: Iterable[str],
-    observed_at: datetime | None | UnsetType = UNSET,
-    confidence: float | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> AssertedNaturalEvent:
-    """AssertNaturalEventExists
-
-    Claim that a natural event happened, under one of the organization's words
-
-    Args:
-        term: The organization's word for what is being claimed — a term's `key`, e.g. 'AIS'. Not a category id and not a graph: a claim names a word, and every view that declares that word will hold what you write. The word is created if the organization has not used it before; a view that declares no category for it simply will not draw it.
-        inputs: List of entity IDs that are inputs to this event
-        outputs: List of entity IDs that are outputs of this event
-        supporting_evidence: List of evidence structures with measurements
-        observed_at: When the world was in this state — world time, the axis a scientist means by 'when'. Distinct from when it is claimed, which the assertion records; left unset, the two are equal. A point, not an interval: a duration is a metric.
-        confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-        derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedNaturalEvent
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["term"] = term
-    _input["inputs"] = inputs
-    _input["outputs"] = outputs
-    _input["supportingEvidence"] = supporting_evidence
-    if observed_at is not UNSET:
-        _input["observedAt"] = observed_at
-    if confidence is not UNSET:
-        _input["confidence"] = confidence
-    _input["derivedFrom"] = derived_from
-    variables["input"] = _input
-    return (
-        await aexecute(AssertNaturalEventExistsMutation, variables, rath=rath)
-    ).assert_natural_event_exists
-
-
-def assert_natural_event_exists(
-    term: str,
-    inputs: Iterable[RoleMappingInput],
-    outputs: Iterable[RoleMappingInput],
-    supporting_evidence: Iterable[StructureReferenceInput],
-    derived_from: Iterable[str],
-    observed_at: datetime | None | UnsetType = UNSET,
-    confidence: float | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> AssertedNaturalEvent:
-    """AssertNaturalEventExists
-
-    Claim that a natural event happened, under one of the organization's words
-
-    Args:
-        term: The organization's word for what is being claimed — a term's `key`, e.g. 'AIS'. Not a category id and not a graph: a claim names a word, and every view that declares that word will hold what you write. The word is created if the organization has not used it before; a view that declares no category for it simply will not draw it.
-        inputs: List of entity IDs that are inputs to this event
-        outputs: List of entity IDs that are outputs of this event
-        supporting_evidence: List of evidence structures with measurements
-        observed_at: When the world was in this state — world time, the axis a scientist means by 'when'. Distinct from when it is claimed, which the assertion records; left unset, the two are equal. A point, not an interval: a duration is a metric.
-        confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-        derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedNaturalEvent
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["term"] = term
-    _input["inputs"] = inputs
-    _input["outputs"] = outputs
-    _input["supportingEvidence"] = supporting_evidence
-    if observed_at is not UNSET:
-        _input["observedAt"] = observed_at
-    if confidence is not UNSET:
-        _input["confidence"] = confidence
-    _input["derivedFrom"] = derived_from
-    variables["input"] = _input
-    return execute(
-        AssertNaturalEventExistsMutation, variables, rath=rath
-    ).assert_natural_event_exists
-
-
-async def aassert_protocol_event_exists(
-    term: str,
-    inputs: Iterable[RoleMappingInput],
-    outputs: Iterable[RoleMappingInput],
-    supporting_evidence: Iterable[StructureReferenceInput],
-    derived_from: Iterable[str],
-    observed_at: datetime | None | UnsetType = UNSET,
-    confidence: float | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> AssertedProtocolEvent:
-    """AssertProtocolEventExists
-
-    Claim that a protocol step happened, under one of the organization's words
-
-    Args:
-        term: The organization's word for what is being claimed — a term's `key`, e.g. 'AIS'. Not a category id and not a graph: a claim names a word, and every view that declares that word will hold what you write. The word is created if the organization has not used it before; a view that declares no category for it simply will not draw it.
-        inputs: List of entity IDs that are inputs to this event
-        outputs: List of entity IDs that are outputs of this event
-        supporting_evidence: List of evidence structures with measurements
-        observed_at: When the world was in this state — world time, the axis a scientist means by 'when'. Distinct from when it is claimed, which the assertion records; left unset, the two are equal. A point, not an interval: a duration is a metric.
-        confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-        derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedProtocolEvent
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["term"] = term
-    _input["inputs"] = inputs
-    _input["outputs"] = outputs
-    _input["supportingEvidence"] = supporting_evidence
-    if observed_at is not UNSET:
-        _input["observedAt"] = observed_at
-    if confidence is not UNSET:
-        _input["confidence"] = confidence
-    _input["derivedFrom"] = derived_from
-    variables["input"] = _input
-    return (
-        await aexecute(AssertProtocolEventExistsMutation, variables, rath=rath)
-    ).assert_protocol_event_exists
-
-
-def assert_protocol_event_exists(
-    term: str,
-    inputs: Iterable[RoleMappingInput],
-    outputs: Iterable[RoleMappingInput],
-    supporting_evidence: Iterable[StructureReferenceInput],
-    derived_from: Iterable[str],
-    observed_at: datetime | None | UnsetType = UNSET,
-    confidence: float | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> AssertedProtocolEvent:
-    """AssertProtocolEventExists
-
-    Claim that a protocol step happened, under one of the organization's words
-
-    Args:
-        term: The organization's word for what is being claimed — a term's `key`, e.g. 'AIS'. Not a category id and not a graph: a claim names a word, and every view that declares that word will hold what you write. The word is created if the organization has not used it before; a view that declares no category for it simply will not draw it.
-        inputs: List of entity IDs that are inputs to this event
-        outputs: List of entity IDs that are outputs of this event
-        supporting_evidence: List of evidence structures with measurements
-        observed_at: When the world was in this state — world time, the axis a scientist means by 'when'. Distinct from when it is claimed, which the assertion records; left unset, the two are equal. A point, not an interval: a duration is a metric.
-        confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-        derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedProtocolEvent
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["term"] = term
-    _input["inputs"] = inputs
-    _input["outputs"] = outputs
-    _input["supportingEvidence"] = supporting_evidence
-    if observed_at is not UNSET:
-        _input["observedAt"] = observed_at
-    if confidence is not UNSET:
-        _input["confidence"] = confidence
-    _input["derivedFrom"] = derived_from
-    variables["input"] = _input
-    return execute(
-        AssertProtocolEventExistsMutation, variables, rath=rath
-    ).assert_protocol_event_exists
-
-
-async def aclassify_nodes(
-    classifications: Iterable[ClassificationInput], rath: KraphRath | None = None
-) -> AssertedInstances:
-    """ClassifyNodes
-     One assertion over many (node, term) pairs — a batch is one act.
-
-    Args:
-        classifications: The claims to record
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedInstances
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["classifications"] = classifications
-    variables["input"] = _input
-    return (await aexecute(ClassifyNodesMutation, variables, rath=rath)).classify_nodes
-
-
-def classify_nodes(
-    classifications: Iterable[ClassificationInput], rath: KraphRath | None = None
-) -> AssertedInstances:
-    """ClassifyNodes
-     One assertion over many (node, term) pairs — a batch is one act.
-
-    Args:
-        classifications: The claims to record
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedInstances
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["classifications"] = classifications
-    variables["input"] = _input
-    return execute(ClassifyNodesMutation, variables, rath=rath).classify_nodes
-
-
-async def aassert_same_instance(
-    instances: Iterable[str],
-    derived_from: Iterable[str],
-    observed_at: datetime | None | UnsetType = UNSET,
-    confidence: float | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> AssertedSameness:
-    """AssertSameInstance
-
-    Claim that several already-recorded instances are one thing. An equivalence with no primary — the order of the ids carries no meaning
-
-    Args:
-        instances: Two or more instance ids that name the same thing — entities or events alike. Every pair among them is claimed, under one assertion.
-        observed_at: When the world was in this state — world time, the axis a scientist means by 'when'. Distinct from when it is claimed, which the assertion records; left unset, the two are equal. A point, not an interval: a duration is a metric.
-        confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-        derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedSameness
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["instances"] = instances
-    if observed_at is not UNSET:
-        _input["observedAt"] = observed_at
-    if confidence is not UNSET:
-        _input["confidence"] = confidence
-    _input["derivedFrom"] = derived_from
-    variables["input"] = _input
-    return (await aexecute(AssertSameInstanceMutation, variables, rath=rath)).assert_same_instance
-
-
-def assert_same_instance(
-    instances: Iterable[str],
-    derived_from: Iterable[str],
-    observed_at: datetime | None | UnsetType = UNSET,
-    confidence: float | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> AssertedSameness:
-    """AssertSameInstance
-
-    Claim that several already-recorded instances are one thing. An equivalence with no primary — the order of the ids carries no meaning
-
-    Args:
-        instances: Two or more instance ids that name the same thing — entities or events alike. Every pair among them is claimed, under one assertion.
-        observed_at: When the world was in this state — world time, the axis a scientist means by 'when'. Distinct from when it is claimed, which the assertion records; left unset, the two are equal. A point, not an interval: a duration is a metric.
-        confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-        derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedSameness
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["instances"] = instances
-    if observed_at is not UNSET:
-        _input["observedAt"] = observed_at
-    if confidence is not UNSET:
-        _input["confidence"] = confidence
-    _input["derivedFrom"] = derived_from
-    variables["input"] = _input
-    return execute(AssertSameInstanceMutation, variables, rath=rath).assert_same_instance
-
-
-async def aassert_structure_exists(
-    object: str,
-    metrics: Iterable[MetricInput],
-    derived_from: Iterable[str],
-    identifier: str,
-    observed_at: datetime | None | UnsetType = UNSET,
-    confidence: float | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> AssertedStructure:
-    """AssertStructureExists
-     ---- structures and metrics ---------------------------------------------------------------
-
-    Args:
-        object: The unique ID of the object this structure references
-        metrics: List of measurements associated with this structure
-        derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
-        identifier: The structure identifier, e.g. '@mikro/roi'
-        observed_at: When the world was in this state — world time, the axis a scientist means by 'when'. Distinct from when it is claimed, which the assertion records; left unset, the two are equal. A point, not an interval: a duration is a metric.
-        confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedStructure
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["object"] = object
-    _input["metrics"] = metrics
-    _input["derivedFrom"] = derived_from
-    _input["identifier"] = identifier
-    if observed_at is not UNSET:
-        _input["observedAt"] = observed_at
-    if confidence is not UNSET:
-        _input["confidence"] = confidence
-    variables["input"] = _input
-    return (
-        await aexecute(AssertStructureExistsMutation, variables, rath=rath)
-    ).assert_structure_exists
-
-
-def assert_structure_exists(
-    object: str,
-    metrics: Iterable[MetricInput],
-    derived_from: Iterable[str],
-    identifier: str,
-    observed_at: datetime | None | UnsetType = UNSET,
-    confidence: float | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> AssertedStructure:
-    """AssertStructureExists
-     ---- structures and metrics ---------------------------------------------------------------
-
-    Args:
-        object: The unique ID of the object this structure references
-        metrics: List of measurements associated with this structure
-        derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
-        identifier: The structure identifier, e.g. '@mikro/roi'
-        observed_at: When the world was in this state — world time, the axis a scientist means by 'when'. Distinct from when it is claimed, which the assertion records; left unset, the two are equal. A point, not an interval: a duration is a metric.
-        confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedStructure
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["object"] = object
-    _input["metrics"] = metrics
-    _input["derivedFrom"] = derived_from
-    _input["identifier"] = identifier
-    if observed_at is not UNSET:
-        _input["observedAt"] = observed_at
-    if confidence is not UNSET:
-        _input["confidence"] = confidence
-    variables["input"] = _input
-    return execute(AssertStructureExistsMutation, variables, rath=rath).assert_structure_exists
-
-
-async def aassert_metric_value(
-    key: str,
-    value: Any,
-    value_kind: PropertyType,
-    derived_from: Iterable[str],
-    identifier: str,
-    object: str,
-    confidence: float | None | UnsetType = UNSET,
-    confidence_type: str | None | UnsetType = UNSET,
-    unit: str | None | UnsetType = UNSET,
-    observed_at: datetime | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> AssertedMetric:
-    """AssertMetricValue
-
-    Record a measurement, creating the structure it describes if this is its first sight. One assertion covers both
-
-    Args:
-        key: The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text. (required)
-        value: The `AnyScalar` scalar type represents an arbitrary JSON-like value (required)
-        value_kind: What type of value this is. Required: it decides which column the value is stored in and which measurement term it is recorded under, and nothing infers it. Two callers may declare the same key differently — a float `confidence` and a category-label `confidence` are two terms, and both are recorded.
-        confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-        confidence_type: What kind of number `confidence` is — a method's own score, a p-value. Measurement-only
-        unit: The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
-        observed_at: When the world was observed. Defaults to when it was claimed.
-        derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
-        identifier: The schema identifier for this metric (e.g. '@mikro/roi_volume')
-        object: The unique ID of the object this metric references
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedMetric
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["key"] = key
-    _input["value"] = value
-    _input["valueKind"] = value_kind
-    if confidence is not UNSET:
-        _input["confidence"] = confidence
-    if confidence_type is not UNSET:
-        _input["confidenceType"] = confidence_type
-    if unit is not UNSET:
-        _input["unit"] = unit
-    if observed_at is not UNSET:
-        _input["observedAt"] = observed_at
-    _input["derivedFrom"] = derived_from
-    _input["identifier"] = identifier
-    _input["object"] = object
-    variables["input"] = _input
-    return (await aexecute(AssertMetricValueMutation, variables, rath=rath)).assert_metric_value
-
-
-def assert_metric_value(
-    key: str,
-    value: Any,
-    value_kind: PropertyType,
-    derived_from: Iterable[str],
-    identifier: str,
-    object: str,
-    confidence: float | None | UnsetType = UNSET,
-    confidence_type: str | None | UnsetType = UNSET,
-    unit: str | None | UnsetType = UNSET,
-    observed_at: datetime | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> AssertedMetric:
-    """AssertMetricValue
-
-    Record a measurement, creating the structure it describes if this is its first sight. One assertion covers both
-
-    Args:
-        key: The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text. (required)
-        value: The `AnyScalar` scalar type represents an arbitrary JSON-like value (required)
-        value_kind: What type of value this is. Required: it decides which column the value is stored in and which measurement term it is recorded under, and nothing infers it. Two callers may declare the same key differently — a float `confidence` and a category-label `confidence` are two terms, and both are recorded.
-        confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-        confidence_type: What kind of number `confidence` is — a method's own score, a p-value. Measurement-only
-        unit: The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
-        observed_at: When the world was observed. Defaults to when it was claimed.
-        derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
-        identifier: The schema identifier for this metric (e.g. '@mikro/roi_volume')
-        object: The unique ID of the object this metric references
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedMetric
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["key"] = key
-    _input["value"] = value
-    _input["valueKind"] = value_kind
-    if confidence is not UNSET:
-        _input["confidence"] = confidence
-    if confidence_type is not UNSET:
-        _input["confidenceType"] = confidence_type
-    if unit is not UNSET:
-        _input["unit"] = unit
-    if observed_at is not UNSET:
-        _input["observedAt"] = observed_at
-    _input["derivedFrom"] = derived_from
-    _input["identifier"] = identifier
-    _input["object"] = object
-    variables["input"] = _input
-    return execute(AssertMetricValueMutation, variables, rath=rath).assert_metric_value
-
-
-async def aassert_metric_value_for_structure(
-    key: str,
-    value: Any,
-    value_kind: PropertyType,
-    derived_from: Iterable[str],
-    structure: IDCoercible,
-    confidence: float | None | UnsetType = UNSET,
-    confidence_type: str | None | UnsetType = UNSET,
-    unit: str | None | UnsetType = UNSET,
-    observed_at: datetime | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> AssertedMetric:
-    """AssertMetricValueForStructure
-
-    Record a measurement against a structure that already exists, named by its evidence id
-
-    Args:
-        key: The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text. (required)
-        value: The `AnyScalar` scalar type represents an arbitrary JSON-like value (required)
-        value_kind: What type of value this is. Required: it decides which column the value is stored in and which measurement term it is recorded under, and nothing infers it. Two callers may declare the same key differently — a float `confidence` and a category-label `confidence` are two terms, and both are recorded.
-        confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-        confidence_type: What kind of number `confidence` is — a method's own score, a p-value. Measurement-only
-        unit: The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
-        observed_at: When the world was observed. Defaults to when it was claimed.
-        derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
-        structure: The unique ID of the structure this metric is associated with
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedMetric
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["key"] = key
-    _input["value"] = value
-    _input["valueKind"] = value_kind
-    if confidence is not UNSET:
-        _input["confidence"] = confidence
-    if confidence_type is not UNSET:
-        _input["confidenceType"] = confidence_type
-    if unit is not UNSET:
-        _input["unit"] = unit
-    if observed_at is not UNSET:
-        _input["observedAt"] = observed_at
-    _input["derivedFrom"] = derived_from
-    _input["structure"] = structure
-    variables["input"] = _input
-    return (
-        await aexecute(AssertMetricValueForStructureMutation, variables, rath=rath)
-    ).assert_metric_value_for_structure
-
-
-def assert_metric_value_for_structure(
-    key: str,
-    value: Any,
-    value_kind: PropertyType,
-    derived_from: Iterable[str],
-    structure: IDCoercible,
-    confidence: float | None | UnsetType = UNSET,
-    confidence_type: str | None | UnsetType = UNSET,
-    unit: str | None | UnsetType = UNSET,
-    observed_at: datetime | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> AssertedMetric:
-    """AssertMetricValueForStructure
-
-    Record a measurement against a structure that already exists, named by its evidence id
-
-    Args:
-        key: The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text. (required)
-        value: The `AnyScalar` scalar type represents an arbitrary JSON-like value (required)
-        value_kind: What type of value this is. Required: it decides which column the value is stored in and which measurement term it is recorded under, and nothing infers it. Two callers may declare the same key differently — a float `confidence` and a category-label `confidence` are two terms, and both are recorded.
-        confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-        confidence_type: What kind of number `confidence` is — a method's own score, a p-value. Measurement-only
-        unit: The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
-        observed_at: When the world was observed. Defaults to when it was claimed.
-        derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
-        structure: The unique ID of the structure this metric is associated with
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedMetric
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["key"] = key
-    _input["value"] = value
-    _input["valueKind"] = value_kind
-    if confidence is not UNSET:
-        _input["confidence"] = confidence
-    if confidence_type is not UNSET:
-        _input["confidenceType"] = confidence_type
-    if unit is not UNSET:
-        _input["unit"] = unit
-    if observed_at is not UNSET:
-        _input["observedAt"] = observed_at
-    _input["derivedFrom"] = derived_from
-    _input["structure"] = structure
-    variables["input"] = _input
-    return execute(
-        AssertMetricValueForStructureMutation, variables, rath=rath
-    ).assert_metric_value_for_structure
-
-
-async def asupersede_metric_value(
-    key: str,
-    value: Any,
-    value_kind: PropertyType,
-    derived_from: Iterable[str],
-    id: str,
-    confidence: float | None | UnsetType = UNSET,
-    confidence_type: str | None | UnsetType = UNSET,
-    unit: str | None | UnsetType = UNSET,
-    observed_at: datetime | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> AssertedMetric:
-    """SupersedeMetricValue
-     Retracting Standing + the new Metric under ONE assertion. Returns a metric with a NEW id.
-
-    Args:
-        key: The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text. (required)
-        value: The `AnyScalar` scalar type represents an arbitrary JSON-like value (required)
-        value_kind: What type of value this is. Required: it decides which column the value is stored in and which measurement term it is recorded under, and nothing infers it. Two callers may declare the same key differently — a float `confidence` and a category-label `confidence` are two terms, and both are recorded.
-        confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-        confidence_type: What kind of number `confidence` is — a method's own score, a p-value. Measurement-only
-        unit: The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
-        observed_at: When the world was observed. Defaults to when it was claimed.
-        derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
-        id: The ID of the metric to update
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedMetric
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["key"] = key
-    _input["value"] = value
-    _input["valueKind"] = value_kind
-    if confidence is not UNSET:
-        _input["confidence"] = confidence
-    if confidence_type is not UNSET:
-        _input["confidenceType"] = confidence_type
-    if unit is not UNSET:
-        _input["unit"] = unit
-    if observed_at is not UNSET:
-        _input["observedAt"] = observed_at
-    _input["derivedFrom"] = derived_from
-    _input["id"] = id
-    variables["input"] = _input
-    return (
-        await aexecute(SupersedeMetricValueMutation, variables, rath=rath)
-    ).supersede_metric_value
-
-
-def supersede_metric_value(
-    key: str,
-    value: Any,
-    value_kind: PropertyType,
-    derived_from: Iterable[str],
-    id: str,
-    confidence: float | None | UnsetType = UNSET,
-    confidence_type: str | None | UnsetType = UNSET,
-    unit: str | None | UnsetType = UNSET,
-    observed_at: datetime | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> AssertedMetric:
-    """SupersedeMetricValue
-     Retracting Standing + the new Metric under ONE assertion. Returns a metric with a NEW id.
-
-    Args:
-        key: The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text. (required)
-        value: The `AnyScalar` scalar type represents an arbitrary JSON-like value (required)
-        value_kind: What type of value this is. Required: it decides which column the value is stored in and which measurement term it is recorded under, and nothing infers it. Two callers may declare the same key differently — a float `confidence` and a category-label `confidence` are two terms, and both are recorded.
-        confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-        confidence_type: What kind of number `confidence` is — a method's own score, a p-value. Measurement-only
-        unit: The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
-        observed_at: When the world was observed. Defaults to when it was claimed.
-        derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
-        id: The ID of the metric to update
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedMetric
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["key"] = key
-    _input["value"] = value
-    _input["valueKind"] = value_kind
-    if confidence is not UNSET:
-        _input["confidence"] = confidence
-    if confidence_type is not UNSET:
-        _input["confidenceType"] = confidence_type
-    if unit is not UNSET:
-        _input["unit"] = unit
-    if observed_at is not UNSET:
-        _input["observedAt"] = observed_at
-    _input["derivedFrom"] = derived_from
-    _input["id"] = id
-    variables["input"] = _input
-    return execute(SupersedeMetricValueMutation, variables, rath=rath).supersede_metric_value
-
-
-async def aassert_relation_exists(
-    source_id: str,
-    target_id: str,
-    supporting_evidence: Iterable[StructureReferenceInput],
-    derived_from: Iterable[str],
-    term: str,
-    observed_at: datetime | None | UnsetType = UNSET,
-    confidence: float | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> AssertedRelation:
-    """AssertRelationExists
-     ---- links ---------------------------------------------------------------------------------
-
-    Args:
-        source_id: The ID of the source entity/structure
-        target_id: The ID of the target entity/structure
-        supporting_evidence: List of evidence structures with measurements
-        observed_at: When the world was in this state — world time, the axis a scientist means by 'when'. Distinct from when it is claimed, which the assertion records; left unset, the two are equal. A point, not an interval: a duration is a metric.
-        confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-        derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
-        term: The organization's word for what is being claimed — a term's `key`, e.g. 'AIS'. Not a category id and not a graph: a claim names a word, and every view that declares that word will hold what you write. The word is created if the organization has not used it before; a view that declares no category for it simply will not draw it.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedRelation
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["sourceId"] = source_id
-    _input["targetId"] = target_id
-    _input["supportingEvidence"] = supporting_evidence
-    if observed_at is not UNSET:
-        _input["observedAt"] = observed_at
-    if confidence is not UNSET:
-        _input["confidence"] = confidence
-    _input["derivedFrom"] = derived_from
-    _input["term"] = term
-    variables["input"] = _input
-    return (
-        await aexecute(AssertRelationExistsMutation, variables, rath=rath)
-    ).assert_relation_exists
-
-
-def assert_relation_exists(
-    source_id: str,
-    target_id: str,
-    supporting_evidence: Iterable[StructureReferenceInput],
-    derived_from: Iterable[str],
-    term: str,
-    observed_at: datetime | None | UnsetType = UNSET,
-    confidence: float | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> AssertedRelation:
-    """AssertRelationExists
-     ---- links ---------------------------------------------------------------------------------
-
-    Args:
-        source_id: The ID of the source entity/structure
-        target_id: The ID of the target entity/structure
-        supporting_evidence: List of evidence structures with measurements
-        observed_at: When the world was in this state — world time, the axis a scientist means by 'when'. Distinct from when it is claimed, which the assertion records; left unset, the two are equal. A point, not an interval: a duration is a metric.
-        confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-        derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
-        term: The organization's word for what is being claimed — a term's `key`, e.g. 'AIS'. Not a category id and not a graph: a claim names a word, and every view that declares that word will hold what you write. The word is created if the organization has not used it before; a view that declares no category for it simply will not draw it.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedRelation
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["sourceId"] = source_id
-    _input["targetId"] = target_id
-    _input["supportingEvidence"] = supporting_evidence
-    if observed_at is not UNSET:
-        _input["observedAt"] = observed_at
-    if confidence is not UNSET:
-        _input["confidence"] = confidence
-    _input["derivedFrom"] = derived_from
-    _input["term"] = term
-    variables["input"] = _input
-    return execute(AssertRelationExistsMutation, variables, rath=rath).assert_relation_exists
-
-
-async def aassert_measurement_exists(
-    source_id: str,
-    target_id: str,
-    supporting_evidence: Iterable[StructureReferenceInput],
-    derived_from: Iterable[str],
-    term: str,
-    observed_at: datetime | None | UnsetType = UNSET,
-    confidence: float | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> AssertedMeasurement:
-    """AssertMeasurementExists
-
-    Assert that a structure measures an entity, under one of the organization's words. Drawings are always empty: a measurement has no AGE edge
-
-    Args:
-        source_id: The ID of the source entity/structure
-        target_id: The ID of the target entity/structure
-        supporting_evidence: List of evidence structures with measurements
-        observed_at: When the world was in this state — world time, the axis a scientist means by 'when'. Distinct from when it is claimed, which the assertion records; left unset, the two are equal. A point, not an interval: a duration is a metric.
-        confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-        derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
-        term: The organization's word for what is being claimed — a term's `key`, e.g. 'AIS'. Not a category id and not a graph: a claim names a word, and every view that declares that word will hold what you write. The word is created if the organization has not used it before; a view that declares no category for it simply will not draw it.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedMeasurement
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["sourceId"] = source_id
-    _input["targetId"] = target_id
-    _input["supportingEvidence"] = supporting_evidence
-    if observed_at is not UNSET:
-        _input["observedAt"] = observed_at
-    if confidence is not UNSET:
-        _input["confidence"] = confidence
-    _input["derivedFrom"] = derived_from
-    _input["term"] = term
-    variables["input"] = _input
-    return (
-        await aexecute(AssertMeasurementExistsMutation, variables, rath=rath)
-    ).assert_measurement_exists
-
-
-def assert_measurement_exists(
-    source_id: str,
-    target_id: str,
-    supporting_evidence: Iterable[StructureReferenceInput],
-    derived_from: Iterable[str],
-    term: str,
-    observed_at: datetime | None | UnsetType = UNSET,
-    confidence: float | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> AssertedMeasurement:
-    """AssertMeasurementExists
-
-    Assert that a structure measures an entity, under one of the organization's words. Drawings are always empty: a measurement has no AGE edge
-
-    Args:
-        source_id: The ID of the source entity/structure
-        target_id: The ID of the target entity/structure
-        supporting_evidence: List of evidence structures with measurements
-        observed_at: When the world was in this state — world time, the axis a scientist means by 'when'. Distinct from when it is claimed, which the assertion records; left unset, the two are equal. A point, not an interval: a duration is a metric.
-        confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-        derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
-        term: The organization's word for what is being claimed — a term's `key`, e.g. 'AIS'. Not a category id and not a graph: a claim names a word, and every view that declares that word will hold what you write. The word is created if the organization has not used it before; a view that declares no category for it simply will not draw it.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedMeasurement
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["sourceId"] = source_id
-    _input["targetId"] = target_id
-    _input["supportingEvidence"] = supporting_evidence
-    if observed_at is not UNSET:
-        _input["observedAt"] = observed_at
-    if confidence is not UNSET:
-        _input["confidence"] = confidence
-    _input["derivedFrom"] = derived_from
-    _input["term"] = term
-    variables["input"] = _input
-    return execute(AssertMeasurementExistsMutation, variables, rath=rath).assert_measurement_exists
-
-
-async def aassert_structure_relation_exists(
-    source_id: str,
-    target_id: str,
-    supporting_evidence: Iterable[StructureReferenceInput],
-    derived_from: Iterable[str],
-    term: str,
-    observed_at: datetime | None | UnsetType = UNSET,
-    confidence: float | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> AssertedStructureRelation:
-    """AssertStructureRelationExists
-
-    Assert a relation between two structures. Drawings are always empty: neither endpoint has a vertex
-
-    Args:
-        source_id: The ID of the source entity/structure
-        target_id: The ID of the target entity/structure
-        supporting_evidence: List of evidence structures with measurements
-        observed_at: When the world was in this state — world time, the axis a scientist means by 'when'. Distinct from when it is claimed, which the assertion records; left unset, the two are equal. A point, not an interval: a duration is a metric.
-        confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-        derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
-        term: The organization's word for what is being claimed — a term's `key`, e.g. 'AIS'. Not a category id and not a graph: a claim names a word, and every view that declares that word will hold what you write. The word is created if the organization has not used it before; a view that declares no category for it simply will not draw it.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedStructureRelation
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["sourceId"] = source_id
-    _input["targetId"] = target_id
-    _input["supportingEvidence"] = supporting_evidence
-    if observed_at is not UNSET:
-        _input["observedAt"] = observed_at
-    if confidence is not UNSET:
-        _input["confidence"] = confidence
-    _input["derivedFrom"] = derived_from
-    _input["term"] = term
-    variables["input"] = _input
-    return (
-        await aexecute(AssertStructureRelationExistsMutation, variables, rath=rath)
-    ).assert_structure_relation_exists
-
-
-def assert_structure_relation_exists(
-    source_id: str,
-    target_id: str,
-    supporting_evidence: Iterable[StructureReferenceInput],
-    derived_from: Iterable[str],
-    term: str,
-    observed_at: datetime | None | UnsetType = UNSET,
-    confidence: float | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> AssertedStructureRelation:
-    """AssertStructureRelationExists
-
-    Assert a relation between two structures. Drawings are always empty: neither endpoint has a vertex
-
-    Args:
-        source_id: The ID of the source entity/structure
-        target_id: The ID of the target entity/structure
-        supporting_evidence: List of evidence structures with measurements
-        observed_at: When the world was in this state — world time, the axis a scientist means by 'when'. Distinct from when it is claimed, which the assertion records; left unset, the two are equal. A point, not an interval: a duration is a metric.
-        confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-        derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
-        term: The organization's word for what is being claimed — a term's `key`, e.g. 'AIS'. Not a category id and not a graph: a claim names a word, and every view that declares that word will hold what you write. The word is created if the organization has not used it before; a view that declares no category for it simply will not draw it.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedStructureRelation
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["sourceId"] = source_id
-    _input["targetId"] = target_id
-    _input["supportingEvidence"] = supporting_evidence
-    if observed_at is not UNSET:
-        _input["observedAt"] = observed_at
-    if confidence is not UNSET:
-        _input["confidence"] = confidence
-    _input["derivedFrom"] = derived_from
-    _input["term"] = term
-    variables["input"] = _input
-    return execute(
-        AssertStructureRelationExistsMutation, variables, rath=rath
-    ).assert_structure_relation_exists
-
-
-async def aassert_participation(
-    event: str,
-    entity: str,
-    role: str,
-    is_input: bool,
-    derived_from: Iterable[str],
-    observed_at: datetime | None | UnsetType = UNSET,
-    confidence: float | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> AssertedParticipation:
-    """AssertParticipation
-
-    Claim that an entity took part in an event, without displacing anyone else's claim
-
-    Args:
-        event: The ID of the event the entity took part in
-        entity: The ID of the entity that took part
-        role: Which role the entity played — the caller's own word; the write names no graph and no category
-        is_input: True if the entity went into the event, False if it came out of it
-        observed_at: When the world was in this state — world time, the axis a scientist means by 'when'. Distinct from when it is claimed, which the assertion records; left unset, the two are equal. A point, not an interval: a duration is a metric.
-        confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-        derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedParticipation
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["event"] = event
-    _input["entity"] = entity
-    _input["role"] = role
-    _input["isInput"] = is_input
-    if observed_at is not UNSET:
-        _input["observedAt"] = observed_at
-    if confidence is not UNSET:
-        _input["confidence"] = confidence
-    _input["derivedFrom"] = derived_from
-    variables["input"] = _input
-    return (await aexecute(AssertParticipationMutation, variables, rath=rath)).assert_participation
-
-
-def assert_participation(
-    event: str,
-    entity: str,
-    role: str,
-    is_input: bool,
-    derived_from: Iterable[str],
-    observed_at: datetime | None | UnsetType = UNSET,
-    confidence: float | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> AssertedParticipation:
-    """AssertParticipation
-
-    Claim that an entity took part in an event, without displacing anyone else's claim
-
-    Args:
-        event: The ID of the event the entity took part in
-        entity: The ID of the entity that took part
-        role: Which role the entity played — the caller's own word; the write names no graph and no category
-        is_input: True if the entity went into the event, False if it came out of it
-        observed_at: When the world was in this state — world time, the axis a scientist means by 'when'. Distinct from when it is claimed, which the assertion records; left unset, the two are equal. A point, not an interval: a duration is a metric.
-        confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-        derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedParticipation
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["event"] = event
-    _input["entity"] = entity
-    _input["role"] = role
-    _input["isInput"] = is_input
-    if observed_at is not UNSET:
-        _input["observedAt"] = observed_at
-    if confidence is not UNSET:
-        _input["confidence"] = confidence
-    _input["derivedFrom"] = derived_from
-    variables["input"] = _input
-    return execute(AssertParticipationMutation, variables, rath=rath).assert_participation
-
-
-async def aassert_participations(
-    event: str, participants: Iterable[ParticipantInput], rath: KraphRath | None = None
-) -> AssertedLinks:
-    """AssertParticipations
-     Many participants in one event, one assertion.
-
-    Args:
-        event: The event the entities took part in
-        participants: Everyone who took part, and how
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedLinks
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["event"] = event
-    _input["participants"] = participants
-    variables["input"] = _input
-    return (
-        await aexecute(AssertParticipationsMutation, variables, rath=rath)
-    ).assert_participations
-
-
-def assert_participations(
-    event: str, participants: Iterable[ParticipantInput], rath: KraphRath | None = None
-) -> AssertedLinks:
-    """AssertParticipations
-     Many participants in one event, one assertion.
-
-    Args:
-        event: The event the entities took part in
-        participants: Everyone who took part, and how
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedLinks
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["event"] = event
-    _input["participants"] = participants
-    variables["input"] = _input
-    return execute(AssertParticipationsMutation, variables, rath=rath).assert_participations
-
-
-async def acomment_on_structure(
-    identifier: str,
-    object: str,
-    descendants: Iterable[DescendantInput],
-    parent: IDCoercible | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> AssertedComment:
-    """CommentOnStructure
-     ---- comments ------------------------------------------------------------------------------
-
-    Args:
-        identifier: The structure identifier of the datum, e.g. '@mikro/roi'
-        object: The id of the external object on its service
-        descendants: The rich body of the remark — a tree of LEAF/MENTION/PARAGRAPH nodes
-        parent: The comment this replies to. Must be on the same structure's thread
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedComment
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["identifier"] = identifier
-    _input["object"] = object
-    _input["descendants"] = descendants
-    if parent is not UNSET:
-        _input["parent"] = parent
-    variables["input"] = _input
-    return (await aexecute(CommentOnStructureMutation, variables, rath=rath)).comment_on_structure
-
-
-def comment_on_structure(
-    identifier: str,
-    object: str,
-    descendants: Iterable[DescendantInput],
-    parent: IDCoercible | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> AssertedComment:
-    """CommentOnStructure
-     ---- comments ------------------------------------------------------------------------------
-
-    Args:
-        identifier: The structure identifier of the datum, e.g. '@mikro/roi'
-        object: The id of the external object on its service
-        descendants: The rich body of the remark — a tree of LEAF/MENTION/PARAGRAPH nodes
-        parent: The comment this replies to. Must be on the same structure's thread
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedComment
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["identifier"] = identifier
-    _input["object"] = object
-    _input["descendants"] = descendants
-    if parent is not UNSET:
-        _input["parent"] = parent
-    variables["input"] = _input
-    return execute(CommentOnStructureMutation, variables, rath=rath).comment_on_structure
-
-
-async def acreate_graph(
-    name: str,
-    backfill: bool,
-    description: str | None | UnsetType = UNSET,
-    definition: GraphDefinitionInput | None | UnsetType = UNSET,
-    sameness_rule: SamenessRuleInput | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> Graph:
-    """CreateGraph
-     A Graph is a VIEW over the organization's claims, not a container. `definition.extensions`
-     carries a whole ontology, so one call can declare every word this view means to draw, and
-     `backfill` projects the claims those words already admit.
-
-    Args:
-        name: Name of the graph
-        description: Description of the graph
-        definition: The complete graph schema definition
-        sameness_rule: Whose sameness claims this view counts (RFC 0024). Omitted means everyone
-        backfill: Draw the evidence this graph's words already admit. A graph is a view over the organization's evidence, so a new one can be a view over history: with this on, every node and edge already claimed under a word this schema declares is projected as the graph is created. Off by default because the work is proportional to the organization's evidence and happens before this mutation returns.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        Graph
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["name"] = name
-    if description is not UNSET:
-        _input["description"] = description
-    if definition is not UNSET:
-        _input["definition"] = definition
-    if sameness_rule is not UNSET:
-        _input["samenessRule"] = sameness_rule
-    _input["backfill"] = backfill
-    variables["input"] = _input
-    return (await aexecute(CreateGraphMutation, variables, rath=rath)).create_graph
-
-
-def create_graph(
-    name: str,
-    backfill: bool,
-    description: str | None | UnsetType = UNSET,
-    definition: GraphDefinitionInput | None | UnsetType = UNSET,
-    sameness_rule: SamenessRuleInput | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> Graph:
-    """CreateGraph
-     A Graph is a VIEW over the organization's claims, not a container. `definition.extensions`
-     carries a whole ontology, so one call can declare every word this view means to draw, and
-     `backfill` projects the claims those words already admit.
-
-    Args:
-        name: Name of the graph
-        description: Description of the graph
-        definition: The complete graph schema definition
-        sameness_rule: Whose sameness claims this view counts (RFC 0024). Omitted means everyone
-        backfill: Draw the evidence this graph's words already admit. A graph is a view over the organization's evidence, so a new one can be a view over history: with this on, every node and edge already claimed under a word this schema declares is projected as the graph is created. Off by default because the work is proportional to the organization's evidence and happens before this mutation returns.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        Graph
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["name"] = name
-    if description is not UNSET:
-        _input["description"] = description
-    if definition is not UNSET:
-        _input["definition"] = definition
-    if sameness_rule is not UNSET:
-        _input["samenessRule"] = sameness_rule
-    _input["backfill"] = backfill
-    variables["input"] = _input
-    return execute(CreateGraphMutation, variables, rath=rath).create_graph
-
-
-async def aupdate_graph(
-    id: str,
-    name: str | None | UnsetType = UNSET,
-    description: str | None | UnsetType = UNSET,
-    archived: bool | None | UnsetType = UNSET,
-    pin: bool | None | UnsetType = UNSET,
-    sameness_rule: SamenessRuleInput | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> Graph:
-    """UpdateGraph
-
-    Update an existing graph in the graph engine
-
-    Args:
-        id: The ID of the graph to update
-        name: New graph name
-        description: New graph description
-        archived: Optional archived flag update
-        pin: Optional pin flag update for the user making the request
-        sameness_rule: Replace whose sameness claims this view counts (RFC 0024); an empty rule list means everyone. Omitted means unchanged. Changing it refolds the view's individuals — the projection is rebuilt
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        Graph
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    if name is not UNSET:
+        if color is not UNSET:
+            _input["color"] = color
+        if image is not UNSET:
+            _input["image"] = image
+        if label is not UNSET:
+            _input["label"] = label
+        if pin is not UNSET:
+            _input["pin"] = pin
+        _input["kind"] = kind
+        _input["inputs"] = inputs
+        _input["outputs"] = outputs
+        _input["properties"] = properties
+        if definition is not UNSET:
+            _input["definition"] = definition
+        _input["protocol"] = protocol
+        _input["graph"] = graph
+        _input["backfill"] = backfill
+        variables["input"] = _input
+        return self.execute(
+            CreateProtocolEventCategoryMutation, variables
+        ).create_protocol_event_category
+
+    async def aupdate_protocol_event_category(
+        self,
+        id: str,
+        clear_definition: bool,
+        key: str | None | UnsetType = UNSET,
+        description: str | None | UnsetType = UNSET,
+        ontology_references: (
+            Iterable[OntologyReferenceInput] | None | UnsetType
+        ) = UNSET,
+        color: Iterable[int] | None | UnsetType = UNSET,
+        image: str | None | UnsetType = UNSET,
+        label: str | None | UnsetType = UNSET,
+        pin: bool | None | UnsetType = UNSET,
+        definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+    ) -> ProtocolEventCategory:
+        """UpdateProtocolEventCategory
+
+        Update an existing protocol event category in the graph
+
+        Args:
+            id: The ID of the protocol event category to update
+            key: The label of the node participating in the event
+            description: Description of this node role
+            ontology_references: Ontology references for this event
+            color: Optional RGBA color for this node role (e.g. [255, 0, 0, 128])
+            image: Optional media store ID for an image representing this node role
+            label: Optional human-readable label for this node role (defaults to 'key' if not provided)
+            pin: Whether to pin this node role in the UI
+            definition: New rule for this category (RFC 0012). Omitted means unchanged; to make it primitive again, use clearDefinition
+            clear_definition: Reset the category to primitive — any claim naming its word counts, standings organization grain
+
+        Returns:
+            ProtocolEventCategory
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        if key is not UNSET:
+            _input["key"] = key
+        if description is not UNSET:
+            _input["description"] = description
+        if ontology_references is not UNSET:
+            _input["ontologyReferences"] = ontology_references
+        if color is not UNSET:
+            _input["color"] = color
+        if image is not UNSET:
+            _input["image"] = image
+        if label is not UNSET:
+            _input["label"] = label
+        if pin is not UNSET:
+            _input["pin"] = pin
+        if definition is not UNSET:
+            _input["definition"] = definition
+        _input["clearDefinition"] = clear_definition
+        variables["input"] = _input
+        return (
+            await self.aexecute(UpdateProtocolEventCategoryMutation, variables)
+        ).update_protocol_event_category
+
+    def update_protocol_event_category(
+        self,
+        id: str,
+        clear_definition: bool,
+        key: str | None | UnsetType = UNSET,
+        description: str | None | UnsetType = UNSET,
+        ontology_references: (
+            Iterable[OntologyReferenceInput] | None | UnsetType
+        ) = UNSET,
+        color: Iterable[int] | None | UnsetType = UNSET,
+        image: str | None | UnsetType = UNSET,
+        label: str | None | UnsetType = UNSET,
+        pin: bool | None | UnsetType = UNSET,
+        definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+    ) -> ProtocolEventCategory:
+        """UpdateProtocolEventCategory
+
+        Update an existing protocol event category in the graph
+
+        Args:
+            id: The ID of the protocol event category to update
+            key: The label of the node participating in the event
+            description: Description of this node role
+            ontology_references: Ontology references for this event
+            color: Optional RGBA color for this node role (e.g. [255, 0, 0, 128])
+            image: Optional media store ID for an image representing this node role
+            label: Optional human-readable label for this node role (defaults to 'key' if not provided)
+            pin: Whether to pin this node role in the UI
+            definition: New rule for this category (RFC 0012). Omitted means unchanged; to make it primitive again, use clearDefinition
+            clear_definition: Reset the category to primitive — any claim naming its word counts, standings organization grain
+
+        Returns:
+            ProtocolEventCategory
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        if key is not UNSET:
+            _input["key"] = key
+        if description is not UNSET:
+            _input["description"] = description
+        if ontology_references is not UNSET:
+            _input["ontologyReferences"] = ontology_references
+        if color is not UNSET:
+            _input["color"] = color
+        if image is not UNSET:
+            _input["image"] = image
+        if label is not UNSET:
+            _input["label"] = label
+        if pin is not UNSET:
+            _input["pin"] = pin
+        if definition is not UNSET:
+            _input["definition"] = definition
+        _input["clearDefinition"] = clear_definition
+        variables["input"] = _input
+        return self.execute(
+            UpdateProtocolEventCategoryMutation, variables
+        ).update_protocol_event_category
+
+    async def adelete_protocol_event_category(self, id: str) -> ID:
+        """DeleteProtocolEventCategory
+
+        Delete a protocol event category from the graph
+
+        Args:
+            id: The ID of the event category to delete
+
+        Returns:
+            ID
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        variables["input"] = _input
+        return (
+            await self.aexecute(DeleteProtocolEventCategoryMutation, variables)
+        ).delete_protocol_event_category
+
+    def delete_protocol_event_category(self, id: str) -> ID:
+        """DeleteProtocolEventCategory
+
+        Delete a protocol event category from the graph
+
+        Args:
+            id: The ID of the event category to delete
+
+        Returns:
+            ID
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        variables["input"] = _input
+        return self.execute(
+            DeleteProtocolEventCategoryMutation, variables
+        ).delete_protocol_event_category
+
+    async def aassert_entity_exists(
+        self,
+        term: str,
+        supporting_evidence: Iterable[StructureReferenceInput],
+        derived_from: Iterable[str],
+        same_as: Iterable[str],
+        observed_at: datetime | None | UnsetType = UNSET,
+        confidence: float | None | UnsetType = UNSET,
+    ) -> AssertedEntity:
+        """AssertEntityExists
+         ---- existence: instances -----------------------------------------------------------------
+         A write names a WORD (`term`), never a graph and never a category id.
+
+        Args:
+            term: The organization's word for what is being claimed — a term's `key`, e.g. 'AIS'. Not a category id and not a graph: a claim names a word, and every view that declares that word will hold what you write. The word is created if the organization has not used it before; a view that declares no category for it simply will not draw it.
+            supporting_evidence: List of evidence structures with measurements
+            observed_at: When the world was in this state — world time, the axis a scientist means by 'when'. Distinct from when it is claimed, which the assertion records; left unset, the two are equal. A point, not an interval: a duration is a metric.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+            derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
+            same_as: Instances this new one is the same as. Saying "this is AIS 6" mints a fresh instance and claims it is the same as the one already known as AIS 6 — all under **one assertion**, because it is one act. Sameness is an equivalence with no primary, so which id you send is immaterial; entities only, never structures.
+
+        Returns:
+            AssertedEntity
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["term"] = term
+        _input["supportingEvidence"] = supporting_evidence
+        if observed_at is not UNSET:
+            _input["observedAt"] = observed_at
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        _input["derivedFrom"] = derived_from
+        _input["sameAs"] = same_as
+        variables["input"] = _input
+        return (
+            await self.aexecute(AssertEntityExistsMutation, variables)
+        ).assert_entity_exists
+
+    def assert_entity_exists(
+        self,
+        term: str,
+        supporting_evidence: Iterable[StructureReferenceInput],
+        derived_from: Iterable[str],
+        same_as: Iterable[str],
+        observed_at: datetime | None | UnsetType = UNSET,
+        confidence: float | None | UnsetType = UNSET,
+    ) -> AssertedEntity:
+        """AssertEntityExists
+         ---- existence: instances -----------------------------------------------------------------
+         A write names a WORD (`term`), never a graph and never a category id.
+
+        Args:
+            term: The organization's word for what is being claimed — a term's `key`, e.g. 'AIS'. Not a category id and not a graph: a claim names a word, and every view that declares that word will hold what you write. The word is created if the organization has not used it before; a view that declares no category for it simply will not draw it.
+            supporting_evidence: List of evidence structures with measurements
+            observed_at: When the world was in this state — world time, the axis a scientist means by 'when'. Distinct from when it is claimed, which the assertion records; left unset, the two are equal. A point, not an interval: a duration is a metric.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+            derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
+            same_as: Instances this new one is the same as. Saying "this is AIS 6" mints a fresh instance and claims it is the same as the one already known as AIS 6 — all under **one assertion**, because it is one act. Sameness is an equivalence with no primary, so which id you send is immaterial; entities only, never structures.
+
+        Returns:
+            AssertedEntity
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["term"] = term
+        _input["supportingEvidence"] = supporting_evidence
+        if observed_at is not UNSET:
+            _input["observedAt"] = observed_at
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        _input["derivedFrom"] = derived_from
+        _input["sameAs"] = same_as
+        variables["input"] = _input
+        return self.execute(AssertEntityExistsMutation, variables).assert_entity_exists
+
+    async def aassert_natural_event_exists(
+        self,
+        term: str,
+        inputs: Iterable[RoleMappingInput],
+        outputs: Iterable[RoleMappingInput],
+        supporting_evidence: Iterable[StructureReferenceInput],
+        derived_from: Iterable[str],
+        observed_at: datetime | None | UnsetType = UNSET,
+        confidence: float | None | UnsetType = UNSET,
+    ) -> AssertedNaturalEvent:
+        """AssertNaturalEventExists
+
+        Claim that a natural event happened, under one of the organization's words
+
+        Args:
+            term: The organization's word for what is being claimed — a term's `key`, e.g. 'AIS'. Not a category id and not a graph: a claim names a word, and every view that declares that word will hold what you write. The word is created if the organization has not used it before; a view that declares no category for it simply will not draw it.
+            inputs: List of entity IDs that are inputs to this event
+            outputs: List of entity IDs that are outputs of this event
+            supporting_evidence: List of evidence structures with measurements
+            observed_at: When the world was in this state — world time, the axis a scientist means by 'when'. Distinct from when it is claimed, which the assertion records; left unset, the two are equal. A point, not an interval: a duration is a metric.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+            derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
+
+        Returns:
+            AssertedNaturalEvent
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["term"] = term
+        _input["inputs"] = inputs
+        _input["outputs"] = outputs
+        _input["supportingEvidence"] = supporting_evidence
+        if observed_at is not UNSET:
+            _input["observedAt"] = observed_at
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        _input["derivedFrom"] = derived_from
+        variables["input"] = _input
+        return (
+            await self.aexecute(AssertNaturalEventExistsMutation, variables)
+        ).assert_natural_event_exists
+
+    def assert_natural_event_exists(
+        self,
+        term: str,
+        inputs: Iterable[RoleMappingInput],
+        outputs: Iterable[RoleMappingInput],
+        supporting_evidence: Iterable[StructureReferenceInput],
+        derived_from: Iterable[str],
+        observed_at: datetime | None | UnsetType = UNSET,
+        confidence: float | None | UnsetType = UNSET,
+    ) -> AssertedNaturalEvent:
+        """AssertNaturalEventExists
+
+        Claim that a natural event happened, under one of the organization's words
+
+        Args:
+            term: The organization's word for what is being claimed — a term's `key`, e.g. 'AIS'. Not a category id and not a graph: a claim names a word, and every view that declares that word will hold what you write. The word is created if the organization has not used it before; a view that declares no category for it simply will not draw it.
+            inputs: List of entity IDs that are inputs to this event
+            outputs: List of entity IDs that are outputs of this event
+            supporting_evidence: List of evidence structures with measurements
+            observed_at: When the world was in this state — world time, the axis a scientist means by 'when'. Distinct from when it is claimed, which the assertion records; left unset, the two are equal. A point, not an interval: a duration is a metric.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+            derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
+
+        Returns:
+            AssertedNaturalEvent
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["term"] = term
+        _input["inputs"] = inputs
+        _input["outputs"] = outputs
+        _input["supportingEvidence"] = supporting_evidence
+        if observed_at is not UNSET:
+            _input["observedAt"] = observed_at
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        _input["derivedFrom"] = derived_from
+        variables["input"] = _input
+        return self.execute(
+            AssertNaturalEventExistsMutation, variables
+        ).assert_natural_event_exists
+
+    async def aassert_protocol_event_exists(
+        self,
+        term: str,
+        inputs: Iterable[RoleMappingInput],
+        outputs: Iterable[RoleMappingInput],
+        supporting_evidence: Iterable[StructureReferenceInput],
+        derived_from: Iterable[str],
+        observed_at: datetime | None | UnsetType = UNSET,
+        confidence: float | None | UnsetType = UNSET,
+    ) -> AssertedProtocolEvent:
+        """AssertProtocolEventExists
+
+        Claim that a protocol step happened, under one of the organization's words
+
+        Args:
+            term: The organization's word for what is being claimed — a term's `key`, e.g. 'AIS'. Not a category id and not a graph: a claim names a word, and every view that declares that word will hold what you write. The word is created if the organization has not used it before; a view that declares no category for it simply will not draw it.
+            inputs: List of entity IDs that are inputs to this event
+            outputs: List of entity IDs that are outputs of this event
+            supporting_evidence: List of evidence structures with measurements
+            observed_at: When the world was in this state — world time, the axis a scientist means by 'when'. Distinct from when it is claimed, which the assertion records; left unset, the two are equal. A point, not an interval: a duration is a metric.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+            derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
+
+        Returns:
+            AssertedProtocolEvent
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["term"] = term
+        _input["inputs"] = inputs
+        _input["outputs"] = outputs
+        _input["supportingEvidence"] = supporting_evidence
+        if observed_at is not UNSET:
+            _input["observedAt"] = observed_at
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        _input["derivedFrom"] = derived_from
+        variables["input"] = _input
+        return (
+            await self.aexecute(AssertProtocolEventExistsMutation, variables)
+        ).assert_protocol_event_exists
+
+    def assert_protocol_event_exists(
+        self,
+        term: str,
+        inputs: Iterable[RoleMappingInput],
+        outputs: Iterable[RoleMappingInput],
+        supporting_evidence: Iterable[StructureReferenceInput],
+        derived_from: Iterable[str],
+        observed_at: datetime | None | UnsetType = UNSET,
+        confidence: float | None | UnsetType = UNSET,
+    ) -> AssertedProtocolEvent:
+        """AssertProtocolEventExists
+
+        Claim that a protocol step happened, under one of the organization's words
+
+        Args:
+            term: The organization's word for what is being claimed — a term's `key`, e.g. 'AIS'. Not a category id and not a graph: a claim names a word, and every view that declares that word will hold what you write. The word is created if the organization has not used it before; a view that declares no category for it simply will not draw it.
+            inputs: List of entity IDs that are inputs to this event
+            outputs: List of entity IDs that are outputs of this event
+            supporting_evidence: List of evidence structures with measurements
+            observed_at: When the world was in this state — world time, the axis a scientist means by 'when'. Distinct from when it is claimed, which the assertion records; left unset, the two are equal. A point, not an interval: a duration is a metric.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+            derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
+
+        Returns:
+            AssertedProtocolEvent
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["term"] = term
+        _input["inputs"] = inputs
+        _input["outputs"] = outputs
+        _input["supportingEvidence"] = supporting_evidence
+        if observed_at is not UNSET:
+            _input["observedAt"] = observed_at
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        _input["derivedFrom"] = derived_from
+        variables["input"] = _input
+        return self.execute(
+            AssertProtocolEventExistsMutation, variables
+        ).assert_protocol_event_exists
+
+    async def aclassify_nodes(
+        self, classifications: Iterable[ClassificationInput]
+    ) -> AssertedInstances:
+        """ClassifyNodes
+         One assertion over many (node, term) pairs — a batch is one act.
+
+        Args:
+            classifications: The claims to record
+
+        Returns:
+            AssertedInstances
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["classifications"] = classifications
+        variables["input"] = _input
+        return (await self.aexecute(ClassifyNodesMutation, variables)).classify_nodes
+
+    def classify_nodes(
+        self, classifications: Iterable[ClassificationInput]
+    ) -> AssertedInstances:
+        """ClassifyNodes
+         One assertion over many (node, term) pairs — a batch is one act.
+
+        Args:
+            classifications: The claims to record
+
+        Returns:
+            AssertedInstances
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["classifications"] = classifications
+        variables["input"] = _input
+        return self.execute(ClassifyNodesMutation, variables).classify_nodes
+
+    async def aassert_same_instance(
+        self,
+        instances: Iterable[str],
+        derived_from: Iterable[str],
+        observed_at: datetime | None | UnsetType = UNSET,
+        confidence: float | None | UnsetType = UNSET,
+    ) -> AssertedSameness:
+        """AssertSameInstance
+
+        Claim that several already-recorded instances are one thing. An equivalence with no primary — the order of the ids carries no meaning
+
+        Args:
+            instances: Two or more instance ids that name the same thing — entities or events alike. Every pair among them is claimed, under one assertion.
+            observed_at: When the world was in this state — world time, the axis a scientist means by 'when'. Distinct from when it is claimed, which the assertion records; left unset, the two are equal. A point, not an interval: a duration is a metric.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+            derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
+
+        Returns:
+            AssertedSameness
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["instances"] = instances
+        if observed_at is not UNSET:
+            _input["observedAt"] = observed_at
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        _input["derivedFrom"] = derived_from
+        variables["input"] = _input
+        return (
+            await self.aexecute(AssertSameInstanceMutation, variables)
+        ).assert_same_instance
+
+    def assert_same_instance(
+        self,
+        instances: Iterable[str],
+        derived_from: Iterable[str],
+        observed_at: datetime | None | UnsetType = UNSET,
+        confidence: float | None | UnsetType = UNSET,
+    ) -> AssertedSameness:
+        """AssertSameInstance
+
+        Claim that several already-recorded instances are one thing. An equivalence with no primary — the order of the ids carries no meaning
+
+        Args:
+            instances: Two or more instance ids that name the same thing — entities or events alike. Every pair among them is claimed, under one assertion.
+            observed_at: When the world was in this state — world time, the axis a scientist means by 'when'. Distinct from when it is claimed, which the assertion records; left unset, the two are equal. A point, not an interval: a duration is a metric.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+            derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
+
+        Returns:
+            AssertedSameness
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["instances"] = instances
+        if observed_at is not UNSET:
+            _input["observedAt"] = observed_at
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        _input["derivedFrom"] = derived_from
+        variables["input"] = _input
+        return self.execute(AssertSameInstanceMutation, variables).assert_same_instance
+
+    async def aassert_structure_exists(
+        self,
+        object: str,
+        metrics: Iterable[MetricInput],
+        derived_from: Iterable[str],
+        identifier: str,
+        observed_at: datetime | None | UnsetType = UNSET,
+        confidence: float | None | UnsetType = UNSET,
+    ) -> AssertedStructure:
+        """AssertStructureExists
+         ---- structures and metrics ---------------------------------------------------------------
+
+        Args:
+            object: The unique ID of the object this structure references
+            metrics: List of measurements associated with this structure
+            derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
+            identifier: The structure identifier, e.g. '@mikro/roi'
+            observed_at: When the world was in this state — world time, the axis a scientist means by 'when'. Distinct from when it is claimed, which the assertion records; left unset, the two are equal. A point, not an interval: a duration is a metric.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+
+        Returns:
+            AssertedStructure
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["object"] = object
+        _input["metrics"] = metrics
+        _input["derivedFrom"] = derived_from
+        _input["identifier"] = identifier
+        if observed_at is not UNSET:
+            _input["observedAt"] = observed_at
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        variables["input"] = _input
+        return (
+            await self.aexecute(AssertStructureExistsMutation, variables)
+        ).assert_structure_exists
+
+    def assert_structure_exists(
+        self,
+        object: str,
+        metrics: Iterable[MetricInput],
+        derived_from: Iterable[str],
+        identifier: str,
+        observed_at: datetime | None | UnsetType = UNSET,
+        confidence: float | None | UnsetType = UNSET,
+    ) -> AssertedStructure:
+        """AssertStructureExists
+         ---- structures and metrics ---------------------------------------------------------------
+
+        Args:
+            object: The unique ID of the object this structure references
+            metrics: List of measurements associated with this structure
+            derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
+            identifier: The structure identifier, e.g. '@mikro/roi'
+            observed_at: When the world was in this state — world time, the axis a scientist means by 'when'. Distinct from when it is claimed, which the assertion records; left unset, the two are equal. A point, not an interval: a duration is a metric.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+
+        Returns:
+            AssertedStructure
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["object"] = object
+        _input["metrics"] = metrics
+        _input["derivedFrom"] = derived_from
+        _input["identifier"] = identifier
+        if observed_at is not UNSET:
+            _input["observedAt"] = observed_at
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        variables["input"] = _input
+        return self.execute(
+            AssertStructureExistsMutation, variables
+        ).assert_structure_exists
+
+    async def aassert_metric_value(
+        self,
+        key: str,
+        value: Any,
+        value_kind: PropertyType,
+        derived_from: Iterable[str],
+        identifier: str,
+        object: str,
+        confidence: float | None | UnsetType = UNSET,
+        confidence_type: str | None | UnsetType = UNSET,
+        unit: str | None | UnsetType = UNSET,
+        observed_at: datetime | None | UnsetType = UNSET,
+    ) -> AssertedMetric:
+        """AssertMetricValue
+
+        Record a measurement, creating the structure it describes if this is its first sight. One assertion covers both
+
+        Args:
+            key: The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text. (required)
+            value: The `AnyScalar` scalar type represents an arbitrary JSON-like value (required)
+            value_kind: What type of value this is. Required: it decides which column the value is stored in and which measurement term it is recorded under, and nothing infers it. Two callers may declare the same key differently — a float `confidence` and a category-label `confidence` are two terms, and both are recorded.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+            confidence_type: What kind of number `confidence` is — a method's own score, a p-value. Measurement-only
+            unit: The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+            observed_at: When the world was observed. Defaults to when it was claimed.
+            derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
+            identifier: The schema identifier for this metric (e.g. '@mikro/roi_volume')
+            object: The unique ID of the object this metric references
+
+        Returns:
+            AssertedMetric
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["key"] = key
+        _input["value"] = value
+        _input["valueKind"] = value_kind
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        if confidence_type is not UNSET:
+            _input["confidenceType"] = confidence_type
+        if unit is not UNSET:
+            _input["unit"] = unit
+        if observed_at is not UNSET:
+            _input["observedAt"] = observed_at
+        _input["derivedFrom"] = derived_from
+        _input["identifier"] = identifier
+        _input["object"] = object
+        variables["input"] = _input
+        return (
+            await self.aexecute(AssertMetricValueMutation, variables)
+        ).assert_metric_value
+
+    def assert_metric_value(
+        self,
+        key: str,
+        value: Any,
+        value_kind: PropertyType,
+        derived_from: Iterable[str],
+        identifier: str,
+        object: str,
+        confidence: float | None | UnsetType = UNSET,
+        confidence_type: str | None | UnsetType = UNSET,
+        unit: str | None | UnsetType = UNSET,
+        observed_at: datetime | None | UnsetType = UNSET,
+    ) -> AssertedMetric:
+        """AssertMetricValue
+
+        Record a measurement, creating the structure it describes if this is its first sight. One assertion covers both
+
+        Args:
+            key: The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text. (required)
+            value: The `AnyScalar` scalar type represents an arbitrary JSON-like value (required)
+            value_kind: What type of value this is. Required: it decides which column the value is stored in and which measurement term it is recorded under, and nothing infers it. Two callers may declare the same key differently — a float `confidence` and a category-label `confidence` are two terms, and both are recorded.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+            confidence_type: What kind of number `confidence` is — a method's own score, a p-value. Measurement-only
+            unit: The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+            observed_at: When the world was observed. Defaults to when it was claimed.
+            derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
+            identifier: The schema identifier for this metric (e.g. '@mikro/roi_volume')
+            object: The unique ID of the object this metric references
+
+        Returns:
+            AssertedMetric
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["key"] = key
+        _input["value"] = value
+        _input["valueKind"] = value_kind
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        if confidence_type is not UNSET:
+            _input["confidenceType"] = confidence_type
+        if unit is not UNSET:
+            _input["unit"] = unit
+        if observed_at is not UNSET:
+            _input["observedAt"] = observed_at
+        _input["derivedFrom"] = derived_from
+        _input["identifier"] = identifier
+        _input["object"] = object
+        variables["input"] = _input
+        return self.execute(AssertMetricValueMutation, variables).assert_metric_value
+
+    async def aassert_metric_value_for_structure(
+        self,
+        key: str,
+        value: Any,
+        value_kind: PropertyType,
+        derived_from: Iterable[str],
+        structure: IDCoercible,
+        confidence: float | None | UnsetType = UNSET,
+        confidence_type: str | None | UnsetType = UNSET,
+        unit: str | None | UnsetType = UNSET,
+        observed_at: datetime | None | UnsetType = UNSET,
+    ) -> AssertedMetric:
+        """AssertMetricValueForStructure
+
+        Record a measurement against a structure that already exists, named by its evidence id
+
+        Args:
+            key: The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text. (required)
+            value: The `AnyScalar` scalar type represents an arbitrary JSON-like value (required)
+            value_kind: What type of value this is. Required: it decides which column the value is stored in and which measurement term it is recorded under, and nothing infers it. Two callers may declare the same key differently — a float `confidence` and a category-label `confidence` are two terms, and both are recorded.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+            confidence_type: What kind of number `confidence` is — a method's own score, a p-value. Measurement-only
+            unit: The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+            observed_at: When the world was observed. Defaults to when it was claimed.
+            derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
+            structure: The unique ID of the structure this metric is associated with
+
+        Returns:
+            AssertedMetric
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["key"] = key
+        _input["value"] = value
+        _input["valueKind"] = value_kind
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        if confidence_type is not UNSET:
+            _input["confidenceType"] = confidence_type
+        if unit is not UNSET:
+            _input["unit"] = unit
+        if observed_at is not UNSET:
+            _input["observedAt"] = observed_at
+        _input["derivedFrom"] = derived_from
+        _input["structure"] = structure
+        variables["input"] = _input
+        return (
+            await self.aexecute(AssertMetricValueForStructureMutation, variables)
+        ).assert_metric_value_for_structure
+
+    def assert_metric_value_for_structure(
+        self,
+        key: str,
+        value: Any,
+        value_kind: PropertyType,
+        derived_from: Iterable[str],
+        structure: IDCoercible,
+        confidence: float | None | UnsetType = UNSET,
+        confidence_type: str | None | UnsetType = UNSET,
+        unit: str | None | UnsetType = UNSET,
+        observed_at: datetime | None | UnsetType = UNSET,
+    ) -> AssertedMetric:
+        """AssertMetricValueForStructure
+
+        Record a measurement against a structure that already exists, named by its evidence id
+
+        Args:
+            key: The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text. (required)
+            value: The `AnyScalar` scalar type represents an arbitrary JSON-like value (required)
+            value_kind: What type of value this is. Required: it decides which column the value is stored in and which measurement term it is recorded under, and nothing infers it. Two callers may declare the same key differently — a float `confidence` and a category-label `confidence` are two terms, and both are recorded.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+            confidence_type: What kind of number `confidence` is — a method's own score, a p-value. Measurement-only
+            unit: The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+            observed_at: When the world was observed. Defaults to when it was claimed.
+            derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
+            structure: The unique ID of the structure this metric is associated with
+
+        Returns:
+            AssertedMetric
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["key"] = key
+        _input["value"] = value
+        _input["valueKind"] = value_kind
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        if confidence_type is not UNSET:
+            _input["confidenceType"] = confidence_type
+        if unit is not UNSET:
+            _input["unit"] = unit
+        if observed_at is not UNSET:
+            _input["observedAt"] = observed_at
+        _input["derivedFrom"] = derived_from
+        _input["structure"] = structure
+        variables["input"] = _input
+        return self.execute(
+            AssertMetricValueForStructureMutation, variables
+        ).assert_metric_value_for_structure
+
+    async def asupersede_metric_value(
+        self,
+        key: str,
+        value: Any,
+        value_kind: PropertyType,
+        derived_from: Iterable[str],
+        id: str,
+        confidence: float | None | UnsetType = UNSET,
+        confidence_type: str | None | UnsetType = UNSET,
+        unit: str | None | UnsetType = UNSET,
+        observed_at: datetime | None | UnsetType = UNSET,
+    ) -> AssertedMetric:
+        """SupersedeMetricValue
+         Retracting Standing + the new Metric under ONE assertion. Returns a metric with a NEW id.
+
+        Args:
+            key: The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text. (required)
+            value: The `AnyScalar` scalar type represents an arbitrary JSON-like value (required)
+            value_kind: What type of value this is. Required: it decides which column the value is stored in and which measurement term it is recorded under, and nothing infers it. Two callers may declare the same key differently — a float `confidence` and a category-label `confidence` are two terms, and both are recorded.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+            confidence_type: What kind of number `confidence` is — a method's own score, a p-value. Measurement-only
+            unit: The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+            observed_at: When the world was observed. Defaults to when it was claimed.
+            derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
+            id: The ID of the metric to update
+
+        Returns:
+            AssertedMetric
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["key"] = key
+        _input["value"] = value
+        _input["valueKind"] = value_kind
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        if confidence_type is not UNSET:
+            _input["confidenceType"] = confidence_type
+        if unit is not UNSET:
+            _input["unit"] = unit
+        if observed_at is not UNSET:
+            _input["observedAt"] = observed_at
+        _input["derivedFrom"] = derived_from
+        _input["id"] = id
+        variables["input"] = _input
+        return (
+            await self.aexecute(SupersedeMetricValueMutation, variables)
+        ).supersede_metric_value
+
+    def supersede_metric_value(
+        self,
+        key: str,
+        value: Any,
+        value_kind: PropertyType,
+        derived_from: Iterable[str],
+        id: str,
+        confidence: float | None | UnsetType = UNSET,
+        confidence_type: str | None | UnsetType = UNSET,
+        unit: str | None | UnsetType = UNSET,
+        observed_at: datetime | None | UnsetType = UNSET,
+    ) -> AssertedMetric:
+        """SupersedeMetricValue
+         Retracting Standing + the new Metric under ONE assertion. Returns a metric with a NEW id.
+
+        Args:
+            key: The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text. (required)
+            value: The `AnyScalar` scalar type represents an arbitrary JSON-like value (required)
+            value_kind: What type of value this is. Required: it decides which column the value is stored in and which measurement term it is recorded under, and nothing infers it. Two callers may declare the same key differently — a float `confidence` and a category-label `confidence` are two terms, and both are recorded.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+            confidence_type: What kind of number `confidence` is — a method's own score, a p-value. Measurement-only
+            unit: The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+            observed_at: When the world was observed. Defaults to when it was claimed.
+            derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
+            id: The ID of the metric to update
+
+        Returns:
+            AssertedMetric
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["key"] = key
+        _input["value"] = value
+        _input["valueKind"] = value_kind
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        if confidence_type is not UNSET:
+            _input["confidenceType"] = confidence_type
+        if unit is not UNSET:
+            _input["unit"] = unit
+        if observed_at is not UNSET:
+            _input["observedAt"] = observed_at
+        _input["derivedFrom"] = derived_from
+        _input["id"] = id
+        variables["input"] = _input
+        return self.execute(
+            SupersedeMetricValueMutation, variables
+        ).supersede_metric_value
+
+    async def aassert_relation_exists(
+        self,
+        source_id: str,
+        target_id: str,
+        supporting_evidence: Iterable[StructureReferenceInput],
+        derived_from: Iterable[str],
+        term: str,
+        observed_at: datetime | None | UnsetType = UNSET,
+        confidence: float | None | UnsetType = UNSET,
+    ) -> AssertedRelation:
+        """AssertRelationExists
+         ---- links ---------------------------------------------------------------------------------
+
+        Args:
+            source_id: The ID of the source entity/structure
+            target_id: The ID of the target entity/structure
+            supporting_evidence: List of evidence structures with measurements
+            observed_at: When the world was in this state — world time, the axis a scientist means by 'when'. Distinct from when it is claimed, which the assertion records; left unset, the two are equal. A point, not an interval: a duration is a metric.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+            derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
+            term: The organization's word for what is being claimed — a term's `key`, e.g. 'AIS'. Not a category id and not a graph: a claim names a word, and every view that declares that word will hold what you write. The word is created if the organization has not used it before; a view that declares no category for it simply will not draw it.
+
+        Returns:
+            AssertedRelation
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["sourceId"] = source_id
+        _input["targetId"] = target_id
+        _input["supportingEvidence"] = supporting_evidence
+        if observed_at is not UNSET:
+            _input["observedAt"] = observed_at
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        _input["derivedFrom"] = derived_from
+        _input["term"] = term
+        variables["input"] = _input
+        return (
+            await self.aexecute(AssertRelationExistsMutation, variables)
+        ).assert_relation_exists
+
+    def assert_relation_exists(
+        self,
+        source_id: str,
+        target_id: str,
+        supporting_evidence: Iterable[StructureReferenceInput],
+        derived_from: Iterable[str],
+        term: str,
+        observed_at: datetime | None | UnsetType = UNSET,
+        confidence: float | None | UnsetType = UNSET,
+    ) -> AssertedRelation:
+        """AssertRelationExists
+         ---- links ---------------------------------------------------------------------------------
+
+        Args:
+            source_id: The ID of the source entity/structure
+            target_id: The ID of the target entity/structure
+            supporting_evidence: List of evidence structures with measurements
+            observed_at: When the world was in this state — world time, the axis a scientist means by 'when'. Distinct from when it is claimed, which the assertion records; left unset, the two are equal. A point, not an interval: a duration is a metric.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+            derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
+            term: The organization's word for what is being claimed — a term's `key`, e.g. 'AIS'. Not a category id and not a graph: a claim names a word, and every view that declares that word will hold what you write. The word is created if the organization has not used it before; a view that declares no category for it simply will not draw it.
+
+        Returns:
+            AssertedRelation
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["sourceId"] = source_id
+        _input["targetId"] = target_id
+        _input["supportingEvidence"] = supporting_evidence
+        if observed_at is not UNSET:
+            _input["observedAt"] = observed_at
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        _input["derivedFrom"] = derived_from
+        _input["term"] = term
+        variables["input"] = _input
+        return self.execute(
+            AssertRelationExistsMutation, variables
+        ).assert_relation_exists
+
+    async def aassert_measurement_exists(
+        self,
+        source_id: str,
+        target_id: str,
+        supporting_evidence: Iterable[StructureReferenceInput],
+        derived_from: Iterable[str],
+        term: str,
+        observed_at: datetime | None | UnsetType = UNSET,
+        confidence: float | None | UnsetType = UNSET,
+    ) -> AssertedMeasurement:
+        """AssertMeasurementExists
+
+        Assert that a structure measures an entity, under one of the organization's words. Drawings are always empty: a measurement has no AGE edge
+
+        Args:
+            source_id: The ID of the source entity/structure
+            target_id: The ID of the target entity/structure
+            supporting_evidence: List of evidence structures with measurements
+            observed_at: When the world was in this state — world time, the axis a scientist means by 'when'. Distinct from when it is claimed, which the assertion records; left unset, the two are equal. A point, not an interval: a duration is a metric.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+            derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
+            term: The organization's word for what is being claimed — a term's `key`, e.g. 'AIS'. Not a category id and not a graph: a claim names a word, and every view that declares that word will hold what you write. The word is created if the organization has not used it before; a view that declares no category for it simply will not draw it.
+
+        Returns:
+            AssertedMeasurement
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["sourceId"] = source_id
+        _input["targetId"] = target_id
+        _input["supportingEvidence"] = supporting_evidence
+        if observed_at is not UNSET:
+            _input["observedAt"] = observed_at
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        _input["derivedFrom"] = derived_from
+        _input["term"] = term
+        variables["input"] = _input
+        return (
+            await self.aexecute(AssertMeasurementExistsMutation, variables)
+        ).assert_measurement_exists
+
+    def assert_measurement_exists(
+        self,
+        source_id: str,
+        target_id: str,
+        supporting_evidence: Iterable[StructureReferenceInput],
+        derived_from: Iterable[str],
+        term: str,
+        observed_at: datetime | None | UnsetType = UNSET,
+        confidence: float | None | UnsetType = UNSET,
+    ) -> AssertedMeasurement:
+        """AssertMeasurementExists
+
+        Assert that a structure measures an entity, under one of the organization's words. Drawings are always empty: a measurement has no AGE edge
+
+        Args:
+            source_id: The ID of the source entity/structure
+            target_id: The ID of the target entity/structure
+            supporting_evidence: List of evidence structures with measurements
+            observed_at: When the world was in this state — world time, the axis a scientist means by 'when'. Distinct from when it is claimed, which the assertion records; left unset, the two are equal. A point, not an interval: a duration is a metric.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+            derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
+            term: The organization's word for what is being claimed — a term's `key`, e.g. 'AIS'. Not a category id and not a graph: a claim names a word, and every view that declares that word will hold what you write. The word is created if the organization has not used it before; a view that declares no category for it simply will not draw it.
+
+        Returns:
+            AssertedMeasurement
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["sourceId"] = source_id
+        _input["targetId"] = target_id
+        _input["supportingEvidence"] = supporting_evidence
+        if observed_at is not UNSET:
+            _input["observedAt"] = observed_at
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        _input["derivedFrom"] = derived_from
+        _input["term"] = term
+        variables["input"] = _input
+        return self.execute(
+            AssertMeasurementExistsMutation, variables
+        ).assert_measurement_exists
+
+    async def aassert_structure_relation_exists(
+        self,
+        source_id: str,
+        target_id: str,
+        supporting_evidence: Iterable[StructureReferenceInput],
+        derived_from: Iterable[str],
+        term: str,
+        observed_at: datetime | None | UnsetType = UNSET,
+        confidence: float | None | UnsetType = UNSET,
+    ) -> AssertedStructureRelation:
+        """AssertStructureRelationExists
+
+        Assert a relation between two structures. Drawings are always empty: neither endpoint has a vertex
+
+        Args:
+            source_id: The ID of the source entity/structure
+            target_id: The ID of the target entity/structure
+            supporting_evidence: List of evidence structures with measurements
+            observed_at: When the world was in this state — world time, the axis a scientist means by 'when'. Distinct from when it is claimed, which the assertion records; left unset, the two are equal. A point, not an interval: a duration is a metric.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+            derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
+            term: The organization's word for what is being claimed — a term's `key`, e.g. 'AIS'. Not a category id and not a graph: a claim names a word, and every view that declares that word will hold what you write. The word is created if the organization has not used it before; a view that declares no category for it simply will not draw it.
+
+        Returns:
+            AssertedStructureRelation
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["sourceId"] = source_id
+        _input["targetId"] = target_id
+        _input["supportingEvidence"] = supporting_evidence
+        if observed_at is not UNSET:
+            _input["observedAt"] = observed_at
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        _input["derivedFrom"] = derived_from
+        _input["term"] = term
+        variables["input"] = _input
+        return (
+            await self.aexecute(AssertStructureRelationExistsMutation, variables)
+        ).assert_structure_relation_exists
+
+    def assert_structure_relation_exists(
+        self,
+        source_id: str,
+        target_id: str,
+        supporting_evidence: Iterable[StructureReferenceInput],
+        derived_from: Iterable[str],
+        term: str,
+        observed_at: datetime | None | UnsetType = UNSET,
+        confidence: float | None | UnsetType = UNSET,
+    ) -> AssertedStructureRelation:
+        """AssertStructureRelationExists
+
+        Assert a relation between two structures. Drawings are always empty: neither endpoint has a vertex
+
+        Args:
+            source_id: The ID of the source entity/structure
+            target_id: The ID of the target entity/structure
+            supporting_evidence: List of evidence structures with measurements
+            observed_at: When the world was in this state — world time, the axis a scientist means by 'when'. Distinct from when it is claimed, which the assertion records; left unset, the two are equal. A point, not an interval: a duration is a metric.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+            derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
+            term: The organization's word for what is being claimed — a term's `key`, e.g. 'AIS'. Not a category id and not a graph: a claim names a word, and every view that declares that word will hold what you write. The word is created if the organization has not used it before; a view that declares no category for it simply will not draw it.
+
+        Returns:
+            AssertedStructureRelation
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["sourceId"] = source_id
+        _input["targetId"] = target_id
+        _input["supportingEvidence"] = supporting_evidence
+        if observed_at is not UNSET:
+            _input["observedAt"] = observed_at
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        _input["derivedFrom"] = derived_from
+        _input["term"] = term
+        variables["input"] = _input
+        return self.execute(
+            AssertStructureRelationExistsMutation, variables
+        ).assert_structure_relation_exists
+
+    async def aassert_participation(
+        self,
+        event: str,
+        entity: str,
+        role: str,
+        is_input: bool,
+        derived_from: Iterable[str],
+        observed_at: datetime | None | UnsetType = UNSET,
+        confidence: float | None | UnsetType = UNSET,
+    ) -> AssertedParticipation:
+        """AssertParticipation
+
+        Claim that an entity took part in an event, without displacing anyone else's claim
+
+        Args:
+            event: The ID of the event the entity took part in
+            entity: The ID of the entity that took part
+            role: Which role the entity played — the caller's own word; the write names no graph and no category
+            is_input: True if the entity went into the event, False if it came out of it
+            observed_at: When the world was in this state — world time, the axis a scientist means by 'when'. Distinct from when it is claimed, which the assertion records; left unset, the two are equal. A point, not an interval: a duration is a metric.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+            derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
+
+        Returns:
+            AssertedParticipation
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["event"] = event
+        _input["entity"] = entity
+        _input["role"] = role
+        _input["isInput"] = is_input
+        if observed_at is not UNSET:
+            _input["observedAt"] = observed_at
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        _input["derivedFrom"] = derived_from
+        variables["input"] = _input
+        return (
+            await self.aexecute(AssertParticipationMutation, variables)
+        ).assert_participation
+
+    def assert_participation(
+        self,
+        event: str,
+        entity: str,
+        role: str,
+        is_input: bool,
+        derived_from: Iterable[str],
+        observed_at: datetime | None | UnsetType = UNSET,
+        confidence: float | None | UnsetType = UNSET,
+    ) -> AssertedParticipation:
+        """AssertParticipation
+
+        Claim that an entity took part in an event, without displacing anyone else's claim
+
+        Args:
+            event: The ID of the event the entity took part in
+            entity: The ID of the entity that took part
+            role: Which role the entity played — the caller's own word; the write names no graph and no category
+            is_input: True if the entity went into the event, False if it came out of it
+            observed_at: When the world was in this state — world time, the axis a scientist means by 'when'. Distinct from when it is claimed, which the assertion records; left unset, the two are equal. A point, not an interval: a duration is a metric.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+            derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
+
+        Returns:
+            AssertedParticipation
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["event"] = event
+        _input["entity"] = entity
+        _input["role"] = role
+        _input["isInput"] = is_input
+        if observed_at is not UNSET:
+            _input["observedAt"] = observed_at
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        _input["derivedFrom"] = derived_from
+        variables["input"] = _input
+        return self.execute(AssertParticipationMutation, variables).assert_participation
+
+    async def aassert_participations(
+        self, event: str, participants: Iterable[ParticipantInput]
+    ) -> AssertedLinks:
+        """AssertParticipations
+         Many participants in one event, one assertion.
+
+        Args:
+            event: The event the entities took part in
+            participants: Everyone who took part, and how
+
+        Returns:
+            AssertedLinks
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["event"] = event
+        _input["participants"] = participants
+        variables["input"] = _input
+        return (
+            await self.aexecute(AssertParticipationsMutation, variables)
+        ).assert_participations
+
+    def assert_participations(
+        self, event: str, participants: Iterable[ParticipantInput]
+    ) -> AssertedLinks:
+        """AssertParticipations
+         Many participants in one event, one assertion.
+
+        Args:
+            event: The event the entities took part in
+            participants: Everyone who took part, and how
+
+        Returns:
+            AssertedLinks
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["event"] = event
+        _input["participants"] = participants
+        variables["input"] = _input
+        return self.execute(
+            AssertParticipationsMutation, variables
+        ).assert_participations
+
+    async def acomment_on_structure(
+        self,
+        identifier: str,
+        object: str,
+        descendants: Iterable[DescendantInput],
+        parent: IDCoercible | None | UnsetType = UNSET,
+    ) -> AssertedComment:
+        """CommentOnStructure
+         ---- comments ------------------------------------------------------------------------------
+
+        Args:
+            identifier: The structure identifier of the datum, e.g. '@mikro/roi'
+            object: The id of the external object on its service
+            descendants: The rich body of the remark — a tree of LEAF/MENTION/PARAGRAPH nodes
+            parent: The comment this replies to. Must be on the same structure's thread
+
+        Returns:
+            AssertedComment
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["identifier"] = identifier
+        _input["object"] = object
+        _input["descendants"] = descendants
+        if parent is not UNSET:
+            _input["parent"] = parent
+        variables["input"] = _input
+        return (
+            await self.aexecute(CommentOnStructureMutation, variables)
+        ).comment_on_structure
+
+    def comment_on_structure(
+        self,
+        identifier: str,
+        object: str,
+        descendants: Iterable[DescendantInput],
+        parent: IDCoercible | None | UnsetType = UNSET,
+    ) -> AssertedComment:
+        """CommentOnStructure
+         ---- comments ------------------------------------------------------------------------------
+
+        Args:
+            identifier: The structure identifier of the datum, e.g. '@mikro/roi'
+            object: The id of the external object on its service
+            descendants: The rich body of the remark — a tree of LEAF/MENTION/PARAGRAPH nodes
+            parent: The comment this replies to. Must be on the same structure's thread
+
+        Returns:
+            AssertedComment
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["identifier"] = identifier
+        _input["object"] = object
+        _input["descendants"] = descendants
+        if parent is not UNSET:
+            _input["parent"] = parent
+        variables["input"] = _input
+        return self.execute(CommentOnStructureMutation, variables).comment_on_structure
+
+    async def acreate_graph(
+        self,
+        name: str,
+        backfill: bool,
+        description: str | None | UnsetType = UNSET,
+        definition: GraphDefinitionInput | None | UnsetType = UNSET,
+        sameness_rule: SamenessRuleInput | None | UnsetType = UNSET,
+    ) -> Graph:
+        """CreateGraph
+         A Graph is a VIEW over the organization's claims, not a container. `definition.extensions`
+         carries a whole ontology, so one call can declare every word this view means to draw, and
+         `backfill` projects the claims those words already admit.
+
+        Args:
+            name: Name of the graph
+            description: Description of the graph
+            definition: The complete graph schema definition
+            sameness_rule: Whose sameness claims this view counts (RFC 0024). Omitted means everyone
+            backfill: Draw the evidence this graph's words already admit. A graph is a view over the organization's evidence, so a new one can be a view over history: with this on, every node and edge already claimed under a word this schema declares is projected as the graph is created. Off by default because the work is proportional to the organization's evidence and happens before this mutation returns.
+
+        Returns:
+            Graph
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
         _input["name"] = name
-    if description is not UNSET:
-        _input["description"] = description
-    if archived is not UNSET:
-        _input["archived"] = archived
-    if pin is not UNSET:
-        _input["pin"] = pin
-    if sameness_rule is not UNSET:
-        _input["samenessRule"] = sameness_rule
-    variables["input"] = _input
-    return (await aexecute(UpdateGraphMutation, variables, rath=rath)).update_graph
+        if description is not UNSET:
+            _input["description"] = description
+        if definition is not UNSET:
+            _input["definition"] = definition
+        if sameness_rule is not UNSET:
+            _input["samenessRule"] = sameness_rule
+        _input["backfill"] = backfill
+        variables["input"] = _input
+        return (await self.aexecute(CreateGraphMutation, variables)).create_graph
 
+    def create_graph(
+        self,
+        name: str,
+        backfill: bool,
+        description: str | None | UnsetType = UNSET,
+        definition: GraphDefinitionInput | None | UnsetType = UNSET,
+        sameness_rule: SamenessRuleInput | None | UnsetType = UNSET,
+    ) -> Graph:
+        """CreateGraph
+         A Graph is a VIEW over the organization's claims, not a container. `definition.extensions`
+         carries a whole ontology, so one call can declare every word this view means to draw, and
+         `backfill` projects the claims those words already admit.
 
-def update_graph(
-    id: str,
-    name: str | None | UnsetType = UNSET,
-    description: str | None | UnsetType = UNSET,
-    archived: bool | None | UnsetType = UNSET,
-    pin: bool | None | UnsetType = UNSET,
-    sameness_rule: SamenessRuleInput | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> Graph:
-    """UpdateGraph
+        Args:
+            name: Name of the graph
+            description: Description of the graph
+            definition: The complete graph schema definition
+            sameness_rule: Whose sameness claims this view counts (RFC 0024). Omitted means everyone
+            backfill: Draw the evidence this graph's words already admit. A graph is a view over the organization's evidence, so a new one can be a view over history: with this on, every node and edge already claimed under a word this schema declares is projected as the graph is created. Off by default because the work is proportional to the organization's evidence and happens before this mutation returns.
 
-    Update an existing graph in the graph engine
-
-    Args:
-        id: The ID of the graph to update
-        name: New graph name
-        description: New graph description
-        archived: Optional archived flag update
-        pin: Optional pin flag update for the user making the request
-        sameness_rule: Replace whose sameness claims this view counts (RFC 0024); an empty rule list means everyone. Omitted means unchanged. Changing it refolds the view's individuals — the projection is rebuilt
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        Graph
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    if name is not UNSET:
+        Returns:
+            Graph
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
         _input["name"] = name
-    if description is not UNSET:
-        _input["description"] = description
-    if archived is not UNSET:
-        _input["archived"] = archived
-    if pin is not UNSET:
-        _input["pin"] = pin
-    if sameness_rule is not UNSET:
-        _input["samenessRule"] = sameness_rule
-    variables["input"] = _input
-    return execute(UpdateGraphMutation, variables, rath=rath).update_graph
-
-
-async def aupdate_graph_visual(
-    id: str,
-    node_positions: Iterable[CategoryNodePositionInput],
-    rath: KraphRath | None = None,
-) -> Graph:
-    """UpdateGraphVisual
-
-    Update the visual configuration of a graph in the graph engine
-
-    Args:
-        id: The ID of the graph element to update
-        node_positions: List of node positions to update
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        Graph
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    _input["nodePositions"] = node_positions
-    variables["input"] = _input
-    return (await aexecute(UpdateGraphVisualMutation, variables, rath=rath)).update_graph_visual
-
-
-def update_graph_visual(
-    id: str,
-    node_positions: Iterable[CategoryNodePositionInput],
-    rath: KraphRath | None = None,
-) -> Graph:
-    """UpdateGraphVisual
-
-    Update the visual configuration of a graph in the graph engine
-
-    Args:
-        id: The ID of the graph element to update
-        node_positions: List of node positions to update
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        Graph
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    _input["nodePositions"] = node_positions
-    variables["input"] = _input
-    return execute(UpdateGraphVisualMutation, variables, rath=rath).update_graph_visual
-
-
-async def aarchive_graph(id: str, rath: KraphRath | None = None) -> Graph:
-    """ArchiveGraph
-
-    Archive a graph in the graph engine (soft delete)
-
-    Args:
-        id: The ID of the graph to archive
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        Graph
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    variables["input"] = _input
-    return (await aexecute(ArchiveGraphMutation, variables, rath=rath)).archive_graph
-
-
-def archive_graph(id: str, rath: KraphRath | None = None) -> Graph:
-    """ArchiveGraph
-
-    Archive a graph in the graph engine (soft delete)
-
-    Args:
-        id: The ID of the graph to archive
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        Graph
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    variables["input"] = _input
-    return execute(ArchiveGraphMutation, variables, rath=rath).archive_graph
-
-
-async def adelete_graph(id: str, rath: KraphRath | None = None) -> ID:
-    """DeleteGraph
-
-    Delete a graph from the graph engine
-
-    Args:
-        id: The ID of the graph to delete
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        ID
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    variables["input"] = _input
-    return (await aexecute(DeleteGraphMutation, variables, rath=rath)).delete_graph
-
-
-def delete_graph(id: str, rath: KraphRath | None = None) -> ID:
-    """DeleteGraph
-
-    Delete a graph from the graph engine
-
-    Args:
-        id: The ID of the graph to delete
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        ID
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    variables["input"] = _input
-    return execute(DeleteGraphMutation, variables, rath=rath).delete_graph
-
-
-async def aattest_entity(
-    id: str,
-    at: datetime | None | UnsetType = UNSET,
-    confidence: float | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> AssertedEntity:
-    """AttestEntity
-     Standing: somebody's position on whether a claim still holds.
-
-     `attest` records stands=True, `retract` records stands=False, and both are evidence of the
-     same kind. Neither deletes: the row, its metrics and its relations all survive a retraction,
-     because a derived value that dropped a contributing measurement still has to be explainable.
-     There is no reinstate and no state machine — only more evidence.
-
-    Args:
-        id: The uuid of the node being attested. The same id `retract*` returns, so the two round-trip.
-        at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
-        confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedEntity
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    if at is not UNSET:
-        _input["at"] = at
-    if confidence is not UNSET:
-        _input["confidence"] = confidence
-    variables["input"] = _input
-    return (await aexecute(AttestEntityMutation, variables, rath=rath)).attest_entity
-
-
-def attest_entity(
-    id: str,
-    at: datetime | None | UnsetType = UNSET,
-    confidence: float | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> AssertedEntity:
-    """AttestEntity
-     Standing: somebody's position on whether a claim still holds.
-
-     `attest` records stands=True, `retract` records stands=False, and both are evidence of the
-     same kind. Neither deletes: the row, its metrics and its relations all survive a retraction,
-     because a derived value that dropped a contributing measurement still has to be explainable.
-     There is no reinstate and no state machine — only more evidence.
-
-    Args:
-        id: The uuid of the node being attested. The same id `retract*` returns, so the two round-trip.
-        at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
-        confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedEntity
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    if at is not UNSET:
-        _input["at"] = at
-    if confidence is not UNSET:
-        _input["confidence"] = confidence
-    variables["input"] = _input
-    return execute(AttestEntityMutation, variables, rath=rath).attest_entity
-
-
-async def aretract_entity(
-    id: IDCoercible,
-    at: datetime | None | UnsetType = UNSET,
-    confidence: float | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> AssertedEntity:
-    """RetractEntity
-
-    Claim that an entity no longer stands. It leaves every projection that counts the claim; the evidence stays.
-
-    Args:
-        id: The ID of the entity to retract
-        at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
-        confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedEntity
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    if at is not UNSET:
-        _input["at"] = at
-    if confidence is not UNSET:
-        _input["confidence"] = confidence
-    variables["input"] = _input
-    return (await aexecute(RetractEntityMutation, variables, rath=rath)).retract_entity
-
-
-def retract_entity(
-    id: IDCoercible,
-    at: datetime | None | UnsetType = UNSET,
-    confidence: float | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> AssertedEntity:
-    """RetractEntity
-
-    Claim that an entity no longer stands. It leaves every projection that counts the claim; the evidence stays.
-
-    Args:
-        id: The ID of the entity to retract
-        at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
-        confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedEntity
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    if at is not UNSET:
-        _input["at"] = at
-    if confidence is not UNSET:
-        _input["confidence"] = confidence
-    variables["input"] = _input
-    return execute(RetractEntityMutation, variables, rath=rath).retract_entity
-
-
-async def aattest_natural_event(
-    id: str,
-    at: datetime | None | UnsetType = UNSET,
-    confidence: float | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> AssertedNaturalEvent:
-    """AttestNaturalEvent
-
-    Claim that a natural event exists
-
-    Args:
-        id: The uuid of the node being attested. The same id `retract*` returns, so the two round-trip.
-        at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
-        confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedNaturalEvent
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    if at is not UNSET:
-        _input["at"] = at
-    if confidence is not UNSET:
-        _input["confidence"] = confidence
-    variables["input"] = _input
-    return (await aexecute(AttestNaturalEventMutation, variables, rath=rath)).attest_natural_event
-
-
-def attest_natural_event(
-    id: str,
-    at: datetime | None | UnsetType = UNSET,
-    confidence: float | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> AssertedNaturalEvent:
-    """AttestNaturalEvent
-
-    Claim that a natural event exists
-
-    Args:
-        id: The uuid of the node being attested. The same id `retract*` returns, so the two round-trip.
-        at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
-        confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedNaturalEvent
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    if at is not UNSET:
-        _input["at"] = at
-    if confidence is not UNSET:
-        _input["confidence"] = confidence
-    variables["input"] = _input
-    return execute(AttestNaturalEventMutation, variables, rath=rath).attest_natural_event
-
-
-async def aretract_natural_event(
-    id: str,
-    at: datetime | None | UnsetType = UNSET,
-    confidence: float | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> AssertedNaturalEvent:
-    """RetractNaturalEvent
-
-    Claim that a natural event no longer stands
-
-    Args:
-        id: The ID of the natural event to retract
-        at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
-        confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedNaturalEvent
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    if at is not UNSET:
-        _input["at"] = at
-    if confidence is not UNSET:
-        _input["confidence"] = confidence
-    variables["input"] = _input
-    return (await aexecute(RetractNaturalEventMutation, variables, rath=rath)).retract_natural_event
-
-
-def retract_natural_event(
-    id: str,
-    at: datetime | None | UnsetType = UNSET,
-    confidence: float | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> AssertedNaturalEvent:
-    """RetractNaturalEvent
-
-    Claim that a natural event no longer stands
-
-    Args:
-        id: The ID of the natural event to retract
-        at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
-        confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedNaturalEvent
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    if at is not UNSET:
-        _input["at"] = at
-    if confidence is not UNSET:
-        _input["confidence"] = confidence
-    variables["input"] = _input
-    return execute(RetractNaturalEventMutation, variables, rath=rath).retract_natural_event
-
-
-async def aattest_protocol_event(
-    id: str,
-    at: datetime | None | UnsetType = UNSET,
-    confidence: float | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> AssertedProtocolEvent:
-    """AttestProtocolEvent
-
-    Claim that a protocol event exists
-
-    Args:
-        id: The uuid of the node being attested. The same id `retract*` returns, so the two round-trip.
-        at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
-        confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedProtocolEvent
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    if at is not UNSET:
-        _input["at"] = at
-    if confidence is not UNSET:
-        _input["confidence"] = confidence
-    variables["input"] = _input
-    return (await aexecute(AttestProtocolEventMutation, variables, rath=rath)).attest_protocol_event
-
-
-def attest_protocol_event(
-    id: str,
-    at: datetime | None | UnsetType = UNSET,
-    confidence: float | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> AssertedProtocolEvent:
-    """AttestProtocolEvent
-
-    Claim that a protocol event exists
-
-    Args:
-        id: The uuid of the node being attested. The same id `retract*` returns, so the two round-trip.
-        at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
-        confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedProtocolEvent
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    if at is not UNSET:
-        _input["at"] = at
-    if confidence is not UNSET:
-        _input["confidence"] = confidence
-    variables["input"] = _input
-    return execute(AttestProtocolEventMutation, variables, rath=rath).attest_protocol_event
-
-
-async def aretract_protocol_event(
-    id: str,
-    at: datetime | None | UnsetType = UNSET,
-    confidence: float | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> AssertedProtocolEvent:
-    """RetractProtocolEvent
-
-    Claim that a protocol event no longer stands
-
-    Args:
-        id: The ID of the protocol event to retract
-        at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
-        confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedProtocolEvent
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    if at is not UNSET:
-        _input["at"] = at
-    if confidence is not UNSET:
-        _input["confidence"] = confidence
-    variables["input"] = _input
-    return (
-        await aexecute(RetractProtocolEventMutation, variables, rath=rath)
-    ).retract_protocol_event
-
-
-def retract_protocol_event(
-    id: str,
-    at: datetime | None | UnsetType = UNSET,
-    confidence: float | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> AssertedProtocolEvent:
-    """RetractProtocolEvent
-
-    Claim that a protocol event no longer stands
-
-    Args:
-        id: The ID of the protocol event to retract
-        at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
-        confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedProtocolEvent
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    if at is not UNSET:
-        _input["at"] = at
-    if confidence is not UNSET:
-        _input["confidence"] = confidence
-    variables["input"] = _input
-    return execute(RetractProtocolEventMutation, variables, rath=rath).retract_protocol_event
-
-
-async def aattest_structure(
-    id: str,
-    at: datetime | None | UnsetType = UNSET,
-    confidence: float | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> AssertedStructure:
-    """AttestStructure
-
-    Claim that a structure still stands, after somebody retracted it. New evidence, not an undo — both positions stay on the record
-
-    Args:
-        id: The ID of the structure to attest — a bare uuid, its evidence primary key
-        at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
-        confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedStructure
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    if at is not UNSET:
-        _input["at"] = at
-    if confidence is not UNSET:
-        _input["confidence"] = confidence
-    variables["input"] = _input
-    return (await aexecute(AttestStructureMutation, variables, rath=rath)).attest_structure
-
-
-def attest_structure(
-    id: str,
-    at: datetime | None | UnsetType = UNSET,
-    confidence: float | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> AssertedStructure:
-    """AttestStructure
-
-    Claim that a structure still stands, after somebody retracted it. New evidence, not an undo — both positions stay on the record
-
-    Args:
-        id: The ID of the structure to attest — a bare uuid, its evidence primary key
-        at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
-        confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedStructure
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    if at is not UNSET:
-        _input["at"] = at
-    if confidence is not UNSET:
-        _input["confidence"] = confidence
-    variables["input"] = _input
-    return execute(AttestStructureMutation, variables, rath=rath).attest_structure
-
-
-async def aretract_structure(
-    id: IDCoercible,
-    at: datetime | None | UnsetType = UNSET,
-    confidence: float | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> AssertedStructure:
-    """RetractStructure
-
-    Retract a datum: a Standing(stands=false) against it. Its metrics and INFORMS claims stay on the record, but stop counting for every node it informs until somebody attests it again (RFC 0023)
-
-    Args:
-        id: The ID of the structure to retract — a bare uuid, its evidence primary key
-        at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
-        confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedStructure
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    if at is not UNSET:
-        _input["at"] = at
-    if confidence is not UNSET:
-        _input["confidence"] = confidence
-    variables["input"] = _input
-    return (await aexecute(RetractStructureMutation, variables, rath=rath)).retract_structure
-
-
-def retract_structure(
-    id: IDCoercible,
-    at: datetime | None | UnsetType = UNSET,
-    confidence: float | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> AssertedStructure:
-    """RetractStructure
-
-    Retract a datum: a Standing(stands=false) against it. Its metrics and INFORMS claims stay on the record, but stop counting for every node it informs until somebody attests it again (RFC 0023)
-
-    Args:
-        id: The ID of the structure to retract — a bare uuid, its evidence primary key
-        at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
-        confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedStructure
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    if at is not UNSET:
-        _input["at"] = at
-    if confidence is not UNSET:
-        _input["confidence"] = confidence
-    variables["input"] = _input
-    return execute(RetractStructureMutation, variables, rath=rath).retract_structure
-
-
-async def aattest_metric(
-    id: str,
-    at: datetime | None | UnsetType = UNSET,
-    confidence: float | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> AssertedMetric:
-    """AttestMetric
-
-    Claim that a measurement still stands. The derived values that dropped it are refolded
-
-    Args:
-        id: The ID of the metric to attest — a bare uuid, its evidence primary key
-        at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
-        confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedMetric
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    if at is not UNSET:
-        _input["at"] = at
-    if confidence is not UNSET:
-        _input["confidence"] = confidence
-    variables["input"] = _input
-    return (await aexecute(AttestMetricMutation, variables, rath=rath)).attest_metric
-
-
-def attest_metric(
-    id: str,
-    at: datetime | None | UnsetType = UNSET,
-    confidence: float | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> AssertedMetric:
-    """AttestMetric
-
-    Claim that a measurement still stands. The derived values that dropped it are refolded
-
-    Args:
-        id: The ID of the metric to attest — a bare uuid, its evidence primary key
-        at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
-        confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedMetric
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    if at is not UNSET:
-        _input["at"] = at
-    if confidence is not UNSET:
-        _input["confidence"] = confidence
-    variables["input"] = _input
-    return execute(AttestMetricMutation, variables, rath=rath).attest_metric
-
-
-async def aretract_metric(
-    id: str,
-    at: datetime | None | UnsetType = UNSET,
-    confidence: float | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> AssertedMetric:
-    """RetractMetric
-
-    Retract a measurement without destroying it. It stays readable, because a derived value that dropped it still has to be explainable
-
-    Args:
-        id: The ID of the metric to retract — a bare uuid, its evidence primary key
-        at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
-        confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedMetric
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    if at is not UNSET:
-        _input["at"] = at
-    if confidence is not UNSET:
-        _input["confidence"] = confidence
-    variables["input"] = _input
-    return (await aexecute(RetractMetricMutation, variables, rath=rath)).retract_metric
-
-
-def retract_metric(
-    id: str,
-    at: datetime | None | UnsetType = UNSET,
-    confidence: float | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> AssertedMetric:
-    """RetractMetric
-
-    Retract a measurement without destroying it. It stays readable, because a derived value that dropped it still has to be explainable
-
-    Args:
-        id: The ID of the metric to retract — a bare uuid, its evidence primary key
-        at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
-        confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedMetric
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    if at is not UNSET:
-        _input["at"] = at
-    if confidence is not UNSET:
-        _input["confidence"] = confidence
-    variables["input"] = _input
-    return execute(RetractMetricMutation, variables, rath=rath).retract_metric
-
-
-async def aattest_comment(
-    id: str,
-    at: datetime | None | UnsetType = UNSET,
-    confidence: float | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> AssertedComment:
-    """AttestComment
-
-    Claim a remark stands again — reopening, as new evidence rather than an undo
-
-    Args:
-        id: The ID of the comment to attest
-        at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
-        confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedComment
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    if at is not UNSET:
-        _input["at"] = at
-    if confidence is not UNSET:
-        _input["confidence"] = confidence
-    variables["input"] = _input
-    return (await aexecute(AttestCommentMutation, variables, rath=rath)).attest_comment
-
-
-def attest_comment(
-    id: str,
-    at: datetime | None | UnsetType = UNSET,
-    confidence: float | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> AssertedComment:
-    """AttestComment
-
-    Claim a remark stands again — reopening, as new evidence rather than an undo
-
-    Args:
-        id: The ID of the comment to attest
-        at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
-        confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedComment
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    if at is not UNSET:
-        _input["at"] = at
-    if confidence is not UNSET:
-        _input["confidence"] = confidence
-    variables["input"] = _input
-    return execute(AttestCommentMutation, variables, rath=rath).attest_comment
-
-
-async def aretract_comment(
-    id: str,
-    at: datetime | None | UnsetType = UNSET,
-    confidence: float | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> AssertedComment:
-    """RetractComment
-
-    Claim a remark no longer stands — resolved by a reviewer or withdrawn by its author; the assertion records whose position it is. The row survives
-
-    Args:
-        id: The ID of the comment to retract
-        at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
-        confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedComment
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    if at is not UNSET:
-        _input["at"] = at
-    if confidence is not UNSET:
-        _input["confidence"] = confidence
-    variables["input"] = _input
-    return (await aexecute(RetractCommentMutation, variables, rath=rath)).retract_comment
-
-
-def retract_comment(
-    id: str,
-    at: datetime | None | UnsetType = UNSET,
-    confidence: float | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> AssertedComment:
-    """RetractComment
-
-    Claim a remark no longer stands — resolved by a reviewer or withdrawn by its author; the assertion records whose position it is. The row survives
-
-    Args:
-        id: The ID of the comment to retract
-        at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
-        confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedComment
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    if at is not UNSET:
-        _input["at"] = at
-    if confidence is not UNSET:
-        _input["confidence"] = confidence
-    variables["input"] = _input
-    return execute(RetractCommentMutation, variables, rath=rath).retract_comment
-
-
-async def aretract_relation(
-    id: IDCoercible,
-    at: datetime | None | UnsetType = UNSET,
-    confidence: float | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> AssertedRelation:
-    """RetractRelation
-
-    Retract a relation assertion without destroying it. The edge survives wherever another live assertion still states the same proposition
-
-    Args:
-        id: The ID of the relation claim to retract — its `Link` primary key
-        at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
-        confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedRelation
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    if at is not UNSET:
-        _input["at"] = at
-    if confidence is not UNSET:
-        _input["confidence"] = confidence
-    variables["input"] = _input
-    return (await aexecute(RetractRelationMutation, variables, rath=rath)).retract_relation
-
-
-def retract_relation(
-    id: IDCoercible,
-    at: datetime | None | UnsetType = UNSET,
-    confidence: float | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> AssertedRelation:
-    """RetractRelation
-
-    Retract a relation assertion without destroying it. The edge survives wherever another live assertion still states the same proposition
-
-    Args:
-        id: The ID of the relation claim to retract — its `Link` primary key
-        at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
-        confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedRelation
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    if at is not UNSET:
-        _input["at"] = at
-    if confidence is not UNSET:
-        _input["confidence"] = confidence
-    variables["input"] = _input
-    return execute(RetractRelationMutation, variables, rath=rath).retract_relation
-
-
-async def aretract_measurement(
-    id: str,
-    at: datetime | None | UnsetType = UNSET,
-    confidence: float | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> AssertedMeasurement:
-    """RetractMeasurement
-
-    Retract a measurement assertion without destroying it
-
-    Args:
-        id: The ID of the measurement claim to retract — its `Link` primary key
-        at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
-        confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedMeasurement
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    if at is not UNSET:
-        _input["at"] = at
-    if confidence is not UNSET:
-        _input["confidence"] = confidence
-    variables["input"] = _input
-    return (await aexecute(RetractMeasurementMutation, variables, rath=rath)).retract_measurement
-
-
-def retract_measurement(
-    id: str,
-    at: datetime | None | UnsetType = UNSET,
-    confidence: float | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> AssertedMeasurement:
-    """RetractMeasurement
-
-    Retract a measurement assertion without destroying it
-
-    Args:
-        id: The ID of the measurement claim to retract — its `Link` primary key
-        at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
-        confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedMeasurement
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    if at is not UNSET:
-        _input["at"] = at
-    if confidence is not UNSET:
-        _input["confidence"] = confidence
-    variables["input"] = _input
-    return execute(RetractMeasurementMutation, variables, rath=rath).retract_measurement
-
-
-async def aretract_structure_relation(
-    id: str,
-    at: datetime | None | UnsetType = UNSET,
-    confidence: float | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> AssertedStructureRelation:
-    """RetractStructureRelation
-
-    Retract a structure relation assertion without destroying it
-
-    Args:
-        id: The ID of the structure relation claim to retract — its `Link` primary key
-        at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
-        confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedStructureRelation
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    if at is not UNSET:
-        _input["at"] = at
-    if confidence is not UNSET:
-        _input["confidence"] = confidence
-    variables["input"] = _input
-    return (
-        await aexecute(RetractStructureRelationMutation, variables, rath=rath)
-    ).retract_structure_relation
-
-
-def retract_structure_relation(
-    id: str,
-    at: datetime | None | UnsetType = UNSET,
-    confidence: float | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> AssertedStructureRelation:
-    """RetractStructureRelation
-
-    Retract a structure relation assertion without destroying it
-
-    Args:
-        id: The ID of the structure relation claim to retract — its `Link` primary key
-        at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
-        confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedStructureRelation
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    if at is not UNSET:
-        _input["at"] = at
-    if confidence is not UNSET:
-        _input["confidence"] = confidence
-    variables["input"] = _input
-    return execute(
-        RetractStructureRelationMutation, variables, rath=rath
-    ).retract_structure_relation
-
-
-async def aretract_participation(
-    id: str,
-    at: datetime | None | UnsetType = UNSET,
-    confidence: float | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> AssertedParticipation:
-    """RetractParticipation
-
-    Retract one claim that an entity took part in an event. The edge survives while another claim still states it
-
-    Args:
-        id: The evidence ID of the participation claim to retract
-        at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
-        confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedParticipation
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    if at is not UNSET:
-        _input["at"] = at
-    if confidence is not UNSET:
-        _input["confidence"] = confidence
-    variables["input"] = _input
-    return (
-        await aexecute(RetractParticipationMutation, variables, rath=rath)
-    ).retract_participation
-
-
-def retract_participation(
-    id: str,
-    at: datetime | None | UnsetType = UNSET,
-    confidence: float | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> AssertedParticipation:
-    """RetractParticipation
-
-    Retract one claim that an entity took part in an event. The edge survives while another claim still states it
-
-    Args:
-        id: The evidence ID of the participation claim to retract
-        at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
-        confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedParticipation
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    if at is not UNSET:
-        _input["at"] = at
-    if confidence is not UNSET:
-        _input["confidence"] = confidence
-    variables["input"] = _input
-    return execute(RetractParticipationMutation, variables, rath=rath).retract_participation
-
-
-async def aretract_same_instance(
-    id: str,
-    at: datetime | None | UnsetType = UNSET,
-    confidence: float | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> AssertedSameness:
-    """RetractSameInstance
-
-    Withdraw one sameness claim. The component it held together is rebuilt from the claims that survive, which may split it
-
-    Args:
-        id: The id of the sameness claim to retract
-        at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
-        confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedSameness
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    if at is not UNSET:
-        _input["at"] = at
-    if confidence is not UNSET:
-        _input["confidence"] = confidence
-    variables["input"] = _input
-    return (await aexecute(RetractSameInstanceMutation, variables, rath=rath)).retract_same_instance
-
-
-def retract_same_instance(
-    id: str,
-    at: datetime | None | UnsetType = UNSET,
-    confidence: float | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> AssertedSameness:
-    """RetractSameInstance
-
-    Withdraw one sameness claim. The component it held together is rebuilt from the claims that survive, which may split it
-
-    Args:
-        id: The id of the sameness claim to retract
-        at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
-        confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedSameness
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    if at is not UNSET:
-        _input["at"] = at
-    if confidence is not UNSET:
-        _input["confidence"] = confidence
-    variables["input"] = _input
-    return execute(RetractSameInstanceMutation, variables, rath=rath).retract_same_instance
-
-
-async def aattest_link(
-    id: str,
-    at: datetime | None | UnsetType = UNSET,
-    confidence: float | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> AssertedLinks:
-    """AttestLink
-
-    Claim that a link claim still stands — a relation, a classification, a participation, a measurement. One act for every kind, as `retractLinks` is
-
-    Args:
-        id: The ID of the claim to attest — its `Link` primary key
-        at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
-        confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedLinks
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    if at is not UNSET:
-        _input["at"] = at
-    if confidence is not UNSET:
-        _input["confidence"] = confidence
-    variables["input"] = _input
-    return (await aexecute(AttestLinkMutation, variables, rath=rath)).attest_link
-
-
-def attest_link(
-    id: str,
-    at: datetime | None | UnsetType = UNSET,
-    confidence: float | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> AssertedLinks:
-    """AttestLink
-
-    Claim that a link claim still stands — a relation, a classification, a participation, a measurement. One act for every kind, as `retractLinks` is
-
-    Args:
-        id: The ID of the claim to attest — its `Link` primary key
-        at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
-        confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedLinks
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    if at is not UNSET:
-        _input["at"] = at
-    if confidence is not UNSET:
-        _input["confidence"] = confidence
-    variables["input"] = _input
-    return execute(AttestLinkMutation, variables, rath=rath).attest_link
-
-
-async def aretract_links(
-    ids: Iterable[str],
-    at: datetime | None | UnsetType = UNSET,
-    confidence: float | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> AssertedLinks:
-    """RetractLinks
-     One assertion over many link ids, of any link kind.
-
-    Args:
-        ids: The `Link` primary keys of the claims to retract
-        at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
-        confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedLinks
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["ids"] = ids
-    if at is not UNSET:
-        _input["at"] = at
-    if confidence is not UNSET:
-        _input["confidence"] = confidence
-    variables["input"] = _input
-    return (await aexecute(RetractLinksMutation, variables, rath=rath)).retract_links
-
-
-def retract_links(
-    ids: Iterable[str],
-    at: datetime | None | UnsetType = UNSET,
-    confidence: float | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> AssertedLinks:
-    """RetractLinks
-     One assertion over many link ids, of any link kind.
-
-    Args:
-        ids: The `Link` primary keys of the claims to retract
-        at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
-        confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        AssertedLinks
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["ids"] = ids
-    if at is not UNSET:
-        _input["at"] = at
-    if confidence is not UNSET:
-        _input["confidence"] = confidence
-    variables["input"] = _input
-    return execute(RetractLinksMutation, variables, rath=rath).retract_links
-
-
-async def acreate_term(
-    kind: TermKind,
-    key: str,
-    label: str | None | UnsetType = UNSET,
-    description: str | None | UnsetType = UNSET,
-    purl: str | None | UnsetType = UNSET,
-    color: Iterable[int] | None | UnsetType = UNSET,
-    image: str | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> Term:
-    """CreateTerm
-     The organization's words. Terms are minted lazily by the first claim that names one, so
-     createTerm is only for declaring a word ahead of use (or giving it a label and colour).
-
-    Args:
-        kind: What sort of thing this word names. Part of its identity.
-        key: The word itself, e.g. 'AIS'
-        label: Human-readable name
-        description: What this word means
-        purl: Persistent URL, where this corresponds to a published ontology term
-        color: Optional RGBA colour
-        image: Optional media store ID for an illustrative image
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        Term
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["kind"] = kind
-    _input["key"] = key
-    if label is not UNSET:
-        _input["label"] = label
-    if description is not UNSET:
-        _input["description"] = description
-    if purl is not UNSET:
-        _input["purl"] = purl
-    if color is not UNSET:
-        _input["color"] = color
-    if image is not UNSET:
-        _input["image"] = image
-    variables["input"] = _input
-    return (await aexecute(CreateTermMutation, variables, rath=rath)).create_term
-
-
-def create_term(
-    kind: TermKind,
-    key: str,
-    label: str | None | UnsetType = UNSET,
-    description: str | None | UnsetType = UNSET,
-    purl: str | None | UnsetType = UNSET,
-    color: Iterable[int] | None | UnsetType = UNSET,
-    image: str | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> Term:
-    """CreateTerm
-     The organization's words. Terms are minted lazily by the first claim that names one, so
-     createTerm is only for declaring a word ahead of use (or giving it a label and colour).
-
-    Args:
-        kind: What sort of thing this word names. Part of its identity.
-        key: The word itself, e.g. 'AIS'
-        label: Human-readable name
-        description: What this word means
-        purl: Persistent URL, where this corresponds to a published ontology term
-        color: Optional RGBA colour
-        image: Optional media store ID for an illustrative image
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        Term
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["kind"] = kind
-    _input["key"] = key
-    if label is not UNSET:
-        _input["label"] = label
-    if description is not UNSET:
-        _input["description"] = description
-    if purl is not UNSET:
-        _input["purl"] = purl
-    if color is not UNSET:
-        _input["color"] = color
-    if image is not UNSET:
-        _input["image"] = image
-    variables["input"] = _input
-    return execute(CreateTermMutation, variables, rath=rath).create_term
-
-
-async def aupdate_term(
-    id: str,
-    label: str | None | UnsetType = UNSET,
-    description: str | None | UnsetType = UNSET,
-    purl: str | None | UnsetType = UNSET,
-    color: Iterable[int] | None | UnsetType = UNSET,
-    image: str | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> Term:
-    """UpdateTerm
-
-    Update a term's label, description, PURL or colour. Its kind and key are its identity and cannot change.
-
-    Args:
-        id: The ID of the term to update
-        label: Human-readable name
-        description: What this word means
-        purl: Persistent URL, where this corresponds to a published ontology term
-        color: Optional RGBA colour
-        image: Optional media store ID for an illustrative image
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        Term
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    if label is not UNSET:
-        _input["label"] = label
-    if description is not UNSET:
-        _input["description"] = description
-    if purl is not UNSET:
-        _input["purl"] = purl
-    if color is not UNSET:
-        _input["color"] = color
-    if image is not UNSET:
-        _input["image"] = image
-    variables["input"] = _input
-    return (await aexecute(UpdateTermMutation, variables, rath=rath)).update_term
-
-
-def update_term(
-    id: str,
-    label: str | None | UnsetType = UNSET,
-    description: str | None | UnsetType = UNSET,
-    purl: str | None | UnsetType = UNSET,
-    color: Iterable[int] | None | UnsetType = UNSET,
-    image: str | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> Term:
-    """UpdateTerm
-
-    Update a term's label, description, PURL or colour. Its kind and key are its identity and cannot change.
-
-    Args:
-        id: The ID of the term to update
-        label: Human-readable name
-        description: What this word means
-        purl: Persistent URL, where this corresponds to a published ontology term
-        color: Optional RGBA colour
-        image: Optional media store ID for an illustrative image
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        Term
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    if label is not UNSET:
-        _input["label"] = label
-    if description is not UNSET:
-        _input["description"] = description
-    if purl is not UNSET:
-        _input["purl"] = purl
-    if color is not UNSET:
-        _input["color"] = color
-    if image is not UNSET:
-        _input["image"] = image
-    variables["input"] = _input
-    return execute(UpdateTermMutation, variables, rath=rath).update_term
-
-
-async def adelete_term(id: str, rath: KraphRath | None = None) -> ID:
-    """DeleteTerm
-
-    Retire a word nothing has been claimed under
-
-    Args:
-        id: The ID of the term to delete
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        ID
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    variables["input"] = _input
-    return (await aexecute(DeleteTermMutation, variables, rath=rath)).delete_term
-
-
-def delete_term(id: str, rath: KraphRath | None = None) -> ID:
-    """DeleteTerm
-
-    Retire a word nothing has been claimed under
-
-    Args:
-        id: The ID of the term to delete
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        ID
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    variables["input"] = _input
-    return execute(DeleteTermMutation, variables, rath=rath).delete_term
-
-
-async def aupdate_structure_kind(
-    id: str,
-    key: str | None | UnsetType = UNSET,
-    description: str | None | UnsetType = UNSET,
-    ontology_references: Iterable[OntologyReferenceInput] | None | UnsetType = UNSET,
-    color: Iterable[int] | None | UnsetType = UNSET,
-    image: str | None | UnsetType = UNSET,
-    label: str | None | UnsetType = UNSET,
-    pin: bool | None | UnsetType = UNSET,
-    identifier: str | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> StructureKind:
-    """UpdateStructureKind
-     StructureKind and MetricKind are minted by the write that first needs them — there is no
-     create mutation for either, only these.
-
-    Args:
-        id: The ID of the definition to update
-        key: The label of the node participating in the event
-        description: Description of this node role
-        ontology_references: Ontology references for this event
-        color: Optional RGBA color for this node role (e.g. [255, 0, 0, 128])
-        image: Optional media store ID for an image representing this node role
-        label: Optional human-readable label for this node role (defaults to 'key' if not provided)
-        pin: Whether to pin this node role in the UI
-        identifier: Read by nothing: `(organization, identifier)` is a structure kind's identity and cannot be reassigned. `update_structure_kind` writes label, description and colour only
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        StructureKind
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    if key is not UNSET:
+        if description is not UNSET:
+            _input["description"] = description
+        if definition is not UNSET:
+            _input["definition"] = definition
+        if sameness_rule is not UNSET:
+            _input["samenessRule"] = sameness_rule
+        _input["backfill"] = backfill
+        variables["input"] = _input
+        return self.execute(CreateGraphMutation, variables).create_graph
+
+    async def aupdate_graph(
+        self,
+        id: str,
+        name: str | None | UnsetType = UNSET,
+        description: str | None | UnsetType = UNSET,
+        archived: bool | None | UnsetType = UNSET,
+        pin: bool | None | UnsetType = UNSET,
+        sameness_rule: SamenessRuleInput | None | UnsetType = UNSET,
+    ) -> Graph:
+        """UpdateGraph
+
+        Update an existing graph in the graph engine
+
+        Args:
+            id: The ID of the graph to update
+            name: New graph name
+            description: New graph description
+            archived: Optional archived flag update
+            pin: Optional pin flag update for the user making the request
+            sameness_rule: Replace whose sameness claims this view counts (RFC 0024); an empty rule list means everyone. Omitted means unchanged. Changing it refolds the view's individuals — the projection is rebuilt
+
+        Returns:
+            Graph
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        if name is not UNSET:
+            _input["name"] = name
+        if description is not UNSET:
+            _input["description"] = description
+        if archived is not UNSET:
+            _input["archived"] = archived
+        if pin is not UNSET:
+            _input["pin"] = pin
+        if sameness_rule is not UNSET:
+            _input["samenessRule"] = sameness_rule
+        variables["input"] = _input
+        return (await self.aexecute(UpdateGraphMutation, variables)).update_graph
+
+    def update_graph(
+        self,
+        id: str,
+        name: str | None | UnsetType = UNSET,
+        description: str | None | UnsetType = UNSET,
+        archived: bool | None | UnsetType = UNSET,
+        pin: bool | None | UnsetType = UNSET,
+        sameness_rule: SamenessRuleInput | None | UnsetType = UNSET,
+    ) -> Graph:
+        """UpdateGraph
+
+        Update an existing graph in the graph engine
+
+        Args:
+            id: The ID of the graph to update
+            name: New graph name
+            description: New graph description
+            archived: Optional archived flag update
+            pin: Optional pin flag update for the user making the request
+            sameness_rule: Replace whose sameness claims this view counts (RFC 0024); an empty rule list means everyone. Omitted means unchanged. Changing it refolds the view's individuals — the projection is rebuilt
+
+        Returns:
+            Graph
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        if name is not UNSET:
+            _input["name"] = name
+        if description is not UNSET:
+            _input["description"] = description
+        if archived is not UNSET:
+            _input["archived"] = archived
+        if pin is not UNSET:
+            _input["pin"] = pin
+        if sameness_rule is not UNSET:
+            _input["samenessRule"] = sameness_rule
+        variables["input"] = _input
+        return self.execute(UpdateGraphMutation, variables).update_graph
+
+    async def aupdate_graph_visual(
+        self, id: str, node_positions: Iterable[CategoryNodePositionInput]
+    ) -> Graph:
+        """UpdateGraphVisual
+
+        Update the visual configuration of a graph in the graph engine
+
+        Args:
+            id: The ID of the graph element to update
+            node_positions: List of node positions to update
+
+        Returns:
+            Graph
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        _input["nodePositions"] = node_positions
+        variables["input"] = _input
+        return (
+            await self.aexecute(UpdateGraphVisualMutation, variables)
+        ).update_graph_visual
+
+    def update_graph_visual(
+        self, id: str, node_positions: Iterable[CategoryNodePositionInput]
+    ) -> Graph:
+        """UpdateGraphVisual
+
+        Update the visual configuration of a graph in the graph engine
+
+        Args:
+            id: The ID of the graph element to update
+            node_positions: List of node positions to update
+
+        Returns:
+            Graph
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        _input["nodePositions"] = node_positions
+        variables["input"] = _input
+        return self.execute(UpdateGraphVisualMutation, variables).update_graph_visual
+
+    async def aarchive_graph(self, id: str) -> Graph:
+        """ArchiveGraph
+
+        Archive a graph in the graph engine (soft delete)
+
+        Args:
+            id: The ID of the graph to archive
+
+        Returns:
+            Graph
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        variables["input"] = _input
+        return (await self.aexecute(ArchiveGraphMutation, variables)).archive_graph
+
+    def archive_graph(self, id: str) -> Graph:
+        """ArchiveGraph
+
+        Archive a graph in the graph engine (soft delete)
+
+        Args:
+            id: The ID of the graph to archive
+
+        Returns:
+            Graph
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        variables["input"] = _input
+        return self.execute(ArchiveGraphMutation, variables).archive_graph
+
+    async def adelete_graph(self, id: str) -> ID:
+        """DeleteGraph
+
+        Delete a graph from the graph engine
+
+        Args:
+            id: The ID of the graph to delete
+
+        Returns:
+            ID
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        variables["input"] = _input
+        return (await self.aexecute(DeleteGraphMutation, variables)).delete_graph
+
+    def delete_graph(self, id: str) -> ID:
+        """DeleteGraph
+
+        Delete a graph from the graph engine
+
+        Args:
+            id: The ID of the graph to delete
+
+        Returns:
+            ID
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        variables["input"] = _input
+        return self.execute(DeleteGraphMutation, variables).delete_graph
+
+    async def aattest_entity(
+        self,
+        id: str,
+        at: datetime | None | UnsetType = UNSET,
+        confidence: float | None | UnsetType = UNSET,
+    ) -> AssertedEntity:
+        """AttestEntity
+         Standing: somebody's position on whether a claim still holds.
+
+         `attest` records stands=True, `retract` records stands=False, and both are evidence of the
+         same kind. Neither deletes: the row, its metrics and its relations all survive a retraction,
+         because a derived value that dropped a contributing measurement still has to be explainable.
+         There is no reinstate and no state machine — only more evidence.
+
+        Args:
+            id: The uuid of the node being attested. The same id `retract*` returns, so the two round-trip.
+            at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+
+        Returns:
+            AssertedEntity
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        if at is not UNSET:
+            _input["at"] = at
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        variables["input"] = _input
+        return (await self.aexecute(AttestEntityMutation, variables)).attest_entity
+
+    def attest_entity(
+        self,
+        id: str,
+        at: datetime | None | UnsetType = UNSET,
+        confidence: float | None | UnsetType = UNSET,
+    ) -> AssertedEntity:
+        """AttestEntity
+         Standing: somebody's position on whether a claim still holds.
+
+         `attest` records stands=True, `retract` records stands=False, and both are evidence of the
+         same kind. Neither deletes: the row, its metrics and its relations all survive a retraction,
+         because a derived value that dropped a contributing measurement still has to be explainable.
+         There is no reinstate and no state machine — only more evidence.
+
+        Args:
+            id: The uuid of the node being attested. The same id `retract*` returns, so the two round-trip.
+            at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+
+        Returns:
+            AssertedEntity
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        if at is not UNSET:
+            _input["at"] = at
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        variables["input"] = _input
+        return self.execute(AttestEntityMutation, variables).attest_entity
+
+    async def aretract_entity(
+        self,
+        id: IDCoercible,
+        at: datetime | None | UnsetType = UNSET,
+        confidence: float | None | UnsetType = UNSET,
+    ) -> AssertedEntity:
+        """RetractEntity
+
+        Claim that an entity no longer stands. It leaves every projection that counts the claim; the evidence stays.
+
+        Args:
+            id: The ID of the entity to retract
+            at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+
+        Returns:
+            AssertedEntity
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        if at is not UNSET:
+            _input["at"] = at
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        variables["input"] = _input
+        return (await self.aexecute(RetractEntityMutation, variables)).retract_entity
+
+    def retract_entity(
+        self,
+        id: IDCoercible,
+        at: datetime | None | UnsetType = UNSET,
+        confidence: float | None | UnsetType = UNSET,
+    ) -> AssertedEntity:
+        """RetractEntity
+
+        Claim that an entity no longer stands. It leaves every projection that counts the claim; the evidence stays.
+
+        Args:
+            id: The ID of the entity to retract
+            at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+
+        Returns:
+            AssertedEntity
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        if at is not UNSET:
+            _input["at"] = at
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        variables["input"] = _input
+        return self.execute(RetractEntityMutation, variables).retract_entity
+
+    async def aattest_natural_event(
+        self,
+        id: str,
+        at: datetime | None | UnsetType = UNSET,
+        confidence: float | None | UnsetType = UNSET,
+    ) -> AssertedNaturalEvent:
+        """AttestNaturalEvent
+
+        Claim that a natural event exists
+
+        Args:
+            id: The uuid of the node being attested. The same id `retract*` returns, so the two round-trip.
+            at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+
+        Returns:
+            AssertedNaturalEvent
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        if at is not UNSET:
+            _input["at"] = at
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        variables["input"] = _input
+        return (
+            await self.aexecute(AttestNaturalEventMutation, variables)
+        ).attest_natural_event
+
+    def attest_natural_event(
+        self,
+        id: str,
+        at: datetime | None | UnsetType = UNSET,
+        confidence: float | None | UnsetType = UNSET,
+    ) -> AssertedNaturalEvent:
+        """AttestNaturalEvent
+
+        Claim that a natural event exists
+
+        Args:
+            id: The uuid of the node being attested. The same id `retract*` returns, so the two round-trip.
+            at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+
+        Returns:
+            AssertedNaturalEvent
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        if at is not UNSET:
+            _input["at"] = at
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        variables["input"] = _input
+        return self.execute(AttestNaturalEventMutation, variables).attest_natural_event
+
+    async def aretract_natural_event(
+        self,
+        id: str,
+        at: datetime | None | UnsetType = UNSET,
+        confidence: float | None | UnsetType = UNSET,
+    ) -> AssertedNaturalEvent:
+        """RetractNaturalEvent
+
+        Claim that a natural event no longer stands
+
+        Args:
+            id: The ID of the natural event to retract
+            at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+
+        Returns:
+            AssertedNaturalEvent
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        if at is not UNSET:
+            _input["at"] = at
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        variables["input"] = _input
+        return (
+            await self.aexecute(RetractNaturalEventMutation, variables)
+        ).retract_natural_event
+
+    def retract_natural_event(
+        self,
+        id: str,
+        at: datetime | None | UnsetType = UNSET,
+        confidence: float | None | UnsetType = UNSET,
+    ) -> AssertedNaturalEvent:
+        """RetractNaturalEvent
+
+        Claim that a natural event no longer stands
+
+        Args:
+            id: The ID of the natural event to retract
+            at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+
+        Returns:
+            AssertedNaturalEvent
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        if at is not UNSET:
+            _input["at"] = at
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        variables["input"] = _input
+        return self.execute(
+            RetractNaturalEventMutation, variables
+        ).retract_natural_event
+
+    async def aattest_protocol_event(
+        self,
+        id: str,
+        at: datetime | None | UnsetType = UNSET,
+        confidence: float | None | UnsetType = UNSET,
+    ) -> AssertedProtocolEvent:
+        """AttestProtocolEvent
+
+        Claim that a protocol event exists
+
+        Args:
+            id: The uuid of the node being attested. The same id `retract*` returns, so the two round-trip.
+            at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+
+        Returns:
+            AssertedProtocolEvent
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        if at is not UNSET:
+            _input["at"] = at
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        variables["input"] = _input
+        return (
+            await self.aexecute(AttestProtocolEventMutation, variables)
+        ).attest_protocol_event
+
+    def attest_protocol_event(
+        self,
+        id: str,
+        at: datetime | None | UnsetType = UNSET,
+        confidence: float | None | UnsetType = UNSET,
+    ) -> AssertedProtocolEvent:
+        """AttestProtocolEvent
+
+        Claim that a protocol event exists
+
+        Args:
+            id: The uuid of the node being attested. The same id `retract*` returns, so the two round-trip.
+            at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+
+        Returns:
+            AssertedProtocolEvent
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        if at is not UNSET:
+            _input["at"] = at
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        variables["input"] = _input
+        return self.execute(
+            AttestProtocolEventMutation, variables
+        ).attest_protocol_event
+
+    async def aretract_protocol_event(
+        self,
+        id: str,
+        at: datetime | None | UnsetType = UNSET,
+        confidence: float | None | UnsetType = UNSET,
+    ) -> AssertedProtocolEvent:
+        """RetractProtocolEvent
+
+        Claim that a protocol event no longer stands
+
+        Args:
+            id: The ID of the protocol event to retract
+            at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+
+        Returns:
+            AssertedProtocolEvent
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        if at is not UNSET:
+            _input["at"] = at
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        variables["input"] = _input
+        return (
+            await self.aexecute(RetractProtocolEventMutation, variables)
+        ).retract_protocol_event
+
+    def retract_protocol_event(
+        self,
+        id: str,
+        at: datetime | None | UnsetType = UNSET,
+        confidence: float | None | UnsetType = UNSET,
+    ) -> AssertedProtocolEvent:
+        """RetractProtocolEvent
+
+        Claim that a protocol event no longer stands
+
+        Args:
+            id: The ID of the protocol event to retract
+            at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+
+        Returns:
+            AssertedProtocolEvent
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        if at is not UNSET:
+            _input["at"] = at
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        variables["input"] = _input
+        return self.execute(
+            RetractProtocolEventMutation, variables
+        ).retract_protocol_event
+
+    async def aattest_structure(
+        self,
+        id: str,
+        at: datetime | None | UnsetType = UNSET,
+        confidence: float | None | UnsetType = UNSET,
+    ) -> AssertedStructure:
+        """AttestStructure
+
+        Claim that a structure still stands, after somebody retracted it. New evidence, not an undo — both positions stay on the record
+
+        Args:
+            id: The ID of the structure to attest — a bare uuid, its evidence primary key
+            at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+
+        Returns:
+            AssertedStructure
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        if at is not UNSET:
+            _input["at"] = at
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        variables["input"] = _input
+        return (
+            await self.aexecute(AttestStructureMutation, variables)
+        ).attest_structure
+
+    def attest_structure(
+        self,
+        id: str,
+        at: datetime | None | UnsetType = UNSET,
+        confidence: float | None | UnsetType = UNSET,
+    ) -> AssertedStructure:
+        """AttestStructure
+
+        Claim that a structure still stands, after somebody retracted it. New evidence, not an undo — both positions stay on the record
+
+        Args:
+            id: The ID of the structure to attest — a bare uuid, its evidence primary key
+            at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+
+        Returns:
+            AssertedStructure
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        if at is not UNSET:
+            _input["at"] = at
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        variables["input"] = _input
+        return self.execute(AttestStructureMutation, variables).attest_structure
+
+    async def aretract_structure(
+        self,
+        id: IDCoercible,
+        at: datetime | None | UnsetType = UNSET,
+        confidence: float | None | UnsetType = UNSET,
+    ) -> AssertedStructure:
+        """RetractStructure
+
+        Retract a datum: a Standing(stands=false) against it. Its metrics and INFORMS claims stay on the record, but stop counting for every node it informs until somebody attests it again (RFC 0023)
+
+        Args:
+            id: The ID of the structure to retract — a bare uuid, its evidence primary key
+            at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+
+        Returns:
+            AssertedStructure
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        if at is not UNSET:
+            _input["at"] = at
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        variables["input"] = _input
+        return (
+            await self.aexecute(RetractStructureMutation, variables)
+        ).retract_structure
+
+    def retract_structure(
+        self,
+        id: IDCoercible,
+        at: datetime | None | UnsetType = UNSET,
+        confidence: float | None | UnsetType = UNSET,
+    ) -> AssertedStructure:
+        """RetractStructure
+
+        Retract a datum: a Standing(stands=false) against it. Its metrics and INFORMS claims stay on the record, but stop counting for every node it informs until somebody attests it again (RFC 0023)
+
+        Args:
+            id: The ID of the structure to retract — a bare uuid, its evidence primary key
+            at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+
+        Returns:
+            AssertedStructure
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        if at is not UNSET:
+            _input["at"] = at
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        variables["input"] = _input
+        return self.execute(RetractStructureMutation, variables).retract_structure
+
+    async def aattest_metric(
+        self,
+        id: str,
+        at: datetime | None | UnsetType = UNSET,
+        confidence: float | None | UnsetType = UNSET,
+    ) -> AssertedMetric:
+        """AttestMetric
+
+        Claim that a measurement still stands. The derived values that dropped it are refolded
+
+        Args:
+            id: The ID of the metric to attest — a bare uuid, its evidence primary key
+            at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+
+        Returns:
+            AssertedMetric
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        if at is not UNSET:
+            _input["at"] = at
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        variables["input"] = _input
+        return (await self.aexecute(AttestMetricMutation, variables)).attest_metric
+
+    def attest_metric(
+        self,
+        id: str,
+        at: datetime | None | UnsetType = UNSET,
+        confidence: float | None | UnsetType = UNSET,
+    ) -> AssertedMetric:
+        """AttestMetric
+
+        Claim that a measurement still stands. The derived values that dropped it are refolded
+
+        Args:
+            id: The ID of the metric to attest — a bare uuid, its evidence primary key
+            at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+
+        Returns:
+            AssertedMetric
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        if at is not UNSET:
+            _input["at"] = at
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        variables["input"] = _input
+        return self.execute(AttestMetricMutation, variables).attest_metric
+
+    async def aretract_metric(
+        self,
+        id: str,
+        at: datetime | None | UnsetType = UNSET,
+        confidence: float | None | UnsetType = UNSET,
+    ) -> AssertedMetric:
+        """RetractMetric
+
+        Retract a measurement without destroying it. It stays readable, because a derived value that dropped it still has to be explainable
+
+        Args:
+            id: The ID of the metric to retract — a bare uuid, its evidence primary key
+            at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+
+        Returns:
+            AssertedMetric
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        if at is not UNSET:
+            _input["at"] = at
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        variables["input"] = _input
+        return (await self.aexecute(RetractMetricMutation, variables)).retract_metric
+
+    def retract_metric(
+        self,
+        id: str,
+        at: datetime | None | UnsetType = UNSET,
+        confidence: float | None | UnsetType = UNSET,
+    ) -> AssertedMetric:
+        """RetractMetric
+
+        Retract a measurement without destroying it. It stays readable, because a derived value that dropped it still has to be explainable
+
+        Args:
+            id: The ID of the metric to retract — a bare uuid, its evidence primary key
+            at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+
+        Returns:
+            AssertedMetric
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        if at is not UNSET:
+            _input["at"] = at
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        variables["input"] = _input
+        return self.execute(RetractMetricMutation, variables).retract_metric
+
+    async def aattest_comment(
+        self,
+        id: str,
+        at: datetime | None | UnsetType = UNSET,
+        confidence: float | None | UnsetType = UNSET,
+    ) -> AssertedComment:
+        """AttestComment
+
+        Claim a remark stands again — reopening, as new evidence rather than an undo
+
+        Args:
+            id: The ID of the comment to attest
+            at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+
+        Returns:
+            AssertedComment
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        if at is not UNSET:
+            _input["at"] = at
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        variables["input"] = _input
+        return (await self.aexecute(AttestCommentMutation, variables)).attest_comment
+
+    def attest_comment(
+        self,
+        id: str,
+        at: datetime | None | UnsetType = UNSET,
+        confidence: float | None | UnsetType = UNSET,
+    ) -> AssertedComment:
+        """AttestComment
+
+        Claim a remark stands again — reopening, as new evidence rather than an undo
+
+        Args:
+            id: The ID of the comment to attest
+            at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+
+        Returns:
+            AssertedComment
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        if at is not UNSET:
+            _input["at"] = at
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        variables["input"] = _input
+        return self.execute(AttestCommentMutation, variables).attest_comment
+
+    async def aretract_comment(
+        self,
+        id: str,
+        at: datetime | None | UnsetType = UNSET,
+        confidence: float | None | UnsetType = UNSET,
+    ) -> AssertedComment:
+        """RetractComment
+
+        Claim a remark no longer stands — resolved by a reviewer or withdrawn by its author; the assertion records whose position it is. The row survives
+
+        Args:
+            id: The ID of the comment to retract
+            at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+
+        Returns:
+            AssertedComment
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        if at is not UNSET:
+            _input["at"] = at
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        variables["input"] = _input
+        return (await self.aexecute(RetractCommentMutation, variables)).retract_comment
+
+    def retract_comment(
+        self,
+        id: str,
+        at: datetime | None | UnsetType = UNSET,
+        confidence: float | None | UnsetType = UNSET,
+    ) -> AssertedComment:
+        """RetractComment
+
+        Claim a remark no longer stands — resolved by a reviewer or withdrawn by its author; the assertion records whose position it is. The row survives
+
+        Args:
+            id: The ID of the comment to retract
+            at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+
+        Returns:
+            AssertedComment
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        if at is not UNSET:
+            _input["at"] = at
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        variables["input"] = _input
+        return self.execute(RetractCommentMutation, variables).retract_comment
+
+    async def aretract_relation(
+        self,
+        id: IDCoercible,
+        at: datetime | None | UnsetType = UNSET,
+        confidence: float | None | UnsetType = UNSET,
+    ) -> AssertedRelation:
+        """RetractRelation
+
+        Retract a relation assertion without destroying it. The edge survives wherever another live assertion still states the same proposition
+
+        Args:
+            id: The ID of the relation claim to retract — its `Link` primary key
+            at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+
+        Returns:
+            AssertedRelation
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        if at is not UNSET:
+            _input["at"] = at
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        variables["input"] = _input
+        return (
+            await self.aexecute(RetractRelationMutation, variables)
+        ).retract_relation
+
+    def retract_relation(
+        self,
+        id: IDCoercible,
+        at: datetime | None | UnsetType = UNSET,
+        confidence: float | None | UnsetType = UNSET,
+    ) -> AssertedRelation:
+        """RetractRelation
+
+        Retract a relation assertion without destroying it. The edge survives wherever another live assertion still states the same proposition
+
+        Args:
+            id: The ID of the relation claim to retract — its `Link` primary key
+            at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+
+        Returns:
+            AssertedRelation
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        if at is not UNSET:
+            _input["at"] = at
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        variables["input"] = _input
+        return self.execute(RetractRelationMutation, variables).retract_relation
+
+    async def aretract_measurement(
+        self,
+        id: str,
+        at: datetime | None | UnsetType = UNSET,
+        confidence: float | None | UnsetType = UNSET,
+    ) -> AssertedMeasurement:
+        """RetractMeasurement
+
+        Retract a measurement assertion without destroying it
+
+        Args:
+            id: The ID of the measurement claim to retract — its `Link` primary key
+            at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+
+        Returns:
+            AssertedMeasurement
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        if at is not UNSET:
+            _input["at"] = at
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        variables["input"] = _input
+        return (
+            await self.aexecute(RetractMeasurementMutation, variables)
+        ).retract_measurement
+
+    def retract_measurement(
+        self,
+        id: str,
+        at: datetime | None | UnsetType = UNSET,
+        confidence: float | None | UnsetType = UNSET,
+    ) -> AssertedMeasurement:
+        """RetractMeasurement
+
+        Retract a measurement assertion without destroying it
+
+        Args:
+            id: The ID of the measurement claim to retract — its `Link` primary key
+            at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+
+        Returns:
+            AssertedMeasurement
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        if at is not UNSET:
+            _input["at"] = at
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        variables["input"] = _input
+        return self.execute(RetractMeasurementMutation, variables).retract_measurement
+
+    async def aretract_structure_relation(
+        self,
+        id: str,
+        at: datetime | None | UnsetType = UNSET,
+        confidence: float | None | UnsetType = UNSET,
+    ) -> AssertedStructureRelation:
+        """RetractStructureRelation
+
+        Retract a structure relation assertion without destroying it
+
+        Args:
+            id: The ID of the structure relation claim to retract — its `Link` primary key
+            at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+
+        Returns:
+            AssertedStructureRelation
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        if at is not UNSET:
+            _input["at"] = at
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        variables["input"] = _input
+        return (
+            await self.aexecute(RetractStructureRelationMutation, variables)
+        ).retract_structure_relation
+
+    def retract_structure_relation(
+        self,
+        id: str,
+        at: datetime | None | UnsetType = UNSET,
+        confidence: float | None | UnsetType = UNSET,
+    ) -> AssertedStructureRelation:
+        """RetractStructureRelation
+
+        Retract a structure relation assertion without destroying it
+
+        Args:
+            id: The ID of the structure relation claim to retract — its `Link` primary key
+            at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+
+        Returns:
+            AssertedStructureRelation
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        if at is not UNSET:
+            _input["at"] = at
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        variables["input"] = _input
+        return self.execute(
+            RetractStructureRelationMutation, variables
+        ).retract_structure_relation
+
+    async def aretract_participation(
+        self,
+        id: str,
+        at: datetime | None | UnsetType = UNSET,
+        confidence: float | None | UnsetType = UNSET,
+    ) -> AssertedParticipation:
+        """RetractParticipation
+
+        Retract one claim that an entity took part in an event. The edge survives while another claim still states it
+
+        Args:
+            id: The evidence ID of the participation claim to retract
+            at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+
+        Returns:
+            AssertedParticipation
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        if at is not UNSET:
+            _input["at"] = at
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        variables["input"] = _input
+        return (
+            await self.aexecute(RetractParticipationMutation, variables)
+        ).retract_participation
+
+    def retract_participation(
+        self,
+        id: str,
+        at: datetime | None | UnsetType = UNSET,
+        confidence: float | None | UnsetType = UNSET,
+    ) -> AssertedParticipation:
+        """RetractParticipation
+
+        Retract one claim that an entity took part in an event. The edge survives while another claim still states it
+
+        Args:
+            id: The evidence ID of the participation claim to retract
+            at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+
+        Returns:
+            AssertedParticipation
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        if at is not UNSET:
+            _input["at"] = at
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        variables["input"] = _input
+        return self.execute(
+            RetractParticipationMutation, variables
+        ).retract_participation
+
+    async def aretract_same_instance(
+        self,
+        id: str,
+        at: datetime | None | UnsetType = UNSET,
+        confidence: float | None | UnsetType = UNSET,
+    ) -> AssertedSameness:
+        """RetractSameInstance
+
+        Withdraw one sameness claim. The component it held together is rebuilt from the claims that survive, which may split it
+
+        Args:
+            id: The id of the sameness claim to retract
+            at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+
+        Returns:
+            AssertedSameness
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        if at is not UNSET:
+            _input["at"] = at
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        variables["input"] = _input
+        return (
+            await self.aexecute(RetractSameInstanceMutation, variables)
+        ).retract_same_instance
+
+    def retract_same_instance(
+        self,
+        id: str,
+        at: datetime | None | UnsetType = UNSET,
+        confidence: float | None | UnsetType = UNSET,
+    ) -> AssertedSameness:
+        """RetractSameInstance
+
+        Withdraw one sameness claim. The component it held together is rebuilt from the claims that survive, which may split it
+
+        Args:
+            id: The id of the sameness claim to retract
+            at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+
+        Returns:
+            AssertedSameness
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        if at is not UNSET:
+            _input["at"] = at
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        variables["input"] = _input
+        return self.execute(
+            RetractSameInstanceMutation, variables
+        ).retract_same_instance
+
+    async def aattest_link(
+        self,
+        id: str,
+        at: datetime | None | UnsetType = UNSET,
+        confidence: float | None | UnsetType = UNSET,
+    ) -> AssertedLinks:
+        """AttestLink
+
+        Claim that a link claim still stands — a relation, a classification, a participation, a measurement. One act for every kind, as `retractLinks` is
+
+        Args:
+            id: The ID of the claim to attest — its `Link` primary key
+            at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+
+        Returns:
+            AssertedLinks
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        if at is not UNSET:
+            _input["at"] = at
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        variables["input"] = _input
+        return (await self.aexecute(AttestLinkMutation, variables)).attest_link
+
+    def attest_link(
+        self,
+        id: str,
+        at: datetime | None | UnsetType = UNSET,
+        confidence: float | None | UnsetType = UNSET,
+    ) -> AssertedLinks:
+        """AttestLink
+
+        Claim that a link claim still stands — a relation, a classification, a participation, a measurement. One act for every kind, as `retractLinks` is
+
+        Args:
+            id: The ID of the claim to attest — its `Link` primary key
+            at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+
+        Returns:
+            AssertedLinks
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        if at is not UNSET:
+            _input["at"] = at
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        variables["input"] = _input
+        return self.execute(AttestLinkMutation, variables).attest_link
+
+    async def aretract_links(
+        self,
+        ids: Iterable[str],
+        at: datetime | None | UnsetType = UNSET,
+        confidence: float | None | UnsetType = UNSET,
+    ) -> AssertedLinks:
+        """RetractLinks
+         One assertion over many link ids, of any link kind.
+
+        Args:
+            ids: The `Link` primary keys of the claims to retract
+            at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+
+        Returns:
+            AssertedLinks
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["ids"] = ids
+        if at is not UNSET:
+            _input["at"] = at
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        variables["input"] = _input
+        return (await self.aexecute(RetractLinksMutation, variables)).retract_links
+
+    def retract_links(
+        self,
+        ids: Iterable[str],
+        at: datetime | None | UnsetType = UNSET,
+        confidence: float | None | UnsetType = UNSET,
+    ) -> AssertedLinks:
+        """RetractLinks
+         One assertion over many link ids, of any link kind.
+
+        Args:
+            ids: The `Link` primary keys of the claims to retract
+            at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+
+        Returns:
+            AssertedLinks
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["ids"] = ids
+        if at is not UNSET:
+            _input["at"] = at
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        variables["input"] = _input
+        return self.execute(RetractLinksMutation, variables).retract_links
+
+    async def acreate_term(
+        self,
+        kind: TermKind,
+        key: str,
+        label: str | None | UnsetType = UNSET,
+        description: str | None | UnsetType = UNSET,
+        purl: str | None | UnsetType = UNSET,
+        color: Iterable[int] | None | UnsetType = UNSET,
+        image: str | None | UnsetType = UNSET,
+    ) -> Term:
+        """CreateTerm
+         The organization's words. Terms are minted lazily by the first claim that names one, so
+         createTerm is only for declaring a word ahead of use (or giving it a label and colour).
+
+        Args:
+            kind: What sort of thing this word names. Part of its identity.
+            key: The word itself, e.g. 'AIS'
+            label: Human-readable name
+            description: What this word means
+            purl: Persistent URL, where this corresponds to a published ontology term
+            color: Optional RGBA colour
+            image: Optional media store ID for an illustrative image
+
+        Returns:
+            Term
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["kind"] = kind
         _input["key"] = key
-    if description is not UNSET:
-        _input["description"] = description
-    if ontology_references is not UNSET:
-        _input["ontologyReferences"] = ontology_references
-    if color is not UNSET:
-        _input["color"] = color
-    if image is not UNSET:
-        _input["image"] = image
-    if label is not UNSET:
-        _input["label"] = label
-    if pin is not UNSET:
-        _input["pin"] = pin
-    if identifier is not UNSET:
-        _input["identifier"] = identifier
-    variables["input"] = _input
-    return (await aexecute(UpdateStructureKindMutation, variables, rath=rath)).update_structure_kind
+        if label is not UNSET:
+            _input["label"] = label
+        if description is not UNSET:
+            _input["description"] = description
+        if purl is not UNSET:
+            _input["purl"] = purl
+        if color is not UNSET:
+            _input["color"] = color
+        if image is not UNSET:
+            _input["image"] = image
+        variables["input"] = _input
+        return (await self.aexecute(CreateTermMutation, variables)).create_term
 
+    def create_term(
+        self,
+        kind: TermKind,
+        key: str,
+        label: str | None | UnsetType = UNSET,
+        description: str | None | UnsetType = UNSET,
+        purl: str | None | UnsetType = UNSET,
+        color: Iterable[int] | None | UnsetType = UNSET,
+        image: str | None | UnsetType = UNSET,
+    ) -> Term:
+        """CreateTerm
+         The organization's words. Terms are minted lazily by the first claim that names one, so
+         createTerm is only for declaring a word ahead of use (or giving it a label and colour).
 
-def update_structure_kind(
-    id: str,
-    key: str | None | UnsetType = UNSET,
-    description: str | None | UnsetType = UNSET,
-    ontology_references: Iterable[OntologyReferenceInput] | None | UnsetType = UNSET,
-    color: Iterable[int] | None | UnsetType = UNSET,
-    image: str | None | UnsetType = UNSET,
-    label: str | None | UnsetType = UNSET,
-    pin: bool | None | UnsetType = UNSET,
-    identifier: str | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> StructureKind:
-    """UpdateStructureKind
-     StructureKind and MetricKind are minted by the write that first needs them — there is no
-     create mutation for either, only these.
+        Args:
+            kind: What sort of thing this word names. Part of its identity.
+            key: The word itself, e.g. 'AIS'
+            label: Human-readable name
+            description: What this word means
+            purl: Persistent URL, where this corresponds to a published ontology term
+            color: Optional RGBA colour
+            image: Optional media store ID for an illustrative image
 
-    Args:
-        id: The ID of the definition to update
-        key: The label of the node participating in the event
-        description: Description of this node role
-        ontology_references: Ontology references for this event
-        color: Optional RGBA color for this node role (e.g. [255, 0, 0, 128])
-        image: Optional media store ID for an image representing this node role
-        label: Optional human-readable label for this node role (defaults to 'key' if not provided)
-        pin: Whether to pin this node role in the UI
-        identifier: Read by nothing: `(organization, identifier)` is a structure kind's identity and cannot be reassigned. `update_structure_kind` writes label, description and colour only
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        StructureKind
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    if key is not UNSET:
+        Returns:
+            Term
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["kind"] = kind
         _input["key"] = key
-    if description is not UNSET:
-        _input["description"] = description
-    if ontology_references is not UNSET:
-        _input["ontologyReferences"] = ontology_references
-    if color is not UNSET:
-        _input["color"] = color
-    if image is not UNSET:
-        _input["image"] = image
-    if label is not UNSET:
-        _input["label"] = label
-    if pin is not UNSET:
-        _input["pin"] = pin
-    if identifier is not UNSET:
-        _input["identifier"] = identifier
-    variables["input"] = _input
-    return execute(UpdateStructureKindMutation, variables, rath=rath).update_structure_kind
-
-
-async def adelete_structure_kind(id: str, rath: KraphRath | None = None) -> ID:
-    """DeleteStructureKind
-
-    Retire a structure kind. Refused while any structure is recorded under it — evidence is never deleted; retract the structures first
-
-    Args:
-        id: The ID of the structure kind to retire
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        ID
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    variables["input"] = _input
-    return (await aexecute(DeleteStructureKindMutation, variables, rath=rath)).delete_structure_kind
-
-
-def delete_structure_kind(id: str, rath: KraphRath | None = None) -> ID:
-    """DeleteStructureKind
-
-    Retire a structure kind. Refused while any structure is recorded under it — evidence is never deleted; retract the structures first
-
-    Args:
-        id: The ID of the structure kind to retire
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        ID
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    variables["input"] = _input
-    return execute(DeleteStructureKindMutation, variables, rath=rath).delete_structure_kind
-
-
-async def aupdate_metric_kind(
-    id: str,
-    key: str | None | UnsetType = UNSET,
-    description: str | None | UnsetType = UNSET,
-    ontology_references: Iterable[OntologyReferenceInput] | None | UnsetType = UNSET,
-    color: Iterable[int] | None | UnsetType = UNSET,
-    image: str | None | UnsetType = UNSET,
-    label: str | None | UnsetType = UNSET,
-    pin: bool | None | UnsetType = UNSET,
-    identifier: str | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> MetricKind:
-    """UpdateMetricKind
-
-    Update a metric kind's label, description or colour
-
-    Args:
-        id: The ID of the definition to update
-        key: The label of the node participating in the event
-        description: Description of this node role
-        ontology_references: Ontology references for this event
-        color: Optional RGBA color for this node role (e.g. [255, 0, 0, 128])
-        image: Optional media store ID for an image representing this node role
-        label: Optional human-readable label for this node role (defaults to 'key' if not provided)
-        pin: Whether to pin this node role in the UI
-        identifier: Read by nothing: a metric kind is identified by `(organization, structure_kind, key, value_kind)`. `update_metric_kind` writes label, description and colour only
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        MetricKind
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    if key is not UNSET:
-        _input["key"] = key
-    if description is not UNSET:
-        _input["description"] = description
-    if ontology_references is not UNSET:
-        _input["ontologyReferences"] = ontology_references
-    if color is not UNSET:
-        _input["color"] = color
-    if image is not UNSET:
-        _input["image"] = image
-    if label is not UNSET:
-        _input["label"] = label
-    if pin is not UNSET:
-        _input["pin"] = pin
-    if identifier is not UNSET:
-        _input["identifier"] = identifier
-    variables["input"] = _input
-    return (await aexecute(UpdateMetricKindMutation, variables, rath=rath)).update_metric_kind
-
-
-def update_metric_kind(
-    id: str,
-    key: str | None | UnsetType = UNSET,
-    description: str | None | UnsetType = UNSET,
-    ontology_references: Iterable[OntologyReferenceInput] | None | UnsetType = UNSET,
-    color: Iterable[int] | None | UnsetType = UNSET,
-    image: str | None | UnsetType = UNSET,
-    label: str | None | UnsetType = UNSET,
-    pin: bool | None | UnsetType = UNSET,
-    identifier: str | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> MetricKind:
-    """UpdateMetricKind
-
-    Update a metric kind's label, description or colour
-
-    Args:
-        id: The ID of the definition to update
-        key: The label of the node participating in the event
-        description: Description of this node role
-        ontology_references: Ontology references for this event
-        color: Optional RGBA color for this node role (e.g. [255, 0, 0, 128])
-        image: Optional media store ID for an image representing this node role
-        label: Optional human-readable label for this node role (defaults to 'key' if not provided)
-        pin: Whether to pin this node role in the UI
-        identifier: Read by nothing: a metric kind is identified by `(organization, structure_kind, key, value_kind)`. `update_metric_kind` writes label, description and colour only
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        MetricKind
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    if key is not UNSET:
-        _input["key"] = key
-    if description is not UNSET:
-        _input["description"] = description
-    if ontology_references is not UNSET:
-        _input["ontologyReferences"] = ontology_references
-    if color is not UNSET:
-        _input["color"] = color
-    if image is not UNSET:
-        _input["image"] = image
-    if label is not UNSET:
-        _input["label"] = label
-    if pin is not UNSET:
-        _input["pin"] = pin
-    if identifier is not UNSET:
-        _input["identifier"] = identifier
-    variables["input"] = _input
-    return execute(UpdateMetricKindMutation, variables, rath=rath).update_metric_kind
-
-
-async def adelete_metric_kind(id: str, rath: KraphRath | None = None) -> ID:
-    """DeleteMetricKind
-
-    Retire a metric kind. Refused while any metric is recorded under it — evidence is never deleted; retract the metrics first
-
-    Args:
-        id: The ID of the metric kind to retire
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        ID
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    variables["input"] = _input
-    return (await aexecute(DeleteMetricKindMutation, variables, rath=rath)).delete_metric_kind
-
-
-def delete_metric_kind(id: str, rath: KraphRath | None = None) -> ID:
-    """DeleteMetricKind
-
-    Retire a metric kind. Refused while any metric is recorded under it — evidence is never deleted; retract the metrics first
-
-    Args:
-        id: The ID of the metric kind to retire
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        ID
-    """
-    variables: dict[str, Any] = {}
-    _input: dict[str, Any] = {}
-    _input["id"] = id
-    variables["input"] = _input
-    return execute(DeleteMetricKindMutation, variables, rath=rath).delete_metric_kind
-
-
-async def aget_entity_category(id: IDCoercible, rath: KraphRath | None = None) -> EntityCategory:
-    """GetEntityCategory
-
-    Get a single entity category by ID
-
-    Args:
-        id (ID): No description
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        EntityCategory
-    """
-    variables: dict[str, Any] = {}
-    variables["id"] = id
-    return (await aexecute(GetEntityCategoryQuery, variables, rath=rath)).entity_category
-
-
-def get_entity_category(id: IDCoercible, rath: KraphRath | None = None) -> EntityCategory:
-    """GetEntityCategory
-
-    Get a single entity category by ID
-
-    Args:
-        id (ID): No description
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        EntityCategory
-    """
-    variables: dict[str, Any] = {}
-    variables["id"] = id
-    return execute(GetEntityCategoryQuery, variables, rath=rath).entity_category
-
-
-async def alist_entity_categories(
-    filters: EntityCategoryFilter | None | UnsetType = UNSET,
-    pagination: OffsetPaginationInput | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> tuple[EntityCategory, ...]:
-    """ListEntityCategories
-
-    List all entity categories
-
-    Args:
-        filters (EntityCategoryFilter | None, optional): No description.
-        pagination (OffsetPaginationInput | None, optional): No description.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        list[EntityCategory]
-    """
-    variables: dict[str, Any] = {}
-    if filters is not UNSET:
-        variables["filters"] = filters
-    if pagination is not UNSET:
-        variables["pagination"] = pagination
-    return (await aexecute(ListEntityCategoriesQuery, variables, rath=rath)).entity_categories
-
-
-def list_entity_categories(
-    filters: EntityCategoryFilter | None | UnsetType = UNSET,
-    pagination: OffsetPaginationInput | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> tuple[EntityCategory, ...]:
-    """ListEntityCategories
-
-    List all entity categories
-
-    Args:
-        filters (EntityCategoryFilter | None, optional): No description.
-        pagination (OffsetPaginationInput | None, optional): No description.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        list[EntityCategory]
-    """
-    variables: dict[str, Any] = {}
-    if filters is not UNSET:
-        variables["filters"] = filters
-    if pagination is not UNSET:
-        variables["pagination"] = pagination
-    return execute(ListEntityCategoriesQuery, variables, rath=rath).entity_categories
-
-
-async def asearch_entity_categories(
-    search: str | None | UnsetType = UNSET,
-    values: list[IDCoercible] | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> tuple[SearchEntityCategoriesQueryOptions, ...]:
-    """SearchEntityCategories
-
-    List all entity categories
-
-    Args:
-        search (str | None, optional): No description.
-        values (list[ID] | None, optional): No description.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        list[SearchEntityCategoriesQueryEntityCategories]
-    """
-    variables: dict[str, Any] = {}
-    if search is not UNSET:
-        variables["search"] = search
-    if values is not UNSET:
-        variables["values"] = values
-    return (await aexecute(SearchEntityCategoriesQuery, variables, rath=rath)).options
-
-
-def search_entity_categories(
-    search: str | None | UnsetType = UNSET,
-    values: list[IDCoercible] | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> tuple[SearchEntityCategoriesQueryOptions, ...]:
-    """SearchEntityCategories
-
-    List all entity categories
-
-    Args:
-        search (str | None, optional): No description.
-        values (list[ID] | None, optional): No description.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        list[SearchEntityCategoriesQueryEntityCategories]
-    """
-    variables: dict[str, Any] = {}
-    if search is not UNSET:
-        variables["search"] = search
-    if values is not UNSET:
-        variables["values"] = values
-    return execute(SearchEntityCategoriesQuery, variables, rath=rath).options
-
-
-async def aget_relation_category(
-    id: IDCoercible, rath: KraphRath | None = None
-) -> RelationCategory:
-    """GetRelationCategory
-
-    Get a single relation category by ID
-
-    Args:
-        id (ID): No description
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        RelationCategory
-    """
-    variables: dict[str, Any] = {}
-    variables["id"] = id
-    return (await aexecute(GetRelationCategoryQuery, variables, rath=rath)).relation_category
-
-
-def get_relation_category(id: IDCoercible, rath: KraphRath | None = None) -> RelationCategory:
-    """GetRelationCategory
-
-    Get a single relation category by ID
-
-    Args:
-        id (ID): No description
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        RelationCategory
-    """
-    variables: dict[str, Any] = {}
-    variables["id"] = id
-    return execute(GetRelationCategoryQuery, variables, rath=rath).relation_category
-
-
-async def alist_relation_categories(
-    filters: RelationCategoryFilter | None | UnsetType = UNSET,
-    pagination: OffsetPaginationInput | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> tuple[RelationCategory, ...]:
-    """ListRelationCategories
-
-    List all relation categories
-
-    Args:
-        filters (RelationCategoryFilter | None, optional): No description.
-        pagination (OffsetPaginationInput | None, optional): No description.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        list[RelationCategory]
-    """
-    variables: dict[str, Any] = {}
-    if filters is not UNSET:
-        variables["filters"] = filters
-    if pagination is not UNSET:
-        variables["pagination"] = pagination
-    return (await aexecute(ListRelationCategoriesQuery, variables, rath=rath)).relation_categories
-
-
-def list_relation_categories(
-    filters: RelationCategoryFilter | None | UnsetType = UNSET,
-    pagination: OffsetPaginationInput | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> tuple[RelationCategory, ...]:
-    """ListRelationCategories
-
-    List all relation categories
-
-    Args:
-        filters (RelationCategoryFilter | None, optional): No description.
-        pagination (OffsetPaginationInput | None, optional): No description.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        list[RelationCategory]
-    """
-    variables: dict[str, Any] = {}
-    if filters is not UNSET:
-        variables["filters"] = filters
-    if pagination is not UNSET:
-        variables["pagination"] = pagination
-    return execute(ListRelationCategoriesQuery, variables, rath=rath).relation_categories
-
-
-async def asearch_relation_categories(
-    search: str | None | UnsetType = UNSET,
-    values: list[IDCoercible] | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> tuple[SearchRelationCategoriesQueryOptions, ...]:
-    """SearchRelationCategories
-
-    List all relation categories
-
-    Args:
-        search (str | None, optional): No description.
-        values (list[ID] | None, optional): No description.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        list[SearchRelationCategoriesQueryRelationCategories]
-    """
-    variables: dict[str, Any] = {}
-    if search is not UNSET:
-        variables["search"] = search
-    if values is not UNSET:
-        variables["values"] = values
-    return (await aexecute(SearchRelationCategoriesQuery, variables, rath=rath)).options
-
-
-def search_relation_categories(
-    search: str | None | UnsetType = UNSET,
-    values: list[IDCoercible] | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> tuple[SearchRelationCategoriesQueryOptions, ...]:
-    """SearchRelationCategories
-
-    List all relation categories
-
-    Args:
-        search (str | None, optional): No description.
-        values (list[ID] | None, optional): No description.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        list[SearchRelationCategoriesQueryRelationCategories]
-    """
-    variables: dict[str, Any] = {}
-    if search is not UNSET:
-        variables["search"] = search
-    if values is not UNSET:
-        variables["values"] = values
-    return execute(SearchRelationCategoriesQuery, variables, rath=rath).options
-
-
-async def aget_measurement_category(
-    id: IDCoercible, rath: KraphRath | None = None
-) -> MeasurementCategory:
-    """GetMeasurementCategory
-
-    Get a single measurement category by ID
-
-    Args:
-        id (ID): No description
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        MeasurementCategory
-    """
-    variables: dict[str, Any] = {}
-    variables["id"] = id
-    return (await aexecute(GetMeasurementCategoryQuery, variables, rath=rath)).measurement_category
-
-
-def get_measurement_category(id: IDCoercible, rath: KraphRath | None = None) -> MeasurementCategory:
-    """GetMeasurementCategory
-
-    Get a single measurement category by ID
-
-    Args:
-        id (ID): No description
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        MeasurementCategory
-    """
-    variables: dict[str, Any] = {}
-    variables["id"] = id
-    return execute(GetMeasurementCategoryQuery, variables, rath=rath).measurement_category
-
-
-async def alist_measurement_categories(
-    filters: MeasurementCategoryFilter | None | UnsetType = UNSET,
-    pagination: OffsetPaginationInput | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> tuple[MeasurementCategory, ...]:
-    """ListMeasurementCategories
-
-    List all measurement categories
-
-    Args:
-        filters (MeasurementCategoryFilter | None, optional): No description.
-        pagination (OffsetPaginationInput | None, optional): No description.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        list[MeasurementCategory]
-    """
-    variables: dict[str, Any] = {}
-    if filters is not UNSET:
-        variables["filters"] = filters
-    if pagination is not UNSET:
-        variables["pagination"] = pagination
-    return (
-        await aexecute(ListMeasurementCategoriesQuery, variables, rath=rath)
-    ).measurement_categories
-
-
-def list_measurement_categories(
-    filters: MeasurementCategoryFilter | None | UnsetType = UNSET,
-    pagination: OffsetPaginationInput | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> tuple[MeasurementCategory, ...]:
-    """ListMeasurementCategories
-
-    List all measurement categories
-
-    Args:
-        filters (MeasurementCategoryFilter | None, optional): No description.
-        pagination (OffsetPaginationInput | None, optional): No description.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        list[MeasurementCategory]
-    """
-    variables: dict[str, Any] = {}
-    if filters is not UNSET:
-        variables["filters"] = filters
-    if pagination is not UNSET:
-        variables["pagination"] = pagination
-    return execute(ListMeasurementCategoriesQuery, variables, rath=rath).measurement_categories
-
-
-async def asearch_measurement_categories(
-    search: str | None | UnsetType = UNSET,
-    values: list[IDCoercible] | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> tuple[SearchMeasurementCategoriesQueryOptions, ...]:
-    """SearchMeasurementCategories
-
-    List all measurement categories
-
-    Args:
-        search (str | None, optional): No description.
-        values (list[ID] | None, optional): No description.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        list[SearchMeasurementCategoriesQueryMeasurementCategories]
-    """
-    variables: dict[str, Any] = {}
-    if search is not UNSET:
-        variables["search"] = search
-    if values is not UNSET:
-        variables["values"] = values
-    return (await aexecute(SearchMeasurementCategoriesQuery, variables, rath=rath)).options
-
-
-def search_measurement_categories(
-    search: str | None | UnsetType = UNSET,
-    values: list[IDCoercible] | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> tuple[SearchMeasurementCategoriesQueryOptions, ...]:
-    """SearchMeasurementCategories
-
-    List all measurement categories
-
-    Args:
-        search (str | None, optional): No description.
-        values (list[ID] | None, optional): No description.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        list[SearchMeasurementCategoriesQueryMeasurementCategories]
-    """
-    variables: dict[str, Any] = {}
-    if search is not UNSET:
-        variables["search"] = search
-    if values is not UNSET:
-        variables["values"] = values
-    return execute(SearchMeasurementCategoriesQuery, variables, rath=rath).options
-
-
-async def aget_structure_relation_category(
-    id: IDCoercible, rath: KraphRath | None = None
-) -> StructureRelationCategory:
-    """GetStructureRelationCategory
-
-    Get a single structure relation category by ID
-
-    Args:
-        id (ID): No description
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        StructureRelationCategory
-    """
-    variables: dict[str, Any] = {}
-    variables["id"] = id
-    return (
-        await aexecute(GetStructureRelationCategoryQuery, variables, rath=rath)
-    ).structure_relation_category
-
-
-def get_structure_relation_category(
-    id: IDCoercible, rath: KraphRath | None = None
-) -> StructureRelationCategory:
-    """GetStructureRelationCategory
-
-    Get a single structure relation category by ID
-
-    Args:
-        id (ID): No description
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        StructureRelationCategory
-    """
-    variables: dict[str, Any] = {}
-    variables["id"] = id
-    return execute(
-        GetStructureRelationCategoryQuery, variables, rath=rath
-    ).structure_relation_category
-
-
-async def alist_structure_relation_categories(
-    filters: StructureRelationCategoryFilter | None | UnsetType = UNSET,
-    pagination: OffsetPaginationInput | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> tuple[StructureRelationCategory, ...]:
-    """ListStructureRelationCategories
-
-    List all structure relation categories
-
-    Args:
-        filters (StructureRelationCategoryFilter | None, optional): No description.
-        pagination (OffsetPaginationInput | None, optional): No description.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        list[StructureRelationCategory]
-    """
-    variables: dict[str, Any] = {}
-    if filters is not UNSET:
-        variables["filters"] = filters
-    if pagination is not UNSET:
-        variables["pagination"] = pagination
-    return (
-        await aexecute(ListStructureRelationCategoriesQuery, variables, rath=rath)
-    ).structure_relation_categories
-
-
-def list_structure_relation_categories(
-    filters: StructureRelationCategoryFilter | None | UnsetType = UNSET,
-    pagination: OffsetPaginationInput | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> tuple[StructureRelationCategory, ...]:
-    """ListStructureRelationCategories
-
-    List all structure relation categories
-
-    Args:
-        filters (StructureRelationCategoryFilter | None, optional): No description.
-        pagination (OffsetPaginationInput | None, optional): No description.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        list[StructureRelationCategory]
-    """
-    variables: dict[str, Any] = {}
-    if filters is not UNSET:
-        variables["filters"] = filters
-    if pagination is not UNSET:
-        variables["pagination"] = pagination
-    return execute(
-        ListStructureRelationCategoriesQuery, variables, rath=rath
-    ).structure_relation_categories
-
-
-async def asearch_structure_relation_categories(
-    search: str | None | UnsetType = UNSET,
-    values: list[IDCoercible] | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> tuple[SearchStructureRelationCategoriesQueryOptions, ...]:
-    """SearchStructureRelationCategories
-
-    List all structure relation categories
-
-    Args:
-        search (str | None, optional): No description.
-        values (list[ID] | None, optional): No description.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        list[SearchStructureRelationCategoriesQueryStructureRelationCategories]
-    """
-    variables: dict[str, Any] = {}
-    if search is not UNSET:
-        variables["search"] = search
-    if values is not UNSET:
-        variables["values"] = values
-    return (await aexecute(SearchStructureRelationCategoriesQuery, variables, rath=rath)).options
-
-
-def search_structure_relation_categories(
-    search: str | None | UnsetType = UNSET,
-    values: list[IDCoercible] | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> tuple[SearchStructureRelationCategoriesQueryOptions, ...]:
-    """SearchStructureRelationCategories
-
-    List all structure relation categories
-
-    Args:
-        search (str | None, optional): No description.
-        values (list[ID] | None, optional): No description.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        list[SearchStructureRelationCategoriesQueryStructureRelationCategories]
-    """
-    variables: dict[str, Any] = {}
-    if search is not UNSET:
-        variables["search"] = search
-    if values is not UNSET:
-        variables["values"] = values
-    return execute(SearchStructureRelationCategoriesQuery, variables, rath=rath).options
-
-
-async def aget_natural_event_category(
-    id: IDCoercible, rath: KraphRath | None = None
-) -> NaturalEventCategory:
-    """GetNaturalEventCategory
-
-    Get a single natural event category by ID
-
-    Args:
-        id (ID): No description
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        NaturalEventCategory
-    """
-    variables: dict[str, Any] = {}
-    variables["id"] = id
-    return (
-        await aexecute(GetNaturalEventCategoryQuery, variables, rath=rath)
-    ).natural_event_category
-
-
-def get_natural_event_category(
-    id: IDCoercible, rath: KraphRath | None = None
-) -> NaturalEventCategory:
-    """GetNaturalEventCategory
-
-    Get a single natural event category by ID
-
-    Args:
-        id (ID): No description
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        NaturalEventCategory
-    """
-    variables: dict[str, Any] = {}
-    variables["id"] = id
-    return execute(GetNaturalEventCategoryQuery, variables, rath=rath).natural_event_category
-
-
-async def alist_natural_event_categories(
-    filters: NaturalEventCategoryFilter | None | UnsetType = UNSET,
-    pagination: OffsetPaginationInput | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> tuple[NaturalEventCategory, ...]:
-    """ListNaturalEventCategories
-
-    List all natural event categories
-
-    Args:
-        filters (NaturalEventCategoryFilter | None, optional): No description.
-        pagination (OffsetPaginationInput | None, optional): No description.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        list[NaturalEventCategory]
-    """
-    variables: dict[str, Any] = {}
-    if filters is not UNSET:
-        variables["filters"] = filters
-    if pagination is not UNSET:
-        variables["pagination"] = pagination
-    return (
-        await aexecute(ListNaturalEventCategoriesQuery, variables, rath=rath)
-    ).natural_event_categories
-
-
-def list_natural_event_categories(
-    filters: NaturalEventCategoryFilter | None | UnsetType = UNSET,
-    pagination: OffsetPaginationInput | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> tuple[NaturalEventCategory, ...]:
-    """ListNaturalEventCategories
-
-    List all natural event categories
-
-    Args:
-        filters (NaturalEventCategoryFilter | None, optional): No description.
-        pagination (OffsetPaginationInput | None, optional): No description.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        list[NaturalEventCategory]
-    """
-    variables: dict[str, Any] = {}
-    if filters is not UNSET:
-        variables["filters"] = filters
-    if pagination is not UNSET:
-        variables["pagination"] = pagination
-    return execute(ListNaturalEventCategoriesQuery, variables, rath=rath).natural_event_categories
-
-
-async def asearch_natural_event_categories(
-    search: str | None | UnsetType = UNSET,
-    values: list[IDCoercible] | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> tuple[SearchNaturalEventCategoriesQueryOptions, ...]:
-    """SearchNaturalEventCategories
-
-    List all natural event categories
-
-    Args:
-        search (str | None, optional): No description.
-        values (list[ID] | None, optional): No description.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        list[SearchNaturalEventCategoriesQueryNaturalEventCategories]
-    """
-    variables: dict[str, Any] = {}
-    if search is not UNSET:
-        variables["search"] = search
-    if values is not UNSET:
-        variables["values"] = values
-    return (await aexecute(SearchNaturalEventCategoriesQuery, variables, rath=rath)).options
-
-
-def search_natural_event_categories(
-    search: str | None | UnsetType = UNSET,
-    values: list[IDCoercible] | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> tuple[SearchNaturalEventCategoriesQueryOptions, ...]:
-    """SearchNaturalEventCategories
-
-    List all natural event categories
-
-    Args:
-        search (str | None, optional): No description.
-        values (list[ID] | None, optional): No description.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        list[SearchNaturalEventCategoriesQueryNaturalEventCategories]
-    """
-    variables: dict[str, Any] = {}
-    if search is not UNSET:
-        variables["search"] = search
-    if values is not UNSET:
-        variables["values"] = values
-    return execute(SearchNaturalEventCategoriesQuery, variables, rath=rath).options
-
-
-async def aget_protocol_event_category(
-    id: IDCoercible, rath: KraphRath | None = None
-) -> ProtocolEventCategory:
-    """GetProtocolEventCategory
-
-    Get a single protocol event category by ID
-
-    Args:
-        id (ID): No description
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        ProtocolEventCategory
-    """
-    variables: dict[str, Any] = {}
-    variables["id"] = id
-    return (
-        await aexecute(GetProtocolEventCategoryQuery, variables, rath=rath)
-    ).protocol_event_category
-
-
-def get_protocol_event_category(
-    id: IDCoercible, rath: KraphRath | None = None
-) -> ProtocolEventCategory:
-    """GetProtocolEventCategory
-
-    Get a single protocol event category by ID
-
-    Args:
-        id (ID): No description
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        ProtocolEventCategory
-    """
-    variables: dict[str, Any] = {}
-    variables["id"] = id
-    return execute(GetProtocolEventCategoryQuery, variables, rath=rath).protocol_event_category
-
-
-async def alist_protocol_event_categories(
-    filters: ProtocolEventCategoryFilter | None | UnsetType = UNSET,
-    pagination: OffsetPaginationInput | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> tuple[ProtocolEventCategory, ...]:
-    """ListProtocolEventCategories
-
-    List all protocol event categories
-
-    Args:
-        filters (ProtocolEventCategoryFilter | None, optional): No description.
-        pagination (OffsetPaginationInput | None, optional): No description.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        list[ProtocolEventCategory]
-    """
-    variables: dict[str, Any] = {}
-    if filters is not UNSET:
-        variables["filters"] = filters
-    if pagination is not UNSET:
-        variables["pagination"] = pagination
-    return (
-        await aexecute(ListProtocolEventCategoriesQuery, variables, rath=rath)
-    ).protocol_event_categories
-
-
-def list_protocol_event_categories(
-    filters: ProtocolEventCategoryFilter | None | UnsetType = UNSET,
-    pagination: OffsetPaginationInput | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> tuple[ProtocolEventCategory, ...]:
-    """ListProtocolEventCategories
-
-    List all protocol event categories
-
-    Args:
-        filters (ProtocolEventCategoryFilter | None, optional): No description.
-        pagination (OffsetPaginationInput | None, optional): No description.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        list[ProtocolEventCategory]
-    """
-    variables: dict[str, Any] = {}
-    if filters is not UNSET:
-        variables["filters"] = filters
-    if pagination is not UNSET:
-        variables["pagination"] = pagination
-    return execute(ListProtocolEventCategoriesQuery, variables, rath=rath).protocol_event_categories
-
-
-async def asearch_protocol_event_categories(
-    search: str | None | UnsetType = UNSET,
-    values: list[IDCoercible] | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> tuple[SearchProtocolEventCategoriesQueryOptions, ...]:
-    """SearchProtocolEventCategories
-
-    List all protocol event categories
-
-    Args:
-        search (str | None, optional): No description.
-        values (list[ID] | None, optional): No description.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        list[SearchProtocolEventCategoriesQueryProtocolEventCategories]
-    """
-    variables: dict[str, Any] = {}
-    if search is not UNSET:
-        variables["search"] = search
-    if values is not UNSET:
-        variables["values"] = values
-    return (await aexecute(SearchProtocolEventCategoriesQuery, variables, rath=rath)).options
-
-
-def search_protocol_event_categories(
-    search: str | None | UnsetType = UNSET,
-    values: list[IDCoercible] | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> tuple[SearchProtocolEventCategoriesQueryOptions, ...]:
-    """SearchProtocolEventCategories
-
-    List all protocol event categories
-
-    Args:
-        search (str | None, optional): No description.
-        values (list[ID] | None, optional): No description.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        list[SearchProtocolEventCategoriesQueryProtocolEventCategories]
-    """
-    variables: dict[str, Any] = {}
-    if search is not UNSET:
-        variables["search"] = search
-    if values is not UNSET:
-        variables["values"] = values
-    return execute(SearchProtocolEventCategoriesQuery, variables, rath=rath).options
-
-
-async def aget_instance(id: IDCoercible, rath: KraphRath | None = None) -> Instance:
-    """GetInstance
-     Claim-grain reads: organization scope, addressed by a bare uuid, no graph argument.
-     `instance(id:)` is the fallback reader for a node no view draws.
-
-    Args:
-        id (ID): No description
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        Instance
-    """
-    variables: dict[str, Any] = {}
-    variables["id"] = id
-    return (await aexecute(GetInstanceQuery, variables, rath=rath)).instance
-
-
-def get_instance(id: IDCoercible, rath: KraphRath | None = None) -> Instance:
-    """GetInstance
-     Claim-grain reads: organization scope, addressed by a bare uuid, no graph argument.
-     `instance(id:)` is the fallback reader for a node no view draws.
-
-    Args:
-        id (ID): No description
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        Instance
-    """
-    variables: dict[str, Any] = {}
-    variables["id"] = id
-    return execute(GetInstanceQuery, variables, rath=rath).instance
-
-
-async def aget_link(id: IDCoercible, rath: KraphRath | None = None) -> Link:
-    """GetLink
-
-    Get one claim relating two things by ID, as the log has it
-
-    Args:
-        id (ID): No description
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        Link
-    """
-    variables: dict[str, Any] = {}
-    variables["id"] = id
-    return (await aexecute(GetLinkQuery, variables, rath=rath)).link
-
-
-def get_link(id: IDCoercible, rath: KraphRath | None = None) -> Link:
-    """GetLink
-
-    Get one claim relating two things by ID, as the log has it
-
-    Args:
-        id (ID): No description
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        Link
-    """
-    variables: dict[str, Any] = {}
-    variables["id"] = id
-    return execute(GetLinkQuery, variables, rath=rath).link
-
-
-async def aget_standings(id: IDCoercible, rath: KraphRath | None = None) -> tuple[Standing, ...]:
-    """GetStandings
-     Every position anyone has taken on a claim, newest first. An empty list means nobody has
-     disputed it — silence is not dissent, and there is no folded boolean beside this.
-
-    Args:
-        id (ID): No description
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        list[Standing]
-    """
-    variables: dict[str, Any] = {}
-    variables["id"] = id
-    return (await aexecute(GetStandingsQuery, variables, rath=rath)).standings
-
-
-def get_standings(id: IDCoercible, rath: KraphRath | None = None) -> tuple[Standing, ...]:
-    """GetStandings
-     Every position anyone has taken on a claim, newest first. An empty list means nobody has
-     disputed it — silence is not dissent, and there is no folded boolean beside this.
-
-    Args:
-        id (ID): No description
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        list[Standing]
-    """
-    variables: dict[str, Any] = {}
-    variables["id"] = id
-    return execute(GetStandingsQuery, variables, rath=rath).standings
-
-
-async def aget_structure(id: IDCoercible, rath: KraphRath | None = None) -> StructureWithMetrics:
-    """GetStructure
-
-    Get a structure by ID — a bare uuid, its evidence primary key
-
-    Args:
-        id (ID): No description
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        StructureWithMetrics
-    """
-    variables: dict[str, Any] = {}
-    variables["id"] = id
-    return (await aexecute(GetStructureQuery, variables, rath=rath)).structure
-
-
-def get_structure(id: IDCoercible, rath: KraphRath | None = None) -> StructureWithMetrics:
-    """GetStructure
-
-    Get a structure by ID — a bare uuid, its evidence primary key
-
-    Args:
-        id (ID): No description
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        StructureWithMetrics
-    """
-    variables: dict[str, Any] = {}
-    variables["id"] = id
-    return execute(GetStructureQuery, variables, rath=rath).structure
-
-
-async def aget_structure_by_identifier(
-    identifier: StructureIdentifierCoercible,
-    object: StructureObjectCoercible,
-    rath: KraphRath | None = None,
-) -> StructureWithMetrics:
-    """GetStructureByIdentifier
-
-    Get a structure by identifier and object. No graph: a structure belongs to the organization and has no vertex in any projection
-
-    Args:
-        identifier (StructureIdentifier): No description
-        object (StructureObject): No description
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        StructureWithMetrics
-    """
-    variables: dict[str, Any] = {}
-    variables["identifier"] = identifier
-    variables["object"] = object
-    return (
-        await aexecute(GetStructureByIdentifierQuery, variables, rath=rath)
-    ).structure_by_identifier
-
-
-def get_structure_by_identifier(
-    identifier: StructureIdentifierCoercible,
-    object: StructureObjectCoercible,
-    rath: KraphRath | None = None,
-) -> StructureWithMetrics:
-    """GetStructureByIdentifier
-
-    Get a structure by identifier and object. No graph: a structure belongs to the organization and has no vertex in any projection
-
-    Args:
-        identifier (StructureIdentifier): No description
-        object (StructureObject): No description
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        StructureWithMetrics
-    """
-    variables: dict[str, Any] = {}
-    variables["identifier"] = identifier
-    variables["object"] = object
-    return execute(GetStructureByIdentifierQuery, variables, rath=rath).structure_by_identifier
-
-
-async def aget_informing_structures(
-    entity_id: str, rath: KraphRath | None = None
-) -> tuple[Structure, ...]:
-    """GetInformingStructures
-     Resolves a naming structure back to what it names — this is how an external id is looked up
-     now that `externalId` no longer exists on any write.
-
-    Args:
-        entity_id (str): No description
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        list[Structure]
-    """
-    variables: dict[str, Any] = {}
-    variables["entityId"] = entity_id
-    return (await aexecute(GetInformingStructuresQuery, variables, rath=rath)).informing_structures
-
-
-def get_informing_structures(
-    entity_id: str, rath: KraphRath | None = None
-) -> tuple[Structure, ...]:
-    """GetInformingStructures
-     Resolves a naming structure back to what it names — this is how an external id is looked up
-     now that `externalId` no longer exists on any write.
-
-    Args:
-        entity_id (str): No description
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        list[Structure]
-    """
-    variables: dict[str, Any] = {}
-    variables["entityId"] = entity_id
-    return execute(GetInformingStructuresQuery, variables, rath=rath).informing_structures
-
-
-async def alist_structures(
-    structure_kind_id: IDCoercible | None | UnsetType = UNSET,
-    filters: StructureFilter | None | UnsetType = UNSET,
-    ordering: list[StructureOrder] | None | UnsetType = UNSET,
-    pagination: StructurePaginationInput | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> tuple[Structure, ...]:
-    """ListStructures
-
-    List structures with optional filters, ordering, and pagination
-
-    Args:
-        structure_kind_id (ID | None, optional): No description.
-        filters (StructureFilter | None, optional): No description.
-        ordering (list[StructureOrder] | None, optional): No description.
-        pagination (StructurePaginationInput | None, optional): No description.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        list[Structure]
-    """
-    variables: dict[str, Any] = {}
-    if structure_kind_id is not UNSET:
-        variables["structureKindId"] = structure_kind_id
-    if filters is not UNSET:
-        variables["filters"] = filters
-    if ordering is not UNSET:
-        variables["ordering"] = ordering
-    if pagination is not UNSET:
-        variables["pagination"] = pagination
-    return (await aexecute(ListStructuresQuery, variables, rath=rath)).structures
-
-
-def list_structures(
-    structure_kind_id: IDCoercible | None | UnsetType = UNSET,
-    filters: StructureFilter | None | UnsetType = UNSET,
-    ordering: list[StructureOrder] | None | UnsetType = UNSET,
-    pagination: StructurePaginationInput | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> tuple[Structure, ...]:
-    """ListStructures
-
-    List structures with optional filters, ordering, and pagination
-
-    Args:
-        structure_kind_id (ID | None, optional): No description.
-        filters (StructureFilter | None, optional): No description.
-        ordering (list[StructureOrder] | None, optional): No description.
-        pagination (StructurePaginationInput | None, optional): No description.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        list[Structure]
-    """
-    variables: dict[str, Any] = {}
-    if structure_kind_id is not UNSET:
-        variables["structureKindId"] = structure_kind_id
-    if filters is not UNSET:
-        variables["filters"] = filters
-    if ordering is not UNSET:
-        variables["ordering"] = ordering
-    if pagination is not UNSET:
-        variables["pagination"] = pagination
-    return execute(ListStructuresQuery, variables, rath=rath).structures
-
-
-async def aget_metric(id: IDCoercible, rath: KraphRath | None = None) -> Metric:
-    """GetMetric
-
-    Get a metric by ID
-
-    Args:
-        id (ID): No description
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        Metric
-    """
-    variables: dict[str, Any] = {}
-    variables["id"] = id
-    return (await aexecute(GetMetricQuery, variables, rath=rath)).metric
-
-
-def get_metric(id: IDCoercible, rath: KraphRath | None = None) -> Metric:
-    """GetMetric
-
-    Get a metric by ID
-
-    Args:
-        id (ID): No description
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        Metric
-    """
-    variables: dict[str, Any] = {}
-    variables["id"] = id
-    return execute(GetMetricQuery, variables, rath=rath).metric
-
-
-async def aget_metrics_for_structure(
-    structure_id: IDCoercible, rath: KraphRath | None = None
-) -> tuple[Metric, ...]:
-    """GetMetricsForStructure
-
-    List every un-retracted metric describing a structure
-
-    Args:
-        structure_id (ID): No description
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        list[Metric]
-    """
-    variables: dict[str, Any] = {}
-    variables["structureId"] = structure_id
-    return (await aexecute(GetMetricsForStructureQuery, variables, rath=rath)).metrics_for_structure
-
-
-def get_metrics_for_structure(
-    structure_id: IDCoercible, rath: KraphRath | None = None
-) -> tuple[Metric, ...]:
-    """GetMetricsForStructure
-
-    List every un-retracted metric describing a structure
-
-    Args:
-        structure_id (ID): No description
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        list[Metric]
-    """
-    variables: dict[str, Any] = {}
-    variables["structureId"] = structure_id
-    return execute(GetMetricsForStructureQuery, variables, rath=rath).metrics_for_structure
-
-
-async def aget_comment(id: IDCoercible, rath: KraphRath | None = None) -> Comment:
-    """GetComment
-
-    Get one remark by ID, as the log has it
-
-    Args:
-        id (ID): No description
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        Comment
-    """
-    variables: dict[str, Any] = {}
-    variables["id"] = id
-    return (await aexecute(GetCommentQuery, variables, rath=rath)).comment
-
-
-def get_comment(id: IDCoercible, rath: KraphRath | None = None) -> Comment:
-    """GetComment
-
-    Get one remark by ID, as the log has it
-
-    Args:
-        id (ID): No description
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        Comment
-    """
-    variables: dict[str, Any] = {}
-    variables["id"] = id
-    return execute(GetCommentQuery, variables, rath=rath).comment
-
-
-async def aget_comments_for(
-    identifier: str, object: IDCoercible, rath: KraphRath | None = None
-) -> tuple[Comment, ...]:
-    """GetCommentsFor
-
-    Every remark about one external datum, addressed by (identifier, object), newest first — resolved ones included
-
-    Args:
-        identifier (str): No description
-        object (ID): No description
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        list[Comment]
-    """
-    variables: dict[str, Any] = {}
-    variables["identifier"] = identifier
-    variables["object"] = object
-    return (await aexecute(GetCommentsForQuery, variables, rath=rath)).comments_for
-
-
-def get_comments_for(
-    identifier: str, object: IDCoercible, rath: KraphRath | None = None
-) -> tuple[Comment, ...]:
-    """GetCommentsFor
-
-    Every remark about one external datum, addressed by (identifier, object), newest first — resolved ones included
-
-    Args:
-        identifier (str): No description
-        object (ID): No description
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        list[Comment]
-    """
-    variables: dict[str, Any] = {}
-    variables["identifier"] = identifier
-    variables["object"] = object
-    return execute(GetCommentsForQuery, variables, rath=rath).comments_for
-
-
-async def asearch_structures(
-    search: str | None | UnsetType = UNSET,
-    values: list[IDCoercible] | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> tuple[SearchStructuresQueryOptions, ...]:
-    """SearchStructures
-
-    List structures with optional filters, ordering, and pagination
-
-    Args:
-        search (str | None, optional): No description.
-        values (list[ID] | None, optional): No description.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        list[SearchStructuresQueryStructures]
-    """
-    variables: dict[str, Any] = {}
-    if search is not UNSET:
-        variables["search"] = search
-    if values is not UNSET:
-        variables["values"] = values
-    return (await aexecute(SearchStructuresQuery, variables, rath=rath)).options
-
-
-def search_structures(
-    search: str | None | UnsetType = UNSET,
-    values: list[IDCoercible] | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> tuple[SearchStructuresQueryOptions, ...]:
-    """SearchStructures
-
-    List structures with optional filters, ordering, and pagination
-
-    Args:
-        search (str | None, optional): No description.
-        values (list[ID] | None, optional): No description.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        list[SearchStructuresQueryStructures]
-    """
-    variables: dict[str, Any] = {}
-    if search is not UNSET:
-        variables["search"] = search
-    if values is not UNSET:
-        variables["values"] = values
-    return execute(SearchStructuresQuery, variables, rath=rath).options
-
-
-async def aget_graph(id: IDCoercible, rath: KraphRath | None = None) -> Graph:
-    """GetGraph
-
-    Get a graph by ID
-
-    Args:
-        id (ID): No description
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        Graph
-    """
-    variables: dict[str, Any] = {}
-    variables["id"] = id
-    return (await aexecute(GetGraphQuery, variables, rath=rath)).graph
-
-
-def get_graph(id: IDCoercible, rath: KraphRath | None = None) -> Graph:
-    """GetGraph
-
-    Get a graph by ID
-
-    Args:
-        id (ID): No description
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        Graph
-    """
-    variables: dict[str, Any] = {}
-    variables["id"] = id
-    return execute(GetGraphQuery, variables, rath=rath).graph
-
-
-async def alist_graphs(
-    filters: GraphFilter | None | UnsetType = UNSET,
-    pagination: OffsetPaginationInput | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> tuple[ListGraph, ...]:
-    """ListGraphs
-
-    List all graphs in the graph engine
-
-    Args:
-        filters (GraphFilter | None, optional): No description.
-        pagination (OffsetPaginationInput | None, optional): No description.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        list[ListGraph]
-    """
-    variables: dict[str, Any] = {}
-    if filters is not UNSET:
-        variables["filters"] = filters
-    if pagination is not UNSET:
-        variables["pagination"] = pagination
-    return (await aexecute(ListGraphsQuery, variables, rath=rath)).graphs
-
-
-def list_graphs(
-    filters: GraphFilter | None | UnsetType = UNSET,
-    pagination: OffsetPaginationInput | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> tuple[ListGraph, ...]:
-    """ListGraphs
-
-    List all graphs in the graph engine
-
-    Args:
-        filters (GraphFilter | None, optional): No description.
-        pagination (OffsetPaginationInput | None, optional): No description.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        list[ListGraph]
-    """
-    variables: dict[str, Any] = {}
-    if filters is not UNSET:
-        variables["filters"] = filters
-    if pagination is not UNSET:
-        variables["pagination"] = pagination
-    return execute(ListGraphsQuery, variables, rath=rath).graphs
-
-
-async def asearch_graphs(
-    search: str | None | UnsetType = UNSET,
-    values: list[IDCoercible] | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> tuple[SearchGraphsQueryOptions, ...]:
-    """SearchGraphs
-
-    List all graphs in the graph engine
-
-    Args:
-        search (str | None, optional): No description.
-        values (list[ID] | None, optional): No description.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        list[SearchGraphsQueryGraphs]
-    """
-    variables: dict[str, Any] = {}
-    if search is not UNSET:
-        variables["search"] = search
-    if values is not UNSET:
-        variables["values"] = values
-    return (await aexecute(SearchGraphsQuery, variables, rath=rath)).options
-
-
-def search_graphs(
-    search: str | None | UnsetType = UNSET,
-    values: list[IDCoercible] | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> tuple[SearchGraphsQueryOptions, ...]:
-    """SearchGraphs
-
-    List all graphs in the graph engine
-
-    Args:
-        search (str | None, optional): No description.
-        values (list[ID] | None, optional): No description.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        list[SearchGraphsQueryGraphs]
-    """
-    variables: dict[str, Any] = {}
-    if search is not UNSET:
-        variables["search"] = search
-    if values is not UNSET:
-        variables["values"] = values
-    return execute(SearchGraphsQuery, variables, rath=rath).options
-
-
-async def aget_node(
-    id: IDCoercible, graph: IDCoercible, rath: KraphRath | None = None
-) -> (
-    Annotated[
-        GetNodeQueryNodeBaseEntity
-        | GetNodeQueryNodeBaseNaturalEvent
-        | GetNodeQueryNodeBaseProtocolEvent,
-        Field(discriminator="typename"),
-    ]
-    | GetNodeQueryNodeBaseCatchAll
-):
-    """GetNode
-     View-grain reads: these name their view, and refuse a node the view does not admit.
-     `node(id, graph)` succeeds exactly when `nodes(graph:)` could list it.
-
-    Args:
-        id (ID): No description
-        graph (ID): No description
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        NodeRef
-    """
-    variables: dict[str, Any] = {}
-    variables["id"] = id
-    variables["graph"] = graph
-    return (await aexecute(GetNodeQuery, variables, rath=rath)).node
-
-
-def get_node(
-    id: IDCoercible, graph: IDCoercible, rath: KraphRath | None = None
-) -> (
-    Annotated[
-        GetNodeQueryNodeBaseEntity
-        | GetNodeQueryNodeBaseNaturalEvent
-        | GetNodeQueryNodeBaseProtocolEvent,
-        Field(discriminator="typename"),
-    ]
-    | GetNodeQueryNodeBaseCatchAll
-):
-    """GetNode
-     View-grain reads: these name their view, and refuse a node the view does not admit.
-     `node(id, graph)` succeeds exactly when `nodes(graph:)` could list it.
-
-    Args:
-        id (ID): No description
-        graph (ID): No description
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        NodeRef
-    """
-    variables: dict[str, Any] = {}
-    variables["id"] = id
-    variables["graph"] = graph
-    return execute(GetNodeQuery, variables, rath=rath).node
-
-
-async def alist_nodes(
-    graph: IDCoercible,
-    filters: NodeFilters | None | UnsetType = UNSET,
-    ordering: list[NodeOrder] | None | UnsetType = UNSET,
-    pagination: NodePaginationInput | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> tuple[
-    Annotated[
-        ListNodesQueryNodesBaseEntity
-        | ListNodesQueryNodesBaseNaturalEvent
-        | ListNodesQueryNodesBaseProtocolEvent,
-        Field(discriminator="typename"),
-    ]
-    | ListNodesQueryNodesBaseCatchAll,
-    ...,
-]:
-    """ListNodes
-
-    List the individuals a view holds, as it draws them — view grain: one row per individual, membership from the view's rule, properties as of the view's cursor
-
-    Args:
-        graph (ID): No description
-        filters (NodeFilters | None, optional): No description.
-        ordering (list[NodeOrder] | None, optional): No description.
-        pagination (NodePaginationInput | None, optional): No description.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        list[NodeRef]
-    """
-    variables: dict[str, Any] = {}
-    variables["graph"] = graph
-    if filters is not UNSET:
-        variables["filters"] = filters
-    if ordering is not UNSET:
-        variables["ordering"] = ordering
-    if pagination is not UNSET:
-        variables["pagination"] = pagination
-    return (await aexecute(ListNodesQuery, variables, rath=rath)).nodes
-
-
-def list_nodes(
-    graph: IDCoercible,
-    filters: NodeFilters | None | UnsetType = UNSET,
-    ordering: list[NodeOrder] | None | UnsetType = UNSET,
-    pagination: NodePaginationInput | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> tuple[
-    Annotated[
-        ListNodesQueryNodesBaseEntity
-        | ListNodesQueryNodesBaseNaturalEvent
-        | ListNodesQueryNodesBaseProtocolEvent,
-        Field(discriminator="typename"),
-    ]
-    | ListNodesQueryNodesBaseCatchAll,
-    ...,
-]:
-    """ListNodes
-
-    List the individuals a view holds, as it draws them — view grain: one row per individual, membership from the view's rule, properties as of the view's cursor
-
-    Args:
-        graph (ID): No description
-        filters (NodeFilters | None, optional): No description.
-        ordering (list[NodeOrder] | None, optional): No description.
-        pagination (NodePaginationInput | None, optional): No description.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        list[NodeRef]
-    """
-    variables: dict[str, Any] = {}
-    variables["graph"] = graph
-    if filters is not UNSET:
-        variables["filters"] = filters
-    if ordering is not UNSET:
-        variables["ordering"] = ordering
-    if pagination is not UNSET:
-        variables["pagination"] = pagination
-    return execute(ListNodesQuery, variables, rath=rath).nodes
-
-
-async def aget_entity(
-    id: IDCoercible, graph: IDCoercible, rath: KraphRath | None = None
-) -> EntityView:
-    """GetEntity
-     richProperties is where derived values surface — the only place a metric recorded on an
-     evidence structure becomes readable as a property of the node.
-
-    Args:
-        id (ID): No description
-        graph (ID): No description
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        EntityView
-    """
-    variables: dict[str, Any] = {}
-    variables["id"] = id
-    variables["graph"] = graph
-    return (await aexecute(GetEntityQuery, variables, rath=rath)).entity
-
-
-def get_entity(id: IDCoercible, graph: IDCoercible, rath: KraphRath | None = None) -> EntityView:
-    """GetEntity
-     richProperties is where derived values surface — the only place a metric recorded on an
-     evidence structure becomes readable as a property of the node.
-
-    Args:
-        id (ID): No description
-        graph (ID): No description
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        EntityView
-    """
-    variables: dict[str, Any] = {}
-    variables["id"] = id
-    variables["graph"] = graph
-    return execute(GetEntityQuery, variables, rath=rath).entity
-
-
-async def aget_term(id: IDCoercible, rath: KraphRath | None = None) -> Term:
-    """GetTerm
-
-    Get one of the organization's words by ID
-
-    Args:
-        id (ID): No description
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        Term
-    """
-    variables: dict[str, Any] = {}
-    variables["id"] = id
-    return (await aexecute(GetTermQuery, variables, rath=rath)).term
-
-
-def get_term(id: IDCoercible, rath: KraphRath | None = None) -> Term:
-    """GetTerm
-
-    Get one of the organization's words by ID
-
-    Args:
-        id (ID): No description
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        Term
-    """
-    variables: dict[str, Any] = {}
-    variables["id"] = id
-    return execute(GetTermQuery, variables, rath=rath).term
-
-
-async def alist_terms(
-    filters: TermFilter | None | UnsetType = UNSET,
-    pagination: VocabularyPaginationInput | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> tuple[Term, ...]:
-    """ListTerms
-
-    List the organization's words — its vocabulary, independent of any graph
-
-    Args:
-        filters (TermFilter | None, optional): No description.
-        pagination (VocabularyPaginationInput | None, optional): No description.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        list[Term]
-    """
-    variables: dict[str, Any] = {}
-    if filters is not UNSET:
-        variables["filters"] = filters
-    if pagination is not UNSET:
-        variables["pagination"] = pagination
-    return (await aexecute(ListTermsQuery, variables, rath=rath)).terms
-
-
-def list_terms(
-    filters: TermFilter | None | UnsetType = UNSET,
-    pagination: VocabularyPaginationInput | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> tuple[Term, ...]:
-    """ListTerms
-
-    List the organization's words — its vocabulary, independent of any graph
-
-    Args:
-        filters (TermFilter | None, optional): No description.
-        pagination (VocabularyPaginationInput | None, optional): No description.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        list[Term]
-    """
-    variables: dict[str, Any] = {}
-    if filters is not UNSET:
-        variables["filters"] = filters
-    if pagination is not UNSET:
-        variables["pagination"] = pagination
-    return execute(ListTermsQuery, variables, rath=rath).terms
-
-
-async def asearch_terms(
-    search: str | None | UnsetType = UNSET,
-    values: list[IDCoercible] | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> tuple[SearchTermsQueryOptions, ...]:
-    """SearchTerms
-
-    List the organization's words — its vocabulary, independent of any graph
-
-    Args:
-        search (str | None, optional): No description.
-        values (list[ID] | None, optional): No description.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        list[SearchTermsQueryTerms]
-    """
-    variables: dict[str, Any] = {}
-    if search is not UNSET:
-        variables["search"] = search
-    if values is not UNSET:
-        variables["values"] = values
-    return (await aexecute(SearchTermsQuery, variables, rath=rath)).options
-
-
-def search_terms(
-    search: str | None | UnsetType = UNSET,
-    values: list[IDCoercible] | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> tuple[SearchTermsQueryOptions, ...]:
-    """SearchTerms
-
-    List the organization's words — its vocabulary, independent of any graph
-
-    Args:
-        search (str | None, optional): No description.
-        values (list[ID] | None, optional): No description.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        list[SearchTermsQueryTerms]
-    """
-    variables: dict[str, Any] = {}
-    if search is not UNSET:
-        variables["search"] = search
-    if values is not UNSET:
-        variables["values"] = values
-    return execute(SearchTermsQuery, variables, rath=rath).options
-
-
-async def aget_structure_kind(id: IDCoercible, rath: KraphRath | None = None) -> StructureKind:
-    """GetStructureKind
-
-    Get one structure kind by ID
-
-    Args:
-        id (ID): No description
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        StructureKind
-    """
-    variables: dict[str, Any] = {}
-    variables["id"] = id
-    return (await aexecute(GetStructureKindQuery, variables, rath=rath)).structure_kind
-
-
-def get_structure_kind(id: IDCoercible, rath: KraphRath | None = None) -> StructureKind:
-    """GetStructureKind
-
-    Get one structure kind by ID
-
-    Args:
-        id (ID): No description
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        StructureKind
-    """
-    variables: dict[str, Any] = {}
-    variables["id"] = id
-    return execute(GetStructureKindQuery, variables, rath=rath).structure_kind
-
-
-async def alist_structure_kinds(
-    filters: StructureKindFilter | None | UnsetType = UNSET,
-    pagination: VocabularyPaginationInput | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> tuple[StructureKind, ...]:
-    """ListStructureKinds
-
-    List the organization's structure kinds
-
-    Args:
-        filters (StructureKindFilter | None, optional): No description.
-        pagination (VocabularyPaginationInput | None, optional): No description.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        list[StructureKind]
-    """
-    variables: dict[str, Any] = {}
-    if filters is not UNSET:
-        variables["filters"] = filters
-    if pagination is not UNSET:
-        variables["pagination"] = pagination
-    return (await aexecute(ListStructureKindsQuery, variables, rath=rath)).structure_kinds
-
-
-def list_structure_kinds(
-    filters: StructureKindFilter | None | UnsetType = UNSET,
-    pagination: VocabularyPaginationInput | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> tuple[StructureKind, ...]:
-    """ListStructureKinds
-
-    List the organization's structure kinds
-
-    Args:
-        filters (StructureKindFilter | None, optional): No description.
-        pagination (VocabularyPaginationInput | None, optional): No description.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        list[StructureKind]
-    """
-    variables: dict[str, Any] = {}
-    if filters is not UNSET:
-        variables["filters"] = filters
-    if pagination is not UNSET:
-        variables["pagination"] = pagination
-    return execute(ListStructureKindsQuery, variables, rath=rath).structure_kinds
-
-
-async def asearch_structure_kinds(
-    search: str | None | UnsetType = UNSET,
-    values: list[IDCoercible] | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> tuple[SearchStructureKindsQueryOptions, ...]:
-    """SearchStructureKinds
-
-    List the organization's structure kinds
-
-    Args:
-        search (str | None, optional): No description.
-        values (list[ID] | None, optional): No description.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        list[SearchStructureKindsQueryStructureKinds]
-    """
-    variables: dict[str, Any] = {}
-    if search is not UNSET:
-        variables["search"] = search
-    if values is not UNSET:
-        variables["values"] = values
-    return (await aexecute(SearchStructureKindsQuery, variables, rath=rath)).options
-
-
-def search_structure_kinds(
-    search: str | None | UnsetType = UNSET,
-    values: list[IDCoercible] | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> tuple[SearchStructureKindsQueryOptions, ...]:
-    """SearchStructureKinds
-
-    List the organization's structure kinds
-
-    Args:
-        search (str | None, optional): No description.
-        values (list[ID] | None, optional): No description.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        list[SearchStructureKindsQueryStructureKinds]
-    """
-    variables: dict[str, Any] = {}
-    if search is not UNSET:
-        variables["search"] = search
-    if values is not UNSET:
-        variables["values"] = values
-    return execute(SearchStructureKindsQuery, variables, rath=rath).options
-
-
-async def aget_metric_kind(id: IDCoercible, rath: KraphRath | None = None) -> MetricKind:
-    """GetMetricKind
-
-    Get one metric kind by ID
-
-    Args:
-        id (ID): No description
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        MetricKind
-    """
-    variables: dict[str, Any] = {}
-    variables["id"] = id
-    return (await aexecute(GetMetricKindQuery, variables, rath=rath)).metric_kind
-
-
-def get_metric_kind(id: IDCoercible, rath: KraphRath | None = None) -> MetricKind:
-    """GetMetricKind
-
-    Get one metric kind by ID
-
-    Args:
-        id (ID): No description
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        MetricKind
-    """
-    variables: dict[str, Any] = {}
-    variables["id"] = id
-    return execute(GetMetricKindQuery, variables, rath=rath).metric_kind
-
-
-async def alist_metric_kinds(
-    filters: MetricKindFilter | None | UnsetType = UNSET,
-    pagination: VocabularyPaginationInput | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> tuple[MetricKind, ...]:
-    """ListMetricKinds
-
-    List the organization's metric kinds
-
-    Args:
-        filters (MetricKindFilter | None, optional): No description.
-        pagination (VocabularyPaginationInput | None, optional): No description.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        list[MetricKind]
-    """
-    variables: dict[str, Any] = {}
-    if filters is not UNSET:
-        variables["filters"] = filters
-    if pagination is not UNSET:
-        variables["pagination"] = pagination
-    return (await aexecute(ListMetricKindsQuery, variables, rath=rath)).metric_kinds
-
-
-def list_metric_kinds(
-    filters: MetricKindFilter | None | UnsetType = UNSET,
-    pagination: VocabularyPaginationInput | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> tuple[MetricKind, ...]:
-    """ListMetricKinds
-
-    List the organization's metric kinds
-
-    Args:
-        filters (MetricKindFilter | None, optional): No description.
-        pagination (VocabularyPaginationInput | None, optional): No description.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        list[MetricKind]
-    """
-    variables: dict[str, Any] = {}
-    if filters is not UNSET:
-        variables["filters"] = filters
-    if pagination is not UNSET:
-        variables["pagination"] = pagination
-    return execute(ListMetricKindsQuery, variables, rath=rath).metric_kinds
-
-
-async def asearch_metric_kinds(
-    search: str | None | UnsetType = UNSET,
-    values: list[IDCoercible] | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> tuple[SearchMetricKindsQueryOptions, ...]:
-    """SearchMetricKinds
-
-    List the organization's metric kinds
-
-    Args:
-        search (str | None, optional): No description.
-        values (list[ID] | None, optional): No description.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        list[SearchMetricKindsQueryMetricKinds]
-    """
-    variables: dict[str, Any] = {}
-    if search is not UNSET:
-        variables["search"] = search
-    if values is not UNSET:
-        variables["values"] = values
-    return (await aexecute(SearchMetricKindsQuery, variables, rath=rath)).options
-
-
-def search_metric_kinds(
-    search: str | None | UnsetType = UNSET,
-    values: list[IDCoercible] | None | UnsetType = UNSET,
-    rath: KraphRath | None = None,
-) -> tuple[SearchMetricKindsQueryOptions, ...]:
-    """SearchMetricKinds
-
-    List the organization's metric kinds
-
-    Args:
-        search (str | None, optional): No description.
-        values (list[ID] | None, optional): No description.
-        rath (kraph.rath.KraphRath, optional): The mikro rath client
-
-    Returns:
-        list[SearchMetricKindsQueryMetricKinds]
-    """
-    variables: dict[str, Any] = {}
-    if search is not UNSET:
-        variables["search"] = search
-    if values is not UNSET:
-        variables["values"] = values
-    return execute(SearchMetricKindsQuery, variables, rath=rath).options
+        if label is not UNSET:
+            _input["label"] = label
+        if description is not UNSET:
+            _input["description"] = description
+        if purl is not UNSET:
+            _input["purl"] = purl
+        if color is not UNSET:
+            _input["color"] = color
+        if image is not UNSET:
+            _input["image"] = image
+        variables["input"] = _input
+        return self.execute(CreateTermMutation, variables).create_term
+
+    async def aupdate_term(
+        self,
+        id: str,
+        label: str | None | UnsetType = UNSET,
+        description: str | None | UnsetType = UNSET,
+        purl: str | None | UnsetType = UNSET,
+        color: Iterable[int] | None | UnsetType = UNSET,
+        image: str | None | UnsetType = UNSET,
+    ) -> Term:
+        """UpdateTerm
+
+        Update a term's label, description, PURL or colour. Its kind and key are its identity and cannot change.
+
+        Args:
+            id: The ID of the term to update
+            label: Human-readable name
+            description: What this word means
+            purl: Persistent URL, where this corresponds to a published ontology term
+            color: Optional RGBA colour
+            image: Optional media store ID for an illustrative image
+
+        Returns:
+            Term
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        if label is not UNSET:
+            _input["label"] = label
+        if description is not UNSET:
+            _input["description"] = description
+        if purl is not UNSET:
+            _input["purl"] = purl
+        if color is not UNSET:
+            _input["color"] = color
+        if image is not UNSET:
+            _input["image"] = image
+        variables["input"] = _input
+        return (await self.aexecute(UpdateTermMutation, variables)).update_term
+
+    def update_term(
+        self,
+        id: str,
+        label: str | None | UnsetType = UNSET,
+        description: str | None | UnsetType = UNSET,
+        purl: str | None | UnsetType = UNSET,
+        color: Iterable[int] | None | UnsetType = UNSET,
+        image: str | None | UnsetType = UNSET,
+    ) -> Term:
+        """UpdateTerm
+
+        Update a term's label, description, PURL or colour. Its kind and key are its identity and cannot change.
+
+        Args:
+            id: The ID of the term to update
+            label: Human-readable name
+            description: What this word means
+            purl: Persistent URL, where this corresponds to a published ontology term
+            color: Optional RGBA colour
+            image: Optional media store ID for an illustrative image
+
+        Returns:
+            Term
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        if label is not UNSET:
+            _input["label"] = label
+        if description is not UNSET:
+            _input["description"] = description
+        if purl is not UNSET:
+            _input["purl"] = purl
+        if color is not UNSET:
+            _input["color"] = color
+        if image is not UNSET:
+            _input["image"] = image
+        variables["input"] = _input
+        return self.execute(UpdateTermMutation, variables).update_term
+
+    async def adelete_term(self, id: str) -> ID:
+        """DeleteTerm
+
+        Retire a word nothing has been claimed under
+
+        Args:
+            id: The ID of the term to delete
+
+        Returns:
+            ID
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        variables["input"] = _input
+        return (await self.aexecute(DeleteTermMutation, variables)).delete_term
+
+    def delete_term(self, id: str) -> ID:
+        """DeleteTerm
+
+        Retire a word nothing has been claimed under
+
+        Args:
+            id: The ID of the term to delete
+
+        Returns:
+            ID
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        variables["input"] = _input
+        return self.execute(DeleteTermMutation, variables).delete_term
+
+    async def aupdate_structure_kind(
+        self,
+        id: str,
+        key: str | None | UnsetType = UNSET,
+        description: str | None | UnsetType = UNSET,
+        ontology_references: (
+            Iterable[OntologyReferenceInput] | None | UnsetType
+        ) = UNSET,
+        color: Iterable[int] | None | UnsetType = UNSET,
+        image: str | None | UnsetType = UNSET,
+        label: str | None | UnsetType = UNSET,
+        pin: bool | None | UnsetType = UNSET,
+        identifier: str | None | UnsetType = UNSET,
+    ) -> StructureKind:
+        """UpdateStructureKind
+         StructureKind and MetricKind are minted by the write that first needs them — there is no
+         create mutation for either, only these.
+
+        Args:
+            id: The ID of the definition to update
+            key: The label of the node participating in the event
+            description: Description of this node role
+            ontology_references: Ontology references for this event
+            color: Optional RGBA color for this node role (e.g. [255, 0, 0, 128])
+            image: Optional media store ID for an image representing this node role
+            label: Optional human-readable label for this node role (defaults to 'key' if not provided)
+            pin: Whether to pin this node role in the UI
+            identifier: Read by nothing: `(organization, identifier)` is a structure kind's identity and cannot be reassigned. `update_structure_kind` writes label, description and colour only
+
+        Returns:
+            StructureKind
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        if key is not UNSET:
+            _input["key"] = key
+        if description is not UNSET:
+            _input["description"] = description
+        if ontology_references is not UNSET:
+            _input["ontologyReferences"] = ontology_references
+        if color is not UNSET:
+            _input["color"] = color
+        if image is not UNSET:
+            _input["image"] = image
+        if label is not UNSET:
+            _input["label"] = label
+        if pin is not UNSET:
+            _input["pin"] = pin
+        if identifier is not UNSET:
+            _input["identifier"] = identifier
+        variables["input"] = _input
+        return (
+            await self.aexecute(UpdateStructureKindMutation, variables)
+        ).update_structure_kind
+
+    def update_structure_kind(
+        self,
+        id: str,
+        key: str | None | UnsetType = UNSET,
+        description: str | None | UnsetType = UNSET,
+        ontology_references: (
+            Iterable[OntologyReferenceInput] | None | UnsetType
+        ) = UNSET,
+        color: Iterable[int] | None | UnsetType = UNSET,
+        image: str | None | UnsetType = UNSET,
+        label: str | None | UnsetType = UNSET,
+        pin: bool | None | UnsetType = UNSET,
+        identifier: str | None | UnsetType = UNSET,
+    ) -> StructureKind:
+        """UpdateStructureKind
+         StructureKind and MetricKind are minted by the write that first needs them — there is no
+         create mutation for either, only these.
+
+        Args:
+            id: The ID of the definition to update
+            key: The label of the node participating in the event
+            description: Description of this node role
+            ontology_references: Ontology references for this event
+            color: Optional RGBA color for this node role (e.g. [255, 0, 0, 128])
+            image: Optional media store ID for an image representing this node role
+            label: Optional human-readable label for this node role (defaults to 'key' if not provided)
+            pin: Whether to pin this node role in the UI
+            identifier: Read by nothing: `(organization, identifier)` is a structure kind's identity and cannot be reassigned. `update_structure_kind` writes label, description and colour only
+
+        Returns:
+            StructureKind
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        if key is not UNSET:
+            _input["key"] = key
+        if description is not UNSET:
+            _input["description"] = description
+        if ontology_references is not UNSET:
+            _input["ontologyReferences"] = ontology_references
+        if color is not UNSET:
+            _input["color"] = color
+        if image is not UNSET:
+            _input["image"] = image
+        if label is not UNSET:
+            _input["label"] = label
+        if pin is not UNSET:
+            _input["pin"] = pin
+        if identifier is not UNSET:
+            _input["identifier"] = identifier
+        variables["input"] = _input
+        return self.execute(
+            UpdateStructureKindMutation, variables
+        ).update_structure_kind
+
+    async def adelete_structure_kind(self, id: str) -> ID:
+        """DeleteStructureKind
+
+        Retire a structure kind. Refused while any structure is recorded under it — evidence is never deleted; retract the structures first
+
+        Args:
+            id: The ID of the structure kind to retire
+
+        Returns:
+            ID
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        variables["input"] = _input
+        return (
+            await self.aexecute(DeleteStructureKindMutation, variables)
+        ).delete_structure_kind
+
+    def delete_structure_kind(self, id: str) -> ID:
+        """DeleteStructureKind
+
+        Retire a structure kind. Refused while any structure is recorded under it — evidence is never deleted; retract the structures first
+
+        Args:
+            id: The ID of the structure kind to retire
+
+        Returns:
+            ID
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        variables["input"] = _input
+        return self.execute(
+            DeleteStructureKindMutation, variables
+        ).delete_structure_kind
+
+    async def aupdate_metric_kind(
+        self,
+        id: str,
+        key: str | None | UnsetType = UNSET,
+        description: str | None | UnsetType = UNSET,
+        ontology_references: (
+            Iterable[OntologyReferenceInput] | None | UnsetType
+        ) = UNSET,
+        color: Iterable[int] | None | UnsetType = UNSET,
+        image: str | None | UnsetType = UNSET,
+        label: str | None | UnsetType = UNSET,
+        pin: bool | None | UnsetType = UNSET,
+        identifier: str | None | UnsetType = UNSET,
+    ) -> MetricKind:
+        """UpdateMetricKind
+
+        Update a metric kind's label, description or colour
+
+        Args:
+            id: The ID of the definition to update
+            key: The label of the node participating in the event
+            description: Description of this node role
+            ontology_references: Ontology references for this event
+            color: Optional RGBA color for this node role (e.g. [255, 0, 0, 128])
+            image: Optional media store ID for an image representing this node role
+            label: Optional human-readable label for this node role (defaults to 'key' if not provided)
+            pin: Whether to pin this node role in the UI
+            identifier: Read by nothing: a metric kind is identified by `(organization, structure_kind, key, value_kind)`. `update_metric_kind` writes label, description and colour only
+
+        Returns:
+            MetricKind
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        if key is not UNSET:
+            _input["key"] = key
+        if description is not UNSET:
+            _input["description"] = description
+        if ontology_references is not UNSET:
+            _input["ontologyReferences"] = ontology_references
+        if color is not UNSET:
+            _input["color"] = color
+        if image is not UNSET:
+            _input["image"] = image
+        if label is not UNSET:
+            _input["label"] = label
+        if pin is not UNSET:
+            _input["pin"] = pin
+        if identifier is not UNSET:
+            _input["identifier"] = identifier
+        variables["input"] = _input
+        return (
+            await self.aexecute(UpdateMetricKindMutation, variables)
+        ).update_metric_kind
+
+    def update_metric_kind(
+        self,
+        id: str,
+        key: str | None | UnsetType = UNSET,
+        description: str | None | UnsetType = UNSET,
+        ontology_references: (
+            Iterable[OntologyReferenceInput] | None | UnsetType
+        ) = UNSET,
+        color: Iterable[int] | None | UnsetType = UNSET,
+        image: str | None | UnsetType = UNSET,
+        label: str | None | UnsetType = UNSET,
+        pin: bool | None | UnsetType = UNSET,
+        identifier: str | None | UnsetType = UNSET,
+    ) -> MetricKind:
+        """UpdateMetricKind
+
+        Update a metric kind's label, description or colour
+
+        Args:
+            id: The ID of the definition to update
+            key: The label of the node participating in the event
+            description: Description of this node role
+            ontology_references: Ontology references for this event
+            color: Optional RGBA color for this node role (e.g. [255, 0, 0, 128])
+            image: Optional media store ID for an image representing this node role
+            label: Optional human-readable label for this node role (defaults to 'key' if not provided)
+            pin: Whether to pin this node role in the UI
+            identifier: Read by nothing: a metric kind is identified by `(organization, structure_kind, key, value_kind)`. `update_metric_kind` writes label, description and colour only
+
+        Returns:
+            MetricKind
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        if key is not UNSET:
+            _input["key"] = key
+        if description is not UNSET:
+            _input["description"] = description
+        if ontology_references is not UNSET:
+            _input["ontologyReferences"] = ontology_references
+        if color is not UNSET:
+            _input["color"] = color
+        if image is not UNSET:
+            _input["image"] = image
+        if label is not UNSET:
+            _input["label"] = label
+        if pin is not UNSET:
+            _input["pin"] = pin
+        if identifier is not UNSET:
+            _input["identifier"] = identifier
+        variables["input"] = _input
+        return self.execute(UpdateMetricKindMutation, variables).update_metric_kind
+
+    async def adelete_metric_kind(self, id: str) -> ID:
+        """DeleteMetricKind
+
+        Retire a metric kind. Refused while any metric is recorded under it — evidence is never deleted; retract the metrics first
+
+        Args:
+            id: The ID of the metric kind to retire
+
+        Returns:
+            ID
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        variables["input"] = _input
+        return (
+            await self.aexecute(DeleteMetricKindMutation, variables)
+        ).delete_metric_kind
+
+    def delete_metric_kind(self, id: str) -> ID:
+        """DeleteMetricKind
+
+        Retire a metric kind. Refused while any metric is recorded under it — evidence is never deleted; retract the metrics first
+
+        Args:
+            id: The ID of the metric kind to retire
+
+        Returns:
+            ID
+        """
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        variables["input"] = _input
+        return self.execute(DeleteMetricKindMutation, variables).delete_metric_kind
+
+    async def aget_entity_category(self, id: IDCoercible) -> EntityCategory:
+        """GetEntityCategory
+
+        Get a single entity category by ID
+
+        Args:
+            id (ID): No description
+
+        Returns:
+            EntityCategory
+        """
+        variables: dict[str, Any] = {}
+        variables["id"] = id
+        return (await self.aexecute(GetEntityCategoryQuery, variables)).entity_category
+
+    def get_entity_category(self, id: IDCoercible) -> EntityCategory:
+        """GetEntityCategory
+
+        Get a single entity category by ID
+
+        Args:
+            id (ID): No description
+
+        Returns:
+            EntityCategory
+        """
+        variables: dict[str, Any] = {}
+        variables["id"] = id
+        return self.execute(GetEntityCategoryQuery, variables).entity_category
+
+    async def alist_entity_categories(
+        self,
+        filters: EntityCategoryFilter | None | UnsetType = UNSET,
+        pagination: OffsetPaginationInput | None | UnsetType = UNSET,
+    ) -> tuple[EntityCategory, ...]:
+        """ListEntityCategories
+
+        List all entity categories
+
+        Args:
+            filters (EntityCategoryFilter | None, optional): No description.
+            pagination (OffsetPaginationInput | None, optional): No description.
+
+        Returns:
+            list[EntityCategory]
+        """
+        variables: dict[str, Any] = {}
+        if filters is not UNSET:
+            variables["filters"] = filters
+        if pagination is not UNSET:
+            variables["pagination"] = pagination
+        return (
+            await self.aexecute(ListEntityCategoriesQuery, variables)
+        ).entity_categories
+
+    def list_entity_categories(
+        self,
+        filters: EntityCategoryFilter | None | UnsetType = UNSET,
+        pagination: OffsetPaginationInput | None | UnsetType = UNSET,
+    ) -> tuple[EntityCategory, ...]:
+        """ListEntityCategories
+
+        List all entity categories
+
+        Args:
+            filters (EntityCategoryFilter | None, optional): No description.
+            pagination (OffsetPaginationInput | None, optional): No description.
+
+        Returns:
+            list[EntityCategory]
+        """
+        variables: dict[str, Any] = {}
+        if filters is not UNSET:
+            variables["filters"] = filters
+        if pagination is not UNSET:
+            variables["pagination"] = pagination
+        return self.execute(ListEntityCategoriesQuery, variables).entity_categories
+
+    async def asearch_entity_categories(
+        self,
+        search: str | None | UnsetType = UNSET,
+        values: list[IDCoercible] | None | UnsetType = UNSET,
+    ) -> tuple[SearchEntityCategoriesQueryOptions, ...]:
+        """SearchEntityCategories
+
+        List all entity categories
+
+        Args:
+            search (str | None, optional): No description.
+            values (list[ID] | None, optional): No description.
+
+        Returns:
+            list[SearchEntityCategoriesQueryEntityCategories]
+        """
+        variables: dict[str, Any] = {}
+        if search is not UNSET:
+            variables["search"] = search
+        if values is not UNSET:
+            variables["values"] = values
+        return (await self.aexecute(SearchEntityCategoriesQuery, variables)).options
+
+    def search_entity_categories(
+        self,
+        search: str | None | UnsetType = UNSET,
+        values: list[IDCoercible] | None | UnsetType = UNSET,
+    ) -> tuple[SearchEntityCategoriesQueryOptions, ...]:
+        """SearchEntityCategories
+
+        List all entity categories
+
+        Args:
+            search (str | None, optional): No description.
+            values (list[ID] | None, optional): No description.
+
+        Returns:
+            list[SearchEntityCategoriesQueryEntityCategories]
+        """
+        variables: dict[str, Any] = {}
+        if search is not UNSET:
+            variables["search"] = search
+        if values is not UNSET:
+            variables["values"] = values
+        return self.execute(SearchEntityCategoriesQuery, variables).options
+
+    async def aget_relation_category(self, id: IDCoercible) -> RelationCategory:
+        """GetRelationCategory
+
+        Get a single relation category by ID
+
+        Args:
+            id (ID): No description
+
+        Returns:
+            RelationCategory
+        """
+        variables: dict[str, Any] = {}
+        variables["id"] = id
+        return (
+            await self.aexecute(GetRelationCategoryQuery, variables)
+        ).relation_category
+
+    def get_relation_category(self, id: IDCoercible) -> RelationCategory:
+        """GetRelationCategory
+
+        Get a single relation category by ID
+
+        Args:
+            id (ID): No description
+
+        Returns:
+            RelationCategory
+        """
+        variables: dict[str, Any] = {}
+        variables["id"] = id
+        return self.execute(GetRelationCategoryQuery, variables).relation_category
+
+    async def alist_relation_categories(
+        self,
+        filters: RelationCategoryFilter | None | UnsetType = UNSET,
+        pagination: OffsetPaginationInput | None | UnsetType = UNSET,
+    ) -> tuple[RelationCategory, ...]:
+        """ListRelationCategories
+
+        List all relation categories
+
+        Args:
+            filters (RelationCategoryFilter | None, optional): No description.
+            pagination (OffsetPaginationInput | None, optional): No description.
+
+        Returns:
+            list[RelationCategory]
+        """
+        variables: dict[str, Any] = {}
+        if filters is not UNSET:
+            variables["filters"] = filters
+        if pagination is not UNSET:
+            variables["pagination"] = pagination
+        return (
+            await self.aexecute(ListRelationCategoriesQuery, variables)
+        ).relation_categories
+
+    def list_relation_categories(
+        self,
+        filters: RelationCategoryFilter | None | UnsetType = UNSET,
+        pagination: OffsetPaginationInput | None | UnsetType = UNSET,
+    ) -> tuple[RelationCategory, ...]:
+        """ListRelationCategories
+
+        List all relation categories
+
+        Args:
+            filters (RelationCategoryFilter | None, optional): No description.
+            pagination (OffsetPaginationInput | None, optional): No description.
+
+        Returns:
+            list[RelationCategory]
+        """
+        variables: dict[str, Any] = {}
+        if filters is not UNSET:
+            variables["filters"] = filters
+        if pagination is not UNSET:
+            variables["pagination"] = pagination
+        return self.execute(ListRelationCategoriesQuery, variables).relation_categories
+
+    async def asearch_relation_categories(
+        self,
+        search: str | None | UnsetType = UNSET,
+        values: list[IDCoercible] | None | UnsetType = UNSET,
+    ) -> tuple[SearchRelationCategoriesQueryOptions, ...]:
+        """SearchRelationCategories
+
+        List all relation categories
+
+        Args:
+            search (str | None, optional): No description.
+            values (list[ID] | None, optional): No description.
+
+        Returns:
+            list[SearchRelationCategoriesQueryRelationCategories]
+        """
+        variables: dict[str, Any] = {}
+        if search is not UNSET:
+            variables["search"] = search
+        if values is not UNSET:
+            variables["values"] = values
+        return (await self.aexecute(SearchRelationCategoriesQuery, variables)).options
+
+    def search_relation_categories(
+        self,
+        search: str | None | UnsetType = UNSET,
+        values: list[IDCoercible] | None | UnsetType = UNSET,
+    ) -> tuple[SearchRelationCategoriesQueryOptions, ...]:
+        """SearchRelationCategories
+
+        List all relation categories
+
+        Args:
+            search (str | None, optional): No description.
+            values (list[ID] | None, optional): No description.
+
+        Returns:
+            list[SearchRelationCategoriesQueryRelationCategories]
+        """
+        variables: dict[str, Any] = {}
+        if search is not UNSET:
+            variables["search"] = search
+        if values is not UNSET:
+            variables["values"] = values
+        return self.execute(SearchRelationCategoriesQuery, variables).options
+
+    async def aget_measurement_category(self, id: IDCoercible) -> MeasurementCategory:
+        """GetMeasurementCategory
+
+        Get a single measurement category by ID
+
+        Args:
+            id (ID): No description
+
+        Returns:
+            MeasurementCategory
+        """
+        variables: dict[str, Any] = {}
+        variables["id"] = id
+        return (
+            await self.aexecute(GetMeasurementCategoryQuery, variables)
+        ).measurement_category
+
+    def get_measurement_category(self, id: IDCoercible) -> MeasurementCategory:
+        """GetMeasurementCategory
+
+        Get a single measurement category by ID
+
+        Args:
+            id (ID): No description
+
+        Returns:
+            MeasurementCategory
+        """
+        variables: dict[str, Any] = {}
+        variables["id"] = id
+        return self.execute(GetMeasurementCategoryQuery, variables).measurement_category
+
+    async def alist_measurement_categories(
+        self,
+        filters: MeasurementCategoryFilter | None | UnsetType = UNSET,
+        pagination: OffsetPaginationInput | None | UnsetType = UNSET,
+    ) -> tuple[MeasurementCategory, ...]:
+        """ListMeasurementCategories
+
+        List all measurement categories
+
+        Args:
+            filters (MeasurementCategoryFilter | None, optional): No description.
+            pagination (OffsetPaginationInput | None, optional): No description.
+
+        Returns:
+            list[MeasurementCategory]
+        """
+        variables: dict[str, Any] = {}
+        if filters is not UNSET:
+            variables["filters"] = filters
+        if pagination is not UNSET:
+            variables["pagination"] = pagination
+        return (
+            await self.aexecute(ListMeasurementCategoriesQuery, variables)
+        ).measurement_categories
+
+    def list_measurement_categories(
+        self,
+        filters: MeasurementCategoryFilter | None | UnsetType = UNSET,
+        pagination: OffsetPaginationInput | None | UnsetType = UNSET,
+    ) -> tuple[MeasurementCategory, ...]:
+        """ListMeasurementCategories
+
+        List all measurement categories
+
+        Args:
+            filters (MeasurementCategoryFilter | None, optional): No description.
+            pagination (OffsetPaginationInput | None, optional): No description.
+
+        Returns:
+            list[MeasurementCategory]
+        """
+        variables: dict[str, Any] = {}
+        if filters is not UNSET:
+            variables["filters"] = filters
+        if pagination is not UNSET:
+            variables["pagination"] = pagination
+        return self.execute(
+            ListMeasurementCategoriesQuery, variables
+        ).measurement_categories
+
+    async def asearch_measurement_categories(
+        self,
+        search: str | None | UnsetType = UNSET,
+        values: list[IDCoercible] | None | UnsetType = UNSET,
+    ) -> tuple[SearchMeasurementCategoriesQueryOptions, ...]:
+        """SearchMeasurementCategories
+
+        List all measurement categories
+
+        Args:
+            search (str | None, optional): No description.
+            values (list[ID] | None, optional): No description.
+
+        Returns:
+            list[SearchMeasurementCategoriesQueryMeasurementCategories]
+        """
+        variables: dict[str, Any] = {}
+        if search is not UNSET:
+            variables["search"] = search
+        if values is not UNSET:
+            variables["values"] = values
+        return (
+            await self.aexecute(SearchMeasurementCategoriesQuery, variables)
+        ).options
+
+    def search_measurement_categories(
+        self,
+        search: str | None | UnsetType = UNSET,
+        values: list[IDCoercible] | None | UnsetType = UNSET,
+    ) -> tuple[SearchMeasurementCategoriesQueryOptions, ...]:
+        """SearchMeasurementCategories
+
+        List all measurement categories
+
+        Args:
+            search (str | None, optional): No description.
+            values (list[ID] | None, optional): No description.
+
+        Returns:
+            list[SearchMeasurementCategoriesQueryMeasurementCategories]
+        """
+        variables: dict[str, Any] = {}
+        if search is not UNSET:
+            variables["search"] = search
+        if values is not UNSET:
+            variables["values"] = values
+        return self.execute(SearchMeasurementCategoriesQuery, variables).options
+
+    async def aget_structure_relation_category(
+        self, id: IDCoercible
+    ) -> StructureRelationCategory:
+        """GetStructureRelationCategory
+
+        Get a single structure relation category by ID
+
+        Args:
+            id (ID): No description
+
+        Returns:
+            StructureRelationCategory
+        """
+        variables: dict[str, Any] = {}
+        variables["id"] = id
+        return (
+            await self.aexecute(GetStructureRelationCategoryQuery, variables)
+        ).structure_relation_category
+
+    def get_structure_relation_category(
+        self, id: IDCoercible
+    ) -> StructureRelationCategory:
+        """GetStructureRelationCategory
+
+        Get a single structure relation category by ID
+
+        Args:
+            id (ID): No description
+
+        Returns:
+            StructureRelationCategory
+        """
+        variables: dict[str, Any] = {}
+        variables["id"] = id
+        return self.execute(
+            GetStructureRelationCategoryQuery, variables
+        ).structure_relation_category
+
+    async def alist_structure_relation_categories(
+        self,
+        filters: StructureRelationCategoryFilter | None | UnsetType = UNSET,
+        pagination: OffsetPaginationInput | None | UnsetType = UNSET,
+    ) -> tuple[StructureRelationCategory, ...]:
+        """ListStructureRelationCategories
+
+        List all structure relation categories
+
+        Args:
+            filters (StructureRelationCategoryFilter | None, optional): No description.
+            pagination (OffsetPaginationInput | None, optional): No description.
+
+        Returns:
+            list[StructureRelationCategory]
+        """
+        variables: dict[str, Any] = {}
+        if filters is not UNSET:
+            variables["filters"] = filters
+        if pagination is not UNSET:
+            variables["pagination"] = pagination
+        return (
+            await self.aexecute(ListStructureRelationCategoriesQuery, variables)
+        ).structure_relation_categories
+
+    def list_structure_relation_categories(
+        self,
+        filters: StructureRelationCategoryFilter | None | UnsetType = UNSET,
+        pagination: OffsetPaginationInput | None | UnsetType = UNSET,
+    ) -> tuple[StructureRelationCategory, ...]:
+        """ListStructureRelationCategories
+
+        List all structure relation categories
+
+        Args:
+            filters (StructureRelationCategoryFilter | None, optional): No description.
+            pagination (OffsetPaginationInput | None, optional): No description.
+
+        Returns:
+            list[StructureRelationCategory]
+        """
+        variables: dict[str, Any] = {}
+        if filters is not UNSET:
+            variables["filters"] = filters
+        if pagination is not UNSET:
+            variables["pagination"] = pagination
+        return self.execute(
+            ListStructureRelationCategoriesQuery, variables
+        ).structure_relation_categories
+
+    async def asearch_structure_relation_categories(
+        self,
+        search: str | None | UnsetType = UNSET,
+        values: list[IDCoercible] | None | UnsetType = UNSET,
+    ) -> tuple[SearchStructureRelationCategoriesQueryOptions, ...]:
+        """SearchStructureRelationCategories
+
+        List all structure relation categories
+
+        Args:
+            search (str | None, optional): No description.
+            values (list[ID] | None, optional): No description.
+
+        Returns:
+            list[SearchStructureRelationCategoriesQueryStructureRelationCategories]
+        """
+        variables: dict[str, Any] = {}
+        if search is not UNSET:
+            variables["search"] = search
+        if values is not UNSET:
+            variables["values"] = values
+        return (
+            await self.aexecute(SearchStructureRelationCategoriesQuery, variables)
+        ).options
+
+    def search_structure_relation_categories(
+        self,
+        search: str | None | UnsetType = UNSET,
+        values: list[IDCoercible] | None | UnsetType = UNSET,
+    ) -> tuple[SearchStructureRelationCategoriesQueryOptions, ...]:
+        """SearchStructureRelationCategories
+
+        List all structure relation categories
+
+        Args:
+            search (str | None, optional): No description.
+            values (list[ID] | None, optional): No description.
+
+        Returns:
+            list[SearchStructureRelationCategoriesQueryStructureRelationCategories]
+        """
+        variables: dict[str, Any] = {}
+        if search is not UNSET:
+            variables["search"] = search
+        if values is not UNSET:
+            variables["values"] = values
+        return self.execute(SearchStructureRelationCategoriesQuery, variables).options
+
+    async def aget_natural_event_category(
+        self, id: IDCoercible
+    ) -> NaturalEventCategory:
+        """GetNaturalEventCategory
+
+        Get a single natural event category by ID
+
+        Args:
+            id (ID): No description
+
+        Returns:
+            NaturalEventCategory
+        """
+        variables: dict[str, Any] = {}
+        variables["id"] = id
+        return (
+            await self.aexecute(GetNaturalEventCategoryQuery, variables)
+        ).natural_event_category
+
+    def get_natural_event_category(self, id: IDCoercible) -> NaturalEventCategory:
+        """GetNaturalEventCategory
+
+        Get a single natural event category by ID
+
+        Args:
+            id (ID): No description
+
+        Returns:
+            NaturalEventCategory
+        """
+        variables: dict[str, Any] = {}
+        variables["id"] = id
+        return self.execute(
+            GetNaturalEventCategoryQuery, variables
+        ).natural_event_category
+
+    async def alist_natural_event_categories(
+        self,
+        filters: NaturalEventCategoryFilter | None | UnsetType = UNSET,
+        pagination: OffsetPaginationInput | None | UnsetType = UNSET,
+    ) -> tuple[NaturalEventCategory, ...]:
+        """ListNaturalEventCategories
+
+        List all natural event categories
+
+        Args:
+            filters (NaturalEventCategoryFilter | None, optional): No description.
+            pagination (OffsetPaginationInput | None, optional): No description.
+
+        Returns:
+            list[NaturalEventCategory]
+        """
+        variables: dict[str, Any] = {}
+        if filters is not UNSET:
+            variables["filters"] = filters
+        if pagination is not UNSET:
+            variables["pagination"] = pagination
+        return (
+            await self.aexecute(ListNaturalEventCategoriesQuery, variables)
+        ).natural_event_categories
+
+    def list_natural_event_categories(
+        self,
+        filters: NaturalEventCategoryFilter | None | UnsetType = UNSET,
+        pagination: OffsetPaginationInput | None | UnsetType = UNSET,
+    ) -> tuple[NaturalEventCategory, ...]:
+        """ListNaturalEventCategories
+
+        List all natural event categories
+
+        Args:
+            filters (NaturalEventCategoryFilter | None, optional): No description.
+            pagination (OffsetPaginationInput | None, optional): No description.
+
+        Returns:
+            list[NaturalEventCategory]
+        """
+        variables: dict[str, Any] = {}
+        if filters is not UNSET:
+            variables["filters"] = filters
+        if pagination is not UNSET:
+            variables["pagination"] = pagination
+        return self.execute(
+            ListNaturalEventCategoriesQuery, variables
+        ).natural_event_categories
+
+    async def asearch_natural_event_categories(
+        self,
+        search: str | None | UnsetType = UNSET,
+        values: list[IDCoercible] | None | UnsetType = UNSET,
+    ) -> tuple[SearchNaturalEventCategoriesQueryOptions, ...]:
+        """SearchNaturalEventCategories
+
+        List all natural event categories
+
+        Args:
+            search (str | None, optional): No description.
+            values (list[ID] | None, optional): No description.
+
+        Returns:
+            list[SearchNaturalEventCategoriesQueryNaturalEventCategories]
+        """
+        variables: dict[str, Any] = {}
+        if search is not UNSET:
+            variables["search"] = search
+        if values is not UNSET:
+            variables["values"] = values
+        return (
+            await self.aexecute(SearchNaturalEventCategoriesQuery, variables)
+        ).options
+
+    def search_natural_event_categories(
+        self,
+        search: str | None | UnsetType = UNSET,
+        values: list[IDCoercible] | None | UnsetType = UNSET,
+    ) -> tuple[SearchNaturalEventCategoriesQueryOptions, ...]:
+        """SearchNaturalEventCategories
+
+        List all natural event categories
+
+        Args:
+            search (str | None, optional): No description.
+            values (list[ID] | None, optional): No description.
+
+        Returns:
+            list[SearchNaturalEventCategoriesQueryNaturalEventCategories]
+        """
+        variables: dict[str, Any] = {}
+        if search is not UNSET:
+            variables["search"] = search
+        if values is not UNSET:
+            variables["values"] = values
+        return self.execute(SearchNaturalEventCategoriesQuery, variables).options
+
+    async def aget_protocol_event_category(
+        self, id: IDCoercible
+    ) -> ProtocolEventCategory:
+        """GetProtocolEventCategory
+
+        Get a single protocol event category by ID
+
+        Args:
+            id (ID): No description
+
+        Returns:
+            ProtocolEventCategory
+        """
+        variables: dict[str, Any] = {}
+        variables["id"] = id
+        return (
+            await self.aexecute(GetProtocolEventCategoryQuery, variables)
+        ).protocol_event_category
+
+    def get_protocol_event_category(self, id: IDCoercible) -> ProtocolEventCategory:
+        """GetProtocolEventCategory
+
+        Get a single protocol event category by ID
+
+        Args:
+            id (ID): No description
+
+        Returns:
+            ProtocolEventCategory
+        """
+        variables: dict[str, Any] = {}
+        variables["id"] = id
+        return self.execute(
+            GetProtocolEventCategoryQuery, variables
+        ).protocol_event_category
+
+    async def alist_protocol_event_categories(
+        self,
+        filters: ProtocolEventCategoryFilter | None | UnsetType = UNSET,
+        pagination: OffsetPaginationInput | None | UnsetType = UNSET,
+    ) -> tuple[ProtocolEventCategory, ...]:
+        """ListProtocolEventCategories
+
+        List all protocol event categories
+
+        Args:
+            filters (ProtocolEventCategoryFilter | None, optional): No description.
+            pagination (OffsetPaginationInput | None, optional): No description.
+
+        Returns:
+            list[ProtocolEventCategory]
+        """
+        variables: dict[str, Any] = {}
+        if filters is not UNSET:
+            variables["filters"] = filters
+        if pagination is not UNSET:
+            variables["pagination"] = pagination
+        return (
+            await self.aexecute(ListProtocolEventCategoriesQuery, variables)
+        ).protocol_event_categories
+
+    def list_protocol_event_categories(
+        self,
+        filters: ProtocolEventCategoryFilter | None | UnsetType = UNSET,
+        pagination: OffsetPaginationInput | None | UnsetType = UNSET,
+    ) -> tuple[ProtocolEventCategory, ...]:
+        """ListProtocolEventCategories
+
+        List all protocol event categories
+
+        Args:
+            filters (ProtocolEventCategoryFilter | None, optional): No description.
+            pagination (OffsetPaginationInput | None, optional): No description.
+
+        Returns:
+            list[ProtocolEventCategory]
+        """
+        variables: dict[str, Any] = {}
+        if filters is not UNSET:
+            variables["filters"] = filters
+        if pagination is not UNSET:
+            variables["pagination"] = pagination
+        return self.execute(
+            ListProtocolEventCategoriesQuery, variables
+        ).protocol_event_categories
+
+    async def asearch_protocol_event_categories(
+        self,
+        search: str | None | UnsetType = UNSET,
+        values: list[IDCoercible] | None | UnsetType = UNSET,
+    ) -> tuple[SearchProtocolEventCategoriesQueryOptions, ...]:
+        """SearchProtocolEventCategories
+
+        List all protocol event categories
+
+        Args:
+            search (str | None, optional): No description.
+            values (list[ID] | None, optional): No description.
+
+        Returns:
+            list[SearchProtocolEventCategoriesQueryProtocolEventCategories]
+        """
+        variables: dict[str, Any] = {}
+        if search is not UNSET:
+            variables["search"] = search
+        if values is not UNSET:
+            variables["values"] = values
+        return (
+            await self.aexecute(SearchProtocolEventCategoriesQuery, variables)
+        ).options
+
+    def search_protocol_event_categories(
+        self,
+        search: str | None | UnsetType = UNSET,
+        values: list[IDCoercible] | None | UnsetType = UNSET,
+    ) -> tuple[SearchProtocolEventCategoriesQueryOptions, ...]:
+        """SearchProtocolEventCategories
+
+        List all protocol event categories
+
+        Args:
+            search (str | None, optional): No description.
+            values (list[ID] | None, optional): No description.
+
+        Returns:
+            list[SearchProtocolEventCategoriesQueryProtocolEventCategories]
+        """
+        variables: dict[str, Any] = {}
+        if search is not UNSET:
+            variables["search"] = search
+        if values is not UNSET:
+            variables["values"] = values
+        return self.execute(SearchProtocolEventCategoriesQuery, variables).options
+
+    async def aget_instance(self, id: IDCoercible) -> Instance:
+        """GetInstance
+         Claim-grain reads: organization scope, addressed by a bare uuid, no graph argument.
+         `instance(id:)` is the fallback reader for a node no view draws.
+
+        Args:
+            id (ID): No description
+
+        Returns:
+            Instance
+        """
+        variables: dict[str, Any] = {}
+        variables["id"] = id
+        return (await self.aexecute(GetInstanceQuery, variables)).instance
+
+    def get_instance(self, id: IDCoercible) -> Instance:
+        """GetInstance
+         Claim-grain reads: organization scope, addressed by a bare uuid, no graph argument.
+         `instance(id:)` is the fallback reader for a node no view draws.
+
+        Args:
+            id (ID): No description
+
+        Returns:
+            Instance
+        """
+        variables: dict[str, Any] = {}
+        variables["id"] = id
+        return self.execute(GetInstanceQuery, variables).instance
+
+    async def aget_link(self, id: IDCoercible) -> Link:
+        """GetLink
+
+        Get one claim relating two things by ID, as the log has it
+
+        Args:
+            id (ID): No description
+
+        Returns:
+            Link
+        """
+        variables: dict[str, Any] = {}
+        variables["id"] = id
+        return (await self.aexecute(GetLinkQuery, variables)).link
+
+    def get_link(self, id: IDCoercible) -> Link:
+        """GetLink
+
+        Get one claim relating two things by ID, as the log has it
+
+        Args:
+            id (ID): No description
+
+        Returns:
+            Link
+        """
+        variables: dict[str, Any] = {}
+        variables["id"] = id
+        return self.execute(GetLinkQuery, variables).link
+
+    async def aget_standings(self, id: IDCoercible) -> tuple[Standing, ...]:
+        """GetStandings
+         Every position anyone has taken on a claim, newest first. An empty list means nobody has
+         disputed it — silence is not dissent, and there is no folded boolean beside this.
+
+        Args:
+            id (ID): No description
+
+        Returns:
+            list[Standing]
+        """
+        variables: dict[str, Any] = {}
+        variables["id"] = id
+        return (await self.aexecute(GetStandingsQuery, variables)).standings
+
+    def get_standings(self, id: IDCoercible) -> tuple[Standing, ...]:
+        """GetStandings
+         Every position anyone has taken on a claim, newest first. An empty list means nobody has
+         disputed it — silence is not dissent, and there is no folded boolean beside this.
+
+        Args:
+            id (ID): No description
+
+        Returns:
+            list[Standing]
+        """
+        variables: dict[str, Any] = {}
+        variables["id"] = id
+        return self.execute(GetStandingsQuery, variables).standings
+
+    async def aget_structure(self, id: IDCoercible) -> StructureWithMetrics:
+        """GetStructure
+
+        Get a structure by ID — a bare uuid, its evidence primary key
+
+        Args:
+            id (ID): No description
+
+        Returns:
+            StructureWithMetrics
+        """
+        variables: dict[str, Any] = {}
+        variables["id"] = id
+        return (await self.aexecute(GetStructureQuery, variables)).structure
+
+    def get_structure(self, id: IDCoercible) -> StructureWithMetrics:
+        """GetStructure
+
+        Get a structure by ID — a bare uuid, its evidence primary key
+
+        Args:
+            id (ID): No description
+
+        Returns:
+            StructureWithMetrics
+        """
+        variables: dict[str, Any] = {}
+        variables["id"] = id
+        return self.execute(GetStructureQuery, variables).structure
+
+    async def aget_structure_by_identifier(
+        self, identifier: StructureIdentifierCoercible, object: StructureObjectCoercible
+    ) -> StructureWithMetrics:
+        """GetStructureByIdentifier
+
+        Get a structure by identifier and object. No graph: a structure belongs to the organization and has no vertex in any projection
+
+        Args:
+            identifier (StructureIdentifier): No description
+            object (StructureObject): No description
+
+        Returns:
+            StructureWithMetrics
+        """
+        variables: dict[str, Any] = {}
+        variables["identifier"] = identifier
+        variables["object"] = object
+        return (
+            await self.aexecute(GetStructureByIdentifierQuery, variables)
+        ).structure_by_identifier
+
+    def get_structure_by_identifier(
+        self, identifier: StructureIdentifierCoercible, object: StructureObjectCoercible
+    ) -> StructureWithMetrics:
+        """GetStructureByIdentifier
+
+        Get a structure by identifier and object. No graph: a structure belongs to the organization and has no vertex in any projection
+
+        Args:
+            identifier (StructureIdentifier): No description
+            object (StructureObject): No description
+
+        Returns:
+            StructureWithMetrics
+        """
+        variables: dict[str, Any] = {}
+        variables["identifier"] = identifier
+        variables["object"] = object
+        return self.execute(
+            GetStructureByIdentifierQuery, variables
+        ).structure_by_identifier
+
+    async def aget_informing_structures(self, entity_id: str) -> tuple[Structure, ...]:
+        """GetInformingStructures
+         Resolves a naming structure back to what it names — this is how an external id is looked up
+         now that `externalId` no longer exists on any write.
+
+        Args:
+            entity_id (str): No description
+
+        Returns:
+            list[Structure]
+        """
+        variables: dict[str, Any] = {}
+        variables["entityId"] = entity_id
+        return (
+            await self.aexecute(GetInformingStructuresQuery, variables)
+        ).informing_structures
+
+    def get_informing_structures(self, entity_id: str) -> tuple[Structure, ...]:
+        """GetInformingStructures
+         Resolves a naming structure back to what it names — this is how an external id is looked up
+         now that `externalId` no longer exists on any write.
+
+        Args:
+            entity_id (str): No description
+
+        Returns:
+            list[Structure]
+        """
+        variables: dict[str, Any] = {}
+        variables["entityId"] = entity_id
+        return self.execute(GetInformingStructuresQuery, variables).informing_structures
+
+    async def alist_structures(
+        self,
+        structure_kind_id: IDCoercible | None | UnsetType = UNSET,
+        filters: StructureFilter | None | UnsetType = UNSET,
+        ordering: list[StructureOrder] | None | UnsetType = UNSET,
+        pagination: StructurePaginationInput | None | UnsetType = UNSET,
+    ) -> tuple[Structure, ...]:
+        """ListStructures
+
+        List structures with optional filters, ordering, and pagination
+
+        Args:
+            structure_kind_id (ID | None, optional): No description.
+            filters (StructureFilter | None, optional): No description.
+            ordering (list[StructureOrder] | None, optional): No description.
+            pagination (StructurePaginationInput | None, optional): No description.
+
+        Returns:
+            list[Structure]
+        """
+        variables: dict[str, Any] = {}
+        if structure_kind_id is not UNSET:
+            variables["structureKindId"] = structure_kind_id
+        if filters is not UNSET:
+            variables["filters"] = filters
+        if ordering is not UNSET:
+            variables["ordering"] = ordering
+        if pagination is not UNSET:
+            variables["pagination"] = pagination
+        return (await self.aexecute(ListStructuresQuery, variables)).structures
+
+    def list_structures(
+        self,
+        structure_kind_id: IDCoercible | None | UnsetType = UNSET,
+        filters: StructureFilter | None | UnsetType = UNSET,
+        ordering: list[StructureOrder] | None | UnsetType = UNSET,
+        pagination: StructurePaginationInput | None | UnsetType = UNSET,
+    ) -> tuple[Structure, ...]:
+        """ListStructures
+
+        List structures with optional filters, ordering, and pagination
+
+        Args:
+            structure_kind_id (ID | None, optional): No description.
+            filters (StructureFilter | None, optional): No description.
+            ordering (list[StructureOrder] | None, optional): No description.
+            pagination (StructurePaginationInput | None, optional): No description.
+
+        Returns:
+            list[Structure]
+        """
+        variables: dict[str, Any] = {}
+        if structure_kind_id is not UNSET:
+            variables["structureKindId"] = structure_kind_id
+        if filters is not UNSET:
+            variables["filters"] = filters
+        if ordering is not UNSET:
+            variables["ordering"] = ordering
+        if pagination is not UNSET:
+            variables["pagination"] = pagination
+        return self.execute(ListStructuresQuery, variables).structures
+
+    async def aget_metric(self, id: IDCoercible) -> Metric:
+        """GetMetric
+
+        Get a metric by ID
+
+        Args:
+            id (ID): No description
+
+        Returns:
+            Metric
+        """
+        variables: dict[str, Any] = {}
+        variables["id"] = id
+        return (await self.aexecute(GetMetricQuery, variables)).metric
+
+    def get_metric(self, id: IDCoercible) -> Metric:
+        """GetMetric
+
+        Get a metric by ID
+
+        Args:
+            id (ID): No description
+
+        Returns:
+            Metric
+        """
+        variables: dict[str, Any] = {}
+        variables["id"] = id
+        return self.execute(GetMetricQuery, variables).metric
+
+    async def aget_metrics_for_structure(
+        self, structure_id: IDCoercible
+    ) -> tuple[Metric, ...]:
+        """GetMetricsForStructure
+
+        List every un-retracted metric describing a structure
+
+        Args:
+            structure_id (ID): No description
+
+        Returns:
+            list[Metric]
+        """
+        variables: dict[str, Any] = {}
+        variables["structureId"] = structure_id
+        return (
+            await self.aexecute(GetMetricsForStructureQuery, variables)
+        ).metrics_for_structure
+
+    def get_metrics_for_structure(
+        self, structure_id: IDCoercible
+    ) -> tuple[Metric, ...]:
+        """GetMetricsForStructure
+
+        List every un-retracted metric describing a structure
+
+        Args:
+            structure_id (ID): No description
+
+        Returns:
+            list[Metric]
+        """
+        variables: dict[str, Any] = {}
+        variables["structureId"] = structure_id
+        return self.execute(
+            GetMetricsForStructureQuery, variables
+        ).metrics_for_structure
+
+    async def aget_comment(self, id: IDCoercible) -> Comment:
+        """GetComment
+
+        Get one remark by ID, as the log has it
+
+        Args:
+            id (ID): No description
+
+        Returns:
+            Comment
+        """
+        variables: dict[str, Any] = {}
+        variables["id"] = id
+        return (await self.aexecute(GetCommentQuery, variables)).comment
+
+    def get_comment(self, id: IDCoercible) -> Comment:
+        """GetComment
+
+        Get one remark by ID, as the log has it
+
+        Args:
+            id (ID): No description
+
+        Returns:
+            Comment
+        """
+        variables: dict[str, Any] = {}
+        variables["id"] = id
+        return self.execute(GetCommentQuery, variables).comment
+
+    async def aget_comments_for(
+        self, identifier: str, object: IDCoercible
+    ) -> tuple[Comment, ...]:
+        """GetCommentsFor
+
+        Every remark about one external datum, addressed by (identifier, object), newest first — resolved ones included
+
+        Args:
+            identifier (str): No description
+            object (ID): No description
+
+        Returns:
+            list[Comment]
+        """
+        variables: dict[str, Any] = {}
+        variables["identifier"] = identifier
+        variables["object"] = object
+        return (await self.aexecute(GetCommentsForQuery, variables)).comments_for
+
+    def get_comments_for(
+        self, identifier: str, object: IDCoercible
+    ) -> tuple[Comment, ...]:
+        """GetCommentsFor
+
+        Every remark about one external datum, addressed by (identifier, object), newest first — resolved ones included
+
+        Args:
+            identifier (str): No description
+            object (ID): No description
+
+        Returns:
+            list[Comment]
+        """
+        variables: dict[str, Any] = {}
+        variables["identifier"] = identifier
+        variables["object"] = object
+        return self.execute(GetCommentsForQuery, variables).comments_for
+
+    async def asearch_structures(
+        self,
+        search: str | None | UnsetType = UNSET,
+        values: list[IDCoercible] | None | UnsetType = UNSET,
+    ) -> tuple[SearchStructuresQueryOptions, ...]:
+        """SearchStructures
+
+        List structures with optional filters, ordering, and pagination
+
+        Args:
+            search (str | None, optional): No description.
+            values (list[ID] | None, optional): No description.
+
+        Returns:
+            list[SearchStructuresQueryStructures]
+        """
+        variables: dict[str, Any] = {}
+        if search is not UNSET:
+            variables["search"] = search
+        if values is not UNSET:
+            variables["values"] = values
+        return (await self.aexecute(SearchStructuresQuery, variables)).options
+
+    def search_structures(
+        self,
+        search: str | None | UnsetType = UNSET,
+        values: list[IDCoercible] | None | UnsetType = UNSET,
+    ) -> tuple[SearchStructuresQueryOptions, ...]:
+        """SearchStructures
+
+        List structures with optional filters, ordering, and pagination
+
+        Args:
+            search (str | None, optional): No description.
+            values (list[ID] | None, optional): No description.
+
+        Returns:
+            list[SearchStructuresQueryStructures]
+        """
+        variables: dict[str, Any] = {}
+        if search is not UNSET:
+            variables["search"] = search
+        if values is not UNSET:
+            variables["values"] = values
+        return self.execute(SearchStructuresQuery, variables).options
+
+    async def aget_graph(self, id: IDCoercible) -> Graph:
+        """GetGraph
+
+        Get a graph by ID
+
+        Args:
+            id (ID): No description
+
+        Returns:
+            Graph
+        """
+        variables: dict[str, Any] = {}
+        variables["id"] = id
+        return (await self.aexecute(GetGraphQuery, variables)).graph
+
+    def get_graph(self, id: IDCoercible) -> Graph:
+        """GetGraph
+
+        Get a graph by ID
+
+        Args:
+            id (ID): No description
+
+        Returns:
+            Graph
+        """
+        variables: dict[str, Any] = {}
+        variables["id"] = id
+        return self.execute(GetGraphQuery, variables).graph
+
+    async def alist_graphs(
+        self,
+        filters: GraphFilter | None | UnsetType = UNSET,
+        pagination: OffsetPaginationInput | None | UnsetType = UNSET,
+    ) -> tuple[ListGraph, ...]:
+        """ListGraphs
+
+        List all graphs in the graph engine
+
+        Args:
+            filters (GraphFilter | None, optional): No description.
+            pagination (OffsetPaginationInput | None, optional): No description.
+
+        Returns:
+            list[ListGraph]
+        """
+        variables: dict[str, Any] = {}
+        if filters is not UNSET:
+            variables["filters"] = filters
+        if pagination is not UNSET:
+            variables["pagination"] = pagination
+        return (await self.aexecute(ListGraphsQuery, variables)).graphs
+
+    def list_graphs(
+        self,
+        filters: GraphFilter | None | UnsetType = UNSET,
+        pagination: OffsetPaginationInput | None | UnsetType = UNSET,
+    ) -> tuple[ListGraph, ...]:
+        """ListGraphs
+
+        List all graphs in the graph engine
+
+        Args:
+            filters (GraphFilter | None, optional): No description.
+            pagination (OffsetPaginationInput | None, optional): No description.
+
+        Returns:
+            list[ListGraph]
+        """
+        variables: dict[str, Any] = {}
+        if filters is not UNSET:
+            variables["filters"] = filters
+        if pagination is not UNSET:
+            variables["pagination"] = pagination
+        return self.execute(ListGraphsQuery, variables).graphs
+
+    async def asearch_graphs(
+        self,
+        search: str | None | UnsetType = UNSET,
+        values: list[IDCoercible] | None | UnsetType = UNSET,
+    ) -> tuple[SearchGraphsQueryOptions, ...]:
+        """SearchGraphs
+
+        List all graphs in the graph engine
+
+        Args:
+            search (str | None, optional): No description.
+            values (list[ID] | None, optional): No description.
+
+        Returns:
+            list[SearchGraphsQueryGraphs]
+        """
+        variables: dict[str, Any] = {}
+        if search is not UNSET:
+            variables["search"] = search
+        if values is not UNSET:
+            variables["values"] = values
+        return (await self.aexecute(SearchGraphsQuery, variables)).options
+
+    def search_graphs(
+        self,
+        search: str | None | UnsetType = UNSET,
+        values: list[IDCoercible] | None | UnsetType = UNSET,
+    ) -> tuple[SearchGraphsQueryOptions, ...]:
+        """SearchGraphs
+
+        List all graphs in the graph engine
+
+        Args:
+            search (str | None, optional): No description.
+            values (list[ID] | None, optional): No description.
+
+        Returns:
+            list[SearchGraphsQueryGraphs]
+        """
+        variables: dict[str, Any] = {}
+        if search is not UNSET:
+            variables["search"] = search
+        if values is not UNSET:
+            variables["values"] = values
+        return self.execute(SearchGraphsQuery, variables).options
+
+    async def aget_node(self, id: IDCoercible, graph: IDCoercible) -> (
+        Annotated[
+            GetNodeQueryNodeBaseEntity
+            | GetNodeQueryNodeBaseNaturalEvent
+            | GetNodeQueryNodeBaseProtocolEvent,
+            Field(discriminator="typename"),
+        ]
+        | GetNodeQueryNodeBaseCatchAll
+    ):
+        """GetNode
+         View-grain reads: these name their view, and refuse a node the view does not admit.
+         `node(id, graph)` succeeds exactly when `nodes(graph:)` could list it.
+
+        Args:
+            id (ID): No description
+            graph (ID): No description
+
+        Returns:
+            NodeRef
+        """
+        variables: dict[str, Any] = {}
+        variables["id"] = id
+        variables["graph"] = graph
+        return (await self.aexecute(GetNodeQuery, variables)).node
+
+    def get_node(self, id: IDCoercible, graph: IDCoercible) -> (
+        Annotated[
+            GetNodeQueryNodeBaseEntity
+            | GetNodeQueryNodeBaseNaturalEvent
+            | GetNodeQueryNodeBaseProtocolEvent,
+            Field(discriminator="typename"),
+        ]
+        | GetNodeQueryNodeBaseCatchAll
+    ):
+        """GetNode
+         View-grain reads: these name their view, and refuse a node the view does not admit.
+         `node(id, graph)` succeeds exactly when `nodes(graph:)` could list it.
+
+        Args:
+            id (ID): No description
+            graph (ID): No description
+
+        Returns:
+            NodeRef
+        """
+        variables: dict[str, Any] = {}
+        variables["id"] = id
+        variables["graph"] = graph
+        return self.execute(GetNodeQuery, variables).node
+
+    async def alist_nodes(
+        self,
+        graph: IDCoercible,
+        filters: NodeFilters | None | UnsetType = UNSET,
+        ordering: list[NodeOrder] | None | UnsetType = UNSET,
+        pagination: NodePaginationInput | None | UnsetType = UNSET,
+    ) -> tuple[
+        Annotated[
+            ListNodesQueryNodesBaseEntity
+            | ListNodesQueryNodesBaseNaturalEvent
+            | ListNodesQueryNodesBaseProtocolEvent,
+            Field(discriminator="typename"),
+        ]
+        | ListNodesQueryNodesBaseCatchAll,
+        ...,
+    ]:
+        """ListNodes
+
+        List the individuals a view holds, as it draws them — view grain: one row per individual, membership from the view's rule, properties as of the view's cursor
+
+        Args:
+            graph (ID): No description
+            filters (NodeFilters | None, optional): No description.
+            ordering (list[NodeOrder] | None, optional): No description.
+            pagination (NodePaginationInput | None, optional): No description.
+
+        Returns:
+            list[NodeRef]
+        """
+        variables: dict[str, Any] = {}
+        variables["graph"] = graph
+        if filters is not UNSET:
+            variables["filters"] = filters
+        if ordering is not UNSET:
+            variables["ordering"] = ordering
+        if pagination is not UNSET:
+            variables["pagination"] = pagination
+        return (await self.aexecute(ListNodesQuery, variables)).nodes
+
+    def list_nodes(
+        self,
+        graph: IDCoercible,
+        filters: NodeFilters | None | UnsetType = UNSET,
+        ordering: list[NodeOrder] | None | UnsetType = UNSET,
+        pagination: NodePaginationInput | None | UnsetType = UNSET,
+    ) -> tuple[
+        Annotated[
+            ListNodesQueryNodesBaseEntity
+            | ListNodesQueryNodesBaseNaturalEvent
+            | ListNodesQueryNodesBaseProtocolEvent,
+            Field(discriminator="typename"),
+        ]
+        | ListNodesQueryNodesBaseCatchAll,
+        ...,
+    ]:
+        """ListNodes
+
+        List the individuals a view holds, as it draws them — view grain: one row per individual, membership from the view's rule, properties as of the view's cursor
+
+        Args:
+            graph (ID): No description
+            filters (NodeFilters | None, optional): No description.
+            ordering (list[NodeOrder] | None, optional): No description.
+            pagination (NodePaginationInput | None, optional): No description.
+
+        Returns:
+            list[NodeRef]
+        """
+        variables: dict[str, Any] = {}
+        variables["graph"] = graph
+        if filters is not UNSET:
+            variables["filters"] = filters
+        if ordering is not UNSET:
+            variables["ordering"] = ordering
+        if pagination is not UNSET:
+            variables["pagination"] = pagination
+        return self.execute(ListNodesQuery, variables).nodes
+
+    async def aget_entity(self, id: IDCoercible, graph: IDCoercible) -> EntityView:
+        """GetEntity
+         richProperties is where derived values surface — the only place a metric recorded on an
+         evidence structure becomes readable as a property of the node.
+
+        Args:
+            id (ID): No description
+            graph (ID): No description
+
+        Returns:
+            EntityView
+        """
+        variables: dict[str, Any] = {}
+        variables["id"] = id
+        variables["graph"] = graph
+        return (await self.aexecute(GetEntityQuery, variables)).entity
+
+    def get_entity(self, id: IDCoercible, graph: IDCoercible) -> EntityView:
+        """GetEntity
+         richProperties is where derived values surface — the only place a metric recorded on an
+         evidence structure becomes readable as a property of the node.
+
+        Args:
+            id (ID): No description
+            graph (ID): No description
+
+        Returns:
+            EntityView
+        """
+        variables: dict[str, Any] = {}
+        variables["id"] = id
+        variables["graph"] = graph
+        return self.execute(GetEntityQuery, variables).entity
+
+    async def aget_term(self, id: IDCoercible) -> Term:
+        """GetTerm
+
+        Get one of the organization's words by ID
+
+        Args:
+            id (ID): No description
+
+        Returns:
+            Term
+        """
+        variables: dict[str, Any] = {}
+        variables["id"] = id
+        return (await self.aexecute(GetTermQuery, variables)).term
+
+    def get_term(self, id: IDCoercible) -> Term:
+        """GetTerm
+
+        Get one of the organization's words by ID
+
+        Args:
+            id (ID): No description
+
+        Returns:
+            Term
+        """
+        variables: dict[str, Any] = {}
+        variables["id"] = id
+        return self.execute(GetTermQuery, variables).term
+
+    async def alist_terms(
+        self,
+        filters: TermFilter | None | UnsetType = UNSET,
+        pagination: VocabularyPaginationInput | None | UnsetType = UNSET,
+    ) -> tuple[Term, ...]:
+        """ListTerms
+
+        List the organization's words — its vocabulary, independent of any graph
+
+        Args:
+            filters (TermFilter | None, optional): No description.
+            pagination (VocabularyPaginationInput | None, optional): No description.
+
+        Returns:
+            list[Term]
+        """
+        variables: dict[str, Any] = {}
+        if filters is not UNSET:
+            variables["filters"] = filters
+        if pagination is not UNSET:
+            variables["pagination"] = pagination
+        return (await self.aexecute(ListTermsQuery, variables)).terms
+
+    def list_terms(
+        self,
+        filters: TermFilter | None | UnsetType = UNSET,
+        pagination: VocabularyPaginationInput | None | UnsetType = UNSET,
+    ) -> tuple[Term, ...]:
+        """ListTerms
+
+        List the organization's words — its vocabulary, independent of any graph
+
+        Args:
+            filters (TermFilter | None, optional): No description.
+            pagination (VocabularyPaginationInput | None, optional): No description.
+
+        Returns:
+            list[Term]
+        """
+        variables: dict[str, Any] = {}
+        if filters is not UNSET:
+            variables["filters"] = filters
+        if pagination is not UNSET:
+            variables["pagination"] = pagination
+        return self.execute(ListTermsQuery, variables).terms
+
+    async def asearch_terms(
+        self,
+        search: str | None | UnsetType = UNSET,
+        values: list[IDCoercible] | None | UnsetType = UNSET,
+    ) -> tuple[SearchTermsQueryOptions, ...]:
+        """SearchTerms
+
+        List the organization's words — its vocabulary, independent of any graph
+
+        Args:
+            search (str | None, optional): No description.
+            values (list[ID] | None, optional): No description.
+
+        Returns:
+            list[SearchTermsQueryTerms]
+        """
+        variables: dict[str, Any] = {}
+        if search is not UNSET:
+            variables["search"] = search
+        if values is not UNSET:
+            variables["values"] = values
+        return (await self.aexecute(SearchTermsQuery, variables)).options
+
+    def search_terms(
+        self,
+        search: str | None | UnsetType = UNSET,
+        values: list[IDCoercible] | None | UnsetType = UNSET,
+    ) -> tuple[SearchTermsQueryOptions, ...]:
+        """SearchTerms
+
+        List the organization's words — its vocabulary, independent of any graph
+
+        Args:
+            search (str | None, optional): No description.
+            values (list[ID] | None, optional): No description.
+
+        Returns:
+            list[SearchTermsQueryTerms]
+        """
+        variables: dict[str, Any] = {}
+        if search is not UNSET:
+            variables["search"] = search
+        if values is not UNSET:
+            variables["values"] = values
+        return self.execute(SearchTermsQuery, variables).options
+
+    async def aget_structure_kind(self, id: IDCoercible) -> StructureKind:
+        """GetStructureKind
+
+        Get one structure kind by ID
+
+        Args:
+            id (ID): No description
+
+        Returns:
+            StructureKind
+        """
+        variables: dict[str, Any] = {}
+        variables["id"] = id
+        return (await self.aexecute(GetStructureKindQuery, variables)).structure_kind
+
+    def get_structure_kind(self, id: IDCoercible) -> StructureKind:
+        """GetStructureKind
+
+        Get one structure kind by ID
+
+        Args:
+            id (ID): No description
+
+        Returns:
+            StructureKind
+        """
+        variables: dict[str, Any] = {}
+        variables["id"] = id
+        return self.execute(GetStructureKindQuery, variables).structure_kind
+
+    async def alist_structure_kinds(
+        self,
+        filters: StructureKindFilter | None | UnsetType = UNSET,
+        pagination: VocabularyPaginationInput | None | UnsetType = UNSET,
+    ) -> tuple[StructureKind, ...]:
+        """ListStructureKinds
+
+        List the organization's structure kinds
+
+        Args:
+            filters (StructureKindFilter | None, optional): No description.
+            pagination (VocabularyPaginationInput | None, optional): No description.
+
+        Returns:
+            list[StructureKind]
+        """
+        variables: dict[str, Any] = {}
+        if filters is not UNSET:
+            variables["filters"] = filters
+        if pagination is not UNSET:
+            variables["pagination"] = pagination
+        return (await self.aexecute(ListStructureKindsQuery, variables)).structure_kinds
+
+    def list_structure_kinds(
+        self,
+        filters: StructureKindFilter | None | UnsetType = UNSET,
+        pagination: VocabularyPaginationInput | None | UnsetType = UNSET,
+    ) -> tuple[StructureKind, ...]:
+        """ListStructureKinds
+
+        List the organization's structure kinds
+
+        Args:
+            filters (StructureKindFilter | None, optional): No description.
+            pagination (VocabularyPaginationInput | None, optional): No description.
+
+        Returns:
+            list[StructureKind]
+        """
+        variables: dict[str, Any] = {}
+        if filters is not UNSET:
+            variables["filters"] = filters
+        if pagination is not UNSET:
+            variables["pagination"] = pagination
+        return self.execute(ListStructureKindsQuery, variables).structure_kinds
+
+    async def asearch_structure_kinds(
+        self,
+        search: str | None | UnsetType = UNSET,
+        values: list[IDCoercible] | None | UnsetType = UNSET,
+    ) -> tuple[SearchStructureKindsQueryOptions, ...]:
+        """SearchStructureKinds
+
+        List the organization's structure kinds
+
+        Args:
+            search (str | None, optional): No description.
+            values (list[ID] | None, optional): No description.
+
+        Returns:
+            list[SearchStructureKindsQueryStructureKinds]
+        """
+        variables: dict[str, Any] = {}
+        if search is not UNSET:
+            variables["search"] = search
+        if values is not UNSET:
+            variables["values"] = values
+        return (await self.aexecute(SearchStructureKindsQuery, variables)).options
+
+    def search_structure_kinds(
+        self,
+        search: str | None | UnsetType = UNSET,
+        values: list[IDCoercible] | None | UnsetType = UNSET,
+    ) -> tuple[SearchStructureKindsQueryOptions, ...]:
+        """SearchStructureKinds
+
+        List the organization's structure kinds
+
+        Args:
+            search (str | None, optional): No description.
+            values (list[ID] | None, optional): No description.
+
+        Returns:
+            list[SearchStructureKindsQueryStructureKinds]
+        """
+        variables: dict[str, Any] = {}
+        if search is not UNSET:
+            variables["search"] = search
+        if values is not UNSET:
+            variables["values"] = values
+        return self.execute(SearchStructureKindsQuery, variables).options
+
+    async def aget_metric_kind(self, id: IDCoercible) -> MetricKind:
+        """GetMetricKind
+
+        Get one metric kind by ID
+
+        Args:
+            id (ID): No description
+
+        Returns:
+            MetricKind
+        """
+        variables: dict[str, Any] = {}
+        variables["id"] = id
+        return (await self.aexecute(GetMetricKindQuery, variables)).metric_kind
+
+    def get_metric_kind(self, id: IDCoercible) -> MetricKind:
+        """GetMetricKind
+
+        Get one metric kind by ID
+
+        Args:
+            id (ID): No description
+
+        Returns:
+            MetricKind
+        """
+        variables: dict[str, Any] = {}
+        variables["id"] = id
+        return self.execute(GetMetricKindQuery, variables).metric_kind
+
+    async def alist_metric_kinds(
+        self,
+        filters: MetricKindFilter | None | UnsetType = UNSET,
+        pagination: VocabularyPaginationInput | None | UnsetType = UNSET,
+    ) -> tuple[MetricKind, ...]:
+        """ListMetricKinds
+
+        List the organization's metric kinds
+
+        Args:
+            filters (MetricKindFilter | None, optional): No description.
+            pagination (VocabularyPaginationInput | None, optional): No description.
+
+        Returns:
+            list[MetricKind]
+        """
+        variables: dict[str, Any] = {}
+        if filters is not UNSET:
+            variables["filters"] = filters
+        if pagination is not UNSET:
+            variables["pagination"] = pagination
+        return (await self.aexecute(ListMetricKindsQuery, variables)).metric_kinds
+
+    def list_metric_kinds(
+        self,
+        filters: MetricKindFilter | None | UnsetType = UNSET,
+        pagination: VocabularyPaginationInput | None | UnsetType = UNSET,
+    ) -> tuple[MetricKind, ...]:
+        """ListMetricKinds
+
+        List the organization's metric kinds
+
+        Args:
+            filters (MetricKindFilter | None, optional): No description.
+            pagination (VocabularyPaginationInput | None, optional): No description.
+
+        Returns:
+            list[MetricKind]
+        """
+        variables: dict[str, Any] = {}
+        if filters is not UNSET:
+            variables["filters"] = filters
+        if pagination is not UNSET:
+            variables["pagination"] = pagination
+        return self.execute(ListMetricKindsQuery, variables).metric_kinds
+
+    async def asearch_metric_kinds(
+        self,
+        search: str | None | UnsetType = UNSET,
+        values: list[IDCoercible] | None | UnsetType = UNSET,
+    ) -> tuple[SearchMetricKindsQueryOptions, ...]:
+        """SearchMetricKinds
+
+        List the organization's metric kinds
+
+        Args:
+            search (str | None, optional): No description.
+            values (list[ID] | None, optional): No description.
+
+        Returns:
+            list[SearchMetricKindsQueryMetricKinds]
+        """
+        variables: dict[str, Any] = {}
+        if search is not UNSET:
+            variables["search"] = search
+        if values is not UNSET:
+            variables["values"] = values
+        return (await self.aexecute(SearchMetricKindsQuery, variables)).options
+
+    def search_metric_kinds(
+        self,
+        search: str | None | UnsetType = UNSET,
+        values: list[IDCoercible] | None | UnsetType = UNSET,
+    ) -> tuple[SearchMetricKindsQueryOptions, ...]:
+        """SearchMetricKinds
+
+        List the organization's metric kinds
+
+        Args:
+            search (str | None, optional): No description.
+            values (list[ID] | None, optional): No description.
+
+        Returns:
+            list[SearchMetricKindsQueryMetricKinds]
+        """
+        variables: dict[str, Any] = {}
+        if search is not UNSET:
+            variables["search"] = search
+        if values is not UNSET:
+            variables["values"] = values
+        return self.execute(SearchMetricKindsQuery, variables).options
 
 
 AssertEntityExistsInput.model_rebuild()
+AssertMeasurementExistsInput.model_rebuild()
 AssertNaturalEventExistsInput.model_rebuild()
 AssertParticipationsInput.model_rebuild()
-ClaimRuleInput.model_rebuild()
-ClassifyNodesInput.model_rebuild()
+AssertProtocolEventExistsInput.model_rebuild()
+AssertRelationExistsInput.model_rebuild()
+AssertStructureExistsInput.model_rebuild()
+AssertStructureRelationExistsInput.model_rebuild()
+CategoryDefinitionInput.model_rebuild()
+ClaimConditionGroupInput.model_rebuild()
 CommentOnStructureInput.model_rebuild()
+CreateEntityCategoryInput.model_rebuild()
 CreateGraphInput.model_rebuild()
+CreateMeasurementCategoryInput.model_rebuild()
+CreateNaturalEventCategoryInput.model_rebuild()
+CreateProtocolEventCategoryInput.model_rebuild()
+CreateRelationCategoryInput.model_rebuild()
+CreateStructureRelationCategoryInput.model_rebuild()
 DerivationRuleInput.model_rebuild()
 DescendantInput.model_rebuild()
 EntityCategoryFilter.model_rebuild()
 EntityDefinitionInput.model_rebuild()
 EventDefinitionInput.model_rebuild()
+EventRoleInput.model_rebuild()
 GraphDefinitionInput.model_rebuild()
 GraphExtensionsInput.model_rebuild()
 GraphFilter.model_rebuild()
 MeasurementCategoryFilter.model_rebuild()
-MetricEvidenceInput.model_rebuild()
+MeasurementDefinitionInput.model_rebuild()
 MetricKindFilter.model_rebuild()
 NaturalEventCategoryFilter.model_rebuild()
-PropertyDefinitionInput.model_rebuild()
 ProtocolEventCategoryFilter.model_rebuild()
 RelationCategoryFilter.model_rebuild()
-StructureFilter.model_rebuild()
 StructureKindFilter.model_rebuild()
-StructureReferenceInput.model_rebuild()
 StructureRelationCategoryFilter.model_rebuild()
 TermFilter.model_rebuild()
-UpdateGraphVisualInput.model_rebuild()

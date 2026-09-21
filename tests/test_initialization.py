@@ -100,7 +100,10 @@ def test_only_the_right_payloads_report_drawings() -> None:
 
 
 def test_write_surface_is_assertion_shaped() -> None:
-    """Writes are assert/attest/retract, and the old create* verbs are gone."""
+    """Writes are assert/attest/retract, and the old create* verbs are gone.
+
+    Every operation is a method of the generated ``KraphApi``; none is module-level.
+    """
     for gone in (
         "create_entity",
         "create_relation",
@@ -114,6 +117,7 @@ def test_write_surface_is_assertion_shaped() -> None:
         "update_structure_relation",
         "link_structure_to_entity",
     ):
-        assert not hasattr(schema, gone), gone
+        assert not hasattr(schema.KraphApi, gone), gone
     for present in ("assert_entity_exists", "retract_entity", "attest_entity", "attest_structure"):
-        assert hasattr(schema, present), present
+        assert hasattr(schema.KraphApi, present), present
+        assert not hasattr(schema, present), present

@@ -26,10 +26,15 @@ from typing import TYPE_CHECKING, Any, Optional
 
 from koil import unkoil
 from pydantic import BaseModel
+from rath.origin import ContextBound
 from rath.turms.utils import get_attributes_or_error
+
+from kraph.client import client_of
 
 if TYPE_CHECKING:
     from rekuest.structures.registry import StructureRegistry
+
+    from kraph.kraph import Kraph
 
 
 class AssertedTrait(BaseModel):
@@ -174,19 +179,16 @@ class StructureTrait(BaseModel):
         """The ``(identifier, object)`` pair that addresses this datum."""
         return get_attributes_or_error(self, "identifier", "object")
 
-    def resolve(self, registry: Optional["StructureRegistry"] = None) -> Any:
+    def resolve(self, registry: "StructureRegistry") -> Any:
         """Expand this structure back into the concrete Python object it points at.
 
-        Uses the rekuest structure registry, so the datum's own service (mikro, and so on) does
-        the loading.
+        Uses ``registry``, a structure registry bound to its clients (the one a running task
+        expands its arguments with), so the datum's own service (mikro, and so on) does the
+        loading, through the client of that service the registry was bound to.
         """
         identifier, object_id = get_attributes_or_error(self, "identifier", "object")
-
-        from rekuest.structures.default import get_default_structure_registry
-
-        registry = registry or get_default_structure_registry()
         fullfilled = registry.get_fullfilled_structure(identifier)
-        return unkoil(fullfilled.aexpand, object_id)
+        return unkoil(fullfilled.expand, object_id)
 
 
 class CategoryTrait(BaseModel):
@@ -247,11 +249,13 @@ class ProjectionTrait(BaseModel):
         return f"{status} through seq {through} (lag {lag}, {pending} pending)"
 
 
-class GraphTrait(BaseModel):
+class GraphTrait(ContextBound):
     """A view over the organization's claims.
 
     Not a container — a reconstruction. A node can be drawn by several views at once, and a
     claim recorded under a word this view does not declare is simply not drawn here.
+
+    Context bound: a graph polls its projection through the client that fetched it.
     """
 
     @property
@@ -259,24 +263,31 @@ class GraphTrait(BaseModel):
         return get_attributes_or_error(self, "projection")
 
     def wait_until_projected(
-        self, seq: int, *, timeout: float = 30.0, poll: float = 0.5
+        self,
+        seq: int,
+        *,
+        timeout: float = 30.0,
+        poll: float = 0.5,
+        kraph: Optional["Kraph"] = None,
     ) -> Any:
         """Block until this view has drawn everything up to ``seq``.
 
         Never implicit: a backfill or a category edit redraws in-request and is unbounded in the
         size of the graph, so no write waits on its own. Raises :class:`ProjectionTimeout`
         carrying the last projection read, rather than returning a stale answer.
+
+        Polls through ``kraph`` if given, else through the client that fetched this graph.
         """
         import time
 
-        from kraph.api.schema import get_graph
         from kraph.errors import ProjectionTimeout
 
+        client = client_of(self, kraph)
         graph_id = get_attributes_or_error(self, "id")
         deadline = time.monotonic() + timeout
         projection = None
         while time.monotonic() < deadline:
-            projection = get_graph(id=graph_id).projection
+            projection = client.get_graph(id=graph_id).projection
             if projection.projected_through_seq >= seq:
                 return projection
             time.sleep(poll)
@@ -285,13 +296,14 @@ class GraphTrait(BaseModel):
         )
 
 
-class HasPresignedDownloadAccessor(BaseModel):
+class HasPresignedDownloadAccessor(ContextBound):
     """Download accessor for media stores."""
 
     _accessor = ("key", "bucket")
 
-    def download(self, file_name: Optional[str] = None) -> str:
+    def download(self, file_name: Optional[str] = None, kraph: Optional["Kraph"] = None) -> str:
+        """Download this file through the datalayer of ``kraph``, else of the client that fetched it."""
         from kraph.io import download_file
 
         url, key = get_attributes_or_error(self, "presigned_url", "key")
-        return unkoil(download_file, url, file_name=file_name or key)
+        return download_file(client_of(self, kraph).datalayer, url, file_name=file_name or key)

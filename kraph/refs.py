@@ -7,8 +7,8 @@ Every claim addresses things by one of two shapes:
 
 The old client resolved these inline in half a dozen places and encoded a structure as a single
 ``identifier:object`` string. The schema now takes the two halves separately, so the resolution
-lives here, once. This is also the only module that imports ``rekuest``, and it does so
-lazily — passing explicit pairs works with rekuest absent.
+lives here, once. A bare object maps to its identifier only through a structure registry;
+passing explicit pairs needs none.
 """
 
 from typing import Any, Union
@@ -22,14 +22,23 @@ StructureRef = Union[str, tuple, BaseModel]
 NodeRef = Union[str, BaseModel]
 
 
-def identifier_for_cls(cls: type) -> str:
-    """The structure identifier a Python class is registered under."""
-    from rekuest.structures.default import get_default_structure_registry
+def identifier_for_cls(cls: type, registry: Any = None) -> str:  # noqa: ANN401
+    """The structure identifier a Python class is registered under in ``registry``.
 
-    identifier = get_default_structure_registry().get_identifier_for_cls(cls)
+    There is no current registry to ask: a class maps to an identifier only through
+    the registry of an app that declared it (``rekuest.structure_registry``).
+    Without one, pass the identifier yourself.
+    """
+    if registry is None:
+        raise UnregisteredStructure(
+            f"Which structure is a {cls.__name__}? Nothing here knows without a "
+            "structure registry. Pass an explicit (identifier, object) pair, or the "
+            "'@ns/name' identifier."
+        )
+    identifier = registry.get_identifier_for_cls(cls)
     if identifier is None:
         raise UnregisteredStructure(
-            f"{cls.__name__} is not registered with the rekuest structure registry. "
+            f"{cls.__name__} is not registered in the given structure registry. "
             f"Pass an explicit (identifier, object) pair instead."
         )
     return identifier

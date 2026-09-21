@@ -1,12 +1,14 @@
-from typing import Optional
+from typing import TYPE_CHECKING
 
 import aiohttp
 from koil import unkoil
-from kraph.vars import current_datalayer
+
+if TYPE_CHECKING:
+    from kraph.datalayer import DataLayer
 
 
-async def adownload_file(presigned_url: str, file_name: str, datalayer=None):
-    datalayer = datalayer or current_datalayer.get()
+async def adownload_file(datalayer: "DataLayer", presigned_url: str, file_name: str) -> str:
+    """Download a presigned url from ``datalayer`` into ``file_name``."""
     endpoint_url = await datalayer.get_endpoint_url()
 
     async with aiohttp.ClientSession() as session:
@@ -23,7 +25,6 @@ async def adownload_file(presigned_url: str, file_name: str, datalayer=None):
     return file_name
 
 
-def download_file(presigned_url: str, file_name: str, datalayer=None):
-    return unkoil(
-        adownload_file, presigned_url, file_name=file_name, datalayer=datalayer
-    )
+def download_file(datalayer: "DataLayer", presigned_url: str, file_name: str) -> str:
+    """Blocking :func:`adownload_file`."""
+    return unkoil(adownload_file, datalayer, presigned_url, file_name)

@@ -6,7 +6,7 @@ class KraphError(Exception):
 
 
 class NoKraphFound(KraphError):
-    """No rath client was found in context and none was passed."""
+    """A call on an object needs a client, and none was passed nor fetched the object."""
 
 
 class UnregisteredStructure(KraphError):

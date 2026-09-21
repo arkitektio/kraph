@@ -1,5 +1,5 @@
 {
-    "schema": "/tmp/claude-1000/-home-jhnnsrs-Code-packages-fakts/f10ff07e-7fed-4d14-aec5-5e64e6c8e62b/scratchpad/kraph-next.schema.graphql",
+    "schema": "http://jhnnsrs-lab/kraph/schema",
     "documents": "graphql/*/**.graphql",
     "extensions": {
         "turms": {
@@ -198,7 +198,11 @@
                     "type": "turms.plugins.operations.OperationsPlugin"
                 },
                 {
-                    "type": "turms.plugins.funcs.FuncsPlugin",
+                    "type": "turms.plugins.client.ClientPlugin",
+                    "client_class": "KraphApi",
+                    "reserved_from": [
+                        "kraph.kraph.Kraph"
+                    ],
                     "coercible_scalars": {
                         "ID": "rath.scalars.IDCoercible",
                         "CypherLiteral": "kraph.scalars.CypherLiteralCoercible",
@@ -207,42 +211,6 @@
                     },
                     "expand_input_types": [
                         "input"
-                    ],
-                    "global_kwargs": [
-                        {
-                            "type": "kraph.rath.KraphRath",
-                            "key": "rath",
-                            "description": "The mikro rath client"
-                        }
-                    ],
-                    "definitions": [
-                        {
-                            "type": "subscription",
-                            "is_async": true,
-                            "use": "kraph.funcs.asubscribe"
-                        },
-                        {
-                            "type": "query",
-                            "is_async": true,
-                            "use": "kraph.funcs.aexecute"
-                        },
-                        {
-                            "type": "mutation",
-                            "is_async": true,
-                            "use": "kraph.funcs.aexecute"
-                        },
-                        {
-                            "type": "subscription",
-                            "use": "kraph.funcs.subscribe"
-                        },
-                        {
-                            "type": "query",
-                            "use": "kraph.funcs.execute"
-                        },
-                        {
-                            "type": "mutation",
-                            "use": "kraph.funcs.execute"
-                        }
                     ]
                 }
             ],

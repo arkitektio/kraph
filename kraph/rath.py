@@ -1,9 +1,7 @@
 from types import TracebackType
-from typing import Optional
 from pydantic import Field
 from kraph.links.upload import UploadLink
 from rath import rath
-import contextvars
 
 from rath.links.auth import AuthTokenLink
 
@@ -11,10 +9,6 @@ from rath.links.compose import TypedComposedLink
 from rath.links.dictinglink import DictingLink
 from rath.links.shrink import ShrinkingLink
 from rath.links.split import SplitLink
-
-current_kraph_rath: contextvars.ContextVar[Optional["KraphRath"]] = (
-    contextvars.ContextVar("current_kraph_rath", default=None)
-)
 
 
 class KraphLinkComposition(TypedComposedLink):
@@ -33,8 +27,12 @@ class KraphRath(rath.Rath):
     """
 
     async def __aenter__(self):
+        """Enter the client.
+
+        Entering does not make it "the current client", and kraph never looks one up: calls go
+        through the :class:`kraph.kraph.Kraph` client that owns this rath.
+        """
         await super().__aenter__()
-        current_kraph_rath.set(self)
         return self
 
     async def __aexit__(
@@ -44,4 +42,3 @@ class KraphRath(rath.Rath):
         exc_tb: TracebackType | None,
     ) -> None:
         await super().__aexit__(exc_type, exc_val, exc_tb)
-        current_kraph_rath.set(None)

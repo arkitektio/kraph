@@ -53,12 +53,12 @@ def integration_ports() -> Generator[dict[str, int], None, None]:
     an unpublished port reads back as ``None`` and the test URLs would quietly
     become ``http://localhost:None`` instead of failing loudly.
     """
-    kraph_port, minio_port = _reserve_free_ports(2)
-    env = {"KRAPH_HOST_PORT": str(kraph_port), "MINIO_HOST_PORT": str(minio_port)}
+    kraph_port, rustfs_port = _reserve_free_ports(2)
+    env = {"KRAPH_HOST_PORT": str(kraph_port), "RUSTFS_HOST_PORT": str(rustfs_port)}
     previous = {key: os.environ.get(key) for key in env}
     os.environ.update(env)
     try:
-        yield {"kraph": kraph_port, "minio": minio_port}
+        yield {"kraph": kraph_port, "rustfs": rustfs_port}
     finally:
         for key, value in previous.items():
             if value is None:
@@ -78,7 +78,7 @@ class DeployedKraph:
 
     deployment: Deployment
     kraph_watcher: LogWatcher
-    minio_watcher: LogWatcher
+    rustfs_watcher: LogWatcher
     kraph: Kraph
 
 
@@ -99,22 +99,22 @@ def deployed_app(integration_ports: dict[str, int]) -> Generator[DeployedKraph, 
     )
 
     watcher = setup.create_watcher("kraph")
-    minio_watcher = setup.create_watcher("minio")
+    rustfs_watcher = setup.create_watcher("rustfs")
 
     with setup:
         setup.down()
         setup.pull()
         setup.inspect()
 
-        minio_url = f"http://localhost:{setup.spec.find_service('minio').get_port_for_internal(9000).published}"
+        rustfs_url = f"http://localhost:{setup.spec.find_service('rustfs').get_port_for_internal(9000).published}"
         http_url = f"http://localhost:{setup.spec.find_service('kraph').get_port_for_internal(80).published}/graphql"
         ws_url = f"ws://localhost:{setup.spec.find_service('kraph').get_port_for_internal(80).published}/graphql"
 
         datalayer = DataLayer(
-            endpoint_url=minio_url,
+            endpoint_url=rustfs_url,
         )
 
-        print(f"Minio URL: {minio_url}")
+        print(f"RustFS URL: {rustfs_url}")
         print(f"HTTP URL: {http_url}")
         print(f"WS URL: {ws_url}")
 
@@ -144,8 +144,14 @@ def deployed_app(integration_ports: dict[str, int]) -> Generator[DeployedKraph, 
             deployed = DeployedKraph(
                 deployment=setup,
                 kraph_watcher=watcher,
-                minio_watcher=minio_watcher,
+                rustfs_watcher=rustfs_watcher,
                 kraph=kraph,
             )
 
             yield deployed
+
+
+@pytest.fixture(scope="session")
+def kraph(deployed_app: DeployedKraph) -> Kraph:
+    """The deployment's client: every call in a test goes through it explicitly."""
+    return deployed_app.kraph

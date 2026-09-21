@@ -32,8 +32,8 @@ Example:
 """
 
 from types import TracebackType
+from fakts import Alias
 from koil.composition import KoiledModel
-from .vars import current_datalayer
 
 
 class DataLayer(KoiledModel):
@@ -53,11 +53,28 @@ class DataLayer(KoiledModel):
 
     endpoint_url: str = ""
 
+
+    @classmethod
+    def from_alias(cls, alias: "Alias") -> "DataLayer":
+        """Point a datalayer at a resolved address.
+
+        Args:
+            alias: Where the store is, resolved when the run connected.
+
+        Returns:
+            The datalayer, ready to use.
+        """
+        return cls(endpoint_url=alias.to_http_path())
+
     async def get_endpoint_url(self):
         return self.endpoint_url
 
     async def __aenter__(self):
-        current_datalayer.set(self)
+        """Enter the DataLayer context.
+
+        Entering does not make it "the current datalayer", and kraph never looks one up: downloads go
+        through the :class:`kraph.kraph.Kraph` client that owns this datalayer.
+        """
         return self
 
     async def __aexit__(
@@ -66,5 +83,4 @@ class DataLayer(KoiledModel):
         exc_val: BaseException | None,
         exc_tb: TracebackType | None,
     ) -> None:
-        current_datalayer.set(None)
         return None
