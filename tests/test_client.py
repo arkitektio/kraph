@@ -125,6 +125,38 @@ async def test_a_task_view_stamps_its_provenance_token() -> None:
     assert task.rath.headers == [{TASK_HEADER: "tok"}]
 
 
+@pytest.mark.asyncio
+async def test_the_ambient_task_is_stamped_without_a_view() -> None:
+    """One shared client attributes each call to whatever task is running."""
+    from types import SimpleNamespace
+
+    from rath.task import task_scope
+
+    shared = client()
+    await shared.aexecute(GetStore, {"id": "store-1"})
+    with task_scope(SimpleNamespace(token="tok")):
+        await shared.aexecute(GetStore, {"id": "store-1"})
+    await shared.aexecute(GetStore, {"id": "store-1"})
+
+    assert shared.rath.headers == [None, {TASK_HEADER: "tok"}, None]
+    assert shared.task_token is None, "the shared client is never changed"
+
+
+@pytest.mark.asyncio
+async def test_a_task_named_at_the_call_beats_the_ambient_one() -> None:
+    from types import SimpleNamespace
+
+    from rath.task import task_scope
+
+    shared = client()
+    with task_scope(SimpleNamespace(token="ambient")):
+        await shared.aexecute(
+            GetStore, {"id": "store-1"}, task=SimpleNamespace(token="explicit")
+        )
+
+    assert shared.rath.headers == [{TASK_HEADER: "explicit"}]
+
+
 # --------------------------------------------------------------------------- #
 # The client
 # --------------------------------------------------------------------------- #
