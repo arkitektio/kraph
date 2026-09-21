@@ -9,7 +9,7 @@ authors = [{ name = "jhnnsrs", email = "jhnnsrs@gmail.com" }]
 requires-python = ">=3.11, <4.0"
 license = "GPL-3.0-or-later"
 dependencies = [
-    "dokker>=2.3",
+    "dokker>=2.8",
     "rath>=4",
     "rekuest>=4",
     "websockets>=15.0.1",

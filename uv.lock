@@ -598,7 +598,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "dokker", specifier = ">=2.3" },
+    { name = "dokker", specifier = ">=2.8" },
     { name = "rath", specifier = ">=4" },
     { name = "rekuest", specifier = ">=4" },
     { name = "websockets", specifier = ">=15.0.1" },
