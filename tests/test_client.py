@@ -179,7 +179,10 @@ async def test_a_generated_method_calls_through_its_own_client(
 ) -> None:
     seen: list[Any] = []
 
-    async def fake_aexecute(self: Any, operation: Any, variables: Any) -> Any:
+    async def fake_aexecute(
+        self: Any, operation: Any, variables: Any, task: Any = None
+    ) -> Any:
+        # Every generated method forwards `task=`, so the delegate takes it.
         seen.append(self)
         return SimpleNamespace(graph="the graph")
 

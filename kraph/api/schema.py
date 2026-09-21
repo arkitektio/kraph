@@ -33,6 +33,7 @@ from kraph.traits import (
 )
 from pydantic import AliasChoices, BaseModel, ConfigDict, Field
 from rath.scalars import ID, IDCoercible
+from rath.task import TaskLike
 from typing import Annotated, Any, Iterable, Literal
 
 
@@ -441,17 +442,16 @@ class AssertNaturalEventExistsInput(BaseModel):
     term: str = Field(
         description="The organization's word for what is being claimed — a term's `key`, e.g. 'AIS'. Not a category id and not a graph: a claim names a word, and every view that declares that word will hold what you write. The word is created if the organization has not used it before; a view that declares no category for it simply will not draw it."
     )
-    inputs: Annotated[tuple["RoleMappingInput", ...] | None, GraphQLDefault("[]")] = (
-        Field(
-            default=None, description="List of entity IDs that are inputs to this event"
-        )
+    inputs: Annotated[
+        tuple["RoleMappingInput", ...] | None, GraphQLDefault("[]")
+    ] = Field(
+        default=None, description="List of entity IDs that are inputs to this event"
     )
     "List of entity IDs that are inputs to this event\nDefault: []"
-    outputs: Annotated[tuple["RoleMappingInput", ...] | None, GraphQLDefault("[]")] = (
-        Field(
-            default=None,
-            description="List of entity IDs that are outputs of this event",
-        )
+    outputs: Annotated[
+        tuple["RoleMappingInput", ...] | None, GraphQLDefault("[]")
+    ] = Field(
+        default=None, description="List of entity IDs that are outputs of this event"
     )
     "List of entity IDs that are outputs of this event\nDefault: []"
     supporting_evidence: Annotated[
@@ -540,17 +540,16 @@ class AssertProtocolEventExistsInput(BaseModel):
     term: str = Field(
         description="The organization's word for what is being claimed — a term's `key`, e.g. 'AIS'. Not a category id and not a graph: a claim names a word, and every view that declares that word will hold what you write. The word is created if the organization has not used it before; a view that declares no category for it simply will not draw it."
     )
-    inputs: Annotated[tuple["RoleMappingInput", ...] | None, GraphQLDefault("[]")] = (
-        Field(
-            default=None, description="List of entity IDs that are inputs to this event"
-        )
+    inputs: Annotated[
+        tuple["RoleMappingInput", ...] | None, GraphQLDefault("[]")
+    ] = Field(
+        default=None, description="List of entity IDs that are inputs to this event"
     )
     "List of entity IDs that are inputs to this event\nDefault: []"
-    outputs: Annotated[tuple["RoleMappingInput", ...] | None, GraphQLDefault("[]")] = (
-        Field(
-            default=None,
-            description="List of entity IDs that are outputs of this event",
-        )
+    outputs: Annotated[
+        tuple["RoleMappingInput", ...] | None, GraphQLDefault("[]")
+    ] = Field(
+        default=None, description="List of entity IDs that are outputs of this event"
     )
     "List of entity IDs that are outputs of this event\nDefault: []"
     supporting_evidence: Annotated[
@@ -1180,13 +1179,13 @@ class CreateNaturalEventCategoryInput(BaseModel):
     kind: EventKind = Field(
         description="Whether the event arises in the system itself (INTRINSIC, e.g. mitosis) or is applied from outside (EXTRINSIC, e.g. a protocol step)"
     )
-    inputs: Annotated[tuple["EventRoleInput", ...] | None, GraphQLDefault("[]")] = (
-        Field(default=None, description="Input node roles")
-    )
+    inputs: Annotated[
+        tuple["EventRoleInput", ...] | None, GraphQLDefault("[]")
+    ] = Field(default=None, description="Input node roles")
     "Input node roles\nDefault: []"
-    outputs: Annotated[tuple["EventRoleInput", ...] | None, GraphQLDefault("[]")] = (
-        Field(default=None, description="Output node roles")
-    )
+    outputs: Annotated[
+        tuple["EventRoleInput", ...] | None, GraphQLDefault("[]")
+    ] = Field(default=None, description="Output node roles")
     "Output node roles\nDefault: []"
     properties: Annotated[
         tuple["PropertyDefinitionInput", ...] | None, GraphQLDefault("[]")
@@ -1241,13 +1240,13 @@ class CreateProtocolEventCategoryInput(BaseModel):
     kind: EventKind = Field(
         description="Whether the event arises in the system itself (INTRINSIC, e.g. mitosis) or is applied from outside (EXTRINSIC, e.g. a protocol step)"
     )
-    inputs: Annotated[tuple["EventRoleInput", ...] | None, GraphQLDefault("[]")] = (
-        Field(default=None, description="Input node roles")
-    )
+    inputs: Annotated[
+        tuple["EventRoleInput", ...] | None, GraphQLDefault("[]")
+    ] = Field(default=None, description="Input node roles")
     "Input node roles\nDefault: []"
-    outputs: Annotated[tuple["EventRoleInput", ...] | None, GraphQLDefault("[]")] = (
-        Field(default=None, description="Output node roles")
-    )
+    outputs: Annotated[
+        tuple["EventRoleInput", ...] | None, GraphQLDefault("[]")
+    ] = Field(default=None, description="Output node roles")
     "Output node roles\nDefault: []"
     properties: Annotated[
         tuple["PropertyDefinitionInput", ...] | None, GraphQLDefault("[]")
@@ -1718,13 +1717,13 @@ class EventDefinitionInput(BaseModel):
     kind: EventKind = Field(
         description="Whether the event arises in the system itself (INTRINSIC, e.g. mitosis) or is applied from outside (EXTRINSIC, e.g. a protocol step)"
     )
-    inputs: Annotated[tuple["EventRoleInput", ...] | None, GraphQLDefault("[]")] = (
-        Field(default=None, description="Input node roles")
-    )
+    inputs: Annotated[
+        tuple["EventRoleInput", ...] | None, GraphQLDefault("[]")
+    ] = Field(default=None, description="Input node roles")
     "Input node roles\nDefault: []"
-    outputs: Annotated[tuple["EventRoleInput", ...] | None, GraphQLDefault("[]")] = (
-        Field(default=None, description="Output node roles")
-    )
+    outputs: Annotated[
+        tuple["EventRoleInput", ...] | None, GraphQLDefault("[]")
+    ] = Field(default=None, description="Output node roles")
     "Output node roles\nDefault: []"
     properties: Annotated[
         tuple["PropertyDefinitionInput", ...] | None, GraphQLDefault("[]")
@@ -1803,9 +1802,9 @@ class GraphExtensionsInput(BaseModel):
         tuple["MeasurementDefinitionInput", ...] | None, GraphQLDefault("[]")
     ] = Field(default=None, description="Measurement definitions")
     "Measurement definitions\nDefault: []"
-    events: Annotated[tuple[EventDefinitionInput, ...] | None, GraphQLDefault("[]")] = (
-        Field(default=None, description="Event definitions")
-    )
+    events: Annotated[
+        tuple[EventDefinitionInput, ...] | None, GraphQLDefault("[]")
+    ] = Field(default=None, description="Event definitions")
     "Event definitions\nDefault: []"
     model_config = ConfigDict(
         frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
@@ -4019,18 +4018,15 @@ class EdgeDrawing(BaseModel):
     )
     graph: EdgeDrawingGraph
     "The view this drawing belongs to"
-    category: (
-        Annotated[
-            EdgeDrawingCategoryBaseEntityCategory
-            | EdgeDrawingCategoryBaseMeasurementCategory
-            | EdgeDrawingCategoryBaseNaturalEventCategory
-            | EdgeDrawingCategoryBaseProtocolEventCategory
-            | EdgeDrawingCategoryBaseRelationCategory
-            | EdgeDrawingCategoryBaseStructureRelationCategory,
-            Field(discriminator="typename"),
-        ]
-        | EdgeDrawingCategoryBaseCatchAll
-    )
+    category: Annotated[
+        EdgeDrawingCategoryBaseEntityCategory
+        | EdgeDrawingCategoryBaseMeasurementCategory
+        | EdgeDrawingCategoryBaseNaturalEventCategory
+        | EdgeDrawingCategoryBaseProtocolEventCategory
+        | EdgeDrawingCategoryBaseRelationCategory
+        | EdgeDrawingCategoryBaseStructureRelationCategory,
+        Field(discriminator="typename"),
+    ] | EdgeDrawingCategoryBaseCatchAll
     "The category this view draws the claim under. A participation names the *event's* category, which is a node category — hence the base interface rather than EdgeCategory"
     model_config = ConfigDict(frozen=True)
 
@@ -4510,28 +4506,22 @@ class NodeDrawing(BaseModel):
     )
     graph: NodeDrawingGraph
     "The view this drawing belongs to"
-    category: (
-        Annotated[
-            NodeDrawingCategoryBaseEntityCategory
-            | NodeDrawingCategoryBaseMeasurementCategory
-            | NodeDrawingCategoryBaseNaturalEventCategory
-            | NodeDrawingCategoryBaseProtocolEventCategory
-            | NodeDrawingCategoryBaseRelationCategory
-            | NodeDrawingCategoryBaseStructureRelationCategory,
-            Field(discriminator="typename"),
-        ]
-        | NodeDrawingCategoryBaseCatchAll
-    )
+    category: Annotated[
+        NodeDrawingCategoryBaseEntityCategory
+        | NodeDrawingCategoryBaseMeasurementCategory
+        | NodeDrawingCategoryBaseNaturalEventCategory
+        | NodeDrawingCategoryBaseProtocolEventCategory
+        | NodeDrawingCategoryBaseRelationCategory
+        | NodeDrawingCategoryBaseStructureRelationCategory,
+        Field(discriminator="typename"),
+    ] | NodeDrawingCategoryBaseCatchAll
     "The category this view draws the claim under — what the word means here"
-    node: (
-        Annotated[
-            NodeDrawingNodeBaseEntity
-            | NodeDrawingNodeBaseNaturalEvent
-            | NodeDrawingNodeBaseProtocolEvent,
-            Field(discriminator="typename"),
-        ]
-        | NodeDrawingNodeBaseCatchAll
-    )
+    node: Annotated[
+        NodeDrawingNodeBaseEntity
+        | NodeDrawingNodeBaseNaturalEvent
+        | NodeDrawingNodeBaseProtocolEvent,
+        Field(discriminator="typename"),
+    ] | NodeDrawingNodeBaseCatchAll
     "The node as this view holds it, with the properties this view derives. Its graph and label are true here, which they cannot be on a result that stands for every view at once"
     model_config = ConfigDict(frozen=True)
 
@@ -6917,15 +6907,12 @@ class GetNodeQuery(BaseModel):
     """View-grain reads: these name their view, and refuse a node the view does not admit.
     `node(id, graph)` succeeds exactly when `nodes(graph:)` could list it."""
 
-    node: (
-        Annotated[
-            GetNodeQueryNodeBaseEntity
-            | GetNodeQueryNodeBaseNaturalEvent
-            | GetNodeQueryNodeBaseProtocolEvent,
-            Field(discriminator="typename"),
-        ]
-        | GetNodeQueryNodeBaseCatchAll
-    )
+    node: Annotated[
+        GetNodeQueryNodeBaseEntity
+        | GetNodeQueryNodeBaseNaturalEvent
+        | GetNodeQueryNodeBaseProtocolEvent,
+        Field(discriminator="typename"),
+    ] | GetNodeQueryNodeBaseCatchAll
     "Get a node by ID, as the named view holds it. Refused when that view does not admit the node; the claim itself is `instance(id:)`"
 
     class Arguments(BaseModel):
@@ -7246,6 +7233,7 @@ class KraphApi:
         pin: bool | None | UnsetType = UNSET,
         instance_kind: str | None | UnsetType = UNSET,
         definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> EntityCategory:
         """CreateEntityCategory
          A Category is one view's rule for a word: what it means HERE, how it is drawn, and which
@@ -7264,10 +7252,10 @@ class KraphApi:
             definition: What this category *means*: a predicate over classification claims (RFC 0007). Omitted means primitive — membership is whatever was asserted under this word
             graph: The graph id this entity will belong to
             backfill: Draw the evidence this word already admits. Claims made under it before this category existed are in the organization's evidence base; with this on they are projected into the graph now, instead of waiting for the next reproject. Off by default because the work is proportional to the graph's evidence and happens before this mutation returns.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            EntityCategory
-        """
+            EntityCategory"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["key"] = key
@@ -7291,7 +7279,7 @@ class KraphApi:
         _input["backfill"] = backfill
         variables["input"] = _input
         return (
-            await self.aexecute(CreateEntityCategoryMutation, variables)
+            await self.aexecute(CreateEntityCategoryMutation, variables, task=task)
         ).create_entity_category
 
     def create_entity_category(
@@ -7308,6 +7296,7 @@ class KraphApi:
         pin: bool | None | UnsetType = UNSET,
         instance_kind: str | None | UnsetType = UNSET,
         definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> EntityCategory:
         """CreateEntityCategory
          A Category is one view's rule for a word: what it means HERE, how it is drawn, and which
@@ -7326,10 +7315,10 @@ class KraphApi:
             definition: What this category *means*: a predicate over classification claims (RFC 0007). Omitted means primitive — membership is whatever was asserted under this word
             graph: The graph id this entity will belong to
             backfill: Draw the evidence this word already admits. Claims made under it before this category existed are in the organization's evidence base; with this on they are projected into the graph now, instead of waiting for the next reproject. Off by default because the work is proportional to the graph's evidence and happens before this mutation returns.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            EntityCategory
-        """
+            EntityCategory"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["key"] = key
@@ -7353,7 +7342,7 @@ class KraphApi:
         _input["backfill"] = backfill
         variables["input"] = _input
         return self.execute(
-            CreateEntityCategoryMutation, variables
+            CreateEntityCategoryMutation, variables, task=task
         ).create_entity_category
 
     async def aupdate_entity_category(
@@ -7362,18 +7351,19 @@ class KraphApi:
         clear_definition: bool,
         key: str | None | UnsetType = UNSET,
         description: str | None | UnsetType = UNSET,
-        ontology_references: (
-            Iterable[OntologyReferenceInput] | None | UnsetType
-        ) = UNSET,
+        ontology_references: Iterable[OntologyReferenceInput]
+        | None
+        | UnsetType = UNSET,
         color: Iterable[int] | None | UnsetType = UNSET,
         image: str | None | UnsetType = UNSET,
         label: str | None | UnsetType = UNSET,
         pin: bool | None | UnsetType = UNSET,
         instance_kind: str | None | UnsetType = UNSET,
-        property_definitions: (
-            Iterable[PropertyDefinitionInput] | None | UnsetType
-        ) = UNSET,
+        property_definitions: Iterable[PropertyDefinitionInput]
+        | None
+        | UnsetType = UNSET,
         definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> EntityCategory:
         """UpdateEntityCategory
 
@@ -7392,10 +7382,10 @@ class KraphApi:
             property_definitions: Property definitions
             definition: New meaning for this category (RFC 0007). Omitted means unchanged; to make the category primitive again, use clearDefinition
             clear_definition: Reset the category to primitive — membership becomes whatever was asserted under its word
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            EntityCategory
-        """
+            EntityCategory"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
@@ -7422,7 +7412,7 @@ class KraphApi:
         _input["clearDefinition"] = clear_definition
         variables["input"] = _input
         return (
-            await self.aexecute(UpdateEntityCategoryMutation, variables)
+            await self.aexecute(UpdateEntityCategoryMutation, variables, task=task)
         ).update_entity_category
 
     def update_entity_category(
@@ -7431,18 +7421,19 @@ class KraphApi:
         clear_definition: bool,
         key: str | None | UnsetType = UNSET,
         description: str | None | UnsetType = UNSET,
-        ontology_references: (
-            Iterable[OntologyReferenceInput] | None | UnsetType
-        ) = UNSET,
+        ontology_references: Iterable[OntologyReferenceInput]
+        | None
+        | UnsetType = UNSET,
         color: Iterable[int] | None | UnsetType = UNSET,
         image: str | None | UnsetType = UNSET,
         label: str | None | UnsetType = UNSET,
         pin: bool | None | UnsetType = UNSET,
         instance_kind: str | None | UnsetType = UNSET,
-        property_definitions: (
-            Iterable[PropertyDefinitionInput] | None | UnsetType
-        ) = UNSET,
+        property_definitions: Iterable[PropertyDefinitionInput]
+        | None
+        | UnsetType = UNSET,
         definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> EntityCategory:
         """UpdateEntityCategory
 
@@ -7461,10 +7452,10 @@ class KraphApi:
             property_definitions: Property definitions
             definition: New meaning for this category (RFC 0007). Omitted means unchanged; to make the category primitive again, use clearDefinition
             clear_definition: Reset the category to primitive — membership becomes whatever was asserted under its word
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            EntityCategory
-        """
+            EntityCategory"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
@@ -7491,45 +7482,49 @@ class KraphApi:
         _input["clearDefinition"] = clear_definition
         variables["input"] = _input
         return self.execute(
-            UpdateEntityCategoryMutation, variables
+            UpdateEntityCategoryMutation, variables, task=task
         ).update_entity_category
 
-    async def adelete_entity_category(self, id: IDCoercible) -> ID:
+    async def adelete_entity_category(
+        self, id: IDCoercible, task: TaskLike | None = None
+    ) -> ID:
         """DeleteEntityCategory
 
         Delete an entity category from the graph
 
         Args:
             id: The ID of the structure category to delete
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            ID
-        """
+            ID"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
         variables["input"] = _input
         return (
-            await self.aexecute(DeleteEntityCategoryMutation, variables)
+            await self.aexecute(DeleteEntityCategoryMutation, variables, task=task)
         ).delete_entity_category
 
-    def delete_entity_category(self, id: IDCoercible) -> ID:
+    def delete_entity_category(
+        self, id: IDCoercible, task: TaskLike | None = None
+    ) -> ID:
         """DeleteEntityCategory
 
         Delete an entity category from the graph
 
         Args:
             id: The ID of the structure category to delete
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            ID
-        """
+            ID"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
         variables["input"] = _input
         return self.execute(
-            DeleteEntityCategoryMutation, variables
+            DeleteEntityCategoryMutation, variables, task=task
         ).delete_entity_category
 
     async def acreate_relation_category(
@@ -7546,6 +7541,7 @@ class KraphApi:
         pin: bool | None | UnsetType = UNSET,
         instance_kind: str | None | UnsetType = UNSET,
         definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> RelationCategory:
         """CreateRelationCategory
 
@@ -7564,10 +7560,10 @@ class KraphApi:
             definition: What this category *means*: a predicate over classification claims (RFC 0007). Omitted means primitive — membership is whatever was asserted under this word
             graph: The graph id this entity will belong to
             backfill: Draw the evidence this word already admits. Claims made under it before this category existed are in the organization's evidence base; with this on they are projected into the graph now, instead of waiting for the next reproject. Off by default because the work is proportional to the graph's evidence and happens before this mutation returns.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            RelationCategory
-        """
+            RelationCategory"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["key"] = key
@@ -7591,7 +7587,7 @@ class KraphApi:
         _input["backfill"] = backfill
         variables["input"] = _input
         return (
-            await self.aexecute(CreateRelationCategoryMutation, variables)
+            await self.aexecute(CreateRelationCategoryMutation, variables, task=task)
         ).create_relation_category
 
     def create_relation_category(
@@ -7608,6 +7604,7 @@ class KraphApi:
         pin: bool | None | UnsetType = UNSET,
         instance_kind: str | None | UnsetType = UNSET,
         definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> RelationCategory:
         """CreateRelationCategory
 
@@ -7626,10 +7623,10 @@ class KraphApi:
             definition: What this category *means*: a predicate over classification claims (RFC 0007). Omitted means primitive — membership is whatever was asserted under this word
             graph: The graph id this entity will belong to
             backfill: Draw the evidence this word already admits. Claims made under it before this category existed are in the organization's evidence base; with this on they are projected into the graph now, instead of waiting for the next reproject. Off by default because the work is proportional to the graph's evidence and happens before this mutation returns.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            RelationCategory
-        """
+            RelationCategory"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["key"] = key
@@ -7653,7 +7650,7 @@ class KraphApi:
         _input["backfill"] = backfill
         variables["input"] = _input
         return self.execute(
-            CreateRelationCategoryMutation, variables
+            CreateRelationCategoryMutation, variables, task=task
         ).create_relation_category
 
     async def aupdate_relation_category(
@@ -7662,14 +7659,15 @@ class KraphApi:
         clear_definition: bool,
         key: str | None | UnsetType = UNSET,
         description: str | None | UnsetType = UNSET,
-        ontology_references: (
-            Iterable[OntologyReferenceInput] | None | UnsetType
-        ) = UNSET,
+        ontology_references: Iterable[OntologyReferenceInput]
+        | None
+        | UnsetType = UNSET,
         color: Iterable[int] | None | UnsetType = UNSET,
         image: str | None | UnsetType = UNSET,
         label: str | None | UnsetType = UNSET,
         pin: bool | None | UnsetType = UNSET,
         definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> RelationCategory:
         """UpdateRelationCategory
 
@@ -7686,10 +7684,10 @@ class KraphApi:
             pin: Whether to pin this node role in the UI
             definition: New rule for this category (RFC 0009). Omitted means unchanged; to make it primitive again, use clearDefinition
             clear_definition: Reset the category to primitive — any claim naming its word counts, standings organization grain
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            RelationCategory
-        """
+            RelationCategory"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
@@ -7712,7 +7710,7 @@ class KraphApi:
         _input["clearDefinition"] = clear_definition
         variables["input"] = _input
         return (
-            await self.aexecute(UpdateRelationCategoryMutation, variables)
+            await self.aexecute(UpdateRelationCategoryMutation, variables, task=task)
         ).update_relation_category
 
     def update_relation_category(
@@ -7721,14 +7719,15 @@ class KraphApi:
         clear_definition: bool,
         key: str | None | UnsetType = UNSET,
         description: str | None | UnsetType = UNSET,
-        ontology_references: (
-            Iterable[OntologyReferenceInput] | None | UnsetType
-        ) = UNSET,
+        ontology_references: Iterable[OntologyReferenceInput]
+        | None
+        | UnsetType = UNSET,
         color: Iterable[int] | None | UnsetType = UNSET,
         image: str | None | UnsetType = UNSET,
         label: str | None | UnsetType = UNSET,
         pin: bool | None | UnsetType = UNSET,
         definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> RelationCategory:
         """UpdateRelationCategory
 
@@ -7745,10 +7744,10 @@ class KraphApi:
             pin: Whether to pin this node role in the UI
             definition: New rule for this category (RFC 0009). Omitted means unchanged; to make it primitive again, use clearDefinition
             clear_definition: Reset the category to primitive — any claim naming its word counts, standings organization grain
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            RelationCategory
-        """
+            RelationCategory"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
@@ -7771,45 +7770,47 @@ class KraphApi:
         _input["clearDefinition"] = clear_definition
         variables["input"] = _input
         return self.execute(
-            UpdateRelationCategoryMutation, variables
+            UpdateRelationCategoryMutation, variables, task=task
         ).update_relation_category
 
-    async def adelete_relation_category(self, id: str) -> ID:
+    async def adelete_relation_category(
+        self, id: str, task: TaskLike | None = None
+    ) -> ID:
         """DeleteRelationCategory
 
         Delete a relation category from the graph
 
         Args:
             id: The ID of the relation category to delete
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            ID
-        """
+            ID"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
         variables["input"] = _input
         return (
-            await self.aexecute(DeleteRelationCategoryMutation, variables)
+            await self.aexecute(DeleteRelationCategoryMutation, variables, task=task)
         ).delete_relation_category
 
-    def delete_relation_category(self, id: str) -> ID:
+    def delete_relation_category(self, id: str, task: TaskLike | None = None) -> ID:
         """DeleteRelationCategory
 
         Delete a relation category from the graph
 
         Args:
             id: The ID of the relation category to delete
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            ID
-        """
+            ID"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
         variables["input"] = _input
         return self.execute(
-            DeleteRelationCategoryMutation, variables
+            DeleteRelationCategoryMutation, variables, task=task
         ).delete_relation_category
 
     async def acreate_measurement_category(
@@ -7827,6 +7828,7 @@ class KraphApi:
         label: str | None | UnsetType = UNSET,
         pin: bool | None | UnsetType = UNSET,
         definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> MeasurementCategory:
         """CreateMeasurementCategory
 
@@ -7846,10 +7848,10 @@ class KraphApi:
             properties: Derived property definitions
             definition: This measurement category's complete rule (RFC 0012): which measurement claims count and whose standings fold. Omitted means primitive
             graph: The graph id this measurement category will belong to
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            MeasurementCategory
-        """
+            MeasurementCategory"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["key"] = key
@@ -7873,7 +7875,7 @@ class KraphApi:
         _input["graph"] = graph
         variables["input"] = _input
         return (
-            await self.aexecute(CreateMeasurementCategoryMutation, variables)
+            await self.aexecute(CreateMeasurementCategoryMutation, variables, task=task)
         ).create_measurement_category
 
     def create_measurement_category(
@@ -7891,6 +7893,7 @@ class KraphApi:
         label: str | None | UnsetType = UNSET,
         pin: bool | None | UnsetType = UNSET,
         definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> MeasurementCategory:
         """CreateMeasurementCategory
 
@@ -7910,10 +7913,10 @@ class KraphApi:
             properties: Derived property definitions
             definition: This measurement category's complete rule (RFC 0012): which measurement claims count and whose standings fold. Omitted means primitive
             graph: The graph id this measurement category will belong to
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            MeasurementCategory
-        """
+            MeasurementCategory"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["key"] = key
@@ -7937,7 +7940,7 @@ class KraphApi:
         _input["graph"] = graph
         variables["input"] = _input
         return self.execute(
-            CreateMeasurementCategoryMutation, variables
+            CreateMeasurementCategoryMutation, variables, task=task
         ).create_measurement_category
 
     async def aupdate_measurement_category(
@@ -7946,14 +7949,15 @@ class KraphApi:
         clear_definition: bool,
         key: str | None | UnsetType = UNSET,
         description: str | None | UnsetType = UNSET,
-        ontology_references: (
-            Iterable[OntologyReferenceInput] | None | UnsetType
-        ) = UNSET,
+        ontology_references: Iterable[OntologyReferenceInput]
+        | None
+        | UnsetType = UNSET,
         color: Iterable[int] | None | UnsetType = UNSET,
         image: str | None | UnsetType = UNSET,
         label: str | None | UnsetType = UNSET,
         pin: bool | None | UnsetType = UNSET,
         definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> MeasurementCategory:
         """UpdateMeasurementCategory
 
@@ -7970,10 +7974,10 @@ class KraphApi:
             pin: Whether to pin this node role in the UI
             definition: New rule for this category (RFC 0012). Omitted means unchanged; to make it primitive again, use clearDefinition
             clear_definition: Reset the category to primitive — any claim naming its word counts, standings organization grain
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            MeasurementCategory
-        """
+            MeasurementCategory"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
@@ -7996,7 +8000,7 @@ class KraphApi:
         _input["clearDefinition"] = clear_definition
         variables["input"] = _input
         return (
-            await self.aexecute(UpdateMeasurementCategoryMutation, variables)
+            await self.aexecute(UpdateMeasurementCategoryMutation, variables, task=task)
         ).update_measurement_category
 
     def update_measurement_category(
@@ -8005,14 +8009,15 @@ class KraphApi:
         clear_definition: bool,
         key: str | None | UnsetType = UNSET,
         description: str | None | UnsetType = UNSET,
-        ontology_references: (
-            Iterable[OntologyReferenceInput] | None | UnsetType
-        ) = UNSET,
+        ontology_references: Iterable[OntologyReferenceInput]
+        | None
+        | UnsetType = UNSET,
         color: Iterable[int] | None | UnsetType = UNSET,
         image: str | None | UnsetType = UNSET,
         label: str | None | UnsetType = UNSET,
         pin: bool | None | UnsetType = UNSET,
         definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> MeasurementCategory:
         """UpdateMeasurementCategory
 
@@ -8029,10 +8034,10 @@ class KraphApi:
             pin: Whether to pin this node role in the UI
             definition: New rule for this category (RFC 0012). Omitted means unchanged; to make it primitive again, use clearDefinition
             clear_definition: Reset the category to primitive — any claim naming its word counts, standings organization grain
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            MeasurementCategory
-        """
+            MeasurementCategory"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
@@ -8055,45 +8060,47 @@ class KraphApi:
         _input["clearDefinition"] = clear_definition
         variables["input"] = _input
         return self.execute(
-            UpdateMeasurementCategoryMutation, variables
+            UpdateMeasurementCategoryMutation, variables, task=task
         ).update_measurement_category
 
-    async def adelete_measurement_category(self, id: str) -> ID:
+    async def adelete_measurement_category(
+        self, id: str, task: TaskLike | None = None
+    ) -> ID:
         """DeleteMeasurementCategory
 
         Delete a measurement category from the graph
 
         Args:
             id: The ID of the measurement category to delete
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            ID
-        """
+            ID"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
         variables["input"] = _input
         return (
-            await self.aexecute(DeleteMeasurementCategoryMutation, variables)
+            await self.aexecute(DeleteMeasurementCategoryMutation, variables, task=task)
         ).delete_measurement_category
 
-    def delete_measurement_category(self, id: str) -> ID:
+    def delete_measurement_category(self, id: str, task: TaskLike | None = None) -> ID:
         """DeleteMeasurementCategory
 
         Delete a measurement category from the graph
 
         Args:
             id: The ID of the measurement category to delete
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            ID
-        """
+            ID"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
         variables["input"] = _input
         return self.execute(
-            DeleteMeasurementCategoryMutation, variables
+            DeleteMeasurementCategoryMutation, variables, task=task
         ).delete_measurement_category
 
     async def acreate_structure_relation_category(
@@ -8111,6 +8118,7 @@ class KraphApi:
         label: str | None | UnsetType = UNSET,
         pin: bool | None | UnsetType = UNSET,
         definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> StructureRelationCategory:
         """CreateStructureRelationCategory
 
@@ -8130,10 +8138,10 @@ class KraphApi:
             cardinality: Relation cardinality
             definition: This structure-relation category's complete rule (RFC 0012): which structure-relation claims count — by word, annotator, app and window — and whose standings fold. Omitted means primitive
             graph: The graph id this entity will belong to
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            StructureRelationCategory
-        """
+            StructureRelationCategory"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["key"] = key
@@ -8157,7 +8165,9 @@ class KraphApi:
         _input["graph"] = graph
         variables["input"] = _input
         return (
-            await self.aexecute(CreateStructureRelationCategoryMutation, variables)
+            await self.aexecute(
+                CreateStructureRelationCategoryMutation, variables, task=task
+            )
         ).create_structure_relation_category
 
     def create_structure_relation_category(
@@ -8175,6 +8185,7 @@ class KraphApi:
         label: str | None | UnsetType = UNSET,
         pin: bool | None | UnsetType = UNSET,
         definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> StructureRelationCategory:
         """CreateStructureRelationCategory
 
@@ -8194,10 +8205,10 @@ class KraphApi:
             cardinality: Relation cardinality
             definition: This structure-relation category's complete rule (RFC 0012): which structure-relation claims count — by word, annotator, app and window — and whose standings fold. Omitted means primitive
             graph: The graph id this entity will belong to
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            StructureRelationCategory
-        """
+            StructureRelationCategory"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["key"] = key
@@ -8221,7 +8232,7 @@ class KraphApi:
         _input["graph"] = graph
         variables["input"] = _input
         return self.execute(
-            CreateStructureRelationCategoryMutation, variables
+            CreateStructureRelationCategoryMutation, variables, task=task
         ).create_structure_relation_category
 
     async def aupdate_structure_relation_category(
@@ -8230,14 +8241,15 @@ class KraphApi:
         clear_definition: bool,
         key: str | None | UnsetType = UNSET,
         description: str | None | UnsetType = UNSET,
-        ontology_references: (
-            Iterable[OntologyReferenceInput] | None | UnsetType
-        ) = UNSET,
+        ontology_references: Iterable[OntologyReferenceInput]
+        | None
+        | UnsetType = UNSET,
         color: Iterable[int] | None | UnsetType = UNSET,
         image: str | None | UnsetType = UNSET,
         label: str | None | UnsetType = UNSET,
         pin: bool | None | UnsetType = UNSET,
         definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> StructureRelationCategory:
         """UpdateStructureRelationCategory
 
@@ -8254,10 +8266,10 @@ class KraphApi:
             pin: Whether to pin this node role in the UI
             definition: New rule for this category (RFC 0012). Omitted means unchanged; to make it primitive again, use clearDefinition
             clear_definition: Reset the category to primitive — any claim naming its word counts, standings organization grain
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            StructureRelationCategory
-        """
+            StructureRelationCategory"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
@@ -8280,7 +8292,9 @@ class KraphApi:
         _input["clearDefinition"] = clear_definition
         variables["input"] = _input
         return (
-            await self.aexecute(UpdateStructureRelationCategoryMutation, variables)
+            await self.aexecute(
+                UpdateStructureRelationCategoryMutation, variables, task=task
+            )
         ).update_structure_relation_category
 
     def update_structure_relation_category(
@@ -8289,14 +8303,15 @@ class KraphApi:
         clear_definition: bool,
         key: str | None | UnsetType = UNSET,
         description: str | None | UnsetType = UNSET,
-        ontology_references: (
-            Iterable[OntologyReferenceInput] | None | UnsetType
-        ) = UNSET,
+        ontology_references: Iterable[OntologyReferenceInput]
+        | None
+        | UnsetType = UNSET,
         color: Iterable[int] | None | UnsetType = UNSET,
         image: str | None | UnsetType = UNSET,
         label: str | None | UnsetType = UNSET,
         pin: bool | None | UnsetType = UNSET,
         definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> StructureRelationCategory:
         """UpdateStructureRelationCategory
 
@@ -8313,10 +8328,10 @@ class KraphApi:
             pin: Whether to pin this node role in the UI
             definition: New rule for this category (RFC 0012). Omitted means unchanged; to make it primitive again, use clearDefinition
             clear_definition: Reset the category to primitive — any claim naming its word counts, standings organization grain
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            StructureRelationCategory
-        """
+            StructureRelationCategory"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
@@ -8339,45 +8354,51 @@ class KraphApi:
         _input["clearDefinition"] = clear_definition
         variables["input"] = _input
         return self.execute(
-            UpdateStructureRelationCategoryMutation, variables
+            UpdateStructureRelationCategoryMutation, variables, task=task
         ).update_structure_relation_category
 
-    async def adelete_structure_relation_category(self, id: str) -> ID:
+    async def adelete_structure_relation_category(
+        self, id: str, task: TaskLike | None = None
+    ) -> ID:
         """DeleteStructureRelationCategory
 
         Delete a structure relation category from the graph
 
         Args:
             id: The ID of the structure relation category to delete
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            ID
-        """
+            ID"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
         variables["input"] = _input
         return (
-            await self.aexecute(DeleteStructureRelationCategoryMutation, variables)
+            await self.aexecute(
+                DeleteStructureRelationCategoryMutation, variables, task=task
+            )
         ).delete_structure_relation_category
 
-    def delete_structure_relation_category(self, id: str) -> ID:
+    def delete_structure_relation_category(
+        self, id: str, task: TaskLike | None = None
+    ) -> ID:
         """DeleteStructureRelationCategory
 
         Delete a structure relation category from the graph
 
         Args:
             id: The ID of the structure relation category to delete
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            ID
-        """
+            ID"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
         variables["input"] = _input
         return self.execute(
-            DeleteStructureRelationCategoryMutation, variables
+            DeleteStructureRelationCategoryMutation, variables, task=task
         ).delete_structure_relation_category
 
     async def acreate_natural_event_category(
@@ -8396,6 +8417,7 @@ class KraphApi:
         label: str | None | UnsetType = UNSET,
         pin: bool | None | UnsetType = UNSET,
         definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> NaturalEventCategory:
         """CreateNaturalEventCategory
 
@@ -8416,10 +8438,10 @@ class KraphApi:
             definition: This event category's complete rule (RFC 0009): which classification claims admit an event, whose existence standings count, and whose participation claims draw its edges. Omitted means primitive
             graph: The graph id this event will belong to
             backfill: Draw the evidence this word already admits. Claims made under it before this category existed are in the organization's evidence base; with this on they are projected into the graph now, instead of waiting for the next reproject. Off by default because the work is proportional to the graph's evidence and happens before this mutation returns.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            NaturalEventCategory
-        """
+            NaturalEventCategory"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["key"] = key
@@ -8444,7 +8466,9 @@ class KraphApi:
         _input["backfill"] = backfill
         variables["input"] = _input
         return (
-            await self.aexecute(CreateNaturalEventCategoryMutation, variables)
+            await self.aexecute(
+                CreateNaturalEventCategoryMutation, variables, task=task
+            )
         ).create_natural_event_category
 
     def create_natural_event_category(
@@ -8463,6 +8487,7 @@ class KraphApi:
         label: str | None | UnsetType = UNSET,
         pin: bool | None | UnsetType = UNSET,
         definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> NaturalEventCategory:
         """CreateNaturalEventCategory
 
@@ -8483,10 +8508,10 @@ class KraphApi:
             definition: This event category's complete rule (RFC 0009): which classification claims admit an event, whose existence standings count, and whose participation claims draw its edges. Omitted means primitive
             graph: The graph id this event will belong to
             backfill: Draw the evidence this word already admits. Claims made under it before this category existed are in the organization's evidence base; with this on they are projected into the graph now, instead of waiting for the next reproject. Off by default because the work is proportional to the graph's evidence and happens before this mutation returns.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            NaturalEventCategory
-        """
+            NaturalEventCategory"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["key"] = key
@@ -8511,7 +8536,7 @@ class KraphApi:
         _input["backfill"] = backfill
         variables["input"] = _input
         return self.execute(
-            CreateNaturalEventCategoryMutation, variables
+            CreateNaturalEventCategoryMutation, variables, task=task
         ).create_natural_event_category
 
     async def aupdate_natural_event_category(
@@ -8520,14 +8545,15 @@ class KraphApi:
         clear_definition: bool,
         key: str | None | UnsetType = UNSET,
         description: str | None | UnsetType = UNSET,
-        ontology_references: (
-            Iterable[OntologyReferenceInput] | None | UnsetType
-        ) = UNSET,
+        ontology_references: Iterable[OntologyReferenceInput]
+        | None
+        | UnsetType = UNSET,
         color: Iterable[int] | None | UnsetType = UNSET,
         image: str | None | UnsetType = UNSET,
         label: str | None | UnsetType = UNSET,
         pin: bool | None | UnsetType = UNSET,
         definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> NaturalEventCategory:
         """UpdateNaturalEventCategory
 
@@ -8544,10 +8570,10 @@ class KraphApi:
             pin: Whether to pin this node role in the UI
             definition: New rule for this category (RFC 0009). Omitted means unchanged; to make it primitive again, use clearDefinition
             clear_definition: Reset the category to primitive — any claim naming its word counts, standings organization grain
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            NaturalEventCategory
-        """
+            NaturalEventCategory"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
@@ -8570,7 +8596,9 @@ class KraphApi:
         _input["clearDefinition"] = clear_definition
         variables["input"] = _input
         return (
-            await self.aexecute(UpdateNaturalEventCategoryMutation, variables)
+            await self.aexecute(
+                UpdateNaturalEventCategoryMutation, variables, task=task
+            )
         ).update_natural_event_category
 
     def update_natural_event_category(
@@ -8579,14 +8607,15 @@ class KraphApi:
         clear_definition: bool,
         key: str | None | UnsetType = UNSET,
         description: str | None | UnsetType = UNSET,
-        ontology_references: (
-            Iterable[OntologyReferenceInput] | None | UnsetType
-        ) = UNSET,
+        ontology_references: Iterable[OntologyReferenceInput]
+        | None
+        | UnsetType = UNSET,
         color: Iterable[int] | None | UnsetType = UNSET,
         image: str | None | UnsetType = UNSET,
         label: str | None | UnsetType = UNSET,
         pin: bool | None | UnsetType = UNSET,
         definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> NaturalEventCategory:
         """UpdateNaturalEventCategory
 
@@ -8603,10 +8632,10 @@ class KraphApi:
             pin: Whether to pin this node role in the UI
             definition: New rule for this category (RFC 0009). Omitted means unchanged; to make it primitive again, use clearDefinition
             clear_definition: Reset the category to primitive — any claim naming its word counts, standings organization grain
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            NaturalEventCategory
-        """
+            NaturalEventCategory"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
@@ -8629,45 +8658,51 @@ class KraphApi:
         _input["clearDefinition"] = clear_definition
         variables["input"] = _input
         return self.execute(
-            UpdateNaturalEventCategoryMutation, variables
+            UpdateNaturalEventCategoryMutation, variables, task=task
         ).update_natural_event_category
 
-    async def adelete_natural_event_category(self, id: str) -> ID:
+    async def adelete_natural_event_category(
+        self, id: str, task: TaskLike | None = None
+    ) -> ID:
         """DeleteNaturalEventCategory
 
         Delete a natural event category from the graph
 
         Args:
             id: The ID of the event category to delete
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            ID
-        """
+            ID"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
         variables["input"] = _input
         return (
-            await self.aexecute(DeleteNaturalEventCategoryMutation, variables)
+            await self.aexecute(
+                DeleteNaturalEventCategoryMutation, variables, task=task
+            )
         ).delete_natural_event_category
 
-    def delete_natural_event_category(self, id: str) -> ID:
+    def delete_natural_event_category(
+        self, id: str, task: TaskLike | None = None
+    ) -> ID:
         """DeleteNaturalEventCategory
 
         Delete a natural event category from the graph
 
         Args:
             id: The ID of the event category to delete
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            ID
-        """
+            ID"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
         variables["input"] = _input
         return self.execute(
-            DeleteNaturalEventCategoryMutation, variables
+            DeleteNaturalEventCategoryMutation, variables, task=task
         ).delete_natural_event_category
 
     async def acreate_protocol_event_category(
@@ -8687,6 +8722,7 @@ class KraphApi:
         label: str | None | UnsetType = UNSET,
         pin: bool | None | UnsetType = UNSET,
         definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> ProtocolEventCategory:
         """CreateProtocolEventCategory
 
@@ -8708,10 +8744,10 @@ class KraphApi:
             protocol: The protocol this event definition belongs to
             graph: The graph id this event will belong to
             backfill: Draw the evidence this word already admits. Claims made under it before this category existed are in the organization's evidence base; with this on they are projected into the graph now, instead of waiting for the next reproject. Off by default because the work is proportional to the graph's evidence and happens before this mutation returns.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            ProtocolEventCategory
-        """
+            ProtocolEventCategory"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["key"] = key
@@ -8737,7 +8773,9 @@ class KraphApi:
         _input["backfill"] = backfill
         variables["input"] = _input
         return (
-            await self.aexecute(CreateProtocolEventCategoryMutation, variables)
+            await self.aexecute(
+                CreateProtocolEventCategoryMutation, variables, task=task
+            )
         ).create_protocol_event_category
 
     def create_protocol_event_category(
@@ -8757,6 +8795,7 @@ class KraphApi:
         label: str | None | UnsetType = UNSET,
         pin: bool | None | UnsetType = UNSET,
         definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> ProtocolEventCategory:
         """CreateProtocolEventCategory
 
@@ -8778,10 +8817,10 @@ class KraphApi:
             protocol: The protocol this event definition belongs to
             graph: The graph id this event will belong to
             backfill: Draw the evidence this word already admits. Claims made under it before this category existed are in the organization's evidence base; with this on they are projected into the graph now, instead of waiting for the next reproject. Off by default because the work is proportional to the graph's evidence and happens before this mutation returns.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            ProtocolEventCategory
-        """
+            ProtocolEventCategory"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["key"] = key
@@ -8807,7 +8846,7 @@ class KraphApi:
         _input["backfill"] = backfill
         variables["input"] = _input
         return self.execute(
-            CreateProtocolEventCategoryMutation, variables
+            CreateProtocolEventCategoryMutation, variables, task=task
         ).create_protocol_event_category
 
     async def aupdate_protocol_event_category(
@@ -8816,14 +8855,15 @@ class KraphApi:
         clear_definition: bool,
         key: str | None | UnsetType = UNSET,
         description: str | None | UnsetType = UNSET,
-        ontology_references: (
-            Iterable[OntologyReferenceInput] | None | UnsetType
-        ) = UNSET,
+        ontology_references: Iterable[OntologyReferenceInput]
+        | None
+        | UnsetType = UNSET,
         color: Iterable[int] | None | UnsetType = UNSET,
         image: str | None | UnsetType = UNSET,
         label: str | None | UnsetType = UNSET,
         pin: bool | None | UnsetType = UNSET,
         definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> ProtocolEventCategory:
         """UpdateProtocolEventCategory
 
@@ -8840,10 +8880,10 @@ class KraphApi:
             pin: Whether to pin this node role in the UI
             definition: New rule for this category (RFC 0012). Omitted means unchanged; to make it primitive again, use clearDefinition
             clear_definition: Reset the category to primitive — any claim naming its word counts, standings organization grain
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            ProtocolEventCategory
-        """
+            ProtocolEventCategory"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
@@ -8866,7 +8906,9 @@ class KraphApi:
         _input["clearDefinition"] = clear_definition
         variables["input"] = _input
         return (
-            await self.aexecute(UpdateProtocolEventCategoryMutation, variables)
+            await self.aexecute(
+                UpdateProtocolEventCategoryMutation, variables, task=task
+            )
         ).update_protocol_event_category
 
     def update_protocol_event_category(
@@ -8875,14 +8917,15 @@ class KraphApi:
         clear_definition: bool,
         key: str | None | UnsetType = UNSET,
         description: str | None | UnsetType = UNSET,
-        ontology_references: (
-            Iterable[OntologyReferenceInput] | None | UnsetType
-        ) = UNSET,
+        ontology_references: Iterable[OntologyReferenceInput]
+        | None
+        | UnsetType = UNSET,
         color: Iterable[int] | None | UnsetType = UNSET,
         image: str | None | UnsetType = UNSET,
         label: str | None | UnsetType = UNSET,
         pin: bool | None | UnsetType = UNSET,
         definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> ProtocolEventCategory:
         """UpdateProtocolEventCategory
 
@@ -8899,10 +8942,10 @@ class KraphApi:
             pin: Whether to pin this node role in the UI
             definition: New rule for this category (RFC 0012). Omitted means unchanged; to make it primitive again, use clearDefinition
             clear_definition: Reset the category to primitive — any claim naming its word counts, standings organization grain
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            ProtocolEventCategory
-        """
+            ProtocolEventCategory"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
@@ -8925,45 +8968,51 @@ class KraphApi:
         _input["clearDefinition"] = clear_definition
         variables["input"] = _input
         return self.execute(
-            UpdateProtocolEventCategoryMutation, variables
+            UpdateProtocolEventCategoryMutation, variables, task=task
         ).update_protocol_event_category
 
-    async def adelete_protocol_event_category(self, id: str) -> ID:
+    async def adelete_protocol_event_category(
+        self, id: str, task: TaskLike | None = None
+    ) -> ID:
         """DeleteProtocolEventCategory
 
         Delete a protocol event category from the graph
 
         Args:
             id: The ID of the event category to delete
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            ID
-        """
+            ID"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
         variables["input"] = _input
         return (
-            await self.aexecute(DeleteProtocolEventCategoryMutation, variables)
+            await self.aexecute(
+                DeleteProtocolEventCategoryMutation, variables, task=task
+            )
         ).delete_protocol_event_category
 
-    def delete_protocol_event_category(self, id: str) -> ID:
+    def delete_protocol_event_category(
+        self, id: str, task: TaskLike | None = None
+    ) -> ID:
         """DeleteProtocolEventCategory
 
         Delete a protocol event category from the graph
 
         Args:
             id: The ID of the event category to delete
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            ID
-        """
+            ID"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
         variables["input"] = _input
         return self.execute(
-            DeleteProtocolEventCategoryMutation, variables
+            DeleteProtocolEventCategoryMutation, variables, task=task
         ).delete_protocol_event_category
 
     async def aassert_entity_exists(
@@ -8974,6 +9023,7 @@ class KraphApi:
         same_as: Iterable[str],
         observed_at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> AssertedEntity:
         """AssertEntityExists
          ---- existence: instances -----------------------------------------------------------------
@@ -8986,10 +9036,10 @@ class KraphApi:
             confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
             derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
             same_as: Instances this new one is the same as. Saying "this is AIS 6" mints a fresh instance and claims it is the same as the one already known as AIS 6 — all under **one assertion**, because it is one act. Sameness is an equivalence with no primary, so which id you send is immaterial; entities only, never structures.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            AssertedEntity
-        """
+            AssertedEntity"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["term"] = term
@@ -9002,7 +9052,7 @@ class KraphApi:
         _input["sameAs"] = same_as
         variables["input"] = _input
         return (
-            await self.aexecute(AssertEntityExistsMutation, variables)
+            await self.aexecute(AssertEntityExistsMutation, variables, task=task)
         ).assert_entity_exists
 
     def assert_entity_exists(
@@ -9013,6 +9063,7 @@ class KraphApi:
         same_as: Iterable[str],
         observed_at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> AssertedEntity:
         """AssertEntityExists
          ---- existence: instances -----------------------------------------------------------------
@@ -9025,10 +9076,10 @@ class KraphApi:
             confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
             derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
             same_as: Instances this new one is the same as. Saying "this is AIS 6" mints a fresh instance and claims it is the same as the one already known as AIS 6 — all under **one assertion**, because it is one act. Sameness is an equivalence with no primary, so which id you send is immaterial; entities only, never structures.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            AssertedEntity
-        """
+            AssertedEntity"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["term"] = term
@@ -9040,7 +9091,9 @@ class KraphApi:
         _input["derivedFrom"] = derived_from
         _input["sameAs"] = same_as
         variables["input"] = _input
-        return self.execute(AssertEntityExistsMutation, variables).assert_entity_exists
+        return self.execute(
+            AssertEntityExistsMutation, variables, task=task
+        ).assert_entity_exists
 
     async def aassert_natural_event_exists(
         self,
@@ -9051,6 +9104,7 @@ class KraphApi:
         derived_from: Iterable[str],
         observed_at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> AssertedNaturalEvent:
         """AssertNaturalEventExists
 
@@ -9064,10 +9118,10 @@ class KraphApi:
             observed_at: When the world was in this state — world time, the axis a scientist means by 'when'. Distinct from when it is claimed, which the assertion records; left unset, the two are equal. A point, not an interval: a duration is a metric.
             confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
             derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            AssertedNaturalEvent
-        """
+            AssertedNaturalEvent"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["term"] = term
@@ -9081,7 +9135,7 @@ class KraphApi:
         _input["derivedFrom"] = derived_from
         variables["input"] = _input
         return (
-            await self.aexecute(AssertNaturalEventExistsMutation, variables)
+            await self.aexecute(AssertNaturalEventExistsMutation, variables, task=task)
         ).assert_natural_event_exists
 
     def assert_natural_event_exists(
@@ -9093,6 +9147,7 @@ class KraphApi:
         derived_from: Iterable[str],
         observed_at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> AssertedNaturalEvent:
         """AssertNaturalEventExists
 
@@ -9106,10 +9161,10 @@ class KraphApi:
             observed_at: When the world was in this state — world time, the axis a scientist means by 'when'. Distinct from when it is claimed, which the assertion records; left unset, the two are equal. A point, not an interval: a duration is a metric.
             confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
             derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            AssertedNaturalEvent
-        """
+            AssertedNaturalEvent"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["term"] = term
@@ -9123,7 +9178,7 @@ class KraphApi:
         _input["derivedFrom"] = derived_from
         variables["input"] = _input
         return self.execute(
-            AssertNaturalEventExistsMutation, variables
+            AssertNaturalEventExistsMutation, variables, task=task
         ).assert_natural_event_exists
 
     async def aassert_protocol_event_exists(
@@ -9135,6 +9190,7 @@ class KraphApi:
         derived_from: Iterable[str],
         observed_at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> AssertedProtocolEvent:
         """AssertProtocolEventExists
 
@@ -9148,10 +9204,10 @@ class KraphApi:
             observed_at: When the world was in this state — world time, the axis a scientist means by 'when'. Distinct from when it is claimed, which the assertion records; left unset, the two are equal. A point, not an interval: a duration is a metric.
             confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
             derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            AssertedProtocolEvent
-        """
+            AssertedProtocolEvent"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["term"] = term
@@ -9165,7 +9221,7 @@ class KraphApi:
         _input["derivedFrom"] = derived_from
         variables["input"] = _input
         return (
-            await self.aexecute(AssertProtocolEventExistsMutation, variables)
+            await self.aexecute(AssertProtocolEventExistsMutation, variables, task=task)
         ).assert_protocol_event_exists
 
     def assert_protocol_event_exists(
@@ -9177,6 +9233,7 @@ class KraphApi:
         derived_from: Iterable[str],
         observed_at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> AssertedProtocolEvent:
         """AssertProtocolEventExists
 
@@ -9190,10 +9247,10 @@ class KraphApi:
             observed_at: When the world was in this state — world time, the axis a scientist means by 'when'. Distinct from when it is claimed, which the assertion records; left unset, the two are equal. A point, not an interval: a duration is a metric.
             confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
             derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            AssertedProtocolEvent
-        """
+            AssertedProtocolEvent"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["term"] = term
@@ -9207,44 +9264,50 @@ class KraphApi:
         _input["derivedFrom"] = derived_from
         variables["input"] = _input
         return self.execute(
-            AssertProtocolEventExistsMutation, variables
+            AssertProtocolEventExistsMutation, variables, task=task
         ).assert_protocol_event_exists
 
     async def aclassify_nodes(
-        self, classifications: Iterable[ClassificationInput]
+        self,
+        classifications: Iterable[ClassificationInput],
+        task: TaskLike | None = None,
     ) -> AssertedInstances:
         """ClassifyNodes
          One assertion over many (node, term) pairs — a batch is one act.
 
         Args:
             classifications: The claims to record
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            AssertedInstances
-        """
+            AssertedInstances"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["classifications"] = classifications
         variables["input"] = _input
-        return (await self.aexecute(ClassifyNodesMutation, variables)).classify_nodes
+        return (
+            await self.aexecute(ClassifyNodesMutation, variables, task=task)
+        ).classify_nodes
 
     def classify_nodes(
-        self, classifications: Iterable[ClassificationInput]
+        self,
+        classifications: Iterable[ClassificationInput],
+        task: TaskLike | None = None,
     ) -> AssertedInstances:
         """ClassifyNodes
          One assertion over many (node, term) pairs — a batch is one act.
 
         Args:
             classifications: The claims to record
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            AssertedInstances
-        """
+            AssertedInstances"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["classifications"] = classifications
         variables["input"] = _input
-        return self.execute(ClassifyNodesMutation, variables).classify_nodes
+        return self.execute(ClassifyNodesMutation, variables, task=task).classify_nodes
 
     async def aassert_same_instance(
         self,
@@ -9252,6 +9315,7 @@ class KraphApi:
         derived_from: Iterable[str],
         observed_at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> AssertedSameness:
         """AssertSameInstance
 
@@ -9262,10 +9326,10 @@ class KraphApi:
             observed_at: When the world was in this state — world time, the axis a scientist means by 'when'. Distinct from when it is claimed, which the assertion records; left unset, the two are equal. A point, not an interval: a duration is a metric.
             confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
             derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            AssertedSameness
-        """
+            AssertedSameness"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["instances"] = instances
@@ -9276,7 +9340,7 @@ class KraphApi:
         _input["derivedFrom"] = derived_from
         variables["input"] = _input
         return (
-            await self.aexecute(AssertSameInstanceMutation, variables)
+            await self.aexecute(AssertSameInstanceMutation, variables, task=task)
         ).assert_same_instance
 
     def assert_same_instance(
@@ -9285,6 +9349,7 @@ class KraphApi:
         derived_from: Iterable[str],
         observed_at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> AssertedSameness:
         """AssertSameInstance
 
@@ -9295,10 +9360,10 @@ class KraphApi:
             observed_at: When the world was in this state — world time, the axis a scientist means by 'when'. Distinct from when it is claimed, which the assertion records; left unset, the two are equal. A point, not an interval: a duration is a metric.
             confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
             derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            AssertedSameness
-        """
+            AssertedSameness"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["instances"] = instances
@@ -9308,7 +9373,9 @@ class KraphApi:
             _input["confidence"] = confidence
         _input["derivedFrom"] = derived_from
         variables["input"] = _input
-        return self.execute(AssertSameInstanceMutation, variables).assert_same_instance
+        return self.execute(
+            AssertSameInstanceMutation, variables, task=task
+        ).assert_same_instance
 
     async def aassert_structure_exists(
         self,
@@ -9318,6 +9385,7 @@ class KraphApi:
         identifier: str,
         observed_at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> AssertedStructure:
         """AssertStructureExists
          ---- structures and metrics ---------------------------------------------------------------
@@ -9329,10 +9397,10 @@ class KraphApi:
             identifier: The structure identifier, e.g. '@mikro/roi'
             observed_at: When the world was in this state — world time, the axis a scientist means by 'when'. Distinct from when it is claimed, which the assertion records; left unset, the two are equal. A point, not an interval: a duration is a metric.
             confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            AssertedStructure
-        """
+            AssertedStructure"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["object"] = object
@@ -9345,7 +9413,7 @@ class KraphApi:
             _input["confidence"] = confidence
         variables["input"] = _input
         return (
-            await self.aexecute(AssertStructureExistsMutation, variables)
+            await self.aexecute(AssertStructureExistsMutation, variables, task=task)
         ).assert_structure_exists
 
     def assert_structure_exists(
@@ -9356,6 +9424,7 @@ class KraphApi:
         identifier: str,
         observed_at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> AssertedStructure:
         """AssertStructureExists
          ---- structures and metrics ---------------------------------------------------------------
@@ -9367,10 +9436,10 @@ class KraphApi:
             identifier: The structure identifier, e.g. '@mikro/roi'
             observed_at: When the world was in this state — world time, the axis a scientist means by 'when'. Distinct from when it is claimed, which the assertion records; left unset, the two are equal. A point, not an interval: a duration is a metric.
             confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            AssertedStructure
-        """
+            AssertedStructure"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["object"] = object
@@ -9383,7 +9452,7 @@ class KraphApi:
             _input["confidence"] = confidence
         variables["input"] = _input
         return self.execute(
-            AssertStructureExistsMutation, variables
+            AssertStructureExistsMutation, variables, task=task
         ).assert_structure_exists
 
     async def aassert_metric_value(
@@ -9398,6 +9467,7 @@ class KraphApi:
         confidence_type: str | None | UnsetType = UNSET,
         unit: str | None | UnsetType = UNSET,
         observed_at: datetime | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> AssertedMetric:
         """AssertMetricValue
 
@@ -9414,10 +9484,10 @@ class KraphApi:
             derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
             identifier: The schema identifier for this metric (e.g. '@mikro/roi_volume')
             object: The unique ID of the object this metric references
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            AssertedMetric
-        """
+            AssertedMetric"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["key"] = key
@@ -9436,7 +9506,7 @@ class KraphApi:
         _input["object"] = object
         variables["input"] = _input
         return (
-            await self.aexecute(AssertMetricValueMutation, variables)
+            await self.aexecute(AssertMetricValueMutation, variables, task=task)
         ).assert_metric_value
 
     def assert_metric_value(
@@ -9451,6 +9521,7 @@ class KraphApi:
         confidence_type: str | None | UnsetType = UNSET,
         unit: str | None | UnsetType = UNSET,
         observed_at: datetime | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> AssertedMetric:
         """AssertMetricValue
 
@@ -9467,10 +9538,10 @@ class KraphApi:
             derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
             identifier: The schema identifier for this metric (e.g. '@mikro/roi_volume')
             object: The unique ID of the object this metric references
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            AssertedMetric
-        """
+            AssertedMetric"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["key"] = key
@@ -9488,7 +9559,9 @@ class KraphApi:
         _input["identifier"] = identifier
         _input["object"] = object
         variables["input"] = _input
-        return self.execute(AssertMetricValueMutation, variables).assert_metric_value
+        return self.execute(
+            AssertMetricValueMutation, variables, task=task
+        ).assert_metric_value
 
     async def aassert_metric_value_for_structure(
         self,
@@ -9501,6 +9574,7 @@ class KraphApi:
         confidence_type: str | None | UnsetType = UNSET,
         unit: str | None | UnsetType = UNSET,
         observed_at: datetime | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> AssertedMetric:
         """AssertMetricValueForStructure
 
@@ -9516,10 +9590,10 @@ class KraphApi:
             observed_at: When the world was observed. Defaults to when it was claimed.
             derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
             structure: The unique ID of the structure this metric is associated with
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            AssertedMetric
-        """
+            AssertedMetric"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["key"] = key
@@ -9537,7 +9611,9 @@ class KraphApi:
         _input["structure"] = structure
         variables["input"] = _input
         return (
-            await self.aexecute(AssertMetricValueForStructureMutation, variables)
+            await self.aexecute(
+                AssertMetricValueForStructureMutation, variables, task=task
+            )
         ).assert_metric_value_for_structure
 
     def assert_metric_value_for_structure(
@@ -9551,6 +9627,7 @@ class KraphApi:
         confidence_type: str | None | UnsetType = UNSET,
         unit: str | None | UnsetType = UNSET,
         observed_at: datetime | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> AssertedMetric:
         """AssertMetricValueForStructure
 
@@ -9566,10 +9643,10 @@ class KraphApi:
             observed_at: When the world was observed. Defaults to when it was claimed.
             derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
             structure: The unique ID of the structure this metric is associated with
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            AssertedMetric
-        """
+            AssertedMetric"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["key"] = key
@@ -9587,7 +9664,7 @@ class KraphApi:
         _input["structure"] = structure
         variables["input"] = _input
         return self.execute(
-            AssertMetricValueForStructureMutation, variables
+            AssertMetricValueForStructureMutation, variables, task=task
         ).assert_metric_value_for_structure
 
     async def asupersede_metric_value(
@@ -9601,6 +9678,7 @@ class KraphApi:
         confidence_type: str | None | UnsetType = UNSET,
         unit: str | None | UnsetType = UNSET,
         observed_at: datetime | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> AssertedMetric:
         """SupersedeMetricValue
          Retracting Standing + the new Metric under ONE assertion. Returns a metric with a NEW id.
@@ -9615,10 +9693,10 @@ class KraphApi:
             observed_at: When the world was observed. Defaults to when it was claimed.
             derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
             id: The ID of the metric to update
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            AssertedMetric
-        """
+            AssertedMetric"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["key"] = key
@@ -9636,7 +9714,7 @@ class KraphApi:
         _input["id"] = id
         variables["input"] = _input
         return (
-            await self.aexecute(SupersedeMetricValueMutation, variables)
+            await self.aexecute(SupersedeMetricValueMutation, variables, task=task)
         ).supersede_metric_value
 
     def supersede_metric_value(
@@ -9650,6 +9728,7 @@ class KraphApi:
         confidence_type: str | None | UnsetType = UNSET,
         unit: str | None | UnsetType = UNSET,
         observed_at: datetime | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> AssertedMetric:
         """SupersedeMetricValue
          Retracting Standing + the new Metric under ONE assertion. Returns a metric with a NEW id.
@@ -9664,10 +9743,10 @@ class KraphApi:
             observed_at: When the world was observed. Defaults to when it was claimed.
             derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
             id: The ID of the metric to update
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            AssertedMetric
-        """
+            AssertedMetric"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["key"] = key
@@ -9685,7 +9764,7 @@ class KraphApi:
         _input["id"] = id
         variables["input"] = _input
         return self.execute(
-            SupersedeMetricValueMutation, variables
+            SupersedeMetricValueMutation, variables, task=task
         ).supersede_metric_value
 
     async def aassert_relation_exists(
@@ -9697,6 +9776,7 @@ class KraphApi:
         term: str,
         observed_at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> AssertedRelation:
         """AssertRelationExists
          ---- links ---------------------------------------------------------------------------------
@@ -9709,10 +9789,10 @@ class KraphApi:
             confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
             derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
             term: The organization's word for what is being claimed — a term's `key`, e.g. 'AIS'. Not a category id and not a graph: a claim names a word, and every view that declares that word will hold what you write. The word is created if the organization has not used it before; a view that declares no category for it simply will not draw it.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            AssertedRelation
-        """
+            AssertedRelation"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["sourceId"] = source_id
@@ -9726,7 +9806,7 @@ class KraphApi:
         _input["term"] = term
         variables["input"] = _input
         return (
-            await self.aexecute(AssertRelationExistsMutation, variables)
+            await self.aexecute(AssertRelationExistsMutation, variables, task=task)
         ).assert_relation_exists
 
     def assert_relation_exists(
@@ -9738,6 +9818,7 @@ class KraphApi:
         term: str,
         observed_at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> AssertedRelation:
         """AssertRelationExists
          ---- links ---------------------------------------------------------------------------------
@@ -9750,10 +9831,10 @@ class KraphApi:
             confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
             derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
             term: The organization's word for what is being claimed — a term's `key`, e.g. 'AIS'. Not a category id and not a graph: a claim names a word, and every view that declares that word will hold what you write. The word is created if the organization has not used it before; a view that declares no category for it simply will not draw it.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            AssertedRelation
-        """
+            AssertedRelation"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["sourceId"] = source_id
@@ -9767,7 +9848,7 @@ class KraphApi:
         _input["term"] = term
         variables["input"] = _input
         return self.execute(
-            AssertRelationExistsMutation, variables
+            AssertRelationExistsMutation, variables, task=task
         ).assert_relation_exists
 
     async def aassert_measurement_exists(
@@ -9779,6 +9860,7 @@ class KraphApi:
         term: str,
         observed_at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> AssertedMeasurement:
         """AssertMeasurementExists
 
@@ -9792,10 +9874,10 @@ class KraphApi:
             confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
             derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
             term: The organization's word for what is being claimed — a term's `key`, e.g. 'AIS'. Not a category id and not a graph: a claim names a word, and every view that declares that word will hold what you write. The word is created if the organization has not used it before; a view that declares no category for it simply will not draw it.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            AssertedMeasurement
-        """
+            AssertedMeasurement"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["sourceId"] = source_id
@@ -9809,7 +9891,7 @@ class KraphApi:
         _input["term"] = term
         variables["input"] = _input
         return (
-            await self.aexecute(AssertMeasurementExistsMutation, variables)
+            await self.aexecute(AssertMeasurementExistsMutation, variables, task=task)
         ).assert_measurement_exists
 
     def assert_measurement_exists(
@@ -9821,6 +9903,7 @@ class KraphApi:
         term: str,
         observed_at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> AssertedMeasurement:
         """AssertMeasurementExists
 
@@ -9834,10 +9917,10 @@ class KraphApi:
             confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
             derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
             term: The organization's word for what is being claimed — a term's `key`, e.g. 'AIS'. Not a category id and not a graph: a claim names a word, and every view that declares that word will hold what you write. The word is created if the organization has not used it before; a view that declares no category for it simply will not draw it.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            AssertedMeasurement
-        """
+            AssertedMeasurement"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["sourceId"] = source_id
@@ -9851,7 +9934,7 @@ class KraphApi:
         _input["term"] = term
         variables["input"] = _input
         return self.execute(
-            AssertMeasurementExistsMutation, variables
+            AssertMeasurementExistsMutation, variables, task=task
         ).assert_measurement_exists
 
     async def aassert_structure_relation_exists(
@@ -9863,6 +9946,7 @@ class KraphApi:
         term: str,
         observed_at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> AssertedStructureRelation:
         """AssertStructureRelationExists
 
@@ -9876,10 +9960,10 @@ class KraphApi:
             confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
             derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
             term: The organization's word for what is being claimed — a term's `key`, e.g. 'AIS'. Not a category id and not a graph: a claim names a word, and every view that declares that word will hold what you write. The word is created if the organization has not used it before; a view that declares no category for it simply will not draw it.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            AssertedStructureRelation
-        """
+            AssertedStructureRelation"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["sourceId"] = source_id
@@ -9893,7 +9977,9 @@ class KraphApi:
         _input["term"] = term
         variables["input"] = _input
         return (
-            await self.aexecute(AssertStructureRelationExistsMutation, variables)
+            await self.aexecute(
+                AssertStructureRelationExistsMutation, variables, task=task
+            )
         ).assert_structure_relation_exists
 
     def assert_structure_relation_exists(
@@ -9905,6 +9991,7 @@ class KraphApi:
         term: str,
         observed_at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> AssertedStructureRelation:
         """AssertStructureRelationExists
 
@@ -9918,10 +10005,10 @@ class KraphApi:
             confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
             derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
             term: The organization's word for what is being claimed — a term's `key`, e.g. 'AIS'. Not a category id and not a graph: a claim names a word, and every view that declares that word will hold what you write. The word is created if the organization has not used it before; a view that declares no category for it simply will not draw it.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            AssertedStructureRelation
-        """
+            AssertedStructureRelation"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["sourceId"] = source_id
@@ -9935,7 +10022,7 @@ class KraphApi:
         _input["term"] = term
         variables["input"] = _input
         return self.execute(
-            AssertStructureRelationExistsMutation, variables
+            AssertStructureRelationExistsMutation, variables, task=task
         ).assert_structure_relation_exists
 
     async def aassert_participation(
@@ -9947,6 +10034,7 @@ class KraphApi:
         derived_from: Iterable[str],
         observed_at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> AssertedParticipation:
         """AssertParticipation
 
@@ -9960,10 +10048,10 @@ class KraphApi:
             observed_at: When the world was in this state — world time, the axis a scientist means by 'when'. Distinct from when it is claimed, which the assertion records; left unset, the two are equal. A point, not an interval: a duration is a metric.
             confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
             derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            AssertedParticipation
-        """
+            AssertedParticipation"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["event"] = event
@@ -9977,7 +10065,7 @@ class KraphApi:
         _input["derivedFrom"] = derived_from
         variables["input"] = _input
         return (
-            await self.aexecute(AssertParticipationMutation, variables)
+            await self.aexecute(AssertParticipationMutation, variables, task=task)
         ).assert_participation
 
     def assert_participation(
@@ -9989,6 +10077,7 @@ class KraphApi:
         derived_from: Iterable[str],
         observed_at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> AssertedParticipation:
         """AssertParticipation
 
@@ -10002,10 +10091,10 @@ class KraphApi:
             observed_at: When the world was in this state — world time, the axis a scientist means by 'when'. Distinct from when it is claimed, which the assertion records; left unset, the two are equal. A point, not an interval: a duration is a metric.
             confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
             derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            AssertedParticipation
-        """
+            AssertedParticipation"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["event"] = event
@@ -10018,10 +10107,15 @@ class KraphApi:
             _input["confidence"] = confidence
         _input["derivedFrom"] = derived_from
         variables["input"] = _input
-        return self.execute(AssertParticipationMutation, variables).assert_participation
+        return self.execute(
+            AssertParticipationMutation, variables, task=task
+        ).assert_participation
 
     async def aassert_participations(
-        self, event: str, participants: Iterable[ParticipantInput]
+        self,
+        event: str,
+        participants: Iterable[ParticipantInput],
+        task: TaskLike | None = None,
     ) -> AssertedLinks:
         """AssertParticipations
          Many participants in one event, one assertion.
@@ -10029,21 +10123,24 @@ class KraphApi:
         Args:
             event: The event the entities took part in
             participants: Everyone who took part, and how
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            AssertedLinks
-        """
+            AssertedLinks"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["event"] = event
         _input["participants"] = participants
         variables["input"] = _input
         return (
-            await self.aexecute(AssertParticipationsMutation, variables)
+            await self.aexecute(AssertParticipationsMutation, variables, task=task)
         ).assert_participations
 
     def assert_participations(
-        self, event: str, participants: Iterable[ParticipantInput]
+        self,
+        event: str,
+        participants: Iterable[ParticipantInput],
+        task: TaskLike | None = None,
     ) -> AssertedLinks:
         """AssertParticipations
          Many participants in one event, one assertion.
@@ -10051,17 +10148,17 @@ class KraphApi:
         Args:
             event: The event the entities took part in
             participants: Everyone who took part, and how
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            AssertedLinks
-        """
+            AssertedLinks"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["event"] = event
         _input["participants"] = participants
         variables["input"] = _input
         return self.execute(
-            AssertParticipationsMutation, variables
+            AssertParticipationsMutation, variables, task=task
         ).assert_participations
 
     async def acomment_on_structure(
@@ -10070,6 +10167,7 @@ class KraphApi:
         object: str,
         descendants: Iterable[DescendantInput],
         parent: IDCoercible | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> AssertedComment:
         """CommentOnStructure
          ---- comments ------------------------------------------------------------------------------
@@ -10079,10 +10177,10 @@ class KraphApi:
             object: The id of the external object on its service
             descendants: The rich body of the remark — a tree of LEAF/MENTION/PARAGRAPH nodes
             parent: The comment this replies to. Must be on the same structure's thread
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            AssertedComment
-        """
+            AssertedComment"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["identifier"] = identifier
@@ -10092,7 +10190,7 @@ class KraphApi:
             _input["parent"] = parent
         variables["input"] = _input
         return (
-            await self.aexecute(CommentOnStructureMutation, variables)
+            await self.aexecute(CommentOnStructureMutation, variables, task=task)
         ).comment_on_structure
 
     def comment_on_structure(
@@ -10101,6 +10199,7 @@ class KraphApi:
         object: str,
         descendants: Iterable[DescendantInput],
         parent: IDCoercible | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> AssertedComment:
         """CommentOnStructure
          ---- comments ------------------------------------------------------------------------------
@@ -10110,10 +10209,10 @@ class KraphApi:
             object: The id of the external object on its service
             descendants: The rich body of the remark — a tree of LEAF/MENTION/PARAGRAPH nodes
             parent: The comment this replies to. Must be on the same structure's thread
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            AssertedComment
-        """
+            AssertedComment"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["identifier"] = identifier
@@ -10122,7 +10221,9 @@ class KraphApi:
         if parent is not UNSET:
             _input["parent"] = parent
         variables["input"] = _input
-        return self.execute(CommentOnStructureMutation, variables).comment_on_structure
+        return self.execute(
+            CommentOnStructureMutation, variables, task=task
+        ).comment_on_structure
 
     async def acreate_graph(
         self,
@@ -10131,6 +10232,7 @@ class KraphApi:
         description: str | None | UnsetType = UNSET,
         definition: GraphDefinitionInput | None | UnsetType = UNSET,
         sameness_rule: SamenessRuleInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> Graph:
         """CreateGraph
          A Graph is a VIEW over the organization's claims, not a container. `definition.extensions`
@@ -10143,10 +10245,10 @@ class KraphApi:
             definition: The complete graph schema definition
             sameness_rule: Whose sameness claims this view counts (RFC 0024). Omitted means everyone
             backfill: Draw the evidence this graph's words already admit. A graph is a view over the organization's evidence, so a new one can be a view over history: with this on, every node and edge already claimed under a word this schema declares is projected as the graph is created. Off by default because the work is proportional to the organization's evidence and happens before this mutation returns.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            Graph
-        """
+            Graph"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["name"] = name
@@ -10158,7 +10260,9 @@ class KraphApi:
             _input["samenessRule"] = sameness_rule
         _input["backfill"] = backfill
         variables["input"] = _input
-        return (await self.aexecute(CreateGraphMutation, variables)).create_graph
+        return (
+            await self.aexecute(CreateGraphMutation, variables, task=task)
+        ).create_graph
 
     def create_graph(
         self,
@@ -10167,6 +10271,7 @@ class KraphApi:
         description: str | None | UnsetType = UNSET,
         definition: GraphDefinitionInput | None | UnsetType = UNSET,
         sameness_rule: SamenessRuleInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> Graph:
         """CreateGraph
          A Graph is a VIEW over the organization's claims, not a container. `definition.extensions`
@@ -10179,10 +10284,10 @@ class KraphApi:
             definition: The complete graph schema definition
             sameness_rule: Whose sameness claims this view counts (RFC 0024). Omitted means everyone
             backfill: Draw the evidence this graph's words already admit. A graph is a view over the organization's evidence, so a new one can be a view over history: with this on, every node and edge already claimed under a word this schema declares is projected as the graph is created. Off by default because the work is proportional to the organization's evidence and happens before this mutation returns.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            Graph
-        """
+            Graph"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["name"] = name
@@ -10194,7 +10299,7 @@ class KraphApi:
             _input["samenessRule"] = sameness_rule
         _input["backfill"] = backfill
         variables["input"] = _input
-        return self.execute(CreateGraphMutation, variables).create_graph
+        return self.execute(CreateGraphMutation, variables, task=task).create_graph
 
     async def aupdate_graph(
         self,
@@ -10204,6 +10309,7 @@ class KraphApi:
         archived: bool | None | UnsetType = UNSET,
         pin: bool | None | UnsetType = UNSET,
         sameness_rule: SamenessRuleInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> Graph:
         """UpdateGraph
 
@@ -10216,10 +10322,10 @@ class KraphApi:
             archived: Optional archived flag update
             pin: Optional pin flag update for the user making the request
             sameness_rule: Replace whose sameness claims this view counts (RFC 0024); an empty rule list means everyone. Omitted means unchanged. Changing it refolds the view's individuals — the projection is rebuilt
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            Graph
-        """
+            Graph"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
@@ -10234,7 +10340,9 @@ class KraphApi:
         if sameness_rule is not UNSET:
             _input["samenessRule"] = sameness_rule
         variables["input"] = _input
-        return (await self.aexecute(UpdateGraphMutation, variables)).update_graph
+        return (
+            await self.aexecute(UpdateGraphMutation, variables, task=task)
+        ).update_graph
 
     def update_graph(
         self,
@@ -10244,6 +10352,7 @@ class KraphApi:
         archived: bool | None | UnsetType = UNSET,
         pin: bool | None | UnsetType = UNSET,
         sameness_rule: SamenessRuleInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> Graph:
         """UpdateGraph
 
@@ -10256,10 +10365,10 @@ class KraphApi:
             archived: Optional archived flag update
             pin: Optional pin flag update for the user making the request
             sameness_rule: Replace whose sameness claims this view counts (RFC 0024); an empty rule list means everyone. Omitted means unchanged. Changing it refolds the view's individuals — the projection is rebuilt
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            Graph
-        """
+            Graph"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
@@ -10274,10 +10383,13 @@ class KraphApi:
         if sameness_rule is not UNSET:
             _input["samenessRule"] = sameness_rule
         variables["input"] = _input
-        return self.execute(UpdateGraphMutation, variables).update_graph
+        return self.execute(UpdateGraphMutation, variables, task=task).update_graph
 
     async def aupdate_graph_visual(
-        self, id: str, node_positions: Iterable[CategoryNodePositionInput]
+        self,
+        id: str,
+        node_positions: Iterable[CategoryNodePositionInput],
+        task: TaskLike | None = None,
     ) -> Graph:
         """UpdateGraphVisual
 
@@ -10286,21 +10398,24 @@ class KraphApi:
         Args:
             id: The ID of the graph element to update
             node_positions: List of node positions to update
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            Graph
-        """
+            Graph"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
         _input["nodePositions"] = node_positions
         variables["input"] = _input
         return (
-            await self.aexecute(UpdateGraphVisualMutation, variables)
+            await self.aexecute(UpdateGraphVisualMutation, variables, task=task)
         ).update_graph_visual
 
     def update_graph_visual(
-        self, id: str, node_positions: Iterable[CategoryNodePositionInput]
+        self,
+        id: str,
+        node_positions: Iterable[CategoryNodePositionInput],
+        task: TaskLike | None = None,
     ) -> Graph:
         """UpdateGraphVisual
 
@@ -10309,90 +10424,97 @@ class KraphApi:
         Args:
             id: The ID of the graph element to update
             node_positions: List of node positions to update
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            Graph
-        """
+            Graph"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
         _input["nodePositions"] = node_positions
         variables["input"] = _input
-        return self.execute(UpdateGraphVisualMutation, variables).update_graph_visual
+        return self.execute(
+            UpdateGraphVisualMutation, variables, task=task
+        ).update_graph_visual
 
-    async def aarchive_graph(self, id: str) -> Graph:
+    async def aarchive_graph(self, id: str, task: TaskLike | None = None) -> Graph:
         """ArchiveGraph
 
         Archive a graph in the graph engine (soft delete)
 
         Args:
             id: The ID of the graph to archive
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            Graph
-        """
+            Graph"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
         variables["input"] = _input
-        return (await self.aexecute(ArchiveGraphMutation, variables)).archive_graph
+        return (
+            await self.aexecute(ArchiveGraphMutation, variables, task=task)
+        ).archive_graph
 
-    def archive_graph(self, id: str) -> Graph:
+    def archive_graph(self, id: str, task: TaskLike | None = None) -> Graph:
         """ArchiveGraph
 
         Archive a graph in the graph engine (soft delete)
 
         Args:
             id: The ID of the graph to archive
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            Graph
-        """
+            Graph"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
         variables["input"] = _input
-        return self.execute(ArchiveGraphMutation, variables).archive_graph
+        return self.execute(ArchiveGraphMutation, variables, task=task).archive_graph
 
-    async def adelete_graph(self, id: str) -> ID:
+    async def adelete_graph(self, id: str, task: TaskLike | None = None) -> ID:
         """DeleteGraph
 
         Delete a graph from the graph engine
 
         Args:
             id: The ID of the graph to delete
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            ID
-        """
+            ID"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
         variables["input"] = _input
-        return (await self.aexecute(DeleteGraphMutation, variables)).delete_graph
+        return (
+            await self.aexecute(DeleteGraphMutation, variables, task=task)
+        ).delete_graph
 
-    def delete_graph(self, id: str) -> ID:
+    def delete_graph(self, id: str, task: TaskLike | None = None) -> ID:
         """DeleteGraph
 
         Delete a graph from the graph engine
 
         Args:
             id: The ID of the graph to delete
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            ID
-        """
+            ID"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
         variables["input"] = _input
-        return self.execute(DeleteGraphMutation, variables).delete_graph
+        return self.execute(DeleteGraphMutation, variables, task=task).delete_graph
 
     async def aattest_entity(
         self,
         id: str,
         at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> AssertedEntity:
         """AttestEntity
          Standing: somebody's position on whether a claim still holds.
@@ -10406,10 +10528,10 @@ class KraphApi:
             id: The uuid of the node being attested. The same id `retract*` returns, so the two round-trip.
             at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
             confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            AssertedEntity
-        """
+            AssertedEntity"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
@@ -10418,13 +10540,16 @@ class KraphApi:
         if confidence is not UNSET:
             _input["confidence"] = confidence
         variables["input"] = _input
-        return (await self.aexecute(AttestEntityMutation, variables)).attest_entity
+        return (
+            await self.aexecute(AttestEntityMutation, variables, task=task)
+        ).attest_entity
 
     def attest_entity(
         self,
         id: str,
         at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> AssertedEntity:
         """AttestEntity
          Standing: somebody's position on whether a claim still holds.
@@ -10438,10 +10563,10 @@ class KraphApi:
             id: The uuid of the node being attested. The same id `retract*` returns, so the two round-trip.
             at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
             confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            AssertedEntity
-        """
+            AssertedEntity"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
@@ -10450,13 +10575,14 @@ class KraphApi:
         if confidence is not UNSET:
             _input["confidence"] = confidence
         variables["input"] = _input
-        return self.execute(AttestEntityMutation, variables).attest_entity
+        return self.execute(AttestEntityMutation, variables, task=task).attest_entity
 
     async def aretract_entity(
         self,
         id: IDCoercible,
         at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> AssertedEntity:
         """RetractEntity
 
@@ -10466,10 +10592,10 @@ class KraphApi:
             id: The ID of the entity to retract
             at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
             confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            AssertedEntity
-        """
+            AssertedEntity"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
@@ -10478,13 +10604,16 @@ class KraphApi:
         if confidence is not UNSET:
             _input["confidence"] = confidence
         variables["input"] = _input
-        return (await self.aexecute(RetractEntityMutation, variables)).retract_entity
+        return (
+            await self.aexecute(RetractEntityMutation, variables, task=task)
+        ).retract_entity
 
     def retract_entity(
         self,
         id: IDCoercible,
         at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> AssertedEntity:
         """RetractEntity
 
@@ -10494,10 +10623,10 @@ class KraphApi:
             id: The ID of the entity to retract
             at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
             confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            AssertedEntity
-        """
+            AssertedEntity"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
@@ -10506,13 +10635,14 @@ class KraphApi:
         if confidence is not UNSET:
             _input["confidence"] = confidence
         variables["input"] = _input
-        return self.execute(RetractEntityMutation, variables).retract_entity
+        return self.execute(RetractEntityMutation, variables, task=task).retract_entity
 
     async def aattest_natural_event(
         self,
         id: str,
         at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> AssertedNaturalEvent:
         """AttestNaturalEvent
 
@@ -10522,10 +10652,10 @@ class KraphApi:
             id: The uuid of the node being attested. The same id `retract*` returns, so the two round-trip.
             at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
             confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            AssertedNaturalEvent
-        """
+            AssertedNaturalEvent"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
@@ -10535,7 +10665,7 @@ class KraphApi:
             _input["confidence"] = confidence
         variables["input"] = _input
         return (
-            await self.aexecute(AttestNaturalEventMutation, variables)
+            await self.aexecute(AttestNaturalEventMutation, variables, task=task)
         ).attest_natural_event
 
     def attest_natural_event(
@@ -10543,6 +10673,7 @@ class KraphApi:
         id: str,
         at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> AssertedNaturalEvent:
         """AttestNaturalEvent
 
@@ -10552,10 +10683,10 @@ class KraphApi:
             id: The uuid of the node being attested. The same id `retract*` returns, so the two round-trip.
             at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
             confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            AssertedNaturalEvent
-        """
+            AssertedNaturalEvent"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
@@ -10564,13 +10695,16 @@ class KraphApi:
         if confidence is not UNSET:
             _input["confidence"] = confidence
         variables["input"] = _input
-        return self.execute(AttestNaturalEventMutation, variables).attest_natural_event
+        return self.execute(
+            AttestNaturalEventMutation, variables, task=task
+        ).attest_natural_event
 
     async def aretract_natural_event(
         self,
         id: str,
         at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> AssertedNaturalEvent:
         """RetractNaturalEvent
 
@@ -10580,10 +10714,10 @@ class KraphApi:
             id: The ID of the natural event to retract
             at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
             confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            AssertedNaturalEvent
-        """
+            AssertedNaturalEvent"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
@@ -10593,7 +10727,7 @@ class KraphApi:
             _input["confidence"] = confidence
         variables["input"] = _input
         return (
-            await self.aexecute(RetractNaturalEventMutation, variables)
+            await self.aexecute(RetractNaturalEventMutation, variables, task=task)
         ).retract_natural_event
 
     def retract_natural_event(
@@ -10601,6 +10735,7 @@ class KraphApi:
         id: str,
         at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> AssertedNaturalEvent:
         """RetractNaturalEvent
 
@@ -10610,10 +10745,10 @@ class KraphApi:
             id: The ID of the natural event to retract
             at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
             confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            AssertedNaturalEvent
-        """
+            AssertedNaturalEvent"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
@@ -10623,7 +10758,7 @@ class KraphApi:
             _input["confidence"] = confidence
         variables["input"] = _input
         return self.execute(
-            RetractNaturalEventMutation, variables
+            RetractNaturalEventMutation, variables, task=task
         ).retract_natural_event
 
     async def aattest_protocol_event(
@@ -10631,6 +10766,7 @@ class KraphApi:
         id: str,
         at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> AssertedProtocolEvent:
         """AttestProtocolEvent
 
@@ -10640,10 +10776,10 @@ class KraphApi:
             id: The uuid of the node being attested. The same id `retract*` returns, so the two round-trip.
             at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
             confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            AssertedProtocolEvent
-        """
+            AssertedProtocolEvent"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
@@ -10653,7 +10789,7 @@ class KraphApi:
             _input["confidence"] = confidence
         variables["input"] = _input
         return (
-            await self.aexecute(AttestProtocolEventMutation, variables)
+            await self.aexecute(AttestProtocolEventMutation, variables, task=task)
         ).attest_protocol_event
 
     def attest_protocol_event(
@@ -10661,6 +10797,7 @@ class KraphApi:
         id: str,
         at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> AssertedProtocolEvent:
         """AttestProtocolEvent
 
@@ -10670,10 +10807,10 @@ class KraphApi:
             id: The uuid of the node being attested. The same id `retract*` returns, so the two round-trip.
             at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
             confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            AssertedProtocolEvent
-        """
+            AssertedProtocolEvent"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
@@ -10683,7 +10820,7 @@ class KraphApi:
             _input["confidence"] = confidence
         variables["input"] = _input
         return self.execute(
-            AttestProtocolEventMutation, variables
+            AttestProtocolEventMutation, variables, task=task
         ).attest_protocol_event
 
     async def aretract_protocol_event(
@@ -10691,6 +10828,7 @@ class KraphApi:
         id: str,
         at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> AssertedProtocolEvent:
         """RetractProtocolEvent
 
@@ -10700,10 +10838,10 @@ class KraphApi:
             id: The ID of the protocol event to retract
             at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
             confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            AssertedProtocolEvent
-        """
+            AssertedProtocolEvent"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
@@ -10713,7 +10851,7 @@ class KraphApi:
             _input["confidence"] = confidence
         variables["input"] = _input
         return (
-            await self.aexecute(RetractProtocolEventMutation, variables)
+            await self.aexecute(RetractProtocolEventMutation, variables, task=task)
         ).retract_protocol_event
 
     def retract_protocol_event(
@@ -10721,6 +10859,7 @@ class KraphApi:
         id: str,
         at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> AssertedProtocolEvent:
         """RetractProtocolEvent
 
@@ -10730,10 +10869,10 @@ class KraphApi:
             id: The ID of the protocol event to retract
             at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
             confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            AssertedProtocolEvent
-        """
+            AssertedProtocolEvent"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
@@ -10743,7 +10882,7 @@ class KraphApi:
             _input["confidence"] = confidence
         variables["input"] = _input
         return self.execute(
-            RetractProtocolEventMutation, variables
+            RetractProtocolEventMutation, variables, task=task
         ).retract_protocol_event
 
     async def aattest_structure(
@@ -10751,6 +10890,7 @@ class KraphApi:
         id: str,
         at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> AssertedStructure:
         """AttestStructure
 
@@ -10760,10 +10900,10 @@ class KraphApi:
             id: The ID of the structure to attest — a bare uuid, its evidence primary key
             at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
             confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            AssertedStructure
-        """
+            AssertedStructure"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
@@ -10773,7 +10913,7 @@ class KraphApi:
             _input["confidence"] = confidence
         variables["input"] = _input
         return (
-            await self.aexecute(AttestStructureMutation, variables)
+            await self.aexecute(AttestStructureMutation, variables, task=task)
         ).attest_structure
 
     def attest_structure(
@@ -10781,6 +10921,7 @@ class KraphApi:
         id: str,
         at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> AssertedStructure:
         """AttestStructure
 
@@ -10790,10 +10931,10 @@ class KraphApi:
             id: The ID of the structure to attest — a bare uuid, its evidence primary key
             at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
             confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            AssertedStructure
-        """
+            AssertedStructure"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
@@ -10802,13 +10943,16 @@ class KraphApi:
         if confidence is not UNSET:
             _input["confidence"] = confidence
         variables["input"] = _input
-        return self.execute(AttestStructureMutation, variables).attest_structure
+        return self.execute(
+            AttestStructureMutation, variables, task=task
+        ).attest_structure
 
     async def aretract_structure(
         self,
         id: IDCoercible,
         at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> AssertedStructure:
         """RetractStructure
 
@@ -10818,10 +10962,10 @@ class KraphApi:
             id: The ID of the structure to retract — a bare uuid, its evidence primary key
             at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
             confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            AssertedStructure
-        """
+            AssertedStructure"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
@@ -10831,7 +10975,7 @@ class KraphApi:
             _input["confidence"] = confidence
         variables["input"] = _input
         return (
-            await self.aexecute(RetractStructureMutation, variables)
+            await self.aexecute(RetractStructureMutation, variables, task=task)
         ).retract_structure
 
     def retract_structure(
@@ -10839,6 +10983,7 @@ class KraphApi:
         id: IDCoercible,
         at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> AssertedStructure:
         """RetractStructure
 
@@ -10848,10 +10993,10 @@ class KraphApi:
             id: The ID of the structure to retract — a bare uuid, its evidence primary key
             at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
             confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            AssertedStructure
-        """
+            AssertedStructure"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
@@ -10860,13 +11005,16 @@ class KraphApi:
         if confidence is not UNSET:
             _input["confidence"] = confidence
         variables["input"] = _input
-        return self.execute(RetractStructureMutation, variables).retract_structure
+        return self.execute(
+            RetractStructureMutation, variables, task=task
+        ).retract_structure
 
     async def aattest_metric(
         self,
         id: str,
         at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> AssertedMetric:
         """AttestMetric
 
@@ -10876,234 +11024,10 @@ class KraphApi:
             id: The ID of the metric to attest — a bare uuid, its evidence primary key
             at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
             confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            AssertedMetric
-        """
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
-        _input["id"] = id
-        if at is not UNSET:
-            _input["at"] = at
-        if confidence is not UNSET:
-            _input["confidence"] = confidence
-        variables["input"] = _input
-        return (await self.aexecute(AttestMetricMutation, variables)).attest_metric
-
-    def attest_metric(
-        self,
-        id: str,
-        at: datetime | None | UnsetType = UNSET,
-        confidence: float | None | UnsetType = UNSET,
-    ) -> AssertedMetric:
-        """AttestMetric
-
-        Claim that a measurement still stands. The derived values that dropped it are refolded
-
-        Args:
-            id: The ID of the metric to attest — a bare uuid, its evidence primary key
-            at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
-            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-
-        Returns:
-            AssertedMetric
-        """
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
-        _input["id"] = id
-        if at is not UNSET:
-            _input["at"] = at
-        if confidence is not UNSET:
-            _input["confidence"] = confidence
-        variables["input"] = _input
-        return self.execute(AttestMetricMutation, variables).attest_metric
-
-    async def aretract_metric(
-        self,
-        id: str,
-        at: datetime | None | UnsetType = UNSET,
-        confidence: float | None | UnsetType = UNSET,
-    ) -> AssertedMetric:
-        """RetractMetric
-
-        Retract a measurement without destroying it. It stays readable, because a derived value that dropped it still has to be explainable
-
-        Args:
-            id: The ID of the metric to retract — a bare uuid, its evidence primary key
-            at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
-            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-
-        Returns:
-            AssertedMetric
-        """
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
-        _input["id"] = id
-        if at is not UNSET:
-            _input["at"] = at
-        if confidence is not UNSET:
-            _input["confidence"] = confidence
-        variables["input"] = _input
-        return (await self.aexecute(RetractMetricMutation, variables)).retract_metric
-
-    def retract_metric(
-        self,
-        id: str,
-        at: datetime | None | UnsetType = UNSET,
-        confidence: float | None | UnsetType = UNSET,
-    ) -> AssertedMetric:
-        """RetractMetric
-
-        Retract a measurement without destroying it. It stays readable, because a derived value that dropped it still has to be explainable
-
-        Args:
-            id: The ID of the metric to retract — a bare uuid, its evidence primary key
-            at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
-            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-
-        Returns:
-            AssertedMetric
-        """
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
-        _input["id"] = id
-        if at is not UNSET:
-            _input["at"] = at
-        if confidence is not UNSET:
-            _input["confidence"] = confidence
-        variables["input"] = _input
-        return self.execute(RetractMetricMutation, variables).retract_metric
-
-    async def aattest_comment(
-        self,
-        id: str,
-        at: datetime | None | UnsetType = UNSET,
-        confidence: float | None | UnsetType = UNSET,
-    ) -> AssertedComment:
-        """AttestComment
-
-        Claim a remark stands again — reopening, as new evidence rather than an undo
-
-        Args:
-            id: The ID of the comment to attest
-            at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
-            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-
-        Returns:
-            AssertedComment
-        """
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
-        _input["id"] = id
-        if at is not UNSET:
-            _input["at"] = at
-        if confidence is not UNSET:
-            _input["confidence"] = confidence
-        variables["input"] = _input
-        return (await self.aexecute(AttestCommentMutation, variables)).attest_comment
-
-    def attest_comment(
-        self,
-        id: str,
-        at: datetime | None | UnsetType = UNSET,
-        confidence: float | None | UnsetType = UNSET,
-    ) -> AssertedComment:
-        """AttestComment
-
-        Claim a remark stands again — reopening, as new evidence rather than an undo
-
-        Args:
-            id: The ID of the comment to attest
-            at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
-            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-
-        Returns:
-            AssertedComment
-        """
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
-        _input["id"] = id
-        if at is not UNSET:
-            _input["at"] = at
-        if confidence is not UNSET:
-            _input["confidence"] = confidence
-        variables["input"] = _input
-        return self.execute(AttestCommentMutation, variables).attest_comment
-
-    async def aretract_comment(
-        self,
-        id: str,
-        at: datetime | None | UnsetType = UNSET,
-        confidence: float | None | UnsetType = UNSET,
-    ) -> AssertedComment:
-        """RetractComment
-
-        Claim a remark no longer stands — resolved by a reviewer or withdrawn by its author; the assertion records whose position it is. The row survives
-
-        Args:
-            id: The ID of the comment to retract
-            at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
-            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-
-        Returns:
-            AssertedComment
-        """
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
-        _input["id"] = id
-        if at is not UNSET:
-            _input["at"] = at
-        if confidence is not UNSET:
-            _input["confidence"] = confidence
-        variables["input"] = _input
-        return (await self.aexecute(RetractCommentMutation, variables)).retract_comment
-
-    def retract_comment(
-        self,
-        id: str,
-        at: datetime | None | UnsetType = UNSET,
-        confidence: float | None | UnsetType = UNSET,
-    ) -> AssertedComment:
-        """RetractComment
-
-        Claim a remark no longer stands — resolved by a reviewer or withdrawn by its author; the assertion records whose position it is. The row survives
-
-        Args:
-            id: The ID of the comment to retract
-            at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
-            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-
-        Returns:
-            AssertedComment
-        """
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
-        _input["id"] = id
-        if at is not UNSET:
-            _input["at"] = at
-        if confidence is not UNSET:
-            _input["confidence"] = confidence
-        variables["input"] = _input
-        return self.execute(RetractCommentMutation, variables).retract_comment
-
-    async def aretract_relation(
-        self,
-        id: IDCoercible,
-        at: datetime | None | UnsetType = UNSET,
-        confidence: float | None | UnsetType = UNSET,
-    ) -> AssertedRelation:
-        """RetractRelation
-
-        Retract a relation assertion without destroying it. The edge survives wherever another live assertion still states the same proposition
-
-        Args:
-            id: The ID of the relation claim to retract — its `Link` primary key
-            at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
-            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-
-        Returns:
-            AssertedRelation
-        """
+            AssertedMetric"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
@@ -11113,7 +11037,249 @@ class KraphApi:
             _input["confidence"] = confidence
         variables["input"] = _input
         return (
-            await self.aexecute(RetractRelationMutation, variables)
+            await self.aexecute(AttestMetricMutation, variables, task=task)
+        ).attest_metric
+
+    def attest_metric(
+        self,
+        id: str,
+        at: datetime | None | UnsetType = UNSET,
+        confidence: float | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
+    ) -> AssertedMetric:
+        """AttestMetric
+
+        Claim that a measurement still stands. The derived values that dropped it are refolded
+
+        Args:
+            id: The ID of the metric to attest — a bare uuid, its evidence primary key
+            at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
+
+        Returns:
+            AssertedMetric"""
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        if at is not UNSET:
+            _input["at"] = at
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        variables["input"] = _input
+        return self.execute(AttestMetricMutation, variables, task=task).attest_metric
+
+    async def aretract_metric(
+        self,
+        id: str,
+        at: datetime | None | UnsetType = UNSET,
+        confidence: float | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
+    ) -> AssertedMetric:
+        """RetractMetric
+
+        Retract a measurement without destroying it. It stays readable, because a derived value that dropped it still has to be explainable
+
+        Args:
+            id: The ID of the metric to retract — a bare uuid, its evidence primary key
+            at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
+
+        Returns:
+            AssertedMetric"""
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        if at is not UNSET:
+            _input["at"] = at
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        variables["input"] = _input
+        return (
+            await self.aexecute(RetractMetricMutation, variables, task=task)
+        ).retract_metric
+
+    def retract_metric(
+        self,
+        id: str,
+        at: datetime | None | UnsetType = UNSET,
+        confidence: float | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
+    ) -> AssertedMetric:
+        """RetractMetric
+
+        Retract a measurement without destroying it. It stays readable, because a derived value that dropped it still has to be explainable
+
+        Args:
+            id: The ID of the metric to retract — a bare uuid, its evidence primary key
+            at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
+
+        Returns:
+            AssertedMetric"""
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        if at is not UNSET:
+            _input["at"] = at
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        variables["input"] = _input
+        return self.execute(RetractMetricMutation, variables, task=task).retract_metric
+
+    async def aattest_comment(
+        self,
+        id: str,
+        at: datetime | None | UnsetType = UNSET,
+        confidence: float | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
+    ) -> AssertedComment:
+        """AttestComment
+
+        Claim a remark stands again — reopening, as new evidence rather than an undo
+
+        Args:
+            id: The ID of the comment to attest
+            at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
+
+        Returns:
+            AssertedComment"""
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        if at is not UNSET:
+            _input["at"] = at
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        variables["input"] = _input
+        return (
+            await self.aexecute(AttestCommentMutation, variables, task=task)
+        ).attest_comment
+
+    def attest_comment(
+        self,
+        id: str,
+        at: datetime | None | UnsetType = UNSET,
+        confidence: float | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
+    ) -> AssertedComment:
+        """AttestComment
+
+        Claim a remark stands again — reopening, as new evidence rather than an undo
+
+        Args:
+            id: The ID of the comment to attest
+            at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
+
+        Returns:
+            AssertedComment"""
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        if at is not UNSET:
+            _input["at"] = at
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        variables["input"] = _input
+        return self.execute(AttestCommentMutation, variables, task=task).attest_comment
+
+    async def aretract_comment(
+        self,
+        id: str,
+        at: datetime | None | UnsetType = UNSET,
+        confidence: float | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
+    ) -> AssertedComment:
+        """RetractComment
+
+        Claim a remark no longer stands — resolved by a reviewer or withdrawn by its author; the assertion records whose position it is. The row survives
+
+        Args:
+            id: The ID of the comment to retract
+            at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
+
+        Returns:
+            AssertedComment"""
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        if at is not UNSET:
+            _input["at"] = at
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        variables["input"] = _input
+        return (
+            await self.aexecute(RetractCommentMutation, variables, task=task)
+        ).retract_comment
+
+    def retract_comment(
+        self,
+        id: str,
+        at: datetime | None | UnsetType = UNSET,
+        confidence: float | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
+    ) -> AssertedComment:
+        """RetractComment
+
+        Claim a remark no longer stands — resolved by a reviewer or withdrawn by its author; the assertion records whose position it is. The row survives
+
+        Args:
+            id: The ID of the comment to retract
+            at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
+
+        Returns:
+            AssertedComment"""
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        if at is not UNSET:
+            _input["at"] = at
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        variables["input"] = _input
+        return self.execute(
+            RetractCommentMutation, variables, task=task
+        ).retract_comment
+
+    async def aretract_relation(
+        self,
+        id: IDCoercible,
+        at: datetime | None | UnsetType = UNSET,
+        confidence: float | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
+    ) -> AssertedRelation:
+        """RetractRelation
+
+        Retract a relation assertion without destroying it. The edge survives wherever another live assertion still states the same proposition
+
+        Args:
+            id: The ID of the relation claim to retract — its `Link` primary key
+            at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
+            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
+
+        Returns:
+            AssertedRelation"""
+        variables: dict[str, Any] = {}
+        _input: dict[str, Any] = {}
+        _input["id"] = id
+        if at is not UNSET:
+            _input["at"] = at
+        if confidence is not UNSET:
+            _input["confidence"] = confidence
+        variables["input"] = _input
+        return (
+            await self.aexecute(RetractRelationMutation, variables, task=task)
         ).retract_relation
 
     def retract_relation(
@@ -11121,6 +11287,7 @@ class KraphApi:
         id: IDCoercible,
         at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> AssertedRelation:
         """RetractRelation
 
@@ -11130,10 +11297,10 @@ class KraphApi:
             id: The ID of the relation claim to retract — its `Link` primary key
             at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
             confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            AssertedRelation
-        """
+            AssertedRelation"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
@@ -11142,13 +11309,16 @@ class KraphApi:
         if confidence is not UNSET:
             _input["confidence"] = confidence
         variables["input"] = _input
-        return self.execute(RetractRelationMutation, variables).retract_relation
+        return self.execute(
+            RetractRelationMutation, variables, task=task
+        ).retract_relation
 
     async def aretract_measurement(
         self,
         id: str,
         at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> AssertedMeasurement:
         """RetractMeasurement
 
@@ -11158,10 +11328,10 @@ class KraphApi:
             id: The ID of the measurement claim to retract — its `Link` primary key
             at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
             confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            AssertedMeasurement
-        """
+            AssertedMeasurement"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
@@ -11171,7 +11341,7 @@ class KraphApi:
             _input["confidence"] = confidence
         variables["input"] = _input
         return (
-            await self.aexecute(RetractMeasurementMutation, variables)
+            await self.aexecute(RetractMeasurementMutation, variables, task=task)
         ).retract_measurement
 
     def retract_measurement(
@@ -11179,6 +11349,7 @@ class KraphApi:
         id: str,
         at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> AssertedMeasurement:
         """RetractMeasurement
 
@@ -11188,10 +11359,10 @@ class KraphApi:
             id: The ID of the measurement claim to retract — its `Link` primary key
             at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
             confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            AssertedMeasurement
-        """
+            AssertedMeasurement"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
@@ -11200,13 +11371,16 @@ class KraphApi:
         if confidence is not UNSET:
             _input["confidence"] = confidence
         variables["input"] = _input
-        return self.execute(RetractMeasurementMutation, variables).retract_measurement
+        return self.execute(
+            RetractMeasurementMutation, variables, task=task
+        ).retract_measurement
 
     async def aretract_structure_relation(
         self,
         id: str,
         at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> AssertedStructureRelation:
         """RetractStructureRelation
 
@@ -11216,10 +11390,10 @@ class KraphApi:
             id: The ID of the structure relation claim to retract — its `Link` primary key
             at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
             confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            AssertedStructureRelation
-        """
+            AssertedStructureRelation"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
@@ -11229,7 +11403,7 @@ class KraphApi:
             _input["confidence"] = confidence
         variables["input"] = _input
         return (
-            await self.aexecute(RetractStructureRelationMutation, variables)
+            await self.aexecute(RetractStructureRelationMutation, variables, task=task)
         ).retract_structure_relation
 
     def retract_structure_relation(
@@ -11237,6 +11411,7 @@ class KraphApi:
         id: str,
         at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> AssertedStructureRelation:
         """RetractStructureRelation
 
@@ -11246,10 +11421,10 @@ class KraphApi:
             id: The ID of the structure relation claim to retract — its `Link` primary key
             at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
             confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            AssertedStructureRelation
-        """
+            AssertedStructureRelation"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
@@ -11259,7 +11434,7 @@ class KraphApi:
             _input["confidence"] = confidence
         variables["input"] = _input
         return self.execute(
-            RetractStructureRelationMutation, variables
+            RetractStructureRelationMutation, variables, task=task
         ).retract_structure_relation
 
     async def aretract_participation(
@@ -11267,6 +11442,7 @@ class KraphApi:
         id: str,
         at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> AssertedParticipation:
         """RetractParticipation
 
@@ -11276,10 +11452,10 @@ class KraphApi:
             id: The evidence ID of the participation claim to retract
             at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
             confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            AssertedParticipation
-        """
+            AssertedParticipation"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
@@ -11289,7 +11465,7 @@ class KraphApi:
             _input["confidence"] = confidence
         variables["input"] = _input
         return (
-            await self.aexecute(RetractParticipationMutation, variables)
+            await self.aexecute(RetractParticipationMutation, variables, task=task)
         ).retract_participation
 
     def retract_participation(
@@ -11297,6 +11473,7 @@ class KraphApi:
         id: str,
         at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> AssertedParticipation:
         """RetractParticipation
 
@@ -11306,10 +11483,10 @@ class KraphApi:
             id: The evidence ID of the participation claim to retract
             at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
             confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            AssertedParticipation
-        """
+            AssertedParticipation"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
@@ -11319,7 +11496,7 @@ class KraphApi:
             _input["confidence"] = confidence
         variables["input"] = _input
         return self.execute(
-            RetractParticipationMutation, variables
+            RetractParticipationMutation, variables, task=task
         ).retract_participation
 
     async def aretract_same_instance(
@@ -11327,6 +11504,7 @@ class KraphApi:
         id: str,
         at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> AssertedSameness:
         """RetractSameInstance
 
@@ -11336,10 +11514,10 @@ class KraphApi:
             id: The id of the sameness claim to retract
             at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
             confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            AssertedSameness
-        """
+            AssertedSameness"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
@@ -11349,7 +11527,7 @@ class KraphApi:
             _input["confidence"] = confidence
         variables["input"] = _input
         return (
-            await self.aexecute(RetractSameInstanceMutation, variables)
+            await self.aexecute(RetractSameInstanceMutation, variables, task=task)
         ).retract_same_instance
 
     def retract_same_instance(
@@ -11357,6 +11535,7 @@ class KraphApi:
         id: str,
         at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> AssertedSameness:
         """RetractSameInstance
 
@@ -11366,10 +11545,10 @@ class KraphApi:
             id: The id of the sameness claim to retract
             at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
             confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            AssertedSameness
-        """
+            AssertedSameness"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
@@ -11379,7 +11558,7 @@ class KraphApi:
             _input["confidence"] = confidence
         variables["input"] = _input
         return self.execute(
-            RetractSameInstanceMutation, variables
+            RetractSameInstanceMutation, variables, task=task
         ).retract_same_instance
 
     async def aattest_link(
@@ -11387,6 +11566,7 @@ class KraphApi:
         id: str,
         at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> AssertedLinks:
         """AttestLink
 
@@ -11396,10 +11576,10 @@ class KraphApi:
             id: The ID of the claim to attest — its `Link` primary key
             at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
             confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            AssertedLinks
-        """
+            AssertedLinks"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
@@ -11408,13 +11588,16 @@ class KraphApi:
         if confidence is not UNSET:
             _input["confidence"] = confidence
         variables["input"] = _input
-        return (await self.aexecute(AttestLinkMutation, variables)).attest_link
+        return (
+            await self.aexecute(AttestLinkMutation, variables, task=task)
+        ).attest_link
 
     def attest_link(
         self,
         id: str,
         at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> AssertedLinks:
         """AttestLink
 
@@ -11424,10 +11607,10 @@ class KraphApi:
             id: The ID of the claim to attest — its `Link` primary key
             at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
             confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            AssertedLinks
-        """
+            AssertedLinks"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
@@ -11436,13 +11619,14 @@ class KraphApi:
         if confidence is not UNSET:
             _input["confidence"] = confidence
         variables["input"] = _input
-        return self.execute(AttestLinkMutation, variables).attest_link
+        return self.execute(AttestLinkMutation, variables, task=task).attest_link
 
     async def aretract_links(
         self,
         ids: Iterable[str],
         at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> AssertedLinks:
         """RetractLinks
          One assertion over many link ids, of any link kind.
@@ -11451,10 +11635,10 @@ class KraphApi:
             ids: The `Link` primary keys of the claims to retract
             at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
             confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            AssertedLinks
-        """
+            AssertedLinks"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["ids"] = ids
@@ -11463,13 +11647,16 @@ class KraphApi:
         if confidence is not UNSET:
             _input["confidence"] = confidence
         variables["input"] = _input
-        return (await self.aexecute(RetractLinksMutation, variables)).retract_links
+        return (
+            await self.aexecute(RetractLinksMutation, variables, task=task)
+        ).retract_links
 
     def retract_links(
         self,
         ids: Iterable[str],
         at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> AssertedLinks:
         """RetractLinks
          One assertion over many link ids, of any link kind.
@@ -11478,10 +11665,10 @@ class KraphApi:
             ids: The `Link` primary keys of the claims to retract
             at: When this position took effect — world time. Left unset, the moment of the claim. A rule bounding OBSERVED_AT on EXISTENCE reads this.
             confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            AssertedLinks
-        """
+            AssertedLinks"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["ids"] = ids
@@ -11490,7 +11677,7 @@ class KraphApi:
         if confidence is not UNSET:
             _input["confidence"] = confidence
         variables["input"] = _input
-        return self.execute(RetractLinksMutation, variables).retract_links
+        return self.execute(RetractLinksMutation, variables, task=task).retract_links
 
     async def acreate_term(
         self,
@@ -11501,6 +11688,7 @@ class KraphApi:
         purl: str | None | UnsetType = UNSET,
         color: Iterable[int] | None | UnsetType = UNSET,
         image: str | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> Term:
         """CreateTerm
          The organization's words. Terms are minted lazily by the first claim that names one, so
@@ -11514,10 +11702,10 @@ class KraphApi:
             purl: Persistent URL, where this corresponds to a published ontology term
             color: Optional RGBA colour
             image: Optional media store ID for an illustrative image
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            Term
-        """
+            Term"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["kind"] = kind
@@ -11533,7 +11721,9 @@ class KraphApi:
         if image is not UNSET:
             _input["image"] = image
         variables["input"] = _input
-        return (await self.aexecute(CreateTermMutation, variables)).create_term
+        return (
+            await self.aexecute(CreateTermMutation, variables, task=task)
+        ).create_term
 
     def create_term(
         self,
@@ -11544,6 +11734,7 @@ class KraphApi:
         purl: str | None | UnsetType = UNSET,
         color: Iterable[int] | None | UnsetType = UNSET,
         image: str | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> Term:
         """CreateTerm
          The organization's words. Terms are minted lazily by the first claim that names one, so
@@ -11557,10 +11748,10 @@ class KraphApi:
             purl: Persistent URL, where this corresponds to a published ontology term
             color: Optional RGBA colour
             image: Optional media store ID for an illustrative image
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            Term
-        """
+            Term"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["kind"] = kind
@@ -11576,7 +11767,7 @@ class KraphApi:
         if image is not UNSET:
             _input["image"] = image
         variables["input"] = _input
-        return self.execute(CreateTermMutation, variables).create_term
+        return self.execute(CreateTermMutation, variables, task=task).create_term
 
     async def aupdate_term(
         self,
@@ -11586,6 +11777,7 @@ class KraphApi:
         purl: str | None | UnsetType = UNSET,
         color: Iterable[int] | None | UnsetType = UNSET,
         image: str | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> Term:
         """UpdateTerm
 
@@ -11598,10 +11790,10 @@ class KraphApi:
             purl: Persistent URL, where this corresponds to a published ontology term
             color: Optional RGBA colour
             image: Optional media store ID for an illustrative image
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            Term
-        """
+            Term"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
@@ -11616,7 +11808,9 @@ class KraphApi:
         if image is not UNSET:
             _input["image"] = image
         variables["input"] = _input
-        return (await self.aexecute(UpdateTermMutation, variables)).update_term
+        return (
+            await self.aexecute(UpdateTermMutation, variables, task=task)
+        ).update_term
 
     def update_term(
         self,
@@ -11626,6 +11820,7 @@ class KraphApi:
         purl: str | None | UnsetType = UNSET,
         color: Iterable[int] | None | UnsetType = UNSET,
         image: str | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> Term:
         """UpdateTerm
 
@@ -11638,10 +11833,10 @@ class KraphApi:
             purl: Persistent URL, where this corresponds to a published ontology term
             color: Optional RGBA colour
             image: Optional media store ID for an illustrative image
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            Term
-        """
+            Term"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
@@ -11656,55 +11851,58 @@ class KraphApi:
         if image is not UNSET:
             _input["image"] = image
         variables["input"] = _input
-        return self.execute(UpdateTermMutation, variables).update_term
+        return self.execute(UpdateTermMutation, variables, task=task).update_term
 
-    async def adelete_term(self, id: str) -> ID:
+    async def adelete_term(self, id: str, task: TaskLike | None = None) -> ID:
         """DeleteTerm
 
         Retire a word nothing has been claimed under
 
         Args:
             id: The ID of the term to delete
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            ID
-        """
+            ID"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
         variables["input"] = _input
-        return (await self.aexecute(DeleteTermMutation, variables)).delete_term
+        return (
+            await self.aexecute(DeleteTermMutation, variables, task=task)
+        ).delete_term
 
-    def delete_term(self, id: str) -> ID:
+    def delete_term(self, id: str, task: TaskLike | None = None) -> ID:
         """DeleteTerm
 
         Retire a word nothing has been claimed under
 
         Args:
             id: The ID of the term to delete
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            ID
-        """
+            ID"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
         variables["input"] = _input
-        return self.execute(DeleteTermMutation, variables).delete_term
+        return self.execute(DeleteTermMutation, variables, task=task).delete_term
 
     async def aupdate_structure_kind(
         self,
         id: str,
         key: str | None | UnsetType = UNSET,
         description: str | None | UnsetType = UNSET,
-        ontology_references: (
-            Iterable[OntologyReferenceInput] | None | UnsetType
-        ) = UNSET,
+        ontology_references: Iterable[OntologyReferenceInput]
+        | None
+        | UnsetType = UNSET,
         color: Iterable[int] | None | UnsetType = UNSET,
         image: str | None | UnsetType = UNSET,
         label: str | None | UnsetType = UNSET,
         pin: bool | None | UnsetType = UNSET,
         identifier: str | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> StructureKind:
         """UpdateStructureKind
          StructureKind and MetricKind are minted by the write that first needs them — there is no
@@ -11720,10 +11918,10 @@ class KraphApi:
             label: Optional human-readable label for this node role (defaults to 'key' if not provided)
             pin: Whether to pin this node role in the UI
             identifier: Read by nothing: `(organization, identifier)` is a structure kind's identity and cannot be reassigned. `update_structure_kind` writes label, description and colour only
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            StructureKind
-        """
+            StructureKind"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
@@ -11745,7 +11943,7 @@ class KraphApi:
             _input["identifier"] = identifier
         variables["input"] = _input
         return (
-            await self.aexecute(UpdateStructureKindMutation, variables)
+            await self.aexecute(UpdateStructureKindMutation, variables, task=task)
         ).update_structure_kind
 
     def update_structure_kind(
@@ -11753,14 +11951,15 @@ class KraphApi:
         id: str,
         key: str | None | UnsetType = UNSET,
         description: str | None | UnsetType = UNSET,
-        ontology_references: (
-            Iterable[OntologyReferenceInput] | None | UnsetType
-        ) = UNSET,
+        ontology_references: Iterable[OntologyReferenceInput]
+        | None
+        | UnsetType = UNSET,
         color: Iterable[int] | None | UnsetType = UNSET,
         image: str | None | UnsetType = UNSET,
         label: str | None | UnsetType = UNSET,
         pin: bool | None | UnsetType = UNSET,
         identifier: str | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> StructureKind:
         """UpdateStructureKind
          StructureKind and MetricKind are minted by the write that first needs them — there is no
@@ -11776,10 +11975,10 @@ class KraphApi:
             label: Optional human-readable label for this node role (defaults to 'key' if not provided)
             pin: Whether to pin this node role in the UI
             identifier: Read by nothing: `(organization, identifier)` is a structure kind's identity and cannot be reassigned. `update_structure_kind` writes label, description and colour only
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            StructureKind
-        """
+            StructureKind"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
@@ -11801,45 +12000,45 @@ class KraphApi:
             _input["identifier"] = identifier
         variables["input"] = _input
         return self.execute(
-            UpdateStructureKindMutation, variables
+            UpdateStructureKindMutation, variables, task=task
         ).update_structure_kind
 
-    async def adelete_structure_kind(self, id: str) -> ID:
+    async def adelete_structure_kind(self, id: str, task: TaskLike | None = None) -> ID:
         """DeleteStructureKind
 
         Retire a structure kind. Refused while any structure is recorded under it — evidence is never deleted; retract the structures first
 
         Args:
             id: The ID of the structure kind to retire
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            ID
-        """
+            ID"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
         variables["input"] = _input
         return (
-            await self.aexecute(DeleteStructureKindMutation, variables)
+            await self.aexecute(DeleteStructureKindMutation, variables, task=task)
         ).delete_structure_kind
 
-    def delete_structure_kind(self, id: str) -> ID:
+    def delete_structure_kind(self, id: str, task: TaskLike | None = None) -> ID:
         """DeleteStructureKind
 
         Retire a structure kind. Refused while any structure is recorded under it — evidence is never deleted; retract the structures first
 
         Args:
             id: The ID of the structure kind to retire
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            ID
-        """
+            ID"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
         variables["input"] = _input
         return self.execute(
-            DeleteStructureKindMutation, variables
+            DeleteStructureKindMutation, variables, task=task
         ).delete_structure_kind
 
     async def aupdate_metric_kind(
@@ -11847,14 +12046,15 @@ class KraphApi:
         id: str,
         key: str | None | UnsetType = UNSET,
         description: str | None | UnsetType = UNSET,
-        ontology_references: (
-            Iterable[OntologyReferenceInput] | None | UnsetType
-        ) = UNSET,
+        ontology_references: Iterable[OntologyReferenceInput]
+        | None
+        | UnsetType = UNSET,
         color: Iterable[int] | None | UnsetType = UNSET,
         image: str | None | UnsetType = UNSET,
         label: str | None | UnsetType = UNSET,
         pin: bool | None | UnsetType = UNSET,
         identifier: str | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> MetricKind:
         """UpdateMetricKind
 
@@ -11870,10 +12070,10 @@ class KraphApi:
             label: Optional human-readable label for this node role (defaults to 'key' if not provided)
             pin: Whether to pin this node role in the UI
             identifier: Read by nothing: a metric kind is identified by `(organization, structure_kind, key, value_kind)`. `update_metric_kind` writes label, description and colour only
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            MetricKind
-        """
+            MetricKind"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
@@ -11895,7 +12095,7 @@ class KraphApi:
             _input["identifier"] = identifier
         variables["input"] = _input
         return (
-            await self.aexecute(UpdateMetricKindMutation, variables)
+            await self.aexecute(UpdateMetricKindMutation, variables, task=task)
         ).update_metric_kind
 
     def update_metric_kind(
@@ -11903,14 +12103,15 @@ class KraphApi:
         id: str,
         key: str | None | UnsetType = UNSET,
         description: str | None | UnsetType = UNSET,
-        ontology_references: (
-            Iterable[OntologyReferenceInput] | None | UnsetType
-        ) = UNSET,
+        ontology_references: Iterable[OntologyReferenceInput]
+        | None
+        | UnsetType = UNSET,
         color: Iterable[int] | None | UnsetType = UNSET,
         image: str | None | UnsetType = UNSET,
         label: str | None | UnsetType = UNSET,
         pin: bool | None | UnsetType = UNSET,
         identifier: str | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> MetricKind:
         """UpdateMetricKind
 
@@ -11926,10 +12127,10 @@ class KraphApi:
             label: Optional human-readable label for this node role (defaults to 'key' if not provided)
             pin: Whether to pin this node role in the UI
             identifier: Read by nothing: a metric kind is identified by `(organization, structure_kind, key, value_kind)`. `update_metric_kind` writes label, description and colour only
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            MetricKind
-        """
+            MetricKind"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
@@ -11950,78 +12151,91 @@ class KraphApi:
         if identifier is not UNSET:
             _input["identifier"] = identifier
         variables["input"] = _input
-        return self.execute(UpdateMetricKindMutation, variables).update_metric_kind
+        return self.execute(
+            UpdateMetricKindMutation, variables, task=task
+        ).update_metric_kind
 
-    async def adelete_metric_kind(self, id: str) -> ID:
+    async def adelete_metric_kind(self, id: str, task: TaskLike | None = None) -> ID:
         """DeleteMetricKind
 
         Retire a metric kind. Refused while any metric is recorded under it — evidence is never deleted; retract the metrics first
 
         Args:
             id: The ID of the metric kind to retire
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            ID
-        """
+            ID"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
         variables["input"] = _input
         return (
-            await self.aexecute(DeleteMetricKindMutation, variables)
+            await self.aexecute(DeleteMetricKindMutation, variables, task=task)
         ).delete_metric_kind
 
-    def delete_metric_kind(self, id: str) -> ID:
+    def delete_metric_kind(self, id: str, task: TaskLike | None = None) -> ID:
         """DeleteMetricKind
 
         Retire a metric kind. Refused while any metric is recorded under it — evidence is never deleted; retract the metrics first
 
         Args:
             id: The ID of the metric kind to retire
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            ID
-        """
+            ID"""
         variables: dict[str, Any] = {}
         _input: dict[str, Any] = {}
         _input["id"] = id
         variables["input"] = _input
-        return self.execute(DeleteMetricKindMutation, variables).delete_metric_kind
+        return self.execute(
+            DeleteMetricKindMutation, variables, task=task
+        ).delete_metric_kind
 
-    async def aget_entity_category(self, id: IDCoercible) -> EntityCategory:
+    async def aget_entity_category(
+        self, id: IDCoercible, task: TaskLike | None = None
+    ) -> EntityCategory:
         """GetEntityCategory
 
         Get a single entity category by ID
 
         Args:
             id (ID): No description
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            EntityCategory
-        """
+            EntityCategory"""
         variables: dict[str, Any] = {}
         variables["id"] = id
-        return (await self.aexecute(GetEntityCategoryQuery, variables)).entity_category
+        return (
+            await self.aexecute(GetEntityCategoryQuery, variables, task=task)
+        ).entity_category
 
-    def get_entity_category(self, id: IDCoercible) -> EntityCategory:
+    def get_entity_category(
+        self, id: IDCoercible, task: TaskLike | None = None
+    ) -> EntityCategory:
         """GetEntityCategory
 
         Get a single entity category by ID
 
         Args:
             id (ID): No description
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            EntityCategory
-        """
+            EntityCategory"""
         variables: dict[str, Any] = {}
         variables["id"] = id
-        return self.execute(GetEntityCategoryQuery, variables).entity_category
+        return self.execute(
+            GetEntityCategoryQuery, variables, task=task
+        ).entity_category
 
     async def alist_entity_categories(
         self,
         filters: EntityCategoryFilter | None | UnsetType = UNSET,
         pagination: OffsetPaginationInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> tuple[EntityCategory, ...]:
         """ListEntityCategories
 
@@ -12030,23 +12244,24 @@ class KraphApi:
         Args:
             filters (EntityCategoryFilter | None, optional): No description.
             pagination (OffsetPaginationInput | None, optional): No description.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            list[EntityCategory]
-        """
+            list[EntityCategory]"""
         variables: dict[str, Any] = {}
         if filters is not UNSET:
             variables["filters"] = filters
         if pagination is not UNSET:
             variables["pagination"] = pagination
         return (
-            await self.aexecute(ListEntityCategoriesQuery, variables)
+            await self.aexecute(ListEntityCategoriesQuery, variables, task=task)
         ).entity_categories
 
     def list_entity_categories(
         self,
         filters: EntityCategoryFilter | None | UnsetType = UNSET,
         pagination: OffsetPaginationInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> tuple[EntityCategory, ...]:
         """ListEntityCategories
 
@@ -12055,21 +12270,24 @@ class KraphApi:
         Args:
             filters (EntityCategoryFilter | None, optional): No description.
             pagination (OffsetPaginationInput | None, optional): No description.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            list[EntityCategory]
-        """
+            list[EntityCategory]"""
         variables: dict[str, Any] = {}
         if filters is not UNSET:
             variables["filters"] = filters
         if pagination is not UNSET:
             variables["pagination"] = pagination
-        return self.execute(ListEntityCategoriesQuery, variables).entity_categories
+        return self.execute(
+            ListEntityCategoriesQuery, variables, task=task
+        ).entity_categories
 
     async def asearch_entity_categories(
         self,
         search: str | None | UnsetType = UNSET,
         values: list[IDCoercible] | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> tuple[SearchEntityCategoriesQueryOptions, ...]:
         """SearchEntityCategories
 
@@ -12078,21 +12296,24 @@ class KraphApi:
         Args:
             search (str | None, optional): No description.
             values (list[ID] | None, optional): No description.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            list[SearchEntityCategoriesQueryEntityCategories]
-        """
+            list[SearchEntityCategoriesQueryEntityCategories]"""
         variables: dict[str, Any] = {}
         if search is not UNSET:
             variables["search"] = search
         if values is not UNSET:
             variables["values"] = values
-        return (await self.aexecute(SearchEntityCategoriesQuery, variables)).options
+        return (
+            await self.aexecute(SearchEntityCategoriesQuery, variables, task=task)
+        ).options
 
     def search_entity_categories(
         self,
         search: str | None | UnsetType = UNSET,
         values: list[IDCoercible] | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> tuple[SearchEntityCategoriesQueryOptions, ...]:
         """SearchEntityCategories
 
@@ -12101,53 +12322,60 @@ class KraphApi:
         Args:
             search (str | None, optional): No description.
             values (list[ID] | None, optional): No description.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            list[SearchEntityCategoriesQueryEntityCategories]
-        """
+            list[SearchEntityCategoriesQueryEntityCategories]"""
         variables: dict[str, Any] = {}
         if search is not UNSET:
             variables["search"] = search
         if values is not UNSET:
             variables["values"] = values
-        return self.execute(SearchEntityCategoriesQuery, variables).options
+        return self.execute(SearchEntityCategoriesQuery, variables, task=task).options
 
-    async def aget_relation_category(self, id: IDCoercible) -> RelationCategory:
+    async def aget_relation_category(
+        self, id: IDCoercible, task: TaskLike | None = None
+    ) -> RelationCategory:
         """GetRelationCategory
 
         Get a single relation category by ID
 
         Args:
             id (ID): No description
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            RelationCategory
-        """
+            RelationCategory"""
         variables: dict[str, Any] = {}
         variables["id"] = id
         return (
-            await self.aexecute(GetRelationCategoryQuery, variables)
+            await self.aexecute(GetRelationCategoryQuery, variables, task=task)
         ).relation_category
 
-    def get_relation_category(self, id: IDCoercible) -> RelationCategory:
+    def get_relation_category(
+        self, id: IDCoercible, task: TaskLike | None = None
+    ) -> RelationCategory:
         """GetRelationCategory
 
         Get a single relation category by ID
 
         Args:
             id (ID): No description
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            RelationCategory
-        """
+            RelationCategory"""
         variables: dict[str, Any] = {}
         variables["id"] = id
-        return self.execute(GetRelationCategoryQuery, variables).relation_category
+        return self.execute(
+            GetRelationCategoryQuery, variables, task=task
+        ).relation_category
 
     async def alist_relation_categories(
         self,
         filters: RelationCategoryFilter | None | UnsetType = UNSET,
         pagination: OffsetPaginationInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> tuple[RelationCategory, ...]:
         """ListRelationCategories
 
@@ -12156,23 +12384,24 @@ class KraphApi:
         Args:
             filters (RelationCategoryFilter | None, optional): No description.
             pagination (OffsetPaginationInput | None, optional): No description.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            list[RelationCategory]
-        """
+            list[RelationCategory]"""
         variables: dict[str, Any] = {}
         if filters is not UNSET:
             variables["filters"] = filters
         if pagination is not UNSET:
             variables["pagination"] = pagination
         return (
-            await self.aexecute(ListRelationCategoriesQuery, variables)
+            await self.aexecute(ListRelationCategoriesQuery, variables, task=task)
         ).relation_categories
 
     def list_relation_categories(
         self,
         filters: RelationCategoryFilter | None | UnsetType = UNSET,
         pagination: OffsetPaginationInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> tuple[RelationCategory, ...]:
         """ListRelationCategories
 
@@ -12181,21 +12410,24 @@ class KraphApi:
         Args:
             filters (RelationCategoryFilter | None, optional): No description.
             pagination (OffsetPaginationInput | None, optional): No description.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            list[RelationCategory]
-        """
+            list[RelationCategory]"""
         variables: dict[str, Any] = {}
         if filters is not UNSET:
             variables["filters"] = filters
         if pagination is not UNSET:
             variables["pagination"] = pagination
-        return self.execute(ListRelationCategoriesQuery, variables).relation_categories
+        return self.execute(
+            ListRelationCategoriesQuery, variables, task=task
+        ).relation_categories
 
     async def asearch_relation_categories(
         self,
         search: str | None | UnsetType = UNSET,
         values: list[IDCoercible] | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> tuple[SearchRelationCategoriesQueryOptions, ...]:
         """SearchRelationCategories
 
@@ -12204,21 +12436,24 @@ class KraphApi:
         Args:
             search (str | None, optional): No description.
             values (list[ID] | None, optional): No description.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            list[SearchRelationCategoriesQueryRelationCategories]
-        """
+            list[SearchRelationCategoriesQueryRelationCategories]"""
         variables: dict[str, Any] = {}
         if search is not UNSET:
             variables["search"] = search
         if values is not UNSET:
             variables["values"] = values
-        return (await self.aexecute(SearchRelationCategoriesQuery, variables)).options
+        return (
+            await self.aexecute(SearchRelationCategoriesQuery, variables, task=task)
+        ).options
 
     def search_relation_categories(
         self,
         search: str | None | UnsetType = UNSET,
         values: list[IDCoercible] | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> tuple[SearchRelationCategoriesQueryOptions, ...]:
         """SearchRelationCategories
 
@@ -12227,53 +12462,60 @@ class KraphApi:
         Args:
             search (str | None, optional): No description.
             values (list[ID] | None, optional): No description.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            list[SearchRelationCategoriesQueryRelationCategories]
-        """
+            list[SearchRelationCategoriesQueryRelationCategories]"""
         variables: dict[str, Any] = {}
         if search is not UNSET:
             variables["search"] = search
         if values is not UNSET:
             variables["values"] = values
-        return self.execute(SearchRelationCategoriesQuery, variables).options
+        return self.execute(SearchRelationCategoriesQuery, variables, task=task).options
 
-    async def aget_measurement_category(self, id: IDCoercible) -> MeasurementCategory:
+    async def aget_measurement_category(
+        self, id: IDCoercible, task: TaskLike | None = None
+    ) -> MeasurementCategory:
         """GetMeasurementCategory
 
         Get a single measurement category by ID
 
         Args:
             id (ID): No description
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            MeasurementCategory
-        """
+            MeasurementCategory"""
         variables: dict[str, Any] = {}
         variables["id"] = id
         return (
-            await self.aexecute(GetMeasurementCategoryQuery, variables)
+            await self.aexecute(GetMeasurementCategoryQuery, variables, task=task)
         ).measurement_category
 
-    def get_measurement_category(self, id: IDCoercible) -> MeasurementCategory:
+    def get_measurement_category(
+        self, id: IDCoercible, task: TaskLike | None = None
+    ) -> MeasurementCategory:
         """GetMeasurementCategory
 
         Get a single measurement category by ID
 
         Args:
             id (ID): No description
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            MeasurementCategory
-        """
+            MeasurementCategory"""
         variables: dict[str, Any] = {}
         variables["id"] = id
-        return self.execute(GetMeasurementCategoryQuery, variables).measurement_category
+        return self.execute(
+            GetMeasurementCategoryQuery, variables, task=task
+        ).measurement_category
 
     async def alist_measurement_categories(
         self,
         filters: MeasurementCategoryFilter | None | UnsetType = UNSET,
         pagination: OffsetPaginationInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> tuple[MeasurementCategory, ...]:
         """ListMeasurementCategories
 
@@ -12282,23 +12524,24 @@ class KraphApi:
         Args:
             filters (MeasurementCategoryFilter | None, optional): No description.
             pagination (OffsetPaginationInput | None, optional): No description.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            list[MeasurementCategory]
-        """
+            list[MeasurementCategory]"""
         variables: dict[str, Any] = {}
         if filters is not UNSET:
             variables["filters"] = filters
         if pagination is not UNSET:
             variables["pagination"] = pagination
         return (
-            await self.aexecute(ListMeasurementCategoriesQuery, variables)
+            await self.aexecute(ListMeasurementCategoriesQuery, variables, task=task)
         ).measurement_categories
 
     def list_measurement_categories(
         self,
         filters: MeasurementCategoryFilter | None | UnsetType = UNSET,
         pagination: OffsetPaginationInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> tuple[MeasurementCategory, ...]:
         """ListMeasurementCategories
 
@@ -12307,23 +12550,24 @@ class KraphApi:
         Args:
             filters (MeasurementCategoryFilter | None, optional): No description.
             pagination (OffsetPaginationInput | None, optional): No description.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            list[MeasurementCategory]
-        """
+            list[MeasurementCategory]"""
         variables: dict[str, Any] = {}
         if filters is not UNSET:
             variables["filters"] = filters
         if pagination is not UNSET:
             variables["pagination"] = pagination
         return self.execute(
-            ListMeasurementCategoriesQuery, variables
+            ListMeasurementCategoriesQuery, variables, task=task
         ).measurement_categories
 
     async def asearch_measurement_categories(
         self,
         search: str | None | UnsetType = UNSET,
         values: list[IDCoercible] | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> tuple[SearchMeasurementCategoriesQueryOptions, ...]:
         """SearchMeasurementCategories
 
@@ -12332,23 +12576,24 @@ class KraphApi:
         Args:
             search (str | None, optional): No description.
             values (list[ID] | None, optional): No description.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            list[SearchMeasurementCategoriesQueryMeasurementCategories]
-        """
+            list[SearchMeasurementCategoriesQueryMeasurementCategories]"""
         variables: dict[str, Any] = {}
         if search is not UNSET:
             variables["search"] = search
         if values is not UNSET:
             variables["values"] = values
         return (
-            await self.aexecute(SearchMeasurementCategoriesQuery, variables)
+            await self.aexecute(SearchMeasurementCategoriesQuery, variables, task=task)
         ).options
 
     def search_measurement_categories(
         self,
         search: str | None | UnsetType = UNSET,
         values: list[IDCoercible] | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> tuple[SearchMeasurementCategoriesQueryOptions, ...]:
         """SearchMeasurementCategories
 
@@ -12357,19 +12602,21 @@ class KraphApi:
         Args:
             search (str | None, optional): No description.
             values (list[ID] | None, optional): No description.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            list[SearchMeasurementCategoriesQueryMeasurementCategories]
-        """
+            list[SearchMeasurementCategoriesQueryMeasurementCategories]"""
         variables: dict[str, Any] = {}
         if search is not UNSET:
             variables["search"] = search
         if values is not UNSET:
             variables["values"] = values
-        return self.execute(SearchMeasurementCategoriesQuery, variables).options
+        return self.execute(
+            SearchMeasurementCategoriesQuery, variables, task=task
+        ).options
 
     async def aget_structure_relation_category(
-        self, id: IDCoercible
+        self, id: IDCoercible, task: TaskLike | None = None
     ) -> StructureRelationCategory:
         """GetStructureRelationCategory
 
@@ -12377,18 +12624,18 @@ class KraphApi:
 
         Args:
             id (ID): No description
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            StructureRelationCategory
-        """
+            StructureRelationCategory"""
         variables: dict[str, Any] = {}
         variables["id"] = id
         return (
-            await self.aexecute(GetStructureRelationCategoryQuery, variables)
+            await self.aexecute(GetStructureRelationCategoryQuery, variables, task=task)
         ).structure_relation_category
 
     def get_structure_relation_category(
-        self, id: IDCoercible
+        self, id: IDCoercible, task: TaskLike | None = None
     ) -> StructureRelationCategory:
         """GetStructureRelationCategory
 
@@ -12396,20 +12643,21 @@ class KraphApi:
 
         Args:
             id (ID): No description
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            StructureRelationCategory
-        """
+            StructureRelationCategory"""
         variables: dict[str, Any] = {}
         variables["id"] = id
         return self.execute(
-            GetStructureRelationCategoryQuery, variables
+            GetStructureRelationCategoryQuery, variables, task=task
         ).structure_relation_category
 
     async def alist_structure_relation_categories(
         self,
         filters: StructureRelationCategoryFilter | None | UnsetType = UNSET,
         pagination: OffsetPaginationInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> tuple[StructureRelationCategory, ...]:
         """ListStructureRelationCategories
 
@@ -12418,23 +12666,26 @@ class KraphApi:
         Args:
             filters (StructureRelationCategoryFilter | None, optional): No description.
             pagination (OffsetPaginationInput | None, optional): No description.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            list[StructureRelationCategory]
-        """
+            list[StructureRelationCategory]"""
         variables: dict[str, Any] = {}
         if filters is not UNSET:
             variables["filters"] = filters
         if pagination is not UNSET:
             variables["pagination"] = pagination
         return (
-            await self.aexecute(ListStructureRelationCategoriesQuery, variables)
+            await self.aexecute(
+                ListStructureRelationCategoriesQuery, variables, task=task
+            )
         ).structure_relation_categories
 
     def list_structure_relation_categories(
         self,
         filters: StructureRelationCategoryFilter | None | UnsetType = UNSET,
         pagination: OffsetPaginationInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> tuple[StructureRelationCategory, ...]:
         """ListStructureRelationCategories
 
@@ -12443,23 +12694,24 @@ class KraphApi:
         Args:
             filters (StructureRelationCategoryFilter | None, optional): No description.
             pagination (OffsetPaginationInput | None, optional): No description.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            list[StructureRelationCategory]
-        """
+            list[StructureRelationCategory]"""
         variables: dict[str, Any] = {}
         if filters is not UNSET:
             variables["filters"] = filters
         if pagination is not UNSET:
             variables["pagination"] = pagination
         return self.execute(
-            ListStructureRelationCategoriesQuery, variables
+            ListStructureRelationCategoriesQuery, variables, task=task
         ).structure_relation_categories
 
     async def asearch_structure_relation_categories(
         self,
         search: str | None | UnsetType = UNSET,
         values: list[IDCoercible] | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> tuple[SearchStructureRelationCategoriesQueryOptions, ...]:
         """SearchStructureRelationCategories
 
@@ -12468,23 +12720,26 @@ class KraphApi:
         Args:
             search (str | None, optional): No description.
             values (list[ID] | None, optional): No description.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            list[SearchStructureRelationCategoriesQueryStructureRelationCategories]
-        """
+            list[SearchStructureRelationCategoriesQueryStructureRelationCategories]"""
         variables: dict[str, Any] = {}
         if search is not UNSET:
             variables["search"] = search
         if values is not UNSET:
             variables["values"] = values
         return (
-            await self.aexecute(SearchStructureRelationCategoriesQuery, variables)
+            await self.aexecute(
+                SearchStructureRelationCategoriesQuery, variables, task=task
+            )
         ).options
 
     def search_structure_relation_categories(
         self,
         search: str | None | UnsetType = UNSET,
         values: list[IDCoercible] | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> tuple[SearchStructureRelationCategoriesQueryOptions, ...]:
         """SearchStructureRelationCategories
 
@@ -12493,19 +12748,21 @@ class KraphApi:
         Args:
             search (str | None, optional): No description.
             values (list[ID] | None, optional): No description.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            list[SearchStructureRelationCategoriesQueryStructureRelationCategories]
-        """
+            list[SearchStructureRelationCategoriesQueryStructureRelationCategories]"""
         variables: dict[str, Any] = {}
         if search is not UNSET:
             variables["search"] = search
         if values is not UNSET:
             variables["values"] = values
-        return self.execute(SearchStructureRelationCategoriesQuery, variables).options
+        return self.execute(
+            SearchStructureRelationCategoriesQuery, variables, task=task
+        ).options
 
     async def aget_natural_event_category(
-        self, id: IDCoercible
+        self, id: IDCoercible, task: TaskLike | None = None
     ) -> NaturalEventCategory:
         """GetNaturalEventCategory
 
@@ -12513,37 +12770,40 @@ class KraphApi:
 
         Args:
             id (ID): No description
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            NaturalEventCategory
-        """
+            NaturalEventCategory"""
         variables: dict[str, Any] = {}
         variables["id"] = id
         return (
-            await self.aexecute(GetNaturalEventCategoryQuery, variables)
+            await self.aexecute(GetNaturalEventCategoryQuery, variables, task=task)
         ).natural_event_category
 
-    def get_natural_event_category(self, id: IDCoercible) -> NaturalEventCategory:
+    def get_natural_event_category(
+        self, id: IDCoercible, task: TaskLike | None = None
+    ) -> NaturalEventCategory:
         """GetNaturalEventCategory
 
         Get a single natural event category by ID
 
         Args:
             id (ID): No description
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            NaturalEventCategory
-        """
+            NaturalEventCategory"""
         variables: dict[str, Any] = {}
         variables["id"] = id
         return self.execute(
-            GetNaturalEventCategoryQuery, variables
+            GetNaturalEventCategoryQuery, variables, task=task
         ).natural_event_category
 
     async def alist_natural_event_categories(
         self,
         filters: NaturalEventCategoryFilter | None | UnsetType = UNSET,
         pagination: OffsetPaginationInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> tuple[NaturalEventCategory, ...]:
         """ListNaturalEventCategories
 
@@ -12552,23 +12812,24 @@ class KraphApi:
         Args:
             filters (NaturalEventCategoryFilter | None, optional): No description.
             pagination (OffsetPaginationInput | None, optional): No description.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            list[NaturalEventCategory]
-        """
+            list[NaturalEventCategory]"""
         variables: dict[str, Any] = {}
         if filters is not UNSET:
             variables["filters"] = filters
         if pagination is not UNSET:
             variables["pagination"] = pagination
         return (
-            await self.aexecute(ListNaturalEventCategoriesQuery, variables)
+            await self.aexecute(ListNaturalEventCategoriesQuery, variables, task=task)
         ).natural_event_categories
 
     def list_natural_event_categories(
         self,
         filters: NaturalEventCategoryFilter | None | UnsetType = UNSET,
         pagination: OffsetPaginationInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> tuple[NaturalEventCategory, ...]:
         """ListNaturalEventCategories
 
@@ -12577,23 +12838,24 @@ class KraphApi:
         Args:
             filters (NaturalEventCategoryFilter | None, optional): No description.
             pagination (OffsetPaginationInput | None, optional): No description.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            list[NaturalEventCategory]
-        """
+            list[NaturalEventCategory]"""
         variables: dict[str, Any] = {}
         if filters is not UNSET:
             variables["filters"] = filters
         if pagination is not UNSET:
             variables["pagination"] = pagination
         return self.execute(
-            ListNaturalEventCategoriesQuery, variables
+            ListNaturalEventCategoriesQuery, variables, task=task
         ).natural_event_categories
 
     async def asearch_natural_event_categories(
         self,
         search: str | None | UnsetType = UNSET,
         values: list[IDCoercible] | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> tuple[SearchNaturalEventCategoriesQueryOptions, ...]:
         """SearchNaturalEventCategories
 
@@ -12602,23 +12864,24 @@ class KraphApi:
         Args:
             search (str | None, optional): No description.
             values (list[ID] | None, optional): No description.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            list[SearchNaturalEventCategoriesQueryNaturalEventCategories]
-        """
+            list[SearchNaturalEventCategoriesQueryNaturalEventCategories]"""
         variables: dict[str, Any] = {}
         if search is not UNSET:
             variables["search"] = search
         if values is not UNSET:
             variables["values"] = values
         return (
-            await self.aexecute(SearchNaturalEventCategoriesQuery, variables)
+            await self.aexecute(SearchNaturalEventCategoriesQuery, variables, task=task)
         ).options
 
     def search_natural_event_categories(
         self,
         search: str | None | UnsetType = UNSET,
         values: list[IDCoercible] | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> tuple[SearchNaturalEventCategoriesQueryOptions, ...]:
         """SearchNaturalEventCategories
 
@@ -12627,19 +12890,21 @@ class KraphApi:
         Args:
             search (str | None, optional): No description.
             values (list[ID] | None, optional): No description.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            list[SearchNaturalEventCategoriesQueryNaturalEventCategories]
-        """
+            list[SearchNaturalEventCategoriesQueryNaturalEventCategories]"""
         variables: dict[str, Any] = {}
         if search is not UNSET:
             variables["search"] = search
         if values is not UNSET:
             variables["values"] = values
-        return self.execute(SearchNaturalEventCategoriesQuery, variables).options
+        return self.execute(
+            SearchNaturalEventCategoriesQuery, variables, task=task
+        ).options
 
     async def aget_protocol_event_category(
-        self, id: IDCoercible
+        self, id: IDCoercible, task: TaskLike | None = None
     ) -> ProtocolEventCategory:
         """GetProtocolEventCategory
 
@@ -12647,37 +12912,40 @@ class KraphApi:
 
         Args:
             id (ID): No description
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            ProtocolEventCategory
-        """
+            ProtocolEventCategory"""
         variables: dict[str, Any] = {}
         variables["id"] = id
         return (
-            await self.aexecute(GetProtocolEventCategoryQuery, variables)
+            await self.aexecute(GetProtocolEventCategoryQuery, variables, task=task)
         ).protocol_event_category
 
-    def get_protocol_event_category(self, id: IDCoercible) -> ProtocolEventCategory:
+    def get_protocol_event_category(
+        self, id: IDCoercible, task: TaskLike | None = None
+    ) -> ProtocolEventCategory:
         """GetProtocolEventCategory
 
         Get a single protocol event category by ID
 
         Args:
             id (ID): No description
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            ProtocolEventCategory
-        """
+            ProtocolEventCategory"""
         variables: dict[str, Any] = {}
         variables["id"] = id
         return self.execute(
-            GetProtocolEventCategoryQuery, variables
+            GetProtocolEventCategoryQuery, variables, task=task
         ).protocol_event_category
 
     async def alist_protocol_event_categories(
         self,
         filters: ProtocolEventCategoryFilter | None | UnsetType = UNSET,
         pagination: OffsetPaginationInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> tuple[ProtocolEventCategory, ...]:
         """ListProtocolEventCategories
 
@@ -12686,23 +12954,24 @@ class KraphApi:
         Args:
             filters (ProtocolEventCategoryFilter | None, optional): No description.
             pagination (OffsetPaginationInput | None, optional): No description.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            list[ProtocolEventCategory]
-        """
+            list[ProtocolEventCategory]"""
         variables: dict[str, Any] = {}
         if filters is not UNSET:
             variables["filters"] = filters
         if pagination is not UNSET:
             variables["pagination"] = pagination
         return (
-            await self.aexecute(ListProtocolEventCategoriesQuery, variables)
+            await self.aexecute(ListProtocolEventCategoriesQuery, variables, task=task)
         ).protocol_event_categories
 
     def list_protocol_event_categories(
         self,
         filters: ProtocolEventCategoryFilter | None | UnsetType = UNSET,
         pagination: OffsetPaginationInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> tuple[ProtocolEventCategory, ...]:
         """ListProtocolEventCategories
 
@@ -12711,23 +12980,24 @@ class KraphApi:
         Args:
             filters (ProtocolEventCategoryFilter | None, optional): No description.
             pagination (OffsetPaginationInput | None, optional): No description.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            list[ProtocolEventCategory]
-        """
+            list[ProtocolEventCategory]"""
         variables: dict[str, Any] = {}
         if filters is not UNSET:
             variables["filters"] = filters
         if pagination is not UNSET:
             variables["pagination"] = pagination
         return self.execute(
-            ListProtocolEventCategoriesQuery, variables
+            ListProtocolEventCategoriesQuery, variables, task=task
         ).protocol_event_categories
 
     async def asearch_protocol_event_categories(
         self,
         search: str | None | UnsetType = UNSET,
         values: list[IDCoercible] | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> tuple[SearchProtocolEventCategoriesQueryOptions, ...]:
         """SearchProtocolEventCategories
 
@@ -12736,23 +13006,26 @@ class KraphApi:
         Args:
             search (str | None, optional): No description.
             values (list[ID] | None, optional): No description.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            list[SearchProtocolEventCategoriesQueryProtocolEventCategories]
-        """
+            list[SearchProtocolEventCategoriesQueryProtocolEventCategories]"""
         variables: dict[str, Any] = {}
         if search is not UNSET:
             variables["search"] = search
         if values is not UNSET:
             variables["values"] = values
         return (
-            await self.aexecute(SearchProtocolEventCategoriesQuery, variables)
+            await self.aexecute(
+                SearchProtocolEventCategoriesQuery, variables, task=task
+            )
         ).options
 
     def search_protocol_event_categories(
         self,
         search: str | None | UnsetType = UNSET,
         values: list[IDCoercible] | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> tuple[SearchProtocolEventCategoriesQueryOptions, ...]:
         """SearchProtocolEventCategories
 
@@ -12761,139 +13034,154 @@ class KraphApi:
         Args:
             search (str | None, optional): No description.
             values (list[ID] | None, optional): No description.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            list[SearchProtocolEventCategoriesQueryProtocolEventCategories]
-        """
+            list[SearchProtocolEventCategoriesQueryProtocolEventCategories]"""
         variables: dict[str, Any] = {}
         if search is not UNSET:
             variables["search"] = search
         if values is not UNSET:
             variables["values"] = values
-        return self.execute(SearchProtocolEventCategoriesQuery, variables).options
+        return self.execute(
+            SearchProtocolEventCategoriesQuery, variables, task=task
+        ).options
 
-    async def aget_instance(self, id: IDCoercible) -> Instance:
+    async def aget_instance(
+        self, id: IDCoercible, task: TaskLike | None = None
+    ) -> Instance:
         """GetInstance
          Claim-grain reads: organization scope, addressed by a bare uuid, no graph argument.
          `instance(id:)` is the fallback reader for a node no view draws.
 
         Args:
             id (ID): No description
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            Instance
-        """
+            Instance"""
         variables: dict[str, Any] = {}
         variables["id"] = id
-        return (await self.aexecute(GetInstanceQuery, variables)).instance
+        return (await self.aexecute(GetInstanceQuery, variables, task=task)).instance
 
-    def get_instance(self, id: IDCoercible) -> Instance:
+    def get_instance(self, id: IDCoercible, task: TaskLike | None = None) -> Instance:
         """GetInstance
          Claim-grain reads: organization scope, addressed by a bare uuid, no graph argument.
          `instance(id:)` is the fallback reader for a node no view draws.
 
         Args:
             id (ID): No description
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            Instance
-        """
+            Instance"""
         variables: dict[str, Any] = {}
         variables["id"] = id
-        return self.execute(GetInstanceQuery, variables).instance
+        return self.execute(GetInstanceQuery, variables, task=task).instance
 
-    async def aget_link(self, id: IDCoercible) -> Link:
+    async def aget_link(self, id: IDCoercible, task: TaskLike | None = None) -> Link:
         """GetLink
 
         Get one claim relating two things by ID, as the log has it
 
         Args:
             id (ID): No description
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            Link
-        """
+            Link"""
         variables: dict[str, Any] = {}
         variables["id"] = id
-        return (await self.aexecute(GetLinkQuery, variables)).link
+        return (await self.aexecute(GetLinkQuery, variables, task=task)).link
 
-    def get_link(self, id: IDCoercible) -> Link:
+    def get_link(self, id: IDCoercible, task: TaskLike | None = None) -> Link:
         """GetLink
 
         Get one claim relating two things by ID, as the log has it
 
         Args:
             id (ID): No description
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            Link
-        """
+            Link"""
         variables: dict[str, Any] = {}
         variables["id"] = id
-        return self.execute(GetLinkQuery, variables).link
+        return self.execute(GetLinkQuery, variables, task=task).link
 
-    async def aget_standings(self, id: IDCoercible) -> tuple[Standing, ...]:
+    async def aget_standings(
+        self, id: IDCoercible, task: TaskLike | None = None
+    ) -> tuple[Standing, ...]:
         """GetStandings
          Every position anyone has taken on a claim, newest first. An empty list means nobody has
          disputed it — silence is not dissent, and there is no folded boolean beside this.
 
         Args:
             id (ID): No description
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            list[Standing]
-        """
+            list[Standing]"""
         variables: dict[str, Any] = {}
         variables["id"] = id
-        return (await self.aexecute(GetStandingsQuery, variables)).standings
+        return (await self.aexecute(GetStandingsQuery, variables, task=task)).standings
 
-    def get_standings(self, id: IDCoercible) -> tuple[Standing, ...]:
+    def get_standings(
+        self, id: IDCoercible, task: TaskLike | None = None
+    ) -> tuple[Standing, ...]:
         """GetStandings
          Every position anyone has taken on a claim, newest first. An empty list means nobody has
          disputed it — silence is not dissent, and there is no folded boolean beside this.
 
         Args:
             id (ID): No description
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            list[Standing]
-        """
+            list[Standing]"""
         variables: dict[str, Any] = {}
         variables["id"] = id
-        return self.execute(GetStandingsQuery, variables).standings
+        return self.execute(GetStandingsQuery, variables, task=task).standings
 
-    async def aget_structure(self, id: IDCoercible) -> StructureWithMetrics:
+    async def aget_structure(
+        self, id: IDCoercible, task: TaskLike | None = None
+    ) -> StructureWithMetrics:
         """GetStructure
 
         Get a structure by ID — a bare uuid, its evidence primary key
 
         Args:
             id (ID): No description
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            StructureWithMetrics
-        """
+            StructureWithMetrics"""
         variables: dict[str, Any] = {}
         variables["id"] = id
-        return (await self.aexecute(GetStructureQuery, variables)).structure
+        return (await self.aexecute(GetStructureQuery, variables, task=task)).structure
 
-    def get_structure(self, id: IDCoercible) -> StructureWithMetrics:
+    def get_structure(
+        self, id: IDCoercible, task: TaskLike | None = None
+    ) -> StructureWithMetrics:
         """GetStructure
 
         Get a structure by ID — a bare uuid, its evidence primary key
 
         Args:
             id (ID): No description
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            StructureWithMetrics
-        """
+            StructureWithMetrics"""
         variables: dict[str, Any] = {}
         variables["id"] = id
-        return self.execute(GetStructureQuery, variables).structure
+        return self.execute(GetStructureQuery, variables, task=task).structure
 
     async def aget_structure_by_identifier(
-        self, identifier: StructureIdentifierCoercible, object: StructureObjectCoercible
+        self,
+        identifier: StructureIdentifierCoercible,
+        object: StructureObjectCoercible,
+        task: TaskLike | None = None,
     ) -> StructureWithMetrics:
         """GetStructureByIdentifier
 
@@ -12902,19 +13190,22 @@ class KraphApi:
         Args:
             identifier (StructureIdentifier): No description
             object (StructureObject): No description
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            StructureWithMetrics
-        """
+            StructureWithMetrics"""
         variables: dict[str, Any] = {}
         variables["identifier"] = identifier
         variables["object"] = object
         return (
-            await self.aexecute(GetStructureByIdentifierQuery, variables)
+            await self.aexecute(GetStructureByIdentifierQuery, variables, task=task)
         ).structure_by_identifier
 
     def get_structure_by_identifier(
-        self, identifier: StructureIdentifierCoercible, object: StructureObjectCoercible
+        self,
+        identifier: StructureIdentifierCoercible,
+        object: StructureObjectCoercible,
+        task: TaskLike | None = None,
     ) -> StructureWithMetrics:
         """GetStructureByIdentifier
 
@@ -12923,48 +13214,54 @@ class KraphApi:
         Args:
             identifier (StructureIdentifier): No description
             object (StructureObject): No description
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            StructureWithMetrics
-        """
+            StructureWithMetrics"""
         variables: dict[str, Any] = {}
         variables["identifier"] = identifier
         variables["object"] = object
         return self.execute(
-            GetStructureByIdentifierQuery, variables
+            GetStructureByIdentifierQuery, variables, task=task
         ).structure_by_identifier
 
-    async def aget_informing_structures(self, entity_id: str) -> tuple[Structure, ...]:
+    async def aget_informing_structures(
+        self, entity_id: str, task: TaskLike | None = None
+    ) -> tuple[Structure, ...]:
         """GetInformingStructures
          Resolves a naming structure back to what it names — this is how an external id is looked up
          now that `externalId` no longer exists on any write.
 
         Args:
             entity_id (str): No description
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            list[Structure]
-        """
+            list[Structure]"""
         variables: dict[str, Any] = {}
         variables["entityId"] = entity_id
         return (
-            await self.aexecute(GetInformingStructuresQuery, variables)
+            await self.aexecute(GetInformingStructuresQuery, variables, task=task)
         ).informing_structures
 
-    def get_informing_structures(self, entity_id: str) -> tuple[Structure, ...]:
+    def get_informing_structures(
+        self, entity_id: str, task: TaskLike | None = None
+    ) -> tuple[Structure, ...]:
         """GetInformingStructures
          Resolves a naming structure back to what it names — this is how an external id is looked up
          now that `externalId` no longer exists on any write.
 
         Args:
             entity_id (str): No description
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            list[Structure]
-        """
+            list[Structure]"""
         variables: dict[str, Any] = {}
         variables["entityId"] = entity_id
-        return self.execute(GetInformingStructuresQuery, variables).informing_structures
+        return self.execute(
+            GetInformingStructuresQuery, variables, task=task
+        ).informing_structures
 
     async def alist_structures(
         self,
@@ -12972,6 +13269,7 @@ class KraphApi:
         filters: StructureFilter | None | UnsetType = UNSET,
         ordering: list[StructureOrder] | None | UnsetType = UNSET,
         pagination: StructurePaginationInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> tuple[Structure, ...]:
         """ListStructures
 
@@ -12982,10 +13280,10 @@ class KraphApi:
             filters (StructureFilter | None, optional): No description.
             ordering (list[StructureOrder] | None, optional): No description.
             pagination (StructurePaginationInput | None, optional): No description.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            list[Structure]
-        """
+            list[Structure]"""
         variables: dict[str, Any] = {}
         if structure_kind_id is not UNSET:
             variables["structureKindId"] = structure_kind_id
@@ -12995,7 +13293,9 @@ class KraphApi:
             variables["ordering"] = ordering
         if pagination is not UNSET:
             variables["pagination"] = pagination
-        return (await self.aexecute(ListStructuresQuery, variables)).structures
+        return (
+            await self.aexecute(ListStructuresQuery, variables, task=task)
+        ).structures
 
     def list_structures(
         self,
@@ -13003,6 +13303,7 @@ class KraphApi:
         filters: StructureFilter | None | UnsetType = UNSET,
         ordering: list[StructureOrder] | None | UnsetType = UNSET,
         pagination: StructurePaginationInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> tuple[Structure, ...]:
         """ListStructures
 
@@ -13013,10 +13314,10 @@ class KraphApi:
             filters (StructureFilter | None, optional): No description.
             ordering (list[StructureOrder] | None, optional): No description.
             pagination (StructurePaginationInput | None, optional): No description.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            list[Structure]
-        """
+            list[Structure]"""
         variables: dict[str, Any] = {}
         if structure_kind_id is not UNSET:
             variables["structureKindId"] = structure_kind_id
@@ -13026,40 +13327,42 @@ class KraphApi:
             variables["ordering"] = ordering
         if pagination is not UNSET:
             variables["pagination"] = pagination
-        return self.execute(ListStructuresQuery, variables).structures
+        return self.execute(ListStructuresQuery, variables, task=task).structures
 
-    async def aget_metric(self, id: IDCoercible) -> Metric:
+    async def aget_metric(
+        self, id: IDCoercible, task: TaskLike | None = None
+    ) -> Metric:
         """GetMetric
 
         Get a metric by ID
 
         Args:
             id (ID): No description
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            Metric
-        """
+            Metric"""
         variables: dict[str, Any] = {}
         variables["id"] = id
-        return (await self.aexecute(GetMetricQuery, variables)).metric
+        return (await self.aexecute(GetMetricQuery, variables, task=task)).metric
 
-    def get_metric(self, id: IDCoercible) -> Metric:
+    def get_metric(self, id: IDCoercible, task: TaskLike | None = None) -> Metric:
         """GetMetric
 
         Get a metric by ID
 
         Args:
             id (ID): No description
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            Metric
-        """
+            Metric"""
         variables: dict[str, Any] = {}
         variables["id"] = id
-        return self.execute(GetMetricQuery, variables).metric
+        return self.execute(GetMetricQuery, variables, task=task).metric
 
     async def aget_metrics_for_structure(
-        self, structure_id: IDCoercible
+        self, structure_id: IDCoercible, task: TaskLike | None = None
     ) -> tuple[Metric, ...]:
         """GetMetricsForStructure
 
@@ -13067,18 +13370,18 @@ class KraphApi:
 
         Args:
             structure_id (ID): No description
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            list[Metric]
-        """
+            list[Metric]"""
         variables: dict[str, Any] = {}
         variables["structureId"] = structure_id
         return (
-            await self.aexecute(GetMetricsForStructureQuery, variables)
+            await self.aexecute(GetMetricsForStructureQuery, variables, task=task)
         ).metrics_for_structure
 
     def get_metrics_for_structure(
-        self, structure_id: IDCoercible
+        self, structure_id: IDCoercible, task: TaskLike | None = None
     ) -> tuple[Metric, ...]:
         """GetMetricsForStructure
 
@@ -13086,48 +13389,50 @@ class KraphApi:
 
         Args:
             structure_id (ID): No description
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            list[Metric]
-        """
+            list[Metric]"""
         variables: dict[str, Any] = {}
         variables["structureId"] = structure_id
         return self.execute(
-            GetMetricsForStructureQuery, variables
+            GetMetricsForStructureQuery, variables, task=task
         ).metrics_for_structure
 
-    async def aget_comment(self, id: IDCoercible) -> Comment:
+    async def aget_comment(
+        self, id: IDCoercible, task: TaskLike | None = None
+    ) -> Comment:
         """GetComment
 
         Get one remark by ID, as the log has it
 
         Args:
             id (ID): No description
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            Comment
-        """
+            Comment"""
         variables: dict[str, Any] = {}
         variables["id"] = id
-        return (await self.aexecute(GetCommentQuery, variables)).comment
+        return (await self.aexecute(GetCommentQuery, variables, task=task)).comment
 
-    def get_comment(self, id: IDCoercible) -> Comment:
+    def get_comment(self, id: IDCoercible, task: TaskLike | None = None) -> Comment:
         """GetComment
 
         Get one remark by ID, as the log has it
 
         Args:
             id (ID): No description
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            Comment
-        """
+            Comment"""
         variables: dict[str, Any] = {}
         variables["id"] = id
-        return self.execute(GetCommentQuery, variables).comment
+        return self.execute(GetCommentQuery, variables, task=task).comment
 
     async def aget_comments_for(
-        self, identifier: str, object: IDCoercible
+        self, identifier: str, object: IDCoercible, task: TaskLike | None = None
     ) -> tuple[Comment, ...]:
         """GetCommentsFor
 
@@ -13136,17 +13441,19 @@ class KraphApi:
         Args:
             identifier (str): No description
             object (ID): No description
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            list[Comment]
-        """
+            list[Comment]"""
         variables: dict[str, Any] = {}
         variables["identifier"] = identifier
         variables["object"] = object
-        return (await self.aexecute(GetCommentsForQuery, variables)).comments_for
+        return (
+            await self.aexecute(GetCommentsForQuery, variables, task=task)
+        ).comments_for
 
     def get_comments_for(
-        self, identifier: str, object: IDCoercible
+        self, identifier: str, object: IDCoercible, task: TaskLike | None = None
     ) -> tuple[Comment, ...]:
         """GetCommentsFor
 
@@ -13155,19 +13462,20 @@ class KraphApi:
         Args:
             identifier (str): No description
             object (ID): No description
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            list[Comment]
-        """
+            list[Comment]"""
         variables: dict[str, Any] = {}
         variables["identifier"] = identifier
         variables["object"] = object
-        return self.execute(GetCommentsForQuery, variables).comments_for
+        return self.execute(GetCommentsForQuery, variables, task=task).comments_for
 
     async def asearch_structures(
         self,
         search: str | None | UnsetType = UNSET,
         values: list[IDCoercible] | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> tuple[SearchStructuresQueryOptions, ...]:
         """SearchStructures
 
@@ -13176,21 +13484,24 @@ class KraphApi:
         Args:
             search (str | None, optional): No description.
             values (list[ID] | None, optional): No description.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            list[SearchStructuresQueryStructures]
-        """
+            list[SearchStructuresQueryStructures]"""
         variables: dict[str, Any] = {}
         if search is not UNSET:
             variables["search"] = search
         if values is not UNSET:
             variables["values"] = values
-        return (await self.aexecute(SearchStructuresQuery, variables)).options
+        return (
+            await self.aexecute(SearchStructuresQuery, variables, task=task)
+        ).options
 
     def search_structures(
         self,
         search: str | None | UnsetType = UNSET,
         values: list[IDCoercible] | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> tuple[SearchStructuresQueryOptions, ...]:
         """SearchStructures
 
@@ -13199,51 +13510,52 @@ class KraphApi:
         Args:
             search (str | None, optional): No description.
             values (list[ID] | None, optional): No description.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            list[SearchStructuresQueryStructures]
-        """
+            list[SearchStructuresQueryStructures]"""
         variables: dict[str, Any] = {}
         if search is not UNSET:
             variables["search"] = search
         if values is not UNSET:
             variables["values"] = values
-        return self.execute(SearchStructuresQuery, variables).options
+        return self.execute(SearchStructuresQuery, variables, task=task).options
 
-    async def aget_graph(self, id: IDCoercible) -> Graph:
+    async def aget_graph(self, id: IDCoercible, task: TaskLike | None = None) -> Graph:
         """GetGraph
 
         Get a graph by ID
 
         Args:
             id (ID): No description
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            Graph
-        """
+            Graph"""
         variables: dict[str, Any] = {}
         variables["id"] = id
-        return (await self.aexecute(GetGraphQuery, variables)).graph
+        return (await self.aexecute(GetGraphQuery, variables, task=task)).graph
 
-    def get_graph(self, id: IDCoercible) -> Graph:
+    def get_graph(self, id: IDCoercible, task: TaskLike | None = None) -> Graph:
         """GetGraph
 
         Get a graph by ID
 
         Args:
             id (ID): No description
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            Graph
-        """
+            Graph"""
         variables: dict[str, Any] = {}
         variables["id"] = id
-        return self.execute(GetGraphQuery, variables).graph
+        return self.execute(GetGraphQuery, variables, task=task).graph
 
     async def alist_graphs(
         self,
         filters: GraphFilter | None | UnsetType = UNSET,
         pagination: OffsetPaginationInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> tuple[ListGraph, ...]:
         """ListGraphs
 
@@ -13252,21 +13564,22 @@ class KraphApi:
         Args:
             filters (GraphFilter | None, optional): No description.
             pagination (OffsetPaginationInput | None, optional): No description.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            list[ListGraph]
-        """
+            list[ListGraph]"""
         variables: dict[str, Any] = {}
         if filters is not UNSET:
             variables["filters"] = filters
         if pagination is not UNSET:
             variables["pagination"] = pagination
-        return (await self.aexecute(ListGraphsQuery, variables)).graphs
+        return (await self.aexecute(ListGraphsQuery, variables, task=task)).graphs
 
     def list_graphs(
         self,
         filters: GraphFilter | None | UnsetType = UNSET,
         pagination: OffsetPaginationInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> tuple[ListGraph, ...]:
         """ListGraphs
 
@@ -13275,21 +13588,22 @@ class KraphApi:
         Args:
             filters (GraphFilter | None, optional): No description.
             pagination (OffsetPaginationInput | None, optional): No description.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            list[ListGraph]
-        """
+            list[ListGraph]"""
         variables: dict[str, Any] = {}
         if filters is not UNSET:
             variables["filters"] = filters
         if pagination is not UNSET:
             variables["pagination"] = pagination
-        return self.execute(ListGraphsQuery, variables).graphs
+        return self.execute(ListGraphsQuery, variables, task=task).graphs
 
     async def asearch_graphs(
         self,
         search: str | None | UnsetType = UNSET,
         values: list[IDCoercible] | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> tuple[SearchGraphsQueryOptions, ...]:
         """SearchGraphs
 
@@ -13298,21 +13612,22 @@ class KraphApi:
         Args:
             search (str | None, optional): No description.
             values (list[ID] | None, optional): No description.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            list[SearchGraphsQueryGraphs]
-        """
+            list[SearchGraphsQueryGraphs]"""
         variables: dict[str, Any] = {}
         if search is not UNSET:
             variables["search"] = search
         if values is not UNSET:
             variables["values"] = values
-        return (await self.aexecute(SearchGraphsQuery, variables)).options
+        return (await self.aexecute(SearchGraphsQuery, variables, task=task)).options
 
     def search_graphs(
         self,
         search: str | None | UnsetType = UNSET,
         values: list[IDCoercible] | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> tuple[SearchGraphsQueryOptions, ...]:
         """SearchGraphs
 
@@ -13321,18 +13636,44 @@ class KraphApi:
         Args:
             search (str | None, optional): No description.
             values (list[ID] | None, optional): No description.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            list[SearchGraphsQueryGraphs]
-        """
+            list[SearchGraphsQueryGraphs]"""
         variables: dict[str, Any] = {}
         if search is not UNSET:
             variables["search"] = search
         if values is not UNSET:
             variables["values"] = values
-        return self.execute(SearchGraphsQuery, variables).options
+        return self.execute(SearchGraphsQuery, variables, task=task).options
 
-    async def aget_node(self, id: IDCoercible, graph: IDCoercible) -> (
+    async def aget_node(
+        self, id: IDCoercible, graph: IDCoercible, task: TaskLike | None = None
+    ) -> Annotated[
+        GetNodeQueryNodeBaseEntity
+        | GetNodeQueryNodeBaseNaturalEvent
+        | GetNodeQueryNodeBaseProtocolEvent,
+        Field(discriminator="typename"),
+    ] | GetNodeQueryNodeBaseCatchAll:
+        """GetNode
+         View-grain reads: these name their view, and refuse a node the view does not admit.
+         `node(id, graph)` succeeds exactly when `nodes(graph:)` could list it.
+
+        Args:
+            id (ID): No description
+            graph (ID): No description
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
+
+        Returns:
+            NodeRef"""
+        variables: dict[str, Any] = {}
+        variables["id"] = id
+        variables["graph"] = graph
+        return (await self.aexecute(GetNodeQuery, variables, task=task)).node
+
+    def get_node(
+        self, id: IDCoercible, graph: IDCoercible, task: TaskLike | None = None
+    ) -> (
         Annotated[
             GetNodeQueryNodeBaseEntity
             | GetNodeQueryNodeBaseNaturalEvent
@@ -13348,39 +13689,14 @@ class KraphApi:
         Args:
             id (ID): No description
             graph (ID): No description
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            NodeRef
-        """
+            NodeRef"""
         variables: dict[str, Any] = {}
         variables["id"] = id
         variables["graph"] = graph
-        return (await self.aexecute(GetNodeQuery, variables)).node
-
-    def get_node(self, id: IDCoercible, graph: IDCoercible) -> (
-        Annotated[
-            GetNodeQueryNodeBaseEntity
-            | GetNodeQueryNodeBaseNaturalEvent
-            | GetNodeQueryNodeBaseProtocolEvent,
-            Field(discriminator="typename"),
-        ]
-        | GetNodeQueryNodeBaseCatchAll
-    ):
-        """GetNode
-         View-grain reads: these name their view, and refuse a node the view does not admit.
-         `node(id, graph)` succeeds exactly when `nodes(graph:)` could list it.
-
-        Args:
-            id (ID): No description
-            graph (ID): No description
-
-        Returns:
-            NodeRef
-        """
-        variables: dict[str, Any] = {}
-        variables["id"] = id
-        variables["graph"] = graph
-        return self.execute(GetNodeQuery, variables).node
+        return self.execute(GetNodeQuery, variables, task=task).node
 
     async def alist_nodes(
         self,
@@ -13388,6 +13704,7 @@ class KraphApi:
         filters: NodeFilters | None | UnsetType = UNSET,
         ordering: list[NodeOrder] | None | UnsetType = UNSET,
         pagination: NodePaginationInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> tuple[
         Annotated[
             ListNodesQueryNodesBaseEntity
@@ -13407,10 +13724,10 @@ class KraphApi:
             filters (NodeFilters | None, optional): No description.
             ordering (list[NodeOrder] | None, optional): No description.
             pagination (NodePaginationInput | None, optional): No description.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            list[NodeRef]
-        """
+            list[NodeRef]"""
         variables: dict[str, Any] = {}
         variables["graph"] = graph
         if filters is not UNSET:
@@ -13419,7 +13736,7 @@ class KraphApi:
             variables["ordering"] = ordering
         if pagination is not UNSET:
             variables["pagination"] = pagination
-        return (await self.aexecute(ListNodesQuery, variables)).nodes
+        return (await self.aexecute(ListNodesQuery, variables, task=task)).nodes
 
     def list_nodes(
         self,
@@ -13427,6 +13744,7 @@ class KraphApi:
         filters: NodeFilters | None | UnsetType = UNSET,
         ordering: list[NodeOrder] | None | UnsetType = UNSET,
         pagination: NodePaginationInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> tuple[
         Annotated[
             ListNodesQueryNodesBaseEntity
@@ -13446,10 +13764,10 @@ class KraphApi:
             filters (NodeFilters | None, optional): No description.
             ordering (list[NodeOrder] | None, optional): No description.
             pagination (NodePaginationInput | None, optional): No description.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            list[NodeRef]
-        """
+            list[NodeRef]"""
         variables: dict[str, Any] = {}
         variables["graph"] = graph
         if filters is not UNSET:
@@ -13458,9 +13776,11 @@ class KraphApi:
             variables["ordering"] = ordering
         if pagination is not UNSET:
             variables["pagination"] = pagination
-        return self.execute(ListNodesQuery, variables).nodes
+        return self.execute(ListNodesQuery, variables, task=task).nodes
 
-    async def aget_entity(self, id: IDCoercible, graph: IDCoercible) -> EntityView:
+    async def aget_entity(
+        self, id: IDCoercible, graph: IDCoercible, task: TaskLike | None = None
+    ) -> EntityView:
         """GetEntity
          richProperties is where derived values surface — the only place a metric recorded on an
          evidence structure becomes readable as a property of the node.
@@ -13468,16 +13788,18 @@ class KraphApi:
         Args:
             id (ID): No description
             graph (ID): No description
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            EntityView
-        """
+            EntityView"""
         variables: dict[str, Any] = {}
         variables["id"] = id
         variables["graph"] = graph
-        return (await self.aexecute(GetEntityQuery, variables)).entity
+        return (await self.aexecute(GetEntityQuery, variables, task=task)).entity
 
-    def get_entity(self, id: IDCoercible, graph: IDCoercible) -> EntityView:
+    def get_entity(
+        self, id: IDCoercible, graph: IDCoercible, task: TaskLike | None = None
+    ) -> EntityView:
         """GetEntity
          richProperties is where derived values surface — the only place a metric recorded on an
          evidence structure becomes readable as a property of the node.
@@ -13485,49 +13807,50 @@ class KraphApi:
         Args:
             id (ID): No description
             graph (ID): No description
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            EntityView
-        """
+            EntityView"""
         variables: dict[str, Any] = {}
         variables["id"] = id
         variables["graph"] = graph
-        return self.execute(GetEntityQuery, variables).entity
+        return self.execute(GetEntityQuery, variables, task=task).entity
 
-    async def aget_term(self, id: IDCoercible) -> Term:
+    async def aget_term(self, id: IDCoercible, task: TaskLike | None = None) -> Term:
         """GetTerm
 
         Get one of the organization's words by ID
 
         Args:
             id (ID): No description
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            Term
-        """
+            Term"""
         variables: dict[str, Any] = {}
         variables["id"] = id
-        return (await self.aexecute(GetTermQuery, variables)).term
+        return (await self.aexecute(GetTermQuery, variables, task=task)).term
 
-    def get_term(self, id: IDCoercible) -> Term:
+    def get_term(self, id: IDCoercible, task: TaskLike | None = None) -> Term:
         """GetTerm
 
         Get one of the organization's words by ID
 
         Args:
             id (ID): No description
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            Term
-        """
+            Term"""
         variables: dict[str, Any] = {}
         variables["id"] = id
-        return self.execute(GetTermQuery, variables).term
+        return self.execute(GetTermQuery, variables, task=task).term
 
     async def alist_terms(
         self,
         filters: TermFilter | None | UnsetType = UNSET,
         pagination: VocabularyPaginationInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> tuple[Term, ...]:
         """ListTerms
 
@@ -13536,21 +13859,22 @@ class KraphApi:
         Args:
             filters (TermFilter | None, optional): No description.
             pagination (VocabularyPaginationInput | None, optional): No description.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            list[Term]
-        """
+            list[Term]"""
         variables: dict[str, Any] = {}
         if filters is not UNSET:
             variables["filters"] = filters
         if pagination is not UNSET:
             variables["pagination"] = pagination
-        return (await self.aexecute(ListTermsQuery, variables)).terms
+        return (await self.aexecute(ListTermsQuery, variables, task=task)).terms
 
     def list_terms(
         self,
         filters: TermFilter | None | UnsetType = UNSET,
         pagination: VocabularyPaginationInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> tuple[Term, ...]:
         """ListTerms
 
@@ -13559,21 +13883,22 @@ class KraphApi:
         Args:
             filters (TermFilter | None, optional): No description.
             pagination (VocabularyPaginationInput | None, optional): No description.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            list[Term]
-        """
+            list[Term]"""
         variables: dict[str, Any] = {}
         if filters is not UNSET:
             variables["filters"] = filters
         if pagination is not UNSET:
             variables["pagination"] = pagination
-        return self.execute(ListTermsQuery, variables).terms
+        return self.execute(ListTermsQuery, variables, task=task).terms
 
     async def asearch_terms(
         self,
         search: str | None | UnsetType = UNSET,
         values: list[IDCoercible] | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> tuple[SearchTermsQueryOptions, ...]:
         """SearchTerms
 
@@ -13582,21 +13907,22 @@ class KraphApi:
         Args:
             search (str | None, optional): No description.
             values (list[ID] | None, optional): No description.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            list[SearchTermsQueryTerms]
-        """
+            list[SearchTermsQueryTerms]"""
         variables: dict[str, Any] = {}
         if search is not UNSET:
             variables["search"] = search
         if values is not UNSET:
             variables["values"] = values
-        return (await self.aexecute(SearchTermsQuery, variables)).options
+        return (await self.aexecute(SearchTermsQuery, variables, task=task)).options
 
     def search_terms(
         self,
         search: str | None | UnsetType = UNSET,
         values: list[IDCoercible] | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> tuple[SearchTermsQueryOptions, ...]:
         """SearchTerms
 
@@ -13605,51 +13931,58 @@ class KraphApi:
         Args:
             search (str | None, optional): No description.
             values (list[ID] | None, optional): No description.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            list[SearchTermsQueryTerms]
-        """
+            list[SearchTermsQueryTerms]"""
         variables: dict[str, Any] = {}
         if search is not UNSET:
             variables["search"] = search
         if values is not UNSET:
             variables["values"] = values
-        return self.execute(SearchTermsQuery, variables).options
+        return self.execute(SearchTermsQuery, variables, task=task).options
 
-    async def aget_structure_kind(self, id: IDCoercible) -> StructureKind:
+    async def aget_structure_kind(
+        self, id: IDCoercible, task: TaskLike | None = None
+    ) -> StructureKind:
         """GetStructureKind
 
         Get one structure kind by ID
 
         Args:
             id (ID): No description
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            StructureKind
-        """
+            StructureKind"""
         variables: dict[str, Any] = {}
         variables["id"] = id
-        return (await self.aexecute(GetStructureKindQuery, variables)).structure_kind
+        return (
+            await self.aexecute(GetStructureKindQuery, variables, task=task)
+        ).structure_kind
 
-    def get_structure_kind(self, id: IDCoercible) -> StructureKind:
+    def get_structure_kind(
+        self, id: IDCoercible, task: TaskLike | None = None
+    ) -> StructureKind:
         """GetStructureKind
 
         Get one structure kind by ID
 
         Args:
             id (ID): No description
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            StructureKind
-        """
+            StructureKind"""
         variables: dict[str, Any] = {}
         variables["id"] = id
-        return self.execute(GetStructureKindQuery, variables).structure_kind
+        return self.execute(GetStructureKindQuery, variables, task=task).structure_kind
 
     async def alist_structure_kinds(
         self,
         filters: StructureKindFilter | None | UnsetType = UNSET,
         pagination: VocabularyPaginationInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> tuple[StructureKind, ...]:
         """ListStructureKinds
 
@@ -13658,21 +13991,24 @@ class KraphApi:
         Args:
             filters (StructureKindFilter | None, optional): No description.
             pagination (VocabularyPaginationInput | None, optional): No description.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            list[StructureKind]
-        """
+            list[StructureKind]"""
         variables: dict[str, Any] = {}
         if filters is not UNSET:
             variables["filters"] = filters
         if pagination is not UNSET:
             variables["pagination"] = pagination
-        return (await self.aexecute(ListStructureKindsQuery, variables)).structure_kinds
+        return (
+            await self.aexecute(ListStructureKindsQuery, variables, task=task)
+        ).structure_kinds
 
     def list_structure_kinds(
         self,
         filters: StructureKindFilter | None | UnsetType = UNSET,
         pagination: VocabularyPaginationInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> tuple[StructureKind, ...]:
         """ListStructureKinds
 
@@ -13681,21 +14017,24 @@ class KraphApi:
         Args:
             filters (StructureKindFilter | None, optional): No description.
             pagination (VocabularyPaginationInput | None, optional): No description.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            list[StructureKind]
-        """
+            list[StructureKind]"""
         variables: dict[str, Any] = {}
         if filters is not UNSET:
             variables["filters"] = filters
         if pagination is not UNSET:
             variables["pagination"] = pagination
-        return self.execute(ListStructureKindsQuery, variables).structure_kinds
+        return self.execute(
+            ListStructureKindsQuery, variables, task=task
+        ).structure_kinds
 
     async def asearch_structure_kinds(
         self,
         search: str | None | UnsetType = UNSET,
         values: list[IDCoercible] | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> tuple[SearchStructureKindsQueryOptions, ...]:
         """SearchStructureKinds
 
@@ -13704,21 +14043,24 @@ class KraphApi:
         Args:
             search (str | None, optional): No description.
             values (list[ID] | None, optional): No description.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            list[SearchStructureKindsQueryStructureKinds]
-        """
+            list[SearchStructureKindsQueryStructureKinds]"""
         variables: dict[str, Any] = {}
         if search is not UNSET:
             variables["search"] = search
         if values is not UNSET:
             variables["values"] = values
-        return (await self.aexecute(SearchStructureKindsQuery, variables)).options
+        return (
+            await self.aexecute(SearchStructureKindsQuery, variables, task=task)
+        ).options
 
     def search_structure_kinds(
         self,
         search: str | None | UnsetType = UNSET,
         values: list[IDCoercible] | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> tuple[SearchStructureKindsQueryOptions, ...]:
         """SearchStructureKinds
 
@@ -13727,51 +14069,58 @@ class KraphApi:
         Args:
             search (str | None, optional): No description.
             values (list[ID] | None, optional): No description.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            list[SearchStructureKindsQueryStructureKinds]
-        """
+            list[SearchStructureKindsQueryStructureKinds]"""
         variables: dict[str, Any] = {}
         if search is not UNSET:
             variables["search"] = search
         if values is not UNSET:
             variables["values"] = values
-        return self.execute(SearchStructureKindsQuery, variables).options
+        return self.execute(SearchStructureKindsQuery, variables, task=task).options
 
-    async def aget_metric_kind(self, id: IDCoercible) -> MetricKind:
+    async def aget_metric_kind(
+        self, id: IDCoercible, task: TaskLike | None = None
+    ) -> MetricKind:
         """GetMetricKind
 
         Get one metric kind by ID
 
         Args:
             id (ID): No description
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            MetricKind
-        """
+            MetricKind"""
         variables: dict[str, Any] = {}
         variables["id"] = id
-        return (await self.aexecute(GetMetricKindQuery, variables)).metric_kind
+        return (
+            await self.aexecute(GetMetricKindQuery, variables, task=task)
+        ).metric_kind
 
-    def get_metric_kind(self, id: IDCoercible) -> MetricKind:
+    def get_metric_kind(
+        self, id: IDCoercible, task: TaskLike | None = None
+    ) -> MetricKind:
         """GetMetricKind
 
         Get one metric kind by ID
 
         Args:
             id (ID): No description
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            MetricKind
-        """
+            MetricKind"""
         variables: dict[str, Any] = {}
         variables["id"] = id
-        return self.execute(GetMetricKindQuery, variables).metric_kind
+        return self.execute(GetMetricKindQuery, variables, task=task).metric_kind
 
     async def alist_metric_kinds(
         self,
         filters: MetricKindFilter | None | UnsetType = UNSET,
         pagination: VocabularyPaginationInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> tuple[MetricKind, ...]:
         """ListMetricKinds
 
@@ -13780,21 +14129,24 @@ class KraphApi:
         Args:
             filters (MetricKindFilter | None, optional): No description.
             pagination (VocabularyPaginationInput | None, optional): No description.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            list[MetricKind]
-        """
+            list[MetricKind]"""
         variables: dict[str, Any] = {}
         if filters is not UNSET:
             variables["filters"] = filters
         if pagination is not UNSET:
             variables["pagination"] = pagination
-        return (await self.aexecute(ListMetricKindsQuery, variables)).metric_kinds
+        return (
+            await self.aexecute(ListMetricKindsQuery, variables, task=task)
+        ).metric_kinds
 
     def list_metric_kinds(
         self,
         filters: MetricKindFilter | None | UnsetType = UNSET,
         pagination: VocabularyPaginationInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> tuple[MetricKind, ...]:
         """ListMetricKinds
 
@@ -13803,21 +14155,22 @@ class KraphApi:
         Args:
             filters (MetricKindFilter | None, optional): No description.
             pagination (VocabularyPaginationInput | None, optional): No description.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            list[MetricKind]
-        """
+            list[MetricKind]"""
         variables: dict[str, Any] = {}
         if filters is not UNSET:
             variables["filters"] = filters
         if pagination is not UNSET:
             variables["pagination"] = pagination
-        return self.execute(ListMetricKindsQuery, variables).metric_kinds
+        return self.execute(ListMetricKindsQuery, variables, task=task).metric_kinds
 
     async def asearch_metric_kinds(
         self,
         search: str | None | UnsetType = UNSET,
         values: list[IDCoercible] | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> tuple[SearchMetricKindsQueryOptions, ...]:
         """SearchMetricKinds
 
@@ -13826,21 +14179,24 @@ class KraphApi:
         Args:
             search (str | None, optional): No description.
             values (list[ID] | None, optional): No description.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            list[SearchMetricKindsQueryMetricKinds]
-        """
+            list[SearchMetricKindsQueryMetricKinds]"""
         variables: dict[str, Any] = {}
         if search is not UNSET:
             variables["search"] = search
         if values is not UNSET:
             variables["values"] = values
-        return (await self.aexecute(SearchMetricKindsQuery, variables)).options
+        return (
+            await self.aexecute(SearchMetricKindsQuery, variables, task=task)
+        ).options
 
     def search_metric_kinds(
         self,
         search: str | None | UnsetType = UNSET,
         values: list[IDCoercible] | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
     ) -> tuple[SearchMetricKindsQueryOptions, ...]:
         """SearchMetricKinds
 
@@ -13849,16 +14205,16 @@ class KraphApi:
         Args:
             search (str | None, optional): No description.
             values (list[ID] | None, optional): No description.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            list[SearchMetricKindsQueryMetricKinds]
-        """
+            list[SearchMetricKindsQueryMetricKinds]"""
         variables: dict[str, Any] = {}
         if search is not UNSET:
             variables["search"] = search
         if values is not UNSET:
             variables["values"] = values
-        return self.execute(SearchMetricKindsQuery, variables).options
+        return self.execute(SearchMetricKindsQuery, variables, task=task).options
 
 
 AssertEntityExistsInput.model_rebuild()
