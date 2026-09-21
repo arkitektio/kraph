@@ -43,12 +43,11 @@ class FakeRath:
         yield self._answer(variables, headers)
 
 
-def client(name: str = "a", task_token: Optional[str] = None) -> Kraph:
+def client(name: str = "a") -> Kraph:
     """A real client over a fake rath, built without validating the rath's type."""
     return Kraph.model_construct(
         rath=FakeRath(),
         datalayer=DataLayer(endpoint_url=f"http://{name}.invalid"),
-        task_token=task_token,
     )
 
 
@@ -116,13 +115,6 @@ async def test_none_arguments_are_omitted() -> None:
     assert mine.rath.sent == [{"id": "store-1"}, {"id": "store-1"}, {"id": "store-1", "note": "x"}]
 
 
-@pytest.mark.asyncio
-async def test_a_task_view_stamps_its_provenance_token() -> None:
-    plain, task = client(), client(task_token="tok")
-    await plain.aexecute(GetStore, {"id": "store-1"})
-    await task.aexecute(GetStore, {"id": "store-1"})
-    assert plain.rath.headers == [None]
-    assert task.rath.headers == [{TASK_HEADER: "tok"}]
 
 
 @pytest.mark.asyncio
@@ -139,7 +131,7 @@ async def test_the_ambient_task_is_stamped_without_a_view() -> None:
     await shared.aexecute(GetStore, {"id": "store-1"})
 
     assert shared.rath.headers == [None, {TASK_HEADER: "tok"}, None]
-    assert shared.task_token is None, "the shared client is never changed"
+    assert "task_token" not in Kraph.model_fields, "no per-task copy exists"
 
 
 @pytest.mark.asyncio
@@ -170,7 +162,7 @@ def test_every_operation_is_a_method_of_the_client() -> None:
     kraph = real_client("self")
 
     assert callable(kraph.create_graph) and callable(kraph.aget_graph)
-    assert set(Kraph.model_fields) == {"datalayer", "rath", "task_token"}
+    assert set(Kraph.model_fields) == {"datalayer", "rath"}
 
 
 @pytest.mark.asyncio
@@ -193,12 +185,6 @@ async def test_a_generated_method_calls_through_its_own_client(
     assert seen == [kraph]
 
 
-def test_for_task_is_a_view_sharing_the_clients() -> None:
-    kraph = real_client("self")
-    view = kraph.for_task(SimpleNamespace(token="tok"))
-
-    assert view.task_token == "tok" and kraph.task_token is None
-    assert view.rath is kraph.rath and view.datalayer is kraph.datalayer
 
 
 # --------------------------------------------------------------------------- #
