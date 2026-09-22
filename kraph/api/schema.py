@@ -1,3 +1,4 @@
+import builtins
 from datetime import datetime
 from enum import Enum
 from kraph.scalars import (
@@ -7256,8 +7257,8 @@ class KraphApi:
 
         Returns:
             EntityCategory"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["key"] = key
         if description is not UNSET:
             _input["description"] = description
@@ -7319,8 +7320,8 @@ class KraphApi:
 
         Returns:
             EntityCategory"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["key"] = key
         if description is not UNSET:
             _input["description"] = description
@@ -7386,8 +7387,8 @@ class KraphApi:
 
         Returns:
             EntityCategory"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         if key is not UNSET:
             _input["key"] = key
@@ -7456,8 +7457,8 @@ class KraphApi:
 
         Returns:
             EntityCategory"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         if key is not UNSET:
             _input["key"] = key
@@ -7498,8 +7499,8 @@ class KraphApi:
 
         Returns:
             ID"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         variables["input"] = _input
         return (
@@ -7519,8 +7520,8 @@ class KraphApi:
 
         Returns:
             ID"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         variables["input"] = _input
         return self.execute(
@@ -7564,8 +7565,8 @@ class KraphApi:
 
         Returns:
             RelationCategory"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["key"] = key
         if description is not UNSET:
             _input["description"] = description
@@ -7627,8 +7628,8 @@ class KraphApi:
 
         Returns:
             RelationCategory"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["key"] = key
         if description is not UNSET:
             _input["description"] = description
@@ -7688,8 +7689,8 @@ class KraphApi:
 
         Returns:
             RelationCategory"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         if key is not UNSET:
             _input["key"] = key
@@ -7748,8 +7749,8 @@ class KraphApi:
 
         Returns:
             RelationCategory"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         if key is not UNSET:
             _input["key"] = key
@@ -7786,8 +7787,8 @@ class KraphApi:
 
         Returns:
             ID"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         variables["input"] = _input
         return (
@@ -7805,8 +7806,8 @@ class KraphApi:
 
         Returns:
             ID"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         variables["input"] = _input
         return self.execute(
@@ -7852,8 +7853,8 @@ class KraphApi:
 
         Returns:
             MeasurementCategory"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["key"] = key
         if description is not UNSET:
             _input["description"] = description
@@ -7917,8 +7918,8 @@ class KraphApi:
 
         Returns:
             MeasurementCategory"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["key"] = key
         if description is not UNSET:
             _input["description"] = description
@@ -7978,8 +7979,8 @@ class KraphApi:
 
         Returns:
             MeasurementCategory"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         if key is not UNSET:
             _input["key"] = key
@@ -8038,8 +8039,8 @@ class KraphApi:
 
         Returns:
             MeasurementCategory"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         if key is not UNSET:
             _input["key"] = key
@@ -8076,8 +8077,8 @@ class KraphApi:
 
         Returns:
             ID"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         variables["input"] = _input
         return (
@@ -8095,8 +8096,8 @@ class KraphApi:
 
         Returns:
             ID"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         variables["input"] = _input
         return self.execute(
@@ -8142,8 +8143,8 @@ class KraphApi:
 
         Returns:
             StructureRelationCategory"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["key"] = key
         if description is not UNSET:
             _input["description"] = description
@@ -8209,8 +8210,8 @@ class KraphApi:
 
         Returns:
             StructureRelationCategory"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["key"] = key
         if description is not UNSET:
             _input["description"] = description
@@ -8270,8 +8271,8 @@ class KraphApi:
 
         Returns:
             StructureRelationCategory"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         if key is not UNSET:
             _input["key"] = key
@@ -8332,8 +8333,8 @@ class KraphApi:
 
         Returns:
             StructureRelationCategory"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         if key is not UNSET:
             _input["key"] = key
@@ -8370,8 +8371,8 @@ class KraphApi:
 
         Returns:
             ID"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         variables["input"] = _input
         return (
@@ -8393,8 +8394,8 @@ class KraphApi:
 
         Returns:
             ID"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         variables["input"] = _input
         return self.execute(
@@ -8442,8 +8443,8 @@ class KraphApi:
 
         Returns:
             NaturalEventCategory"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["key"] = key
         if description is not UNSET:
             _input["description"] = description
@@ -8512,8 +8513,8 @@ class KraphApi:
 
         Returns:
             NaturalEventCategory"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["key"] = key
         if description is not UNSET:
             _input["description"] = description
@@ -8574,8 +8575,8 @@ class KraphApi:
 
         Returns:
             NaturalEventCategory"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         if key is not UNSET:
             _input["key"] = key
@@ -8636,8 +8637,8 @@ class KraphApi:
 
         Returns:
             NaturalEventCategory"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         if key is not UNSET:
             _input["key"] = key
@@ -8674,8 +8675,8 @@ class KraphApi:
 
         Returns:
             ID"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         variables["input"] = _input
         return (
@@ -8697,8 +8698,8 @@ class KraphApi:
 
         Returns:
             ID"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         variables["input"] = _input
         return self.execute(
@@ -8748,8 +8749,8 @@ class KraphApi:
 
         Returns:
             ProtocolEventCategory"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["key"] = key
         if description is not UNSET:
             _input["description"] = description
@@ -8821,8 +8822,8 @@ class KraphApi:
 
         Returns:
             ProtocolEventCategory"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["key"] = key
         if description is not UNSET:
             _input["description"] = description
@@ -8884,8 +8885,8 @@ class KraphApi:
 
         Returns:
             ProtocolEventCategory"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         if key is not UNSET:
             _input["key"] = key
@@ -8946,8 +8947,8 @@ class KraphApi:
 
         Returns:
             ProtocolEventCategory"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         if key is not UNSET:
             _input["key"] = key
@@ -8984,8 +8985,8 @@ class KraphApi:
 
         Returns:
             ID"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         variables["input"] = _input
         return (
@@ -9007,8 +9008,8 @@ class KraphApi:
 
         Returns:
             ID"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         variables["input"] = _input
         return self.execute(
@@ -9040,8 +9041,8 @@ class KraphApi:
 
         Returns:
             AssertedEntity"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["term"] = term
         _input["supportingEvidence"] = supporting_evidence
         if observed_at is not UNSET:
@@ -9080,8 +9081,8 @@ class KraphApi:
 
         Returns:
             AssertedEntity"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["term"] = term
         _input["supportingEvidence"] = supporting_evidence
         if observed_at is not UNSET:
@@ -9122,8 +9123,8 @@ class KraphApi:
 
         Returns:
             AssertedNaturalEvent"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["term"] = term
         _input["inputs"] = inputs
         _input["outputs"] = outputs
@@ -9165,8 +9166,8 @@ class KraphApi:
 
         Returns:
             AssertedNaturalEvent"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["term"] = term
         _input["inputs"] = inputs
         _input["outputs"] = outputs
@@ -9208,8 +9209,8 @@ class KraphApi:
 
         Returns:
             AssertedProtocolEvent"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["term"] = term
         _input["inputs"] = inputs
         _input["outputs"] = outputs
@@ -9251,8 +9252,8 @@ class KraphApi:
 
         Returns:
             AssertedProtocolEvent"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["term"] = term
         _input["inputs"] = inputs
         _input["outputs"] = outputs
@@ -9281,8 +9282,8 @@ class KraphApi:
 
         Returns:
             AssertedInstances"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["classifications"] = classifications
         variables["input"] = _input
         return (
@@ -9303,8 +9304,8 @@ class KraphApi:
 
         Returns:
             AssertedInstances"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["classifications"] = classifications
         variables["input"] = _input
         return self.execute(ClassifyNodesMutation, variables, task=task).classify_nodes
@@ -9330,8 +9331,8 @@ class KraphApi:
 
         Returns:
             AssertedSameness"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["instances"] = instances
         if observed_at is not UNSET:
             _input["observedAt"] = observed_at
@@ -9364,8 +9365,8 @@ class KraphApi:
 
         Returns:
             AssertedSameness"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["instances"] = instances
         if observed_at is not UNSET:
             _input["observedAt"] = observed_at
@@ -9401,8 +9402,8 @@ class KraphApi:
 
         Returns:
             AssertedStructure"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["object"] = object
         _input["metrics"] = metrics
         _input["derivedFrom"] = derived_from
@@ -9440,8 +9441,8 @@ class KraphApi:
 
         Returns:
             AssertedStructure"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["object"] = object
         _input["metrics"] = metrics
         _input["derivedFrom"] = derived_from
@@ -9488,8 +9489,8 @@ class KraphApi:
 
         Returns:
             AssertedMetric"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["key"] = key
         _input["value"] = value
         _input["valueKind"] = value_kind
@@ -9542,8 +9543,8 @@ class KraphApi:
 
         Returns:
             AssertedMetric"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["key"] = key
         _input["value"] = value
         _input["valueKind"] = value_kind
@@ -9594,8 +9595,8 @@ class KraphApi:
 
         Returns:
             AssertedMetric"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["key"] = key
         _input["value"] = value
         _input["valueKind"] = value_kind
@@ -9647,8 +9648,8 @@ class KraphApi:
 
         Returns:
             AssertedMetric"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["key"] = key
         _input["value"] = value
         _input["valueKind"] = value_kind
@@ -9697,8 +9698,8 @@ class KraphApi:
 
         Returns:
             AssertedMetric"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["key"] = key
         _input["value"] = value
         _input["valueKind"] = value_kind
@@ -9747,8 +9748,8 @@ class KraphApi:
 
         Returns:
             AssertedMetric"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["key"] = key
         _input["value"] = value
         _input["valueKind"] = value_kind
@@ -9793,8 +9794,8 @@ class KraphApi:
 
         Returns:
             AssertedRelation"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["sourceId"] = source_id
         _input["targetId"] = target_id
         _input["supportingEvidence"] = supporting_evidence
@@ -9835,8 +9836,8 @@ class KraphApi:
 
         Returns:
             AssertedRelation"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["sourceId"] = source_id
         _input["targetId"] = target_id
         _input["supportingEvidence"] = supporting_evidence
@@ -9878,8 +9879,8 @@ class KraphApi:
 
         Returns:
             AssertedMeasurement"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["sourceId"] = source_id
         _input["targetId"] = target_id
         _input["supportingEvidence"] = supporting_evidence
@@ -9921,8 +9922,8 @@ class KraphApi:
 
         Returns:
             AssertedMeasurement"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["sourceId"] = source_id
         _input["targetId"] = target_id
         _input["supportingEvidence"] = supporting_evidence
@@ -9964,8 +9965,8 @@ class KraphApi:
 
         Returns:
             AssertedStructureRelation"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["sourceId"] = source_id
         _input["targetId"] = target_id
         _input["supportingEvidence"] = supporting_evidence
@@ -10009,8 +10010,8 @@ class KraphApi:
 
         Returns:
             AssertedStructureRelation"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["sourceId"] = source_id
         _input["targetId"] = target_id
         _input["supportingEvidence"] = supporting_evidence
@@ -10052,8 +10053,8 @@ class KraphApi:
 
         Returns:
             AssertedParticipation"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["event"] = event
         _input["entity"] = entity
         _input["role"] = role
@@ -10095,8 +10096,8 @@ class KraphApi:
 
         Returns:
             AssertedParticipation"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["event"] = event
         _input["entity"] = entity
         _input["role"] = role
@@ -10127,8 +10128,8 @@ class KraphApi:
 
         Returns:
             AssertedLinks"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["event"] = event
         _input["participants"] = participants
         variables["input"] = _input
@@ -10152,8 +10153,8 @@ class KraphApi:
 
         Returns:
             AssertedLinks"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["event"] = event
         _input["participants"] = participants
         variables["input"] = _input
@@ -10181,8 +10182,8 @@ class KraphApi:
 
         Returns:
             AssertedComment"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["identifier"] = identifier
         _input["object"] = object
         _input["descendants"] = descendants
@@ -10213,8 +10214,8 @@ class KraphApi:
 
         Returns:
             AssertedComment"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["identifier"] = identifier
         _input["object"] = object
         _input["descendants"] = descendants
@@ -10249,8 +10250,8 @@ class KraphApi:
 
         Returns:
             Graph"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["name"] = name
         if description is not UNSET:
             _input["description"] = description
@@ -10288,8 +10289,8 @@ class KraphApi:
 
         Returns:
             Graph"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["name"] = name
         if description is not UNSET:
             _input["description"] = description
@@ -10326,8 +10327,8 @@ class KraphApi:
 
         Returns:
             Graph"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         if name is not UNSET:
             _input["name"] = name
@@ -10369,8 +10370,8 @@ class KraphApi:
 
         Returns:
             Graph"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         if name is not UNSET:
             _input["name"] = name
@@ -10402,8 +10403,8 @@ class KraphApi:
 
         Returns:
             Graph"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         _input["nodePositions"] = node_positions
         variables["input"] = _input
@@ -10428,8 +10429,8 @@ class KraphApi:
 
         Returns:
             Graph"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         _input["nodePositions"] = node_positions
         variables["input"] = _input
@@ -10448,8 +10449,8 @@ class KraphApi:
 
         Returns:
             Graph"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         variables["input"] = _input
         return (
@@ -10467,8 +10468,8 @@ class KraphApi:
 
         Returns:
             Graph"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         variables["input"] = _input
         return self.execute(ArchiveGraphMutation, variables, task=task).archive_graph
@@ -10484,8 +10485,8 @@ class KraphApi:
 
         Returns:
             ID"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         variables["input"] = _input
         return (
@@ -10503,8 +10504,8 @@ class KraphApi:
 
         Returns:
             ID"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         variables["input"] = _input
         return self.execute(DeleteGraphMutation, variables, task=task).delete_graph
@@ -10532,8 +10533,8 @@ class KraphApi:
 
         Returns:
             AssertedEntity"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         if at is not UNSET:
             _input["at"] = at
@@ -10567,8 +10568,8 @@ class KraphApi:
 
         Returns:
             AssertedEntity"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         if at is not UNSET:
             _input["at"] = at
@@ -10596,8 +10597,8 @@ class KraphApi:
 
         Returns:
             AssertedEntity"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         if at is not UNSET:
             _input["at"] = at
@@ -10627,8 +10628,8 @@ class KraphApi:
 
         Returns:
             AssertedEntity"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         if at is not UNSET:
             _input["at"] = at
@@ -10656,8 +10657,8 @@ class KraphApi:
 
         Returns:
             AssertedNaturalEvent"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         if at is not UNSET:
             _input["at"] = at
@@ -10687,8 +10688,8 @@ class KraphApi:
 
         Returns:
             AssertedNaturalEvent"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         if at is not UNSET:
             _input["at"] = at
@@ -10718,8 +10719,8 @@ class KraphApi:
 
         Returns:
             AssertedNaturalEvent"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         if at is not UNSET:
             _input["at"] = at
@@ -10749,8 +10750,8 @@ class KraphApi:
 
         Returns:
             AssertedNaturalEvent"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         if at is not UNSET:
             _input["at"] = at
@@ -10780,8 +10781,8 @@ class KraphApi:
 
         Returns:
             AssertedProtocolEvent"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         if at is not UNSET:
             _input["at"] = at
@@ -10811,8 +10812,8 @@ class KraphApi:
 
         Returns:
             AssertedProtocolEvent"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         if at is not UNSET:
             _input["at"] = at
@@ -10842,8 +10843,8 @@ class KraphApi:
 
         Returns:
             AssertedProtocolEvent"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         if at is not UNSET:
             _input["at"] = at
@@ -10873,8 +10874,8 @@ class KraphApi:
 
         Returns:
             AssertedProtocolEvent"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         if at is not UNSET:
             _input["at"] = at
@@ -10904,8 +10905,8 @@ class KraphApi:
 
         Returns:
             AssertedStructure"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         if at is not UNSET:
             _input["at"] = at
@@ -10935,8 +10936,8 @@ class KraphApi:
 
         Returns:
             AssertedStructure"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         if at is not UNSET:
             _input["at"] = at
@@ -10966,8 +10967,8 @@ class KraphApi:
 
         Returns:
             AssertedStructure"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         if at is not UNSET:
             _input["at"] = at
@@ -10997,8 +10998,8 @@ class KraphApi:
 
         Returns:
             AssertedStructure"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         if at is not UNSET:
             _input["at"] = at
@@ -11028,8 +11029,8 @@ class KraphApi:
 
         Returns:
             AssertedMetric"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         if at is not UNSET:
             _input["at"] = at
@@ -11059,8 +11060,8 @@ class KraphApi:
 
         Returns:
             AssertedMetric"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         if at is not UNSET:
             _input["at"] = at
@@ -11088,8 +11089,8 @@ class KraphApi:
 
         Returns:
             AssertedMetric"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         if at is not UNSET:
             _input["at"] = at
@@ -11119,8 +11120,8 @@ class KraphApi:
 
         Returns:
             AssertedMetric"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         if at is not UNSET:
             _input["at"] = at
@@ -11148,8 +11149,8 @@ class KraphApi:
 
         Returns:
             AssertedComment"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         if at is not UNSET:
             _input["at"] = at
@@ -11179,8 +11180,8 @@ class KraphApi:
 
         Returns:
             AssertedComment"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         if at is not UNSET:
             _input["at"] = at
@@ -11208,8 +11209,8 @@ class KraphApi:
 
         Returns:
             AssertedComment"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         if at is not UNSET:
             _input["at"] = at
@@ -11239,8 +11240,8 @@ class KraphApi:
 
         Returns:
             AssertedComment"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         if at is not UNSET:
             _input["at"] = at
@@ -11270,8 +11271,8 @@ class KraphApi:
 
         Returns:
             AssertedRelation"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         if at is not UNSET:
             _input["at"] = at
@@ -11301,8 +11302,8 @@ class KraphApi:
 
         Returns:
             AssertedRelation"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         if at is not UNSET:
             _input["at"] = at
@@ -11332,8 +11333,8 @@ class KraphApi:
 
         Returns:
             AssertedMeasurement"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         if at is not UNSET:
             _input["at"] = at
@@ -11363,8 +11364,8 @@ class KraphApi:
 
         Returns:
             AssertedMeasurement"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         if at is not UNSET:
             _input["at"] = at
@@ -11394,8 +11395,8 @@ class KraphApi:
 
         Returns:
             AssertedStructureRelation"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         if at is not UNSET:
             _input["at"] = at
@@ -11425,8 +11426,8 @@ class KraphApi:
 
         Returns:
             AssertedStructureRelation"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         if at is not UNSET:
             _input["at"] = at
@@ -11456,8 +11457,8 @@ class KraphApi:
 
         Returns:
             AssertedParticipation"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         if at is not UNSET:
             _input["at"] = at
@@ -11487,8 +11488,8 @@ class KraphApi:
 
         Returns:
             AssertedParticipation"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         if at is not UNSET:
             _input["at"] = at
@@ -11518,8 +11519,8 @@ class KraphApi:
 
         Returns:
             AssertedSameness"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         if at is not UNSET:
             _input["at"] = at
@@ -11549,8 +11550,8 @@ class KraphApi:
 
         Returns:
             AssertedSameness"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         if at is not UNSET:
             _input["at"] = at
@@ -11580,8 +11581,8 @@ class KraphApi:
 
         Returns:
             AssertedLinks"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         if at is not UNSET:
             _input["at"] = at
@@ -11611,8 +11612,8 @@ class KraphApi:
 
         Returns:
             AssertedLinks"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         if at is not UNSET:
             _input["at"] = at
@@ -11639,8 +11640,8 @@ class KraphApi:
 
         Returns:
             AssertedLinks"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["ids"] = ids
         if at is not UNSET:
             _input["at"] = at
@@ -11669,8 +11670,8 @@ class KraphApi:
 
         Returns:
             AssertedLinks"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["ids"] = ids
         if at is not UNSET:
             _input["at"] = at
@@ -11706,8 +11707,8 @@ class KraphApi:
 
         Returns:
             Term"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["kind"] = kind
         _input["key"] = key
         if label is not UNSET:
@@ -11752,8 +11753,8 @@ class KraphApi:
 
         Returns:
             Term"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["kind"] = kind
         _input["key"] = key
         if label is not UNSET:
@@ -11794,8 +11795,8 @@ class KraphApi:
 
         Returns:
             Term"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         if label is not UNSET:
             _input["label"] = label
@@ -11837,8 +11838,8 @@ class KraphApi:
 
         Returns:
             Term"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         if label is not UNSET:
             _input["label"] = label
@@ -11864,8 +11865,8 @@ class KraphApi:
 
         Returns:
             ID"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         variables["input"] = _input
         return (
@@ -11883,8 +11884,8 @@ class KraphApi:
 
         Returns:
             ID"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         variables["input"] = _input
         return self.execute(DeleteTermMutation, variables, task=task).delete_term
@@ -11922,8 +11923,8 @@ class KraphApi:
 
         Returns:
             StructureKind"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         if key is not UNSET:
             _input["key"] = key
@@ -11979,8 +11980,8 @@ class KraphApi:
 
         Returns:
             StructureKind"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         if key is not UNSET:
             _input["key"] = key
@@ -12014,8 +12015,8 @@ class KraphApi:
 
         Returns:
             ID"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         variables["input"] = _input
         return (
@@ -12033,8 +12034,8 @@ class KraphApi:
 
         Returns:
             ID"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         variables["input"] = _input
         return self.execute(
@@ -12074,8 +12075,8 @@ class KraphApi:
 
         Returns:
             MetricKind"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         if key is not UNSET:
             _input["key"] = key
@@ -12131,8 +12132,8 @@ class KraphApi:
 
         Returns:
             MetricKind"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         if key is not UNSET:
             _input["key"] = key
@@ -12166,8 +12167,8 @@ class KraphApi:
 
         Returns:
             ID"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         variables["input"] = _input
         return (
@@ -12185,8 +12186,8 @@ class KraphApi:
 
         Returns:
             ID"""
-        variables: dict[str, Any] = {}
-        _input: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
         _input["id"] = id
         variables["input"] = _input
         return self.execute(
@@ -12206,7 +12207,7 @@ class KraphApi:
 
         Returns:
             EntityCategory"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         variables["id"] = id
         return (
             await self.aexecute(GetEntityCategoryQuery, variables, task=task)
@@ -12225,7 +12226,7 @@ class KraphApi:
 
         Returns:
             EntityCategory"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         variables["id"] = id
         return self.execute(
             GetEntityCategoryQuery, variables, task=task
@@ -12248,7 +12249,7 @@ class KraphApi:
 
         Returns:
             list[EntityCategory]"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         if filters is not UNSET:
             variables["filters"] = filters
         if pagination is not UNSET:
@@ -12274,7 +12275,7 @@ class KraphApi:
 
         Returns:
             list[EntityCategory]"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         if filters is not UNSET:
             variables["filters"] = filters
         if pagination is not UNSET:
@@ -12300,7 +12301,7 @@ class KraphApi:
 
         Returns:
             list[SearchEntityCategoriesQueryEntityCategories]"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         if search is not UNSET:
             variables["search"] = search
         if values is not UNSET:
@@ -12326,7 +12327,7 @@ class KraphApi:
 
         Returns:
             list[SearchEntityCategoriesQueryEntityCategories]"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         if search is not UNSET:
             variables["search"] = search
         if values is not UNSET:
@@ -12346,7 +12347,7 @@ class KraphApi:
 
         Returns:
             RelationCategory"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         variables["id"] = id
         return (
             await self.aexecute(GetRelationCategoryQuery, variables, task=task)
@@ -12365,7 +12366,7 @@ class KraphApi:
 
         Returns:
             RelationCategory"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         variables["id"] = id
         return self.execute(
             GetRelationCategoryQuery, variables, task=task
@@ -12388,7 +12389,7 @@ class KraphApi:
 
         Returns:
             list[RelationCategory]"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         if filters is not UNSET:
             variables["filters"] = filters
         if pagination is not UNSET:
@@ -12414,7 +12415,7 @@ class KraphApi:
 
         Returns:
             list[RelationCategory]"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         if filters is not UNSET:
             variables["filters"] = filters
         if pagination is not UNSET:
@@ -12440,7 +12441,7 @@ class KraphApi:
 
         Returns:
             list[SearchRelationCategoriesQueryRelationCategories]"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         if search is not UNSET:
             variables["search"] = search
         if values is not UNSET:
@@ -12466,7 +12467,7 @@ class KraphApi:
 
         Returns:
             list[SearchRelationCategoriesQueryRelationCategories]"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         if search is not UNSET:
             variables["search"] = search
         if values is not UNSET:
@@ -12486,7 +12487,7 @@ class KraphApi:
 
         Returns:
             MeasurementCategory"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         variables["id"] = id
         return (
             await self.aexecute(GetMeasurementCategoryQuery, variables, task=task)
@@ -12505,7 +12506,7 @@ class KraphApi:
 
         Returns:
             MeasurementCategory"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         variables["id"] = id
         return self.execute(
             GetMeasurementCategoryQuery, variables, task=task
@@ -12528,7 +12529,7 @@ class KraphApi:
 
         Returns:
             list[MeasurementCategory]"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         if filters is not UNSET:
             variables["filters"] = filters
         if pagination is not UNSET:
@@ -12554,7 +12555,7 @@ class KraphApi:
 
         Returns:
             list[MeasurementCategory]"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         if filters is not UNSET:
             variables["filters"] = filters
         if pagination is not UNSET:
@@ -12580,7 +12581,7 @@ class KraphApi:
 
         Returns:
             list[SearchMeasurementCategoriesQueryMeasurementCategories]"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         if search is not UNSET:
             variables["search"] = search
         if values is not UNSET:
@@ -12606,7 +12607,7 @@ class KraphApi:
 
         Returns:
             list[SearchMeasurementCategoriesQueryMeasurementCategories]"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         if search is not UNSET:
             variables["search"] = search
         if values is not UNSET:
@@ -12628,7 +12629,7 @@ class KraphApi:
 
         Returns:
             StructureRelationCategory"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         variables["id"] = id
         return (
             await self.aexecute(GetStructureRelationCategoryQuery, variables, task=task)
@@ -12647,7 +12648,7 @@ class KraphApi:
 
         Returns:
             StructureRelationCategory"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         variables["id"] = id
         return self.execute(
             GetStructureRelationCategoryQuery, variables, task=task
@@ -12670,7 +12671,7 @@ class KraphApi:
 
         Returns:
             list[StructureRelationCategory]"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         if filters is not UNSET:
             variables["filters"] = filters
         if pagination is not UNSET:
@@ -12698,7 +12699,7 @@ class KraphApi:
 
         Returns:
             list[StructureRelationCategory]"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         if filters is not UNSET:
             variables["filters"] = filters
         if pagination is not UNSET:
@@ -12724,7 +12725,7 @@ class KraphApi:
 
         Returns:
             list[SearchStructureRelationCategoriesQueryStructureRelationCategories]"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         if search is not UNSET:
             variables["search"] = search
         if values is not UNSET:
@@ -12752,7 +12753,7 @@ class KraphApi:
 
         Returns:
             list[SearchStructureRelationCategoriesQueryStructureRelationCategories]"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         if search is not UNSET:
             variables["search"] = search
         if values is not UNSET:
@@ -12774,7 +12775,7 @@ class KraphApi:
 
         Returns:
             NaturalEventCategory"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         variables["id"] = id
         return (
             await self.aexecute(GetNaturalEventCategoryQuery, variables, task=task)
@@ -12793,7 +12794,7 @@ class KraphApi:
 
         Returns:
             NaturalEventCategory"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         variables["id"] = id
         return self.execute(
             GetNaturalEventCategoryQuery, variables, task=task
@@ -12816,7 +12817,7 @@ class KraphApi:
 
         Returns:
             list[NaturalEventCategory]"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         if filters is not UNSET:
             variables["filters"] = filters
         if pagination is not UNSET:
@@ -12842,7 +12843,7 @@ class KraphApi:
 
         Returns:
             list[NaturalEventCategory]"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         if filters is not UNSET:
             variables["filters"] = filters
         if pagination is not UNSET:
@@ -12868,7 +12869,7 @@ class KraphApi:
 
         Returns:
             list[SearchNaturalEventCategoriesQueryNaturalEventCategories]"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         if search is not UNSET:
             variables["search"] = search
         if values is not UNSET:
@@ -12894,7 +12895,7 @@ class KraphApi:
 
         Returns:
             list[SearchNaturalEventCategoriesQueryNaturalEventCategories]"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         if search is not UNSET:
             variables["search"] = search
         if values is not UNSET:
@@ -12916,7 +12917,7 @@ class KraphApi:
 
         Returns:
             ProtocolEventCategory"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         variables["id"] = id
         return (
             await self.aexecute(GetProtocolEventCategoryQuery, variables, task=task)
@@ -12935,7 +12936,7 @@ class KraphApi:
 
         Returns:
             ProtocolEventCategory"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         variables["id"] = id
         return self.execute(
             GetProtocolEventCategoryQuery, variables, task=task
@@ -12958,7 +12959,7 @@ class KraphApi:
 
         Returns:
             list[ProtocolEventCategory]"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         if filters is not UNSET:
             variables["filters"] = filters
         if pagination is not UNSET:
@@ -12984,7 +12985,7 @@ class KraphApi:
 
         Returns:
             list[ProtocolEventCategory]"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         if filters is not UNSET:
             variables["filters"] = filters
         if pagination is not UNSET:
@@ -13010,7 +13011,7 @@ class KraphApi:
 
         Returns:
             list[SearchProtocolEventCategoriesQueryProtocolEventCategories]"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         if search is not UNSET:
             variables["search"] = search
         if values is not UNSET:
@@ -13038,7 +13039,7 @@ class KraphApi:
 
         Returns:
             list[SearchProtocolEventCategoriesQueryProtocolEventCategories]"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         if search is not UNSET:
             variables["search"] = search
         if values is not UNSET:
@@ -13060,7 +13061,7 @@ class KraphApi:
 
         Returns:
             Instance"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         variables["id"] = id
         return (await self.aexecute(GetInstanceQuery, variables, task=task)).instance
 
@@ -13075,7 +13076,7 @@ class KraphApi:
 
         Returns:
             Instance"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         variables["id"] = id
         return self.execute(GetInstanceQuery, variables, task=task).instance
 
@@ -13090,7 +13091,7 @@ class KraphApi:
 
         Returns:
             Link"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         variables["id"] = id
         return (await self.aexecute(GetLinkQuery, variables, task=task)).link
 
@@ -13105,7 +13106,7 @@ class KraphApi:
 
         Returns:
             Link"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         variables["id"] = id
         return self.execute(GetLinkQuery, variables, task=task).link
 
@@ -13122,7 +13123,7 @@ class KraphApi:
 
         Returns:
             list[Standing]"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         variables["id"] = id
         return (await self.aexecute(GetStandingsQuery, variables, task=task)).standings
 
@@ -13139,7 +13140,7 @@ class KraphApi:
 
         Returns:
             list[Standing]"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         variables["id"] = id
         return self.execute(GetStandingsQuery, variables, task=task).standings
 
@@ -13156,7 +13157,7 @@ class KraphApi:
 
         Returns:
             StructureWithMetrics"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         variables["id"] = id
         return (await self.aexecute(GetStructureQuery, variables, task=task)).structure
 
@@ -13173,7 +13174,7 @@ class KraphApi:
 
         Returns:
             StructureWithMetrics"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         variables["id"] = id
         return self.execute(GetStructureQuery, variables, task=task).structure
 
@@ -13194,7 +13195,7 @@ class KraphApi:
 
         Returns:
             StructureWithMetrics"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         variables["identifier"] = identifier
         variables["object"] = object
         return (
@@ -13218,7 +13219,7 @@ class KraphApi:
 
         Returns:
             StructureWithMetrics"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         variables["identifier"] = identifier
         variables["object"] = object
         return self.execute(
@@ -13238,7 +13239,7 @@ class KraphApi:
 
         Returns:
             list[Structure]"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         variables["entityId"] = entity_id
         return (
             await self.aexecute(GetInformingStructuresQuery, variables, task=task)
@@ -13257,7 +13258,7 @@ class KraphApi:
 
         Returns:
             list[Structure]"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         variables["entityId"] = entity_id
         return self.execute(
             GetInformingStructuresQuery, variables, task=task
@@ -13284,7 +13285,7 @@ class KraphApi:
 
         Returns:
             list[Structure]"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         if structure_kind_id is not UNSET:
             variables["structureKindId"] = structure_kind_id
         if filters is not UNSET:
@@ -13318,7 +13319,7 @@ class KraphApi:
 
         Returns:
             list[Structure]"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         if structure_kind_id is not UNSET:
             variables["structureKindId"] = structure_kind_id
         if filters is not UNSET:
@@ -13342,7 +13343,7 @@ class KraphApi:
 
         Returns:
             Metric"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         variables["id"] = id
         return (await self.aexecute(GetMetricQuery, variables, task=task)).metric
 
@@ -13357,7 +13358,7 @@ class KraphApi:
 
         Returns:
             Metric"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         variables["id"] = id
         return self.execute(GetMetricQuery, variables, task=task).metric
 
@@ -13374,7 +13375,7 @@ class KraphApi:
 
         Returns:
             list[Metric]"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         variables["structureId"] = structure_id
         return (
             await self.aexecute(GetMetricsForStructureQuery, variables, task=task)
@@ -13393,7 +13394,7 @@ class KraphApi:
 
         Returns:
             list[Metric]"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         variables["structureId"] = structure_id
         return self.execute(
             GetMetricsForStructureQuery, variables, task=task
@@ -13412,7 +13413,7 @@ class KraphApi:
 
         Returns:
             Comment"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         variables["id"] = id
         return (await self.aexecute(GetCommentQuery, variables, task=task)).comment
 
@@ -13427,7 +13428,7 @@ class KraphApi:
 
         Returns:
             Comment"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         variables["id"] = id
         return self.execute(GetCommentQuery, variables, task=task).comment
 
@@ -13445,7 +13446,7 @@ class KraphApi:
 
         Returns:
             list[Comment]"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         variables["identifier"] = identifier
         variables["object"] = object
         return (
@@ -13466,7 +13467,7 @@ class KraphApi:
 
         Returns:
             list[Comment]"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         variables["identifier"] = identifier
         variables["object"] = object
         return self.execute(GetCommentsForQuery, variables, task=task).comments_for
@@ -13488,7 +13489,7 @@ class KraphApi:
 
         Returns:
             list[SearchStructuresQueryStructures]"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         if search is not UNSET:
             variables["search"] = search
         if values is not UNSET:
@@ -13514,7 +13515,7 @@ class KraphApi:
 
         Returns:
             list[SearchStructuresQueryStructures]"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         if search is not UNSET:
             variables["search"] = search
         if values is not UNSET:
@@ -13532,7 +13533,7 @@ class KraphApi:
 
         Returns:
             Graph"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         variables["id"] = id
         return (await self.aexecute(GetGraphQuery, variables, task=task)).graph
 
@@ -13547,7 +13548,7 @@ class KraphApi:
 
         Returns:
             Graph"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         variables["id"] = id
         return self.execute(GetGraphQuery, variables, task=task).graph
 
@@ -13568,7 +13569,7 @@ class KraphApi:
 
         Returns:
             list[ListGraph]"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         if filters is not UNSET:
             variables["filters"] = filters
         if pagination is not UNSET:
@@ -13592,7 +13593,7 @@ class KraphApi:
 
         Returns:
             list[ListGraph]"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         if filters is not UNSET:
             variables["filters"] = filters
         if pagination is not UNSET:
@@ -13616,7 +13617,7 @@ class KraphApi:
 
         Returns:
             list[SearchGraphsQueryGraphs]"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         if search is not UNSET:
             variables["search"] = search
         if values is not UNSET:
@@ -13640,7 +13641,7 @@ class KraphApi:
 
         Returns:
             list[SearchGraphsQueryGraphs]"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         if search is not UNSET:
             variables["search"] = search
         if values is not UNSET:
@@ -13666,7 +13667,7 @@ class KraphApi:
 
         Returns:
             NodeRef"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         variables["id"] = id
         variables["graph"] = graph
         return (await self.aexecute(GetNodeQuery, variables, task=task)).node
@@ -13693,7 +13694,7 @@ class KraphApi:
 
         Returns:
             NodeRef"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         variables["id"] = id
         variables["graph"] = graph
         return self.execute(GetNodeQuery, variables, task=task).node
@@ -13728,7 +13729,7 @@ class KraphApi:
 
         Returns:
             list[NodeRef]"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         variables["graph"] = graph
         if filters is not UNSET:
             variables["filters"] = filters
@@ -13768,7 +13769,7 @@ class KraphApi:
 
         Returns:
             list[NodeRef]"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         variables["graph"] = graph
         if filters is not UNSET:
             variables["filters"] = filters
@@ -13792,7 +13793,7 @@ class KraphApi:
 
         Returns:
             EntityView"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         variables["id"] = id
         variables["graph"] = graph
         return (await self.aexecute(GetEntityQuery, variables, task=task)).entity
@@ -13811,7 +13812,7 @@ class KraphApi:
 
         Returns:
             EntityView"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         variables["id"] = id
         variables["graph"] = graph
         return self.execute(GetEntityQuery, variables, task=task).entity
@@ -13827,7 +13828,7 @@ class KraphApi:
 
         Returns:
             Term"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         variables["id"] = id
         return (await self.aexecute(GetTermQuery, variables, task=task)).term
 
@@ -13842,7 +13843,7 @@ class KraphApi:
 
         Returns:
             Term"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         variables["id"] = id
         return self.execute(GetTermQuery, variables, task=task).term
 
@@ -13863,7 +13864,7 @@ class KraphApi:
 
         Returns:
             list[Term]"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         if filters is not UNSET:
             variables["filters"] = filters
         if pagination is not UNSET:
@@ -13887,7 +13888,7 @@ class KraphApi:
 
         Returns:
             list[Term]"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         if filters is not UNSET:
             variables["filters"] = filters
         if pagination is not UNSET:
@@ -13911,7 +13912,7 @@ class KraphApi:
 
         Returns:
             list[SearchTermsQueryTerms]"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         if search is not UNSET:
             variables["search"] = search
         if values is not UNSET:
@@ -13935,7 +13936,7 @@ class KraphApi:
 
         Returns:
             list[SearchTermsQueryTerms]"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         if search is not UNSET:
             variables["search"] = search
         if values is not UNSET:
@@ -13955,7 +13956,7 @@ class KraphApi:
 
         Returns:
             StructureKind"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         variables["id"] = id
         return (
             await self.aexecute(GetStructureKindQuery, variables, task=task)
@@ -13974,7 +13975,7 @@ class KraphApi:
 
         Returns:
             StructureKind"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         variables["id"] = id
         return self.execute(GetStructureKindQuery, variables, task=task).structure_kind
 
@@ -13995,7 +13996,7 @@ class KraphApi:
 
         Returns:
             list[StructureKind]"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         if filters is not UNSET:
             variables["filters"] = filters
         if pagination is not UNSET:
@@ -14021,7 +14022,7 @@ class KraphApi:
 
         Returns:
             list[StructureKind]"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         if filters is not UNSET:
             variables["filters"] = filters
         if pagination is not UNSET:
@@ -14047,7 +14048,7 @@ class KraphApi:
 
         Returns:
             list[SearchStructureKindsQueryStructureKinds]"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         if search is not UNSET:
             variables["search"] = search
         if values is not UNSET:
@@ -14073,7 +14074,7 @@ class KraphApi:
 
         Returns:
             list[SearchStructureKindsQueryStructureKinds]"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         if search is not UNSET:
             variables["search"] = search
         if values is not UNSET:
@@ -14093,7 +14094,7 @@ class KraphApi:
 
         Returns:
             MetricKind"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         variables["id"] = id
         return (
             await self.aexecute(GetMetricKindQuery, variables, task=task)
@@ -14112,7 +14113,7 @@ class KraphApi:
 
         Returns:
             MetricKind"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         variables["id"] = id
         return self.execute(GetMetricKindQuery, variables, task=task).metric_kind
 
@@ -14133,7 +14134,7 @@ class KraphApi:
 
         Returns:
             list[MetricKind]"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         if filters is not UNSET:
             variables["filters"] = filters
         if pagination is not UNSET:
@@ -14159,7 +14160,7 @@ class KraphApi:
 
         Returns:
             list[MetricKind]"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         if filters is not UNSET:
             variables["filters"] = filters
         if pagination is not UNSET:
@@ -14183,7 +14184,7 @@ class KraphApi:
 
         Returns:
             list[SearchMetricKindsQueryMetricKinds]"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         if search is not UNSET:
             variables["search"] = search
         if values is not UNSET:
@@ -14209,7 +14210,7 @@ class KraphApi:
 
         Returns:
             list[SearchMetricKindsQueryMetricKinds]"""
-        variables: dict[str, Any] = {}
+        variables: dict[str, builtins.object] = {}
         if search is not UNSET:
             variables["search"] = search
         if values is not UNSET:
