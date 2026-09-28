@@ -11,8 +11,9 @@ license = "GPL-3.0-or-later"
 dependencies = [
     "dokker>=2.8",
     "rath>=4",
-    "rekuest>=4",
     "websockets>=15.0.1",
+    # The service and structures are declared with arkitekt-spec.
+    "arkitekt-spec>=0.1",
 ]
 
 [project.optional-dependencies]

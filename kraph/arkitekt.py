@@ -35,8 +35,8 @@ from rath.links.graphql_ws import GraphQLWSLink
 from rath.links.shrink import ShrinkingLink
 from rath.links.split import SplitLink
 
-from rekuest.app import AppRegistry
-from rekuest.widgets import SearchWidget
+from arkitekt_spec.declare.app import AppRegistry
+from arkitekt_spec.declare.widgets import SearchWidget
 
 from kraph.api.schema import (
     EntityCategory,

@@ -32,7 +32,7 @@ from rath.turms.utils import get_attributes_or_error
 from kraph.client import client_of
 
 if TYPE_CHECKING:
-    from rekuest.structures.registry import StructureRegistry
+    from arkitekt_spec.declare.structures.registry import StructureRegistry
 
     from kraph.kraph import Kraph
 
