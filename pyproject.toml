@@ -13,7 +13,7 @@ dependencies = [
     "rath>=4",
     "websockets>=15.0.1",
     # The service and structures are declared with arkitekt-spec.
-    "arkitekt-spec>=0.1",
+    "arkitekt-spec>=1.1.1",
 ]
 
 [project.optional-dependencies]
