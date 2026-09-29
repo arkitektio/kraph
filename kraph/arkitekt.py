@@ -111,8 +111,8 @@ def kraph(
                 FaktsAuthLink(token_loader=tokens),
                 UploadLink(datalayer=store),
                 SplitLink(
-                    left=AIOHttpLink(endpoint_url=kraph.to_http_path("graphql")),
-                    right=GraphQLWSLink(ws_endpoint_url=kraph.to_ws_path("graphql")),
+                    left=AIOHttpLink(endpoint_url=kraph.to_http_path("graphql"), proxy=kraph.proxy),
+                    right=GraphQLWSLink(ws_endpoint_url=kraph.to_ws_path("graphql"), proxy=kraph.proxy),
                     split=lambda o: o.node.operation != OperationType.SUBSCRIPTION,
                 ),
             )

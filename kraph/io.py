@@ -12,7 +12,10 @@ async def adownload_file(datalayer: "DataLayer", presigned_url: str, file_name: 
     endpoint_url = await datalayer.get_endpoint_url()
 
     async with aiohttp.ClientSession() as session:
-        async with session.get(endpoint_url + presigned_url) as response:
+        # ``proxy=None`` is aiohttp's own default, so an unproxied datalayer is unchanged.
+        async with session.get(
+            endpoint_url + presigned_url, proxy=datalayer.proxy
+        ) as response:
             with open(file_name, "wb") as file:
                 while True:
                     chunk = await response.content.read(
