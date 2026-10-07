@@ -8,13 +8,27 @@ services:
       POSTGRES_MULTIPLE_DATABASES: kraph
       POSTGRES_PASSWORD: hello_django
       POSTGRES_USER: hello_django
+  # Brings the database to the image's release, once, before the server is started: a
+  # service's own start only serves.
+  kraph-migrate:
+    depends_on:
+    - db
+    image: jhnnsrs/kraph:${KRAPH_SERVICE_TAG:-latest}
+    command: arkitekt-service run migrate
+    volumes:
+    - ./configs/kraph.yaml:/workspace/config.yaml
   kraph:
     depends_on:
-    - redis
-    - db
-    - rustfs
+      redis:
+        condition: service_started
+      db:
+        condition: service_started
+      rustfs:
+        condition: service_started
+      kraph-migrate:
+        condition: service_completed_successfully
     image: jhnnsrs/kraph:${KRAPH_SERVICE_TAG:-latest}
-    command: bash run-debug.sh
+    command: arkitekt-service debug
     stop_grace_period: 1s
     ports:
     - "${KRAPH_HOST_PORT:-6888}:80"
