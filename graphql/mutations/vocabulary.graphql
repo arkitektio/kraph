@@ -6,9 +6,6 @@ mutation CreateTerm($input: CreateTermInput!) {
 mutation UpdateTerm($input: UpdateTermInput!) {
   updateTerm(input: $input) { ...Term }
 }
-mutation DeleteTerm($input: DeleteTermInput!) {
-  deleteTerm(input: $input)
-}
 
 # StructureKind and MetricKind are minted by the write that first needs them — there is no
 # create mutation for either, only these.

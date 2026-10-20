@@ -1486,15 +1486,6 @@ class DeleteStructureRelationCategoryInput(BaseModel):
     )
 
 
-class DeleteTermInput(BaseModel):
-    """Input for retiring one of the organization's words"""
-
-    id: str = Field(description="The ID of the term to delete")
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
 class DerivationRuleInput(BaseModel):
     """Configuration for property derivation rules"""
 
@@ -2909,6 +2900,10 @@ class TermFilter(BaseModel):
         default=None,
         description="Filter to terms at least one graph declares a category for",
     )
+    hidden: bool | None = Field(
+        default=None,
+        description="Only hidden words, or only offered ones. Omitted shows both",
+    )
     model_config = ConfigDict(
         frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
     )
@@ -3345,6 +3340,10 @@ class UpdateTermInput(BaseModel):
     )
     image: str | None = Field(
         default=None, description="Optional media store ID for an illustrative image"
+    )
+    hidden: bool | None = Field(
+        default=None,
+        description="Put the word away (true) or offer it again (false). A word is never deleted; omitted leaves it as it is",
     )
     model_config = ConfigDict(
         frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
@@ -4220,6 +4219,8 @@ class Term(TermRef, TermTrait, BaseModel):
     "Persistent URL, where this corresponds to a published ontology term"
     color: tuple[int, ...] | None = Field(default=None)
     "Display colour as RGBA"
+    hidden: bool
+    "Whether curators have put this word away. A word is never deleted; a hidden one is still named by its claims, it is just no longer offered"
     created_at: datetime = Field(alias="createdAt")
     "When this organization first used this word"
     model_config = ConfigDict(frozen=True)
@@ -4227,7 +4228,7 @@ class Term(TermRef, TermTrait, BaseModel):
     class Meta:
         """Meta class for Term"""
 
-        document = "fragment TermRef on Term {\n  id\n  key\n  kind\n  __typename\n}\n\nfragment Term on Term {\n  ...TermRef\n  label\n  description\n  purl\n  color\n  createdAt\n  __typename\n}"
+        document = "fragment TermRef on Term {\n  id\n  key\n  kind\n  __typename\n}\n\nfragment Term on Term {\n  ...TermRef\n  label\n  description\n  purl\n  color\n  hidden\n  createdAt\n  __typename\n}"
         name = "Term"
         type = "Term"
 
@@ -6042,14 +6043,14 @@ class CreateTermMutation(BaseModel):
     class Meta:
         """Meta class for CreateTerm"""
 
-        document = "fragment TermRef on Term {\n  id\n  key\n  kind\n  __typename\n}\n\nfragment Term on Term {\n  ...TermRef\n  label\n  description\n  purl\n  color\n  createdAt\n  __typename\n}\n\nmutation CreateTerm($input: CreateTermInput!) {\n  createTerm(input: $input) {\n    ...Term\n    __typename\n  }\n}"
+        document = "fragment TermRef on Term {\n  id\n  key\n  kind\n  __typename\n}\n\nfragment Term on Term {\n  ...TermRef\n  label\n  description\n  purl\n  color\n  hidden\n  createdAt\n  __typename\n}\n\nmutation CreateTerm($input: CreateTermInput!) {\n  createTerm(input: $input) {\n    ...Term\n    __typename\n  }\n}"
 
 
 class UpdateTermMutation(BaseModel):
     """No documentation found for this operation."""
 
     update_term: Term = Field(alias="updateTerm")
-    "Update a term's label, description, PURL or colour. Its kind and key are its identity and cannot change."
+    "Update a term's label, description, PURL or colour, or hide it. Its kind and key are its identity and cannot change, and a term is never deleted — hiding is how a word is put away."
 
     class Arguments(BaseModel):
         """Arguments for UpdateTerm"""
@@ -6059,24 +6060,7 @@ class UpdateTermMutation(BaseModel):
     class Meta:
         """Meta class for UpdateTerm"""
 
-        document = "fragment TermRef on Term {\n  id\n  key\n  kind\n  __typename\n}\n\nfragment Term on Term {\n  ...TermRef\n  label\n  description\n  purl\n  color\n  createdAt\n  __typename\n}\n\nmutation UpdateTerm($input: UpdateTermInput!) {\n  updateTerm(input: $input) {\n    ...Term\n    __typename\n  }\n}"
-
-
-class DeleteTermMutation(BaseModel):
-    """No documentation found for this operation."""
-
-    delete_term: ID = Field(alias="deleteTerm")
-    "Retire a word nothing has been claimed under"
-
-    class Arguments(BaseModel):
-        """Arguments for DeleteTerm"""
-
-        input: DeleteTermInput
-
-    class Meta:
-        """Meta class for DeleteTerm"""
-
-        document = "mutation DeleteTerm($input: DeleteTermInput!) {\n  deleteTerm(input: $input)\n}"
+        document = "fragment TermRef on Term {\n  id\n  key\n  kind\n  __typename\n}\n\nfragment Term on Term {\n  ...TermRef\n  label\n  description\n  purl\n  color\n  hidden\n  createdAt\n  __typename\n}\n\nmutation UpdateTerm($input: UpdateTermInput!) {\n  updateTerm(input: $input) {\n    ...Term\n    __typename\n  }\n}"
 
 
 class UpdateStructureKindMutation(BaseModel):
@@ -7032,7 +7016,7 @@ class GetTermQuery(BaseModel):
     class Meta:
         """Meta class for GetTerm"""
 
-        document = "fragment TermRef on Term {\n  id\n  key\n  kind\n  __typename\n}\n\nfragment Term on Term {\n  ...TermRef\n  label\n  description\n  purl\n  color\n  createdAt\n  __typename\n}\n\nquery GetTerm($id: ID!) {\n  term(id: $id) {\n    ...Term\n    __typename\n  }\n}"
+        document = "fragment TermRef on Term {\n  id\n  key\n  kind\n  __typename\n}\n\nfragment Term on Term {\n  ...TermRef\n  label\n  description\n  purl\n  color\n  hidden\n  createdAt\n  __typename\n}\n\nquery GetTerm($id: ID!) {\n  term(id: $id) {\n    ...Term\n    __typename\n  }\n}"
 
 
 class ListTermsQuery(BaseModel):
@@ -7050,7 +7034,7 @@ class ListTermsQuery(BaseModel):
     class Meta:
         """Meta class for ListTerms"""
 
-        document = "fragment TermRef on Term {\n  id\n  key\n  kind\n  __typename\n}\n\nfragment Term on Term {\n  ...TermRef\n  label\n  description\n  purl\n  color\n  createdAt\n  __typename\n}\n\nquery ListTerms($filters: TermFilter, $pagination: VocabularyPaginationInput) {\n  terms(filters: $filters, pagination: $pagination) {\n    ...Term\n    __typename\n  }\n}"
+        document = "fragment TermRef on Term {\n  id\n  key\n  kind\n  __typename\n}\n\nfragment Term on Term {\n  ...TermRef\n  label\n  description\n  purl\n  color\n  hidden\n  createdAt\n  __typename\n}\n\nquery ListTerms($filters: TermFilter, $pagination: VocabularyPaginationInput) {\n  terms(filters: $filters, pagination: $pagination) {\n    ...Term\n    __typename\n  }\n}"
 
 
 class SearchTermsQueryOptions(TermTrait, BaseModel):
@@ -11778,11 +11762,12 @@ class KraphApi:
         purl: str | None | UnsetType = UNSET,
         color: Iterable[int] | None | UnsetType = UNSET,
         image: str | None | UnsetType = UNSET,
+        hidden: bool | None | UnsetType = UNSET,
         task: TaskLike | None = None,
     ) -> Term:
         """UpdateTerm
 
-        Update a term's label, description, PURL or colour. Its kind and key are its identity and cannot change.
+        Update a term's label, description, PURL or colour, or hide it. Its kind and key are its identity and cannot change, and a term is never deleted — hiding is how a word is put away.
 
         Args:
             id: The ID of the term to update
@@ -11791,6 +11776,7 @@ class KraphApi:
             purl: Persistent URL, where this corresponds to a published ontology term
             color: Optional RGBA colour
             image: Optional media store ID for an illustrative image
+            hidden: Put the word away (true) or offer it again (false). A word is never deleted; omitted leaves it as it is
             task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
@@ -11808,6 +11794,8 @@ class KraphApi:
             _input["color"] = color
         if image is not UNSET:
             _input["image"] = image
+        if hidden is not UNSET:
+            _input["hidden"] = hidden
         variables["input"] = _input
         return (
             await self.aexecute(UpdateTermMutation, variables, task=task)
@@ -11821,11 +11809,12 @@ class KraphApi:
         purl: str | None | UnsetType = UNSET,
         color: Iterable[int] | None | UnsetType = UNSET,
         image: str | None | UnsetType = UNSET,
+        hidden: bool | None | UnsetType = UNSET,
         task: TaskLike | None = None,
     ) -> Term:
         """UpdateTerm
 
-        Update a term's label, description, PURL or colour. Its kind and key are its identity and cannot change.
+        Update a term's label, description, PURL or colour, or hide it. Its kind and key are its identity and cannot change, and a term is never deleted — hiding is how a word is put away.
 
         Args:
             id: The ID of the term to update
@@ -11834,6 +11823,7 @@ class KraphApi:
             purl: Persistent URL, where this corresponds to a published ontology term
             color: Optional RGBA colour
             image: Optional media store ID for an illustrative image
+            hidden: Put the word away (true) or offer it again (false). A word is never deleted; omitted leaves it as it is
             task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
@@ -11851,44 +11841,10 @@ class KraphApi:
             _input["color"] = color
         if image is not UNSET:
             _input["image"] = image
+        if hidden is not UNSET:
+            _input["hidden"] = hidden
         variables["input"] = _input
         return self.execute(UpdateTermMutation, variables, task=task).update_term
-
-    async def adelete_term(self, id: str, task: TaskLike | None = None) -> ID:
-        """DeleteTerm
-
-        Retire a word nothing has been claimed under
-
-        Args:
-            id: The ID of the term to delete
-            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
-
-        Returns:
-            ID"""
-        variables: dict[str, builtins.object] = {}
-        _input: dict[str, builtins.object] = {}
-        _input["id"] = id
-        variables["input"] = _input
-        return (
-            await self.aexecute(DeleteTermMutation, variables, task=task)
-        ).delete_term
-
-    def delete_term(self, id: str, task: TaskLike | None = None) -> ID:
-        """DeleteTerm
-
-        Retire a word nothing has been claimed under
-
-        Args:
-            id: The ID of the term to delete
-            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
-
-        Returns:
-            ID"""
-        variables: dict[str, builtins.object] = {}
-        _input: dict[str, builtins.object] = {}
-        _input["id"] = id
-        variables["input"] = _input
-        return self.execute(DeleteTermMutation, variables, task=task).delete_term
 
     async def aupdate_structure_kind(
         self,

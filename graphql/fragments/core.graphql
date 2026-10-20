@@ -30,6 +30,7 @@ fragment Term on Term {
   description
   purl
   color
+  hidden
   createdAt
 }
 
