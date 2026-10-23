@@ -32,6 +32,7 @@ dev-dependencies =  [
     "black>=23.1.0,<24",
     "pytest-aiohttp>=1.0.4,<2",
     "ruff>=0.0.254",
+    "turms>=2.3.0",
     "dokker>=2.8",
     "basedpyright>=1.21",
 ]
