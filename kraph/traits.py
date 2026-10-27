@@ -294,16 +294,3 @@ class GraphTrait(ContextBound):
         raise ProjectionTimeout(
             f"view {graph_id} did not draw seq {seq} within {timeout}s: {projection}"
         )
-
-
-class HasPresignedDownloadAccessor(ContextBound):
-    """Download accessor for media stores."""
-
-    _accessor = ("key", "bucket")
-
-    def download(self, file_name: Optional[str] = None, kraph: Optional["Kraph"] = None) -> str:
-        """Download this file through the datalayer of ``kraph``, else of the client that fetched it."""
-        from kraph.io import download_file
-
-        url, key = get_attributes_or_error(self, "presigned_url", "key")
-        return download_file(client_of(self, kraph).datalayer, url, file_name=file_name or key)

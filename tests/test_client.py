@@ -11,13 +11,13 @@ import pytest
 from koil import Koil
 from pydantic import BaseModel, ConfigDict
 from rath.links.testing.mock import AsyncMockLink
-from rath.origin import get_origin, origin_context
+from rath.origin import ContextBound, get_origin, origin_context
 
 from kraph.datalayer import DataLayer
 from kraph.errors import NoKraphFound
 from kraph.kraph import TASK_HEADER, Kraph
 from kraph.rath import KraphRath
-from kraph.traits import GraphTrait, HasPresignedDownloadAccessor, StructureTrait
+from kraph.traits import GraphTrait, StructureTrait
 
 
 class FakeRath:
@@ -31,7 +31,7 @@ class FakeRath:
         self.sent.append(variables)
         self.headers.append(headers)
         return SimpleNamespace(
-            data={"store": {"id": "store-1", "presigned_url": "/media/file.bin", "key": "file.bin"}}
+            data={"store": {"id": "store-1", "key": "file.bin"}}
         )
 
     async def aquery(self, document: str, variables: dict[str, Any], headers: Any = None) -> Any:
@@ -51,10 +51,9 @@ def client(name: str = "a") -> Kraph:
     )
 
 
-class Store(HasPresignedDownloadAccessor):
+class Store(ContextBound):
     model_config = ConfigDict(frozen=True)
     id: str
-    presigned_url: str
     key: str
 
 
@@ -68,7 +67,7 @@ class GetStore(BaseModel):
         note: Optional[str] = None
 
     class Meta:
-        document = "query GetStore($id: ID!) { store(id: $id) { id presignedUrl key } }"
+        document = "query GetStore($id: ID!) { store(id: $id) { id key } }"
 
 
 # --------------------------------------------------------------------------- #
@@ -185,50 +184,9 @@ async def test_a_generated_method_calls_through_its_own_client(
     assert seen == [kraph]
 
 
-
-
 # --------------------------------------------------------------------------- #
 # What an object fetches later
 # --------------------------------------------------------------------------- #
-
-
-@pytest.fixture()
-def downloaded(monkeypatch: pytest.MonkeyPatch) -> list[dict[str, Any]]:
-    """Record which datalayer a download reaches for, without any I/O."""
-    seen: list[dict[str, Any]] = []
-
-    def fake_unkoil(function: Any, datalayer: Any, url: str, file_name: str) -> str:
-        seen.append({"url": url, "datalayer": datalayer})
-        return file_name
-
-    monkeypatch.setattr("kraph.io.unkoil", fake_unkoil)
-    return seen
-
-
-def test_object_downloads_through_the_client_that_fetched_it(
-    downloaded: list[dict[str, Any]],
-) -> None:
-    a, b = real_client("a"), real_client("b")
-    store = Store.model_validate(
-        {"id": "s", "presigned_url": "/media/file.bin", "key": "file.bin"},
-        context=origin_context(client=a, rath=a.rath, datalayer=a.datalayer),
-    )
-
-    assert store.download() == "file.bin"
-    store.download("elsewhere.bin", kraph=b)
-
-    assert downloaded == [
-        {"url": "/media/file.bin", "datalayer": a.datalayer},
-        {"url": "/media/file.bin", "datalayer": b.datalayer},
-    ]
-
-
-def test_an_unfetched_object_needs_a_client(downloaded: list[dict[str, Any]]) -> None:
-    store = Store(id="s", presigned_url="/media/file.bin", key="file.bin")
-
-    with pytest.raises(NoKraphFound, match="kraph="):
-        store.download()
-    assert downloaded == []
 
 
 def test_graph_polls_its_projection_through_its_own_client() -> None:

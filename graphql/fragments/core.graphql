@@ -62,5 +62,4 @@ fragment MetricKind on MetricKind {
 fragment MediaStore on MediaStore {
   id
   key
-  presignedUrl
 }

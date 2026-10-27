@@ -128,9 +128,6 @@
                 "Standing": [
                     "kraph.traits.StandingTrait"
                 ],
-                "MediaStore": [
-                    "kraph.traits.HasPresignedDownloadAccessor"
-                ],
                 "AssertedEntity": [
                     "kraph.traits.AssertedTrait",
                     "kraph.traits.HasDrawings"
