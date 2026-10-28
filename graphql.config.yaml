@@ -33,6 +33,17 @@ projects:
             # of self, which the Kraph client implements over its rath, so no call
             # looks a client up.
             client_class: KraphApi
+            # What the operations need at kraph, read off the schema's
+            # `@auth(required_scopes: ...)` on every root field they select: every
+            # app using kraph asks for it (arkitekt-spec reads it off the client).
+            client_fields:
+              - name: __scopes__
+                kind: tuple[str, ...]
+                collector:
+                  type: root_field_directive
+                  directive: auth
+                  argument: required_scopes
+                combine: union
             # Every operation takes an optional `task=`: the task its request is
             # attributed to. Omitted, the client falls back to the ambient one
             # (`rath.task.current_task`), which is what an action gets for free.
@@ -50,9 +61,6 @@ projects:
               StructureObject: kraph.scalars.StructureObjectCoercible
             expand_input_types:
               - input
-          # SCOPES: what the operations above need at kraph, read off the schema's
-          # `@auth(required_scopes: ...)`. The service hands it to every app's manifest.
-          - type: turms.plugins.scopes.ScopesPlugin
         processors:
           - type: turms.processors.black.BlackProcessor
         scalar_definitions:

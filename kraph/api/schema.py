@@ -34,7 +34,7 @@ from kraph.traits import (
 from pydantic import AliasChoices, BaseModel, ConfigDict, Field
 from rath.scalars import ID, IDCoercible
 from rath.task import TaskLike
-from typing import Annotated, Any, Iterable, Literal
+from typing import Annotated, Any, ClassVar, Iterable, Literal
 
 
 class GraphQLDefault:
@@ -7201,6 +7201,13 @@ class KraphApi:
     Each method hands its operation to ``execute``, ``aexecute``, ``subscribe``, ``asubscribe`` of ``self``, which the class this one is mixed into (or a base of it) provides.
     """
 
+    __scopes__: ClassVar[tuple[str, ...]] = (
+        "kraph_assert",
+        "kraph_insights",
+        "kraph_read",
+        "kraph_schema",
+    )
+
     async def acreate_entity_category(
         self,
         key: str,
@@ -14171,7 +14178,6 @@ class KraphApi:
         return self.execute(SearchMetricKindsQuery, variables, task=task).options
 
 
-SCOPES: list[str] = ["kraph_assert", "kraph_insights", "kraph_read", "kraph_schema"]
 AssertEntityExistsInput.model_rebuild()
 AssertMeasurementExistsInput.model_rebuild()
 AssertNaturalEventExistsInput.model_rebuild()
