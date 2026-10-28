@@ -39,6 +39,7 @@ from arkitekt_spec.declare.app import AppRegistry
 from arkitekt_spec.declare.widgets import SearchWidget
 
 from kraph.api.schema import (
+    SCOPES,
     EntityCategory,
     Graph,
     Instance,
@@ -84,6 +85,9 @@ registry = AppRegistry()
 @registry.service(
     schema=build_relative_path("api", "schema.graphql"),
     turms=build_relative_path("api", "project.json"),
+    # What the client's operations need at kraph, as turms gathered it from the schema: every
+    # app using kraph asks for it.
+    scopes=SCOPES,
 )
 def kraph(
     kraph: Annotated[

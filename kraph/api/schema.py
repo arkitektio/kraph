@@ -14171,6 +14171,7 @@ class KraphApi:
         return self.execute(SearchMetricKindsQuery, variables, task=task).options
 
 
+SCOPES: list[str] = ["kraph_assert", "kraph_insights", "kraph_read", "kraph_schema"]
 AssertEntityExistsInput.model_rebuild()
 AssertMeasurementExistsInput.model_rebuild()
 AssertNaturalEventExistsInput.model_rebuild()
