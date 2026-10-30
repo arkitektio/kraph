@@ -5,9 +5,11 @@ categories that say what its words mean) and recording a **claim** (which names 
 graph at all).
 """
 
+import uuid
+
 import pytest
 
-from kraph.api.schema import Cardinality, StructureDescriptorInput
+from kraph.api.schema import Cardinality, MetricValueInput, StructureDescriptorInput, ValueKind
 from kraph.kraph import Kraph
 
 
@@ -96,3 +98,38 @@ def test_retraction_records_a_position_rather_than_deleting(
     standings = kraph.get_standings(id=asserted.instance.id)
     # Newest first, and the retraction did not remove anything.
     assert standings[0].stands is False
+
+
+def _value(object: str, value: float, *, source: uuid.UUID | None = None) -> MetricValueInput:
+    return MetricValueInput(identifier="@mikro/annotation", object=object, key="area", value=value, value_kind=ValueKind.FLOAT, uuid=source)
+
+
+@pytest.mark.integration
+def test_many_values_about_many_data_are_one_act(kraph: Kraph) -> None:
+    """One assertion covers the batch; the structures are created by the write that needed them."""
+    asserted = kraph.assert_metric_values(metrics=[_value("batch-1", 2.0), _value("batch-2", 3.0)])
+
+    assert asserted.recorded == 2
+    assert asserted.assertion is not None and asserted.assertion.seq > 0
+    assert [metric.value for metric in asserted.metrics] == [2.0, 3.0]
+
+
+@pytest.mark.integration
+def test_a_metric_that_names_its_uuid_is_recorded_once(kraph: Kraph) -> None:
+    """A retry with the same uuid reports the metric on the record and makes no act."""
+    source = uuid.uuid4()
+    first = kraph.assert_metric_values(metrics=[_value("retried", 2.0, source=source)])
+    again = kraph.assert_metric_values(metrics=[_value("retried", 2.0, source=source)])
+
+    assert (first.recorded, again.recorded) == (1, 0)
+    assert again.assertion is None
+    assert again.metrics[0].id == first.metrics[0].id
+
+
+@pytest.mark.integration
+def test_rerunning_without_a_uuid_is_a_second_measurement(kraph: Kraph) -> None:
+    first = kraph.assert_metric_values(metrics=[_value("rerun", 2.0)])
+    second = kraph.assert_metric_values(metrics=[_value("rerun", 2.0)])
+
+    assert second.recorded == 1
+    assert second.metrics[0].id != first.metrics[0].id

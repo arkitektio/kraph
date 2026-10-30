@@ -68,6 +68,13 @@ fragment AssertedMetric on AssertedMetric {
   metric { ...Metric }
 }
 
+fragment AssertedMetricValues on AssertedMetricValues {
+  assertion { ...Assertion }
+  pending
+  recorded
+  metrics { ...Metric }
+}
+
 fragment AssertedComment on AssertedComment {
   assertion { ...Assertion }
   comment { ...Comment }

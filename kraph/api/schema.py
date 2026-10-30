@@ -6,6 +6,7 @@ from kraph.scalars import (
     StructureIdentifierCoercible,
     StructureObject,
     StructureObjectCoercible,
+    UUID,
 )
 from kraph.traits import (
     AssertedTrait,
@@ -349,48 +350,6 @@ class AssertMeasurementExistsInput(BaseModel):
     )
 
 
-class AssertMetricValueForStructureInput(BaseModel):
-    """Input for creating a new metric"""
-
-    key: str
-    value: Any
-    value_kind: PropertyType = Field(
-        validation_alias=AliasChoices("value_kind", "valueKind"),
-        serialization_alias="valueKind",
-        description="What type of value this is. Required: it decides which column the value is stored in and which measurement term it is recorded under, and nothing infers it. Two callers may declare the same key differently — a float `confidence` and a category-label `confidence` are two terms, and both are recorded.",
-    )
-    confidence: float | None = Field(
-        default=None,
-        description="How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.",
-    )
-    confidence_type: str | None = Field(
-        validation_alias=AliasChoices("confidence_type", "confidenceType"),
-        serialization_alias="confidenceType",
-        default=None,
-        description="What kind of number `confidence` is — a method's own score, a p-value. Measurement-only",
-    )
-    unit: str | None = None
-    observed_at: datetime | None = Field(
-        validation_alias=AliasChoices("observed_at", "observedAt"),
-        serialization_alias="observedAt",
-        default=None,
-        description="When the world was observed. Defaults to when it was claimed.",
-    )
-    derived_from: Annotated[tuple[str, ...] | None, GraphQLDefault("[]")] = Field(
-        validation_alias=AliasChoices("derived_from", "derivedFrom"),
-        serialization_alias="derivedFrom",
-        default=None,
-        description='The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.',
-    )
-    'The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.\nDefault: []'
-    structure: ID = Field(
-        description="The unique ID of the structure this metric is associated with"
-    )
-    model_config = ConfigDict(
-        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
-    )
-
-
 class AssertMetricValueInput(BaseModel):
     """Input for creating a new metric"""
 
@@ -430,6 +389,17 @@ class AssertMetricValueInput(BaseModel):
     )
     object: str = Field(
         description="The unique ID of the object this metric references"
+    )
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class AssertMetricValuesInput(BaseModel):
+    """Input for recording many metrics, about any number of data, as one act"""
+
+    metrics: tuple["MetricValueInput", ...] = Field(
+        description="The values to record, at most 5000 in one act"
     )
     model_config = ConfigDict(
         frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
@@ -2024,6 +1994,57 @@ class MetricKindFilter(BaseModel):
         serialization_alias="structureKind",
         default=None,
         description="Filter by the structure kind this describes",
+    )
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class MetricValueInput(BaseModel):
+    """One value about one external datum, inside a batch"""
+
+    key: str
+    value: Any
+    value_kind: ValueKind = Field(
+        validation_alias=AliasChoices("value_kind", "valueKind"),
+        serialization_alias="valueKind",
+        description="What type of value this is. Required: it decides the storage column and the measurement term",
+    )
+    confidence: float | None = Field(
+        default=None,
+        description="How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.",
+    )
+    confidence_type: str | None = Field(
+        validation_alias=AliasChoices("confidence_type", "confidenceType"),
+        serialization_alias="confidenceType",
+        default=None,
+        description="What kind of number `confidence` is — a method's own score, a p-value. Measurement-only",
+    )
+    unit: str | None = None
+    observed_at: datetime | None = Field(
+        validation_alias=AliasChoices("observed_at", "observedAt"),
+        serialization_alias="observedAt",
+        default=None,
+        description="When the world was observed. Defaults to when it was claimed.",
+    )
+    derived_from: Annotated[tuple[str, ...] | None, GraphQLDefault("[]")] = Field(
+        validation_alias=AliasChoices("derived_from", "derivedFrom"),
+        serialization_alias="derivedFrom",
+        default=None,
+        description='The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.',
+    )
+    'The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.\nDefault: []'
+    uuid: UUID | None = Field(
+        default=None,
+        description="Optional: a uuid for this metric that stays the same across retries, so a retried batch records nothing twice. Left out, one is minted, and rerunning records the value again",
+    )
+    identifier: str = Field(
+        description="The structure identifier of the datum this value is about, e.g. '@mikro/annotation'"
+    )
+    object: str = Field(description="The id of the datum this value is about")
+    supersedes: UUID | None = Field(
+        default=None,
+        description="The uuid of an earlier metric of this API that this value corrects: that one is retracted and cited, under this act",
     )
     model_config = ConfigDict(
         frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
@@ -4095,6 +4116,30 @@ class AssertedMetric(AssertedTrait, BaseModel):
         type = "AssertedMetric"
 
 
+class AssertedMetricValues(BaseModel):
+    """A batch of metrics as one act. A metric that names a uuid already on the record is reported, not recorded again"""
+
+    typename: Literal["AssertedMetricValues"] = Field(
+        alias="__typename", default="AssertedMetricValues", exclude=True
+    )
+    assertion: Assertion | None = Field(default=None)
+    "The act that recorded this batch's new metrics. Null when every one of them was already recorded"
+    pending: bool
+    "True when the act was recorded and announced but its drawing did not finish. The claim is durable; the drawing is owed, `Graph.projection { pending lag }` counts it, and `reproject --incremental` (the runner) applies it. `drawings` lists what was drawn so far. False is the ordinary case: the drawing completes within the request."
+    recorded: int
+    "How many of the batch's metrics this call recorded"
+    metrics: tuple[Metric, ...]
+    "Every metric of the batch, in the order given: new ones and those an earlier attempt recorded"
+    model_config = ConfigDict(frozen=True)
+
+    class Meta:
+        """Meta class for AssertedMetricValues"""
+
+        document = "fragment Assertion on Assertion {\n  id\n  subject\n  appId\n  actionId\n  actionName\n  assertedAt\n  recordedAt\n  seq\n  __typename\n}\n\nfragment Metric on Metric {\n  id\n  kindId\n  key\n  value\n  unit\n  confidence\n  confidenceType\n  observedAt\n  assertedAt\n  __typename\n}\n\nfragment AssertedMetricValues on AssertedMetricValues {\n  assertion {\n    ...Assertion\n    __typename\n  }\n  pending\n  recorded\n  metrics {\n    ...Metric\n    __typename\n  }\n  __typename\n}"
+        name = "AssertedMetricValues"
+        type = "AssertedMetricValues"
+
+
 class CommentParent(BaseModel):
     """A remark somebody made about a structure — a claim, as the log has it"""
 
@@ -5465,23 +5510,22 @@ class AssertMetricValueMutation(BaseModel):
         document = "fragment Assertion on Assertion {\n  id\n  subject\n  appId\n  actionId\n  actionName\n  assertedAt\n  recordedAt\n  seq\n  __typename\n}\n\nfragment Metric on Metric {\n  id\n  kindId\n  key\n  value\n  unit\n  confidence\n  confidenceType\n  observedAt\n  assertedAt\n  __typename\n}\n\nfragment AssertedMetric on AssertedMetric {\n  assertion {\n    ...Assertion\n    __typename\n  }\n  metric {\n    ...Metric\n    __typename\n  }\n  __typename\n}\n\nmutation AssertMetricValue($input: AssertMetricValueInput!) {\n  assertMetricValue(input: $input) {\n    ...AssertedMetric\n    __typename\n  }\n}"
 
 
-class AssertMetricValueForStructureMutation(BaseModel):
-    """No documentation found for this operation."""
+class AssertMetricValuesMutation(BaseModel):
+    """Many values about any number of data, as one act. A metric that names a uuid already on the
+    record is reported, not recorded again; a batch of only those has no assertion."""
 
-    assert_metric_value_for_structure: AssertedMetric = Field(
-        alias="assertMetricValueForStructure"
-    )
-    "Record a measurement against a structure that already exists, named by its evidence id"
+    assert_metric_values: AssertedMetricValues = Field(alias="assertMetricValues")
+    "Record many measurements, about any number of data, as one act, creating the structures they describe. A metric that names its own uuid is recorded once however often the batch is retried"
 
     class Arguments(BaseModel):
-        """Arguments for AssertMetricValueForStructure"""
+        """Arguments for AssertMetricValues"""
 
-        input: AssertMetricValueForStructureInput
+        input: AssertMetricValuesInput
 
     class Meta:
-        """Meta class for AssertMetricValueForStructure"""
+        """Meta class for AssertMetricValues"""
 
-        document = "fragment Assertion on Assertion {\n  id\n  subject\n  appId\n  actionId\n  actionName\n  assertedAt\n  recordedAt\n  seq\n  __typename\n}\n\nfragment Metric on Metric {\n  id\n  kindId\n  key\n  value\n  unit\n  confidence\n  confidenceType\n  observedAt\n  assertedAt\n  __typename\n}\n\nfragment AssertedMetric on AssertedMetric {\n  assertion {\n    ...Assertion\n    __typename\n  }\n  metric {\n    ...Metric\n    __typename\n  }\n  __typename\n}\n\nmutation AssertMetricValueForStructure($input: AssertMetricValueForStructureInput!) {\n  assertMetricValueForStructure(input: $input) {\n    ...AssertedMetric\n    __typename\n  }\n}"
+        document = "fragment Assertion on Assertion {\n  id\n  subject\n  appId\n  actionId\n  actionName\n  assertedAt\n  recordedAt\n  seq\n  __typename\n}\n\nfragment Metric on Metric {\n  id\n  kindId\n  key\n  value\n  unit\n  confidence\n  confidenceType\n  observedAt\n  assertedAt\n  __typename\n}\n\nfragment AssertedMetricValues on AssertedMetricValues {\n  assertion {\n    ...Assertion\n    __typename\n  }\n  pending\n  recorded\n  metrics {\n    ...Metric\n    __typename\n  }\n  __typename\n}\n\nmutation AssertMetricValues($input: AssertMetricValuesInput!) {\n  assertMetricValues(input: $input) {\n    ...AssertedMetricValues\n    __typename\n  }\n}"
 
 
 class SupersedeMetricValueMutation(BaseModel):
@@ -7211,17 +7255,17 @@ class KraphApi:
     async def acreate_entity_category(
         self,
         key: str,
-        ontology_references: Iterable[OntologyReferenceInput],
-        property_definitions: Iterable[PropertyDefinitionInput],
         graph: str,
-        backfill: bool,
         description: str | None | UnsetType = UNSET,
+        ontology_references: Iterable[OntologyReferenceInput] | UnsetType = UNSET,
         color: Iterable[int] | None | UnsetType = UNSET,
         image: str | None | UnsetType = UNSET,
         label: str | None | UnsetType = UNSET,
         pin: bool | None | UnsetType = UNSET,
         instance_kind: str | None | UnsetType = UNSET,
+        property_definitions: Iterable[PropertyDefinitionInput] | UnsetType = UNSET,
         definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+        backfill: bool | UnsetType = UNSET,
         task: TaskLike | None = None,
     ) -> EntityCategory:
         """CreateEntityCategory
@@ -7250,7 +7294,8 @@ class KraphApi:
         _input["key"] = key
         if description is not UNSET:
             _input["description"] = description
-        _input["ontologyReferences"] = ontology_references
+        if ontology_references is not UNSET:
+            _input["ontologyReferences"] = ontology_references
         if color is not UNSET:
             _input["color"] = color
         if image is not UNSET:
@@ -7261,11 +7306,13 @@ class KraphApi:
             _input["pin"] = pin
         if instance_kind is not UNSET:
             _input["instanceKind"] = instance_kind
-        _input["propertyDefinitions"] = property_definitions
+        if property_definitions is not UNSET:
+            _input["propertyDefinitions"] = property_definitions
         if definition is not UNSET:
             _input["definition"] = definition
         _input["graph"] = graph
-        _input["backfill"] = backfill
+        if backfill is not UNSET:
+            _input["backfill"] = backfill
         variables["input"] = _input
         return (
             await self.aexecute(CreateEntityCategoryMutation, variables, task=task)
@@ -7274,17 +7321,17 @@ class KraphApi:
     def create_entity_category(
         self,
         key: str,
-        ontology_references: Iterable[OntologyReferenceInput],
-        property_definitions: Iterable[PropertyDefinitionInput],
         graph: str,
-        backfill: bool,
         description: str | None | UnsetType = UNSET,
+        ontology_references: Iterable[OntologyReferenceInput] | UnsetType = UNSET,
         color: Iterable[int] | None | UnsetType = UNSET,
         image: str | None | UnsetType = UNSET,
         label: str | None | UnsetType = UNSET,
         pin: bool | None | UnsetType = UNSET,
         instance_kind: str | None | UnsetType = UNSET,
+        property_definitions: Iterable[PropertyDefinitionInput] | UnsetType = UNSET,
         definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+        backfill: bool | UnsetType = UNSET,
         task: TaskLike | None = None,
     ) -> EntityCategory:
         """CreateEntityCategory
@@ -7313,7 +7360,8 @@ class KraphApi:
         _input["key"] = key
         if description is not UNSET:
             _input["description"] = description
-        _input["ontologyReferences"] = ontology_references
+        if ontology_references is not UNSET:
+            _input["ontologyReferences"] = ontology_references
         if color is not UNSET:
             _input["color"] = color
         if image is not UNSET:
@@ -7324,11 +7372,13 @@ class KraphApi:
             _input["pin"] = pin
         if instance_kind is not UNSET:
             _input["instanceKind"] = instance_kind
-        _input["propertyDefinitions"] = property_definitions
+        if property_definitions is not UNSET:
+            _input["propertyDefinitions"] = property_definitions
         if definition is not UNSET:
             _input["definition"] = definition
         _input["graph"] = graph
-        _input["backfill"] = backfill
+        if backfill is not UNSET:
+            _input["backfill"] = backfill
         variables["input"] = _input
         return self.execute(
             CreateEntityCategoryMutation, variables, task=task
@@ -7337,7 +7387,6 @@ class KraphApi:
     async def aupdate_entity_category(
         self,
         id: IDCoercible,
-        clear_definition: bool,
         key: str | None | UnsetType = UNSET,
         description: str | None | UnsetType = UNSET,
         ontology_references: Iterable[OntologyReferenceInput]
@@ -7352,6 +7401,7 @@ class KraphApi:
         | None
         | UnsetType = UNSET,
         definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+        clear_definition: bool | UnsetType = UNSET,
         task: TaskLike | None = None,
     ) -> EntityCategory:
         """UpdateEntityCategory
@@ -7398,7 +7448,8 @@ class KraphApi:
             _input["propertyDefinitions"] = property_definitions
         if definition is not UNSET:
             _input["definition"] = definition
-        _input["clearDefinition"] = clear_definition
+        if clear_definition is not UNSET:
+            _input["clearDefinition"] = clear_definition
         variables["input"] = _input
         return (
             await self.aexecute(UpdateEntityCategoryMutation, variables, task=task)
@@ -7407,7 +7458,6 @@ class KraphApi:
     def update_entity_category(
         self,
         id: IDCoercible,
-        clear_definition: bool,
         key: str | None | UnsetType = UNSET,
         description: str | None | UnsetType = UNSET,
         ontology_references: Iterable[OntologyReferenceInput]
@@ -7422,6 +7472,7 @@ class KraphApi:
         | None
         | UnsetType = UNSET,
         definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+        clear_definition: bool | UnsetType = UNSET,
         task: TaskLike | None = None,
     ) -> EntityCategory:
         """UpdateEntityCategory
@@ -7468,7 +7519,8 @@ class KraphApi:
             _input["propertyDefinitions"] = property_definitions
         if definition is not UNSET:
             _input["definition"] = definition
-        _input["clearDefinition"] = clear_definition
+        if clear_definition is not UNSET:
+            _input["clearDefinition"] = clear_definition
         variables["input"] = _input
         return self.execute(
             UpdateEntityCategoryMutation, variables, task=task
@@ -7519,17 +7571,17 @@ class KraphApi:
     async def acreate_relation_category(
         self,
         key: str,
-        ontology_references: Iterable[OntologyReferenceInput],
-        property_definitions: Iterable[PropertyDefinitionInput],
         graph: str,
-        backfill: bool,
         description: str | None | UnsetType = UNSET,
+        ontology_references: Iterable[OntologyReferenceInput] | UnsetType = UNSET,
         color: Iterable[int] | None | UnsetType = UNSET,
         image: str | None | UnsetType = UNSET,
         label: str | None | UnsetType = UNSET,
         pin: bool | None | UnsetType = UNSET,
         instance_kind: str | None | UnsetType = UNSET,
+        property_definitions: Iterable[PropertyDefinitionInput] | UnsetType = UNSET,
         definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+        backfill: bool | UnsetType = UNSET,
         task: TaskLike | None = None,
     ) -> RelationCategory:
         """CreateRelationCategory
@@ -7558,7 +7610,8 @@ class KraphApi:
         _input["key"] = key
         if description is not UNSET:
             _input["description"] = description
-        _input["ontologyReferences"] = ontology_references
+        if ontology_references is not UNSET:
+            _input["ontologyReferences"] = ontology_references
         if color is not UNSET:
             _input["color"] = color
         if image is not UNSET:
@@ -7569,11 +7622,13 @@ class KraphApi:
             _input["pin"] = pin
         if instance_kind is not UNSET:
             _input["instanceKind"] = instance_kind
-        _input["propertyDefinitions"] = property_definitions
+        if property_definitions is not UNSET:
+            _input["propertyDefinitions"] = property_definitions
         if definition is not UNSET:
             _input["definition"] = definition
         _input["graph"] = graph
-        _input["backfill"] = backfill
+        if backfill is not UNSET:
+            _input["backfill"] = backfill
         variables["input"] = _input
         return (
             await self.aexecute(CreateRelationCategoryMutation, variables, task=task)
@@ -7582,17 +7637,17 @@ class KraphApi:
     def create_relation_category(
         self,
         key: str,
-        ontology_references: Iterable[OntologyReferenceInput],
-        property_definitions: Iterable[PropertyDefinitionInput],
         graph: str,
-        backfill: bool,
         description: str | None | UnsetType = UNSET,
+        ontology_references: Iterable[OntologyReferenceInput] | UnsetType = UNSET,
         color: Iterable[int] | None | UnsetType = UNSET,
         image: str | None | UnsetType = UNSET,
         label: str | None | UnsetType = UNSET,
         pin: bool | None | UnsetType = UNSET,
         instance_kind: str | None | UnsetType = UNSET,
+        property_definitions: Iterable[PropertyDefinitionInput] | UnsetType = UNSET,
         definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+        backfill: bool | UnsetType = UNSET,
         task: TaskLike | None = None,
     ) -> RelationCategory:
         """CreateRelationCategory
@@ -7621,7 +7676,8 @@ class KraphApi:
         _input["key"] = key
         if description is not UNSET:
             _input["description"] = description
-        _input["ontologyReferences"] = ontology_references
+        if ontology_references is not UNSET:
+            _input["ontologyReferences"] = ontology_references
         if color is not UNSET:
             _input["color"] = color
         if image is not UNSET:
@@ -7632,11 +7688,13 @@ class KraphApi:
             _input["pin"] = pin
         if instance_kind is not UNSET:
             _input["instanceKind"] = instance_kind
-        _input["propertyDefinitions"] = property_definitions
+        if property_definitions is not UNSET:
+            _input["propertyDefinitions"] = property_definitions
         if definition is not UNSET:
             _input["definition"] = definition
         _input["graph"] = graph
-        _input["backfill"] = backfill
+        if backfill is not UNSET:
+            _input["backfill"] = backfill
         variables["input"] = _input
         return self.execute(
             CreateRelationCategoryMutation, variables, task=task
@@ -7645,7 +7703,6 @@ class KraphApi:
     async def aupdate_relation_category(
         self,
         id: str,
-        clear_definition: bool,
         key: str | None | UnsetType = UNSET,
         description: str | None | UnsetType = UNSET,
         ontology_references: Iterable[OntologyReferenceInput]
@@ -7656,6 +7713,7 @@ class KraphApi:
         label: str | None | UnsetType = UNSET,
         pin: bool | None | UnsetType = UNSET,
         definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+        clear_definition: bool | UnsetType = UNSET,
         task: TaskLike | None = None,
     ) -> RelationCategory:
         """UpdateRelationCategory
@@ -7696,7 +7754,8 @@ class KraphApi:
             _input["pin"] = pin
         if definition is not UNSET:
             _input["definition"] = definition
-        _input["clearDefinition"] = clear_definition
+        if clear_definition is not UNSET:
+            _input["clearDefinition"] = clear_definition
         variables["input"] = _input
         return (
             await self.aexecute(UpdateRelationCategoryMutation, variables, task=task)
@@ -7705,7 +7764,6 @@ class KraphApi:
     def update_relation_category(
         self,
         id: str,
-        clear_definition: bool,
         key: str | None | UnsetType = UNSET,
         description: str | None | UnsetType = UNSET,
         ontology_references: Iterable[OntologyReferenceInput]
@@ -7716,6 +7774,7 @@ class KraphApi:
         label: str | None | UnsetType = UNSET,
         pin: bool | None | UnsetType = UNSET,
         definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+        clear_definition: bool | UnsetType = UNSET,
         task: TaskLike | None = None,
     ) -> RelationCategory:
         """UpdateRelationCategory
@@ -7756,7 +7815,8 @@ class KraphApi:
             _input["pin"] = pin
         if definition is not UNSET:
             _input["definition"] = definition
-        _input["clearDefinition"] = clear_definition
+        if clear_definition is not UNSET:
+            _input["clearDefinition"] = clear_definition
         variables["input"] = _input
         return self.execute(
             UpdateRelationCategoryMutation, variables, task=task
@@ -7805,17 +7865,17 @@ class KraphApi:
     async def acreate_measurement_category(
         self,
         key: str,
-        ontology_references: Iterable[OntologyReferenceInput],
         source: StructureDescriptorInput,
         target: EntityDescriptorInput,
-        cardinality: Cardinality,
-        properties: Iterable[PropertyDefinitionInput],
         graph: str,
         description: str | None | UnsetType = UNSET,
+        ontology_references: Iterable[OntologyReferenceInput] | UnsetType = UNSET,
         color: Iterable[int] | None | UnsetType = UNSET,
         image: str | None | UnsetType = UNSET,
         label: str | None | UnsetType = UNSET,
         pin: bool | None | UnsetType = UNSET,
+        cardinality: Cardinality | UnsetType = UNSET,
+        properties: Iterable[PropertyDefinitionInput] | UnsetType = UNSET,
         definition: CategoryDefinitionInput | None | UnsetType = UNSET,
         task: TaskLike | None = None,
     ) -> MeasurementCategory:
@@ -7846,7 +7906,8 @@ class KraphApi:
         _input["key"] = key
         if description is not UNSET:
             _input["description"] = description
-        _input["ontologyReferences"] = ontology_references
+        if ontology_references is not UNSET:
+            _input["ontologyReferences"] = ontology_references
         if color is not UNSET:
             _input["color"] = color
         if image is not UNSET:
@@ -7857,8 +7918,10 @@ class KraphApi:
             _input["pin"] = pin
         _input["source"] = source
         _input["target"] = target
-        _input["cardinality"] = cardinality
-        _input["properties"] = properties
+        if cardinality is not UNSET:
+            _input["cardinality"] = cardinality
+        if properties is not UNSET:
+            _input["properties"] = properties
         if definition is not UNSET:
             _input["definition"] = definition
         _input["graph"] = graph
@@ -7870,17 +7933,17 @@ class KraphApi:
     def create_measurement_category(
         self,
         key: str,
-        ontology_references: Iterable[OntologyReferenceInput],
         source: StructureDescriptorInput,
         target: EntityDescriptorInput,
-        cardinality: Cardinality,
-        properties: Iterable[PropertyDefinitionInput],
         graph: str,
         description: str | None | UnsetType = UNSET,
+        ontology_references: Iterable[OntologyReferenceInput] | UnsetType = UNSET,
         color: Iterable[int] | None | UnsetType = UNSET,
         image: str | None | UnsetType = UNSET,
         label: str | None | UnsetType = UNSET,
         pin: bool | None | UnsetType = UNSET,
+        cardinality: Cardinality | UnsetType = UNSET,
+        properties: Iterable[PropertyDefinitionInput] | UnsetType = UNSET,
         definition: CategoryDefinitionInput | None | UnsetType = UNSET,
         task: TaskLike | None = None,
     ) -> MeasurementCategory:
@@ -7911,7 +7974,8 @@ class KraphApi:
         _input["key"] = key
         if description is not UNSET:
             _input["description"] = description
-        _input["ontologyReferences"] = ontology_references
+        if ontology_references is not UNSET:
+            _input["ontologyReferences"] = ontology_references
         if color is not UNSET:
             _input["color"] = color
         if image is not UNSET:
@@ -7922,8 +7986,10 @@ class KraphApi:
             _input["pin"] = pin
         _input["source"] = source
         _input["target"] = target
-        _input["cardinality"] = cardinality
-        _input["properties"] = properties
+        if cardinality is not UNSET:
+            _input["cardinality"] = cardinality
+        if properties is not UNSET:
+            _input["properties"] = properties
         if definition is not UNSET:
             _input["definition"] = definition
         _input["graph"] = graph
@@ -7935,7 +8001,6 @@ class KraphApi:
     async def aupdate_measurement_category(
         self,
         id: str,
-        clear_definition: bool,
         key: str | None | UnsetType = UNSET,
         description: str | None | UnsetType = UNSET,
         ontology_references: Iterable[OntologyReferenceInput]
@@ -7946,6 +8011,7 @@ class KraphApi:
         label: str | None | UnsetType = UNSET,
         pin: bool | None | UnsetType = UNSET,
         definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+        clear_definition: bool | UnsetType = UNSET,
         task: TaskLike | None = None,
     ) -> MeasurementCategory:
         """UpdateMeasurementCategory
@@ -7986,7 +8052,8 @@ class KraphApi:
             _input["pin"] = pin
         if definition is not UNSET:
             _input["definition"] = definition
-        _input["clearDefinition"] = clear_definition
+        if clear_definition is not UNSET:
+            _input["clearDefinition"] = clear_definition
         variables["input"] = _input
         return (
             await self.aexecute(UpdateMeasurementCategoryMutation, variables, task=task)
@@ -7995,7 +8062,6 @@ class KraphApi:
     def update_measurement_category(
         self,
         id: str,
-        clear_definition: bool,
         key: str | None | UnsetType = UNSET,
         description: str | None | UnsetType = UNSET,
         ontology_references: Iterable[OntologyReferenceInput]
@@ -8006,6 +8072,7 @@ class KraphApi:
         label: str | None | UnsetType = UNSET,
         pin: bool | None | UnsetType = UNSET,
         definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+        clear_definition: bool | UnsetType = UNSET,
         task: TaskLike | None = None,
     ) -> MeasurementCategory:
         """UpdateMeasurementCategory
@@ -8046,7 +8113,8 @@ class KraphApi:
             _input["pin"] = pin
         if definition is not UNSET:
             _input["definition"] = definition
-        _input["clearDefinition"] = clear_definition
+        if clear_definition is not UNSET:
+            _input["clearDefinition"] = clear_definition
         variables["input"] = _input
         return self.execute(
             UpdateMeasurementCategoryMutation, variables, task=task
@@ -8095,17 +8163,17 @@ class KraphApi:
     async def acreate_structure_relation_category(
         self,
         key: str,
-        ontology_references: Iterable[OntologyReferenceInput],
-        properties: Iterable[PropertyDefinitionInput],
         source: StructureDescriptorInput,
         target: StructureDescriptorInput,
-        cardinality: Cardinality,
         graph: str,
         description: str | None | UnsetType = UNSET,
+        ontology_references: Iterable[OntologyReferenceInput] | UnsetType = UNSET,
         color: Iterable[int] | None | UnsetType = UNSET,
         image: str | None | UnsetType = UNSET,
         label: str | None | UnsetType = UNSET,
         pin: bool | None | UnsetType = UNSET,
+        properties: Iterable[PropertyDefinitionInput] | UnsetType = UNSET,
+        cardinality: Cardinality | UnsetType = UNSET,
         definition: CategoryDefinitionInput | None | UnsetType = UNSET,
         task: TaskLike | None = None,
     ) -> StructureRelationCategory:
@@ -8136,7 +8204,8 @@ class KraphApi:
         _input["key"] = key
         if description is not UNSET:
             _input["description"] = description
-        _input["ontologyReferences"] = ontology_references
+        if ontology_references is not UNSET:
+            _input["ontologyReferences"] = ontology_references
         if color is not UNSET:
             _input["color"] = color
         if image is not UNSET:
@@ -8145,10 +8214,12 @@ class KraphApi:
             _input["label"] = label
         if pin is not UNSET:
             _input["pin"] = pin
-        _input["properties"] = properties
+        if properties is not UNSET:
+            _input["properties"] = properties
         _input["source"] = source
         _input["target"] = target
-        _input["cardinality"] = cardinality
+        if cardinality is not UNSET:
+            _input["cardinality"] = cardinality
         if definition is not UNSET:
             _input["definition"] = definition
         _input["graph"] = graph
@@ -8162,17 +8233,17 @@ class KraphApi:
     def create_structure_relation_category(
         self,
         key: str,
-        ontology_references: Iterable[OntologyReferenceInput],
-        properties: Iterable[PropertyDefinitionInput],
         source: StructureDescriptorInput,
         target: StructureDescriptorInput,
-        cardinality: Cardinality,
         graph: str,
         description: str | None | UnsetType = UNSET,
+        ontology_references: Iterable[OntologyReferenceInput] | UnsetType = UNSET,
         color: Iterable[int] | None | UnsetType = UNSET,
         image: str | None | UnsetType = UNSET,
         label: str | None | UnsetType = UNSET,
         pin: bool | None | UnsetType = UNSET,
+        properties: Iterable[PropertyDefinitionInput] | UnsetType = UNSET,
+        cardinality: Cardinality | UnsetType = UNSET,
         definition: CategoryDefinitionInput | None | UnsetType = UNSET,
         task: TaskLike | None = None,
     ) -> StructureRelationCategory:
@@ -8203,7 +8274,8 @@ class KraphApi:
         _input["key"] = key
         if description is not UNSET:
             _input["description"] = description
-        _input["ontologyReferences"] = ontology_references
+        if ontology_references is not UNSET:
+            _input["ontologyReferences"] = ontology_references
         if color is not UNSET:
             _input["color"] = color
         if image is not UNSET:
@@ -8212,10 +8284,12 @@ class KraphApi:
             _input["label"] = label
         if pin is not UNSET:
             _input["pin"] = pin
-        _input["properties"] = properties
+        if properties is not UNSET:
+            _input["properties"] = properties
         _input["source"] = source
         _input["target"] = target
-        _input["cardinality"] = cardinality
+        if cardinality is not UNSET:
+            _input["cardinality"] = cardinality
         if definition is not UNSET:
             _input["definition"] = definition
         _input["graph"] = graph
@@ -8227,7 +8301,6 @@ class KraphApi:
     async def aupdate_structure_relation_category(
         self,
         id: str,
-        clear_definition: bool,
         key: str | None | UnsetType = UNSET,
         description: str | None | UnsetType = UNSET,
         ontology_references: Iterable[OntologyReferenceInput]
@@ -8238,6 +8311,7 @@ class KraphApi:
         label: str | None | UnsetType = UNSET,
         pin: bool | None | UnsetType = UNSET,
         definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+        clear_definition: bool | UnsetType = UNSET,
         task: TaskLike | None = None,
     ) -> StructureRelationCategory:
         """UpdateStructureRelationCategory
@@ -8278,7 +8352,8 @@ class KraphApi:
             _input["pin"] = pin
         if definition is not UNSET:
             _input["definition"] = definition
-        _input["clearDefinition"] = clear_definition
+        if clear_definition is not UNSET:
+            _input["clearDefinition"] = clear_definition
         variables["input"] = _input
         return (
             await self.aexecute(
@@ -8289,7 +8364,6 @@ class KraphApi:
     def update_structure_relation_category(
         self,
         id: str,
-        clear_definition: bool,
         key: str | None | UnsetType = UNSET,
         description: str | None | UnsetType = UNSET,
         ontology_references: Iterable[OntologyReferenceInput]
@@ -8300,6 +8374,7 @@ class KraphApi:
         label: str | None | UnsetType = UNSET,
         pin: bool | None | UnsetType = UNSET,
         definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+        clear_definition: bool | UnsetType = UNSET,
         task: TaskLike | None = None,
     ) -> StructureRelationCategory:
         """UpdateStructureRelationCategory
@@ -8340,7 +8415,8 @@ class KraphApi:
             _input["pin"] = pin
         if definition is not UNSET:
             _input["definition"] = definition
-        _input["clearDefinition"] = clear_definition
+        if clear_definition is not UNSET:
+            _input["clearDefinition"] = clear_definition
         variables["input"] = _input
         return self.execute(
             UpdateStructureRelationCategoryMutation, variables, task=task
@@ -8393,19 +8469,19 @@ class KraphApi:
     async def acreate_natural_event_category(
         self,
         key: str,
-        ontology_references: Iterable[OntologyReferenceInput],
         kind: EventKind,
-        inputs: Iterable[EventRoleInput],
-        outputs: Iterable[EventRoleInput],
-        properties: Iterable[PropertyDefinitionInput],
         graph: str,
-        backfill: bool,
         description: str | None | UnsetType = UNSET,
+        ontology_references: Iterable[OntologyReferenceInput] | UnsetType = UNSET,
         color: Iterable[int] | None | UnsetType = UNSET,
         image: str | None | UnsetType = UNSET,
         label: str | None | UnsetType = UNSET,
         pin: bool | None | UnsetType = UNSET,
+        inputs: Iterable[EventRoleInput] | UnsetType = UNSET,
+        outputs: Iterable[EventRoleInput] | UnsetType = UNSET,
+        properties: Iterable[PropertyDefinitionInput] | UnsetType = UNSET,
         definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+        backfill: bool | UnsetType = UNSET,
         task: TaskLike | None = None,
     ) -> NaturalEventCategory:
         """CreateNaturalEventCategory
@@ -8436,7 +8512,8 @@ class KraphApi:
         _input["key"] = key
         if description is not UNSET:
             _input["description"] = description
-        _input["ontologyReferences"] = ontology_references
+        if ontology_references is not UNSET:
+            _input["ontologyReferences"] = ontology_references
         if color is not UNSET:
             _input["color"] = color
         if image is not UNSET:
@@ -8446,13 +8523,17 @@ class KraphApi:
         if pin is not UNSET:
             _input["pin"] = pin
         _input["kind"] = kind
-        _input["inputs"] = inputs
-        _input["outputs"] = outputs
-        _input["properties"] = properties
+        if inputs is not UNSET:
+            _input["inputs"] = inputs
+        if outputs is not UNSET:
+            _input["outputs"] = outputs
+        if properties is not UNSET:
+            _input["properties"] = properties
         if definition is not UNSET:
             _input["definition"] = definition
         _input["graph"] = graph
-        _input["backfill"] = backfill
+        if backfill is not UNSET:
+            _input["backfill"] = backfill
         variables["input"] = _input
         return (
             await self.aexecute(
@@ -8463,19 +8544,19 @@ class KraphApi:
     def create_natural_event_category(
         self,
         key: str,
-        ontology_references: Iterable[OntologyReferenceInput],
         kind: EventKind,
-        inputs: Iterable[EventRoleInput],
-        outputs: Iterable[EventRoleInput],
-        properties: Iterable[PropertyDefinitionInput],
         graph: str,
-        backfill: bool,
         description: str | None | UnsetType = UNSET,
+        ontology_references: Iterable[OntologyReferenceInput] | UnsetType = UNSET,
         color: Iterable[int] | None | UnsetType = UNSET,
         image: str | None | UnsetType = UNSET,
         label: str | None | UnsetType = UNSET,
         pin: bool | None | UnsetType = UNSET,
+        inputs: Iterable[EventRoleInput] | UnsetType = UNSET,
+        outputs: Iterable[EventRoleInput] | UnsetType = UNSET,
+        properties: Iterable[PropertyDefinitionInput] | UnsetType = UNSET,
         definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+        backfill: bool | UnsetType = UNSET,
         task: TaskLike | None = None,
     ) -> NaturalEventCategory:
         """CreateNaturalEventCategory
@@ -8506,7 +8587,8 @@ class KraphApi:
         _input["key"] = key
         if description is not UNSET:
             _input["description"] = description
-        _input["ontologyReferences"] = ontology_references
+        if ontology_references is not UNSET:
+            _input["ontologyReferences"] = ontology_references
         if color is not UNSET:
             _input["color"] = color
         if image is not UNSET:
@@ -8516,13 +8598,17 @@ class KraphApi:
         if pin is not UNSET:
             _input["pin"] = pin
         _input["kind"] = kind
-        _input["inputs"] = inputs
-        _input["outputs"] = outputs
-        _input["properties"] = properties
+        if inputs is not UNSET:
+            _input["inputs"] = inputs
+        if outputs is not UNSET:
+            _input["outputs"] = outputs
+        if properties is not UNSET:
+            _input["properties"] = properties
         if definition is not UNSET:
             _input["definition"] = definition
         _input["graph"] = graph
-        _input["backfill"] = backfill
+        if backfill is not UNSET:
+            _input["backfill"] = backfill
         variables["input"] = _input
         return self.execute(
             CreateNaturalEventCategoryMutation, variables, task=task
@@ -8531,7 +8617,6 @@ class KraphApi:
     async def aupdate_natural_event_category(
         self,
         id: str,
-        clear_definition: bool,
         key: str | None | UnsetType = UNSET,
         description: str | None | UnsetType = UNSET,
         ontology_references: Iterable[OntologyReferenceInput]
@@ -8542,6 +8627,7 @@ class KraphApi:
         label: str | None | UnsetType = UNSET,
         pin: bool | None | UnsetType = UNSET,
         definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+        clear_definition: bool | UnsetType = UNSET,
         task: TaskLike | None = None,
     ) -> NaturalEventCategory:
         """UpdateNaturalEventCategory
@@ -8582,7 +8668,8 @@ class KraphApi:
             _input["pin"] = pin
         if definition is not UNSET:
             _input["definition"] = definition
-        _input["clearDefinition"] = clear_definition
+        if clear_definition is not UNSET:
+            _input["clearDefinition"] = clear_definition
         variables["input"] = _input
         return (
             await self.aexecute(
@@ -8593,7 +8680,6 @@ class KraphApi:
     def update_natural_event_category(
         self,
         id: str,
-        clear_definition: bool,
         key: str | None | UnsetType = UNSET,
         description: str | None | UnsetType = UNSET,
         ontology_references: Iterable[OntologyReferenceInput]
@@ -8604,6 +8690,7 @@ class KraphApi:
         label: str | None | UnsetType = UNSET,
         pin: bool | None | UnsetType = UNSET,
         definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+        clear_definition: bool | UnsetType = UNSET,
         task: TaskLike | None = None,
     ) -> NaturalEventCategory:
         """UpdateNaturalEventCategory
@@ -8644,7 +8731,8 @@ class KraphApi:
             _input["pin"] = pin
         if definition is not UNSET:
             _input["definition"] = definition
-        _input["clearDefinition"] = clear_definition
+        if clear_definition is not UNSET:
+            _input["clearDefinition"] = clear_definition
         variables["input"] = _input
         return self.execute(
             UpdateNaturalEventCategoryMutation, variables, task=task
@@ -8697,20 +8785,20 @@ class KraphApi:
     async def acreate_protocol_event_category(
         self,
         key: str,
-        ontology_references: Iterable[OntologyReferenceInput],
         kind: EventKind,
-        inputs: Iterable[EventRoleInput],
-        outputs: Iterable[EventRoleInput],
-        properties: Iterable[PropertyDefinitionInput],
         protocol: str,
         graph: str,
-        backfill: bool,
         description: str | None | UnsetType = UNSET,
+        ontology_references: Iterable[OntologyReferenceInput] | UnsetType = UNSET,
         color: Iterable[int] | None | UnsetType = UNSET,
         image: str | None | UnsetType = UNSET,
         label: str | None | UnsetType = UNSET,
         pin: bool | None | UnsetType = UNSET,
+        inputs: Iterable[EventRoleInput] | UnsetType = UNSET,
+        outputs: Iterable[EventRoleInput] | UnsetType = UNSET,
+        properties: Iterable[PropertyDefinitionInput] | UnsetType = UNSET,
         definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+        backfill: bool | UnsetType = UNSET,
         task: TaskLike | None = None,
     ) -> ProtocolEventCategory:
         """CreateProtocolEventCategory
@@ -8742,7 +8830,8 @@ class KraphApi:
         _input["key"] = key
         if description is not UNSET:
             _input["description"] = description
-        _input["ontologyReferences"] = ontology_references
+        if ontology_references is not UNSET:
+            _input["ontologyReferences"] = ontology_references
         if color is not UNSET:
             _input["color"] = color
         if image is not UNSET:
@@ -8752,14 +8841,18 @@ class KraphApi:
         if pin is not UNSET:
             _input["pin"] = pin
         _input["kind"] = kind
-        _input["inputs"] = inputs
-        _input["outputs"] = outputs
-        _input["properties"] = properties
+        if inputs is not UNSET:
+            _input["inputs"] = inputs
+        if outputs is not UNSET:
+            _input["outputs"] = outputs
+        if properties is not UNSET:
+            _input["properties"] = properties
         if definition is not UNSET:
             _input["definition"] = definition
         _input["protocol"] = protocol
         _input["graph"] = graph
-        _input["backfill"] = backfill
+        if backfill is not UNSET:
+            _input["backfill"] = backfill
         variables["input"] = _input
         return (
             await self.aexecute(
@@ -8770,20 +8863,20 @@ class KraphApi:
     def create_protocol_event_category(
         self,
         key: str,
-        ontology_references: Iterable[OntologyReferenceInput],
         kind: EventKind,
-        inputs: Iterable[EventRoleInput],
-        outputs: Iterable[EventRoleInput],
-        properties: Iterable[PropertyDefinitionInput],
         protocol: str,
         graph: str,
-        backfill: bool,
         description: str | None | UnsetType = UNSET,
+        ontology_references: Iterable[OntologyReferenceInput] | UnsetType = UNSET,
         color: Iterable[int] | None | UnsetType = UNSET,
         image: str | None | UnsetType = UNSET,
         label: str | None | UnsetType = UNSET,
         pin: bool | None | UnsetType = UNSET,
+        inputs: Iterable[EventRoleInput] | UnsetType = UNSET,
+        outputs: Iterable[EventRoleInput] | UnsetType = UNSET,
+        properties: Iterable[PropertyDefinitionInput] | UnsetType = UNSET,
         definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+        backfill: bool | UnsetType = UNSET,
         task: TaskLike | None = None,
     ) -> ProtocolEventCategory:
         """CreateProtocolEventCategory
@@ -8815,7 +8908,8 @@ class KraphApi:
         _input["key"] = key
         if description is not UNSET:
             _input["description"] = description
-        _input["ontologyReferences"] = ontology_references
+        if ontology_references is not UNSET:
+            _input["ontologyReferences"] = ontology_references
         if color is not UNSET:
             _input["color"] = color
         if image is not UNSET:
@@ -8825,14 +8919,18 @@ class KraphApi:
         if pin is not UNSET:
             _input["pin"] = pin
         _input["kind"] = kind
-        _input["inputs"] = inputs
-        _input["outputs"] = outputs
-        _input["properties"] = properties
+        if inputs is not UNSET:
+            _input["inputs"] = inputs
+        if outputs is not UNSET:
+            _input["outputs"] = outputs
+        if properties is not UNSET:
+            _input["properties"] = properties
         if definition is not UNSET:
             _input["definition"] = definition
         _input["protocol"] = protocol
         _input["graph"] = graph
-        _input["backfill"] = backfill
+        if backfill is not UNSET:
+            _input["backfill"] = backfill
         variables["input"] = _input
         return self.execute(
             CreateProtocolEventCategoryMutation, variables, task=task
@@ -8841,7 +8939,6 @@ class KraphApi:
     async def aupdate_protocol_event_category(
         self,
         id: str,
-        clear_definition: bool,
         key: str | None | UnsetType = UNSET,
         description: str | None | UnsetType = UNSET,
         ontology_references: Iterable[OntologyReferenceInput]
@@ -8852,6 +8949,7 @@ class KraphApi:
         label: str | None | UnsetType = UNSET,
         pin: bool | None | UnsetType = UNSET,
         definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+        clear_definition: bool | UnsetType = UNSET,
         task: TaskLike | None = None,
     ) -> ProtocolEventCategory:
         """UpdateProtocolEventCategory
@@ -8892,7 +8990,8 @@ class KraphApi:
             _input["pin"] = pin
         if definition is not UNSET:
             _input["definition"] = definition
-        _input["clearDefinition"] = clear_definition
+        if clear_definition is not UNSET:
+            _input["clearDefinition"] = clear_definition
         variables["input"] = _input
         return (
             await self.aexecute(
@@ -8903,7 +9002,6 @@ class KraphApi:
     def update_protocol_event_category(
         self,
         id: str,
-        clear_definition: bool,
         key: str | None | UnsetType = UNSET,
         description: str | None | UnsetType = UNSET,
         ontology_references: Iterable[OntologyReferenceInput]
@@ -8914,6 +9012,7 @@ class KraphApi:
         label: str | None | UnsetType = UNSET,
         pin: bool | None | UnsetType = UNSET,
         definition: CategoryDefinitionInput | None | UnsetType = UNSET,
+        clear_definition: bool | UnsetType = UNSET,
         task: TaskLike | None = None,
     ) -> ProtocolEventCategory:
         """UpdateProtocolEventCategory
@@ -8954,7 +9053,8 @@ class KraphApi:
             _input["pin"] = pin
         if definition is not UNSET:
             _input["definition"] = definition
-        _input["clearDefinition"] = clear_definition
+        if clear_definition is not UNSET:
+            _input["clearDefinition"] = clear_definition
         variables["input"] = _input
         return self.execute(
             UpdateProtocolEventCategoryMutation, variables, task=task
@@ -9007,11 +9107,11 @@ class KraphApi:
     async def aassert_entity_exists(
         self,
         term: str,
-        supporting_evidence: Iterable[StructureReferenceInput],
-        derived_from: Iterable[str],
-        same_as: Iterable[str],
+        supporting_evidence: Iterable[StructureReferenceInput] | UnsetType = UNSET,
         observed_at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
+        derived_from: Iterable[str] | UnsetType = UNSET,
+        same_as: Iterable[str] | UnsetType = UNSET,
         task: TaskLike | None = None,
     ) -> AssertedEntity:
         """AssertEntityExists
@@ -9032,13 +9132,16 @@ class KraphApi:
         variables: dict[str, builtins.object] = {}
         _input: dict[str, builtins.object] = {}
         _input["term"] = term
-        _input["supportingEvidence"] = supporting_evidence
+        if supporting_evidence is not UNSET:
+            _input["supportingEvidence"] = supporting_evidence
         if observed_at is not UNSET:
             _input["observedAt"] = observed_at
         if confidence is not UNSET:
             _input["confidence"] = confidence
-        _input["derivedFrom"] = derived_from
-        _input["sameAs"] = same_as
+        if derived_from is not UNSET:
+            _input["derivedFrom"] = derived_from
+        if same_as is not UNSET:
+            _input["sameAs"] = same_as
         variables["input"] = _input
         return (
             await self.aexecute(AssertEntityExistsMutation, variables, task=task)
@@ -9047,11 +9150,11 @@ class KraphApi:
     def assert_entity_exists(
         self,
         term: str,
-        supporting_evidence: Iterable[StructureReferenceInput],
-        derived_from: Iterable[str],
-        same_as: Iterable[str],
+        supporting_evidence: Iterable[StructureReferenceInput] | UnsetType = UNSET,
         observed_at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
+        derived_from: Iterable[str] | UnsetType = UNSET,
+        same_as: Iterable[str] | UnsetType = UNSET,
         task: TaskLike | None = None,
     ) -> AssertedEntity:
         """AssertEntityExists
@@ -9072,13 +9175,16 @@ class KraphApi:
         variables: dict[str, builtins.object] = {}
         _input: dict[str, builtins.object] = {}
         _input["term"] = term
-        _input["supportingEvidence"] = supporting_evidence
+        if supporting_evidence is not UNSET:
+            _input["supportingEvidence"] = supporting_evidence
         if observed_at is not UNSET:
             _input["observedAt"] = observed_at
         if confidence is not UNSET:
             _input["confidence"] = confidence
-        _input["derivedFrom"] = derived_from
-        _input["sameAs"] = same_as
+        if derived_from is not UNSET:
+            _input["derivedFrom"] = derived_from
+        if same_as is not UNSET:
+            _input["sameAs"] = same_as
         variables["input"] = _input
         return self.execute(
             AssertEntityExistsMutation, variables, task=task
@@ -9087,12 +9193,12 @@ class KraphApi:
     async def aassert_natural_event_exists(
         self,
         term: str,
-        inputs: Iterable[RoleMappingInput],
-        outputs: Iterable[RoleMappingInput],
-        supporting_evidence: Iterable[StructureReferenceInput],
-        derived_from: Iterable[str],
+        inputs: Iterable[RoleMappingInput] | UnsetType = UNSET,
+        outputs: Iterable[RoleMappingInput] | UnsetType = UNSET,
+        supporting_evidence: Iterable[StructureReferenceInput] | UnsetType = UNSET,
         observed_at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
+        derived_from: Iterable[str] | UnsetType = UNSET,
         task: TaskLike | None = None,
     ) -> AssertedNaturalEvent:
         """AssertNaturalEventExists
@@ -9114,14 +9220,18 @@ class KraphApi:
         variables: dict[str, builtins.object] = {}
         _input: dict[str, builtins.object] = {}
         _input["term"] = term
-        _input["inputs"] = inputs
-        _input["outputs"] = outputs
-        _input["supportingEvidence"] = supporting_evidence
+        if inputs is not UNSET:
+            _input["inputs"] = inputs
+        if outputs is not UNSET:
+            _input["outputs"] = outputs
+        if supporting_evidence is not UNSET:
+            _input["supportingEvidence"] = supporting_evidence
         if observed_at is not UNSET:
             _input["observedAt"] = observed_at
         if confidence is not UNSET:
             _input["confidence"] = confidence
-        _input["derivedFrom"] = derived_from
+        if derived_from is not UNSET:
+            _input["derivedFrom"] = derived_from
         variables["input"] = _input
         return (
             await self.aexecute(AssertNaturalEventExistsMutation, variables, task=task)
@@ -9130,12 +9240,12 @@ class KraphApi:
     def assert_natural_event_exists(
         self,
         term: str,
-        inputs: Iterable[RoleMappingInput],
-        outputs: Iterable[RoleMappingInput],
-        supporting_evidence: Iterable[StructureReferenceInput],
-        derived_from: Iterable[str],
+        inputs: Iterable[RoleMappingInput] | UnsetType = UNSET,
+        outputs: Iterable[RoleMappingInput] | UnsetType = UNSET,
+        supporting_evidence: Iterable[StructureReferenceInput] | UnsetType = UNSET,
         observed_at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
+        derived_from: Iterable[str] | UnsetType = UNSET,
         task: TaskLike | None = None,
     ) -> AssertedNaturalEvent:
         """AssertNaturalEventExists
@@ -9157,14 +9267,18 @@ class KraphApi:
         variables: dict[str, builtins.object] = {}
         _input: dict[str, builtins.object] = {}
         _input["term"] = term
-        _input["inputs"] = inputs
-        _input["outputs"] = outputs
-        _input["supportingEvidence"] = supporting_evidence
+        if inputs is not UNSET:
+            _input["inputs"] = inputs
+        if outputs is not UNSET:
+            _input["outputs"] = outputs
+        if supporting_evidence is not UNSET:
+            _input["supportingEvidence"] = supporting_evidence
         if observed_at is not UNSET:
             _input["observedAt"] = observed_at
         if confidence is not UNSET:
             _input["confidence"] = confidence
-        _input["derivedFrom"] = derived_from
+        if derived_from is not UNSET:
+            _input["derivedFrom"] = derived_from
         variables["input"] = _input
         return self.execute(
             AssertNaturalEventExistsMutation, variables, task=task
@@ -9173,12 +9287,12 @@ class KraphApi:
     async def aassert_protocol_event_exists(
         self,
         term: str,
-        inputs: Iterable[RoleMappingInput],
-        outputs: Iterable[RoleMappingInput],
-        supporting_evidence: Iterable[StructureReferenceInput],
-        derived_from: Iterable[str],
+        inputs: Iterable[RoleMappingInput] | UnsetType = UNSET,
+        outputs: Iterable[RoleMappingInput] | UnsetType = UNSET,
+        supporting_evidence: Iterable[StructureReferenceInput] | UnsetType = UNSET,
         observed_at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
+        derived_from: Iterable[str] | UnsetType = UNSET,
         task: TaskLike | None = None,
     ) -> AssertedProtocolEvent:
         """AssertProtocolEventExists
@@ -9200,14 +9314,18 @@ class KraphApi:
         variables: dict[str, builtins.object] = {}
         _input: dict[str, builtins.object] = {}
         _input["term"] = term
-        _input["inputs"] = inputs
-        _input["outputs"] = outputs
-        _input["supportingEvidence"] = supporting_evidence
+        if inputs is not UNSET:
+            _input["inputs"] = inputs
+        if outputs is not UNSET:
+            _input["outputs"] = outputs
+        if supporting_evidence is not UNSET:
+            _input["supportingEvidence"] = supporting_evidence
         if observed_at is not UNSET:
             _input["observedAt"] = observed_at
         if confidence is not UNSET:
             _input["confidence"] = confidence
-        _input["derivedFrom"] = derived_from
+        if derived_from is not UNSET:
+            _input["derivedFrom"] = derived_from
         variables["input"] = _input
         return (
             await self.aexecute(AssertProtocolEventExistsMutation, variables, task=task)
@@ -9216,12 +9334,12 @@ class KraphApi:
     def assert_protocol_event_exists(
         self,
         term: str,
-        inputs: Iterable[RoleMappingInput],
-        outputs: Iterable[RoleMappingInput],
-        supporting_evidence: Iterable[StructureReferenceInput],
-        derived_from: Iterable[str],
+        inputs: Iterable[RoleMappingInput] | UnsetType = UNSET,
+        outputs: Iterable[RoleMappingInput] | UnsetType = UNSET,
+        supporting_evidence: Iterable[StructureReferenceInput] | UnsetType = UNSET,
         observed_at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
+        derived_from: Iterable[str] | UnsetType = UNSET,
         task: TaskLike | None = None,
     ) -> AssertedProtocolEvent:
         """AssertProtocolEventExists
@@ -9243,14 +9361,18 @@ class KraphApi:
         variables: dict[str, builtins.object] = {}
         _input: dict[str, builtins.object] = {}
         _input["term"] = term
-        _input["inputs"] = inputs
-        _input["outputs"] = outputs
-        _input["supportingEvidence"] = supporting_evidence
+        if inputs is not UNSET:
+            _input["inputs"] = inputs
+        if outputs is not UNSET:
+            _input["outputs"] = outputs
+        if supporting_evidence is not UNSET:
+            _input["supportingEvidence"] = supporting_evidence
         if observed_at is not UNSET:
             _input["observedAt"] = observed_at
         if confidence is not UNSET:
             _input["confidence"] = confidence
-        _input["derivedFrom"] = derived_from
+        if derived_from is not UNSET:
+            _input["derivedFrom"] = derived_from
         variables["input"] = _input
         return self.execute(
             AssertProtocolEventExistsMutation, variables, task=task
@@ -9301,9 +9423,9 @@ class KraphApi:
     async def aassert_same_instance(
         self,
         instances: Iterable[str],
-        derived_from: Iterable[str],
         observed_at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
+        derived_from: Iterable[str] | UnsetType = UNSET,
         task: TaskLike | None = None,
     ) -> AssertedSameness:
         """AssertSameInstance
@@ -9326,7 +9448,8 @@ class KraphApi:
             _input["observedAt"] = observed_at
         if confidence is not UNSET:
             _input["confidence"] = confidence
-        _input["derivedFrom"] = derived_from
+        if derived_from is not UNSET:
+            _input["derivedFrom"] = derived_from
         variables["input"] = _input
         return (
             await self.aexecute(AssertSameInstanceMutation, variables, task=task)
@@ -9335,9 +9458,9 @@ class KraphApi:
     def assert_same_instance(
         self,
         instances: Iterable[str],
-        derived_from: Iterable[str],
         observed_at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
+        derived_from: Iterable[str] | UnsetType = UNSET,
         task: TaskLike | None = None,
     ) -> AssertedSameness:
         """AssertSameInstance
@@ -9360,7 +9483,8 @@ class KraphApi:
             _input["observedAt"] = observed_at
         if confidence is not UNSET:
             _input["confidence"] = confidence
-        _input["derivedFrom"] = derived_from
+        if derived_from is not UNSET:
+            _input["derivedFrom"] = derived_from
         variables["input"] = _input
         return self.execute(
             AssertSameInstanceMutation, variables, task=task
@@ -9369,9 +9493,9 @@ class KraphApi:
     async def aassert_structure_exists(
         self,
         object: str,
-        metrics: Iterable[MetricInput],
-        derived_from: Iterable[str],
         identifier: str,
+        metrics: Iterable[MetricInput] | UnsetType = UNSET,
+        derived_from: Iterable[str] | UnsetType = UNSET,
         observed_at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
         task: TaskLike | None = None,
@@ -9393,8 +9517,10 @@ class KraphApi:
         variables: dict[str, builtins.object] = {}
         _input: dict[str, builtins.object] = {}
         _input["object"] = object
-        _input["metrics"] = metrics
-        _input["derivedFrom"] = derived_from
+        if metrics is not UNSET:
+            _input["metrics"] = metrics
+        if derived_from is not UNSET:
+            _input["derivedFrom"] = derived_from
         _input["identifier"] = identifier
         if observed_at is not UNSET:
             _input["observedAt"] = observed_at
@@ -9408,9 +9534,9 @@ class KraphApi:
     def assert_structure_exists(
         self,
         object: str,
-        metrics: Iterable[MetricInput],
-        derived_from: Iterable[str],
         identifier: str,
+        metrics: Iterable[MetricInput] | UnsetType = UNSET,
+        derived_from: Iterable[str] | UnsetType = UNSET,
         observed_at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
         task: TaskLike | None = None,
@@ -9432,8 +9558,10 @@ class KraphApi:
         variables: dict[str, builtins.object] = {}
         _input: dict[str, builtins.object] = {}
         _input["object"] = object
-        _input["metrics"] = metrics
-        _input["derivedFrom"] = derived_from
+        if metrics is not UNSET:
+            _input["metrics"] = metrics
+        if derived_from is not UNSET:
+            _input["derivedFrom"] = derived_from
         _input["identifier"] = identifier
         if observed_at is not UNSET:
             _input["observedAt"] = observed_at
@@ -9449,13 +9577,13 @@ class KraphApi:
         key: str,
         value: Any,
         value_kind: PropertyType,
-        derived_from: Iterable[str],
         identifier: str,
         object: str,
         confidence: float | None | UnsetType = UNSET,
         confidence_type: str | None | UnsetType = UNSET,
         unit: str | None | UnsetType = UNSET,
         observed_at: datetime | None | UnsetType = UNSET,
+        derived_from: Iterable[str] | UnsetType = UNSET,
         task: TaskLike | None = None,
     ) -> AssertedMetric:
         """AssertMetricValue
@@ -9490,7 +9618,8 @@ class KraphApi:
             _input["unit"] = unit
         if observed_at is not UNSET:
             _input["observedAt"] = observed_at
-        _input["derivedFrom"] = derived_from
+        if derived_from is not UNSET:
+            _input["derivedFrom"] = derived_from
         _input["identifier"] = identifier
         _input["object"] = object
         variables["input"] = _input
@@ -9503,13 +9632,13 @@ class KraphApi:
         key: str,
         value: Any,
         value_kind: PropertyType,
-        derived_from: Iterable[str],
         identifier: str,
         object: str,
         confidence: float | None | UnsetType = UNSET,
         confidence_type: str | None | UnsetType = UNSET,
         unit: str | None | UnsetType = UNSET,
         observed_at: datetime | None | UnsetType = UNSET,
+        derived_from: Iterable[str] | UnsetType = UNSET,
         task: TaskLike | None = None,
     ) -> AssertedMetric:
         """AssertMetricValue
@@ -9544,7 +9673,8 @@ class KraphApi:
             _input["unit"] = unit
         if observed_at is not UNSET:
             _input["observedAt"] = observed_at
-        _input["derivedFrom"] = derived_from
+        if derived_from is not UNSET:
+            _input["derivedFrom"] = derived_from
         _input["identifier"] = identifier
         _input["object"] = object
         variables["input"] = _input
@@ -9552,121 +9682,59 @@ class KraphApi:
             AssertMetricValueMutation, variables, task=task
         ).assert_metric_value
 
-    async def aassert_metric_value_for_structure(
-        self,
-        key: str,
-        value: Any,
-        value_kind: PropertyType,
-        derived_from: Iterable[str],
-        structure: IDCoercible,
-        confidence: float | None | UnsetType = UNSET,
-        confidence_type: str | None | UnsetType = UNSET,
-        unit: str | None | UnsetType = UNSET,
-        observed_at: datetime | None | UnsetType = UNSET,
-        task: TaskLike | None = None,
-    ) -> AssertedMetric:
-        """AssertMetricValueForStructure
-
-        Record a measurement against a structure that already exists, named by its evidence id
+    async def aassert_metric_values(
+        self, metrics: Iterable[MetricValueInput], task: TaskLike | None = None
+    ) -> AssertedMetricValues:
+        """AssertMetricValues
+         Many values about any number of data, as one act. A metric that names a uuid already on the
+         record is reported, not recorded again; a batch of only those has no assertion.
 
         Args:
-            key: The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text. (required)
-            value: The `AnyScalar` scalar type represents an arbitrary JSON-like value (required)
-            value_kind: What type of value this is. Required: it decides which column the value is stored in and which measurement term it is recorded under, and nothing infers it. Two callers may declare the same key differently — a float `confidence` and a category-label `confidence` are two terms, and both are recorded.
-            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-            confidence_type: What kind of number `confidence` is — a method's own score, a p-value. Measurement-only
-            unit: The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
-            observed_at: When the world was observed. Defaults to when it was claimed.
-            derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
-            structure: The unique ID of the structure this metric is associated with
+            metrics: The values to record, at most 5000 in one act
             task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            AssertedMetric"""
+            AssertedMetricValues"""
         variables: dict[str, builtins.object] = {}
         _input: dict[str, builtins.object] = {}
-        _input["key"] = key
-        _input["value"] = value
-        _input["valueKind"] = value_kind
-        if confidence is not UNSET:
-            _input["confidence"] = confidence
-        if confidence_type is not UNSET:
-            _input["confidenceType"] = confidence_type
-        if unit is not UNSET:
-            _input["unit"] = unit
-        if observed_at is not UNSET:
-            _input["observedAt"] = observed_at
-        _input["derivedFrom"] = derived_from
-        _input["structure"] = structure
+        _input["metrics"] = metrics
         variables["input"] = _input
         return (
-            await self.aexecute(
-                AssertMetricValueForStructureMutation, variables, task=task
-            )
-        ).assert_metric_value_for_structure
+            await self.aexecute(AssertMetricValuesMutation, variables, task=task)
+        ).assert_metric_values
 
-    def assert_metric_value_for_structure(
-        self,
-        key: str,
-        value: Any,
-        value_kind: PropertyType,
-        derived_from: Iterable[str],
-        structure: IDCoercible,
-        confidence: float | None | UnsetType = UNSET,
-        confidence_type: str | None | UnsetType = UNSET,
-        unit: str | None | UnsetType = UNSET,
-        observed_at: datetime | None | UnsetType = UNSET,
-        task: TaskLike | None = None,
-    ) -> AssertedMetric:
-        """AssertMetricValueForStructure
-
-        Record a measurement against a structure that already exists, named by its evidence id
+    def assert_metric_values(
+        self, metrics: Iterable[MetricValueInput], task: TaskLike | None = None
+    ) -> AssertedMetricValues:
+        """AssertMetricValues
+         Many values about any number of data, as one act. A metric that names a uuid already on the
+         record is reported, not recorded again; a batch of only those has no assertion.
 
         Args:
-            key: The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text. (required)
-            value: The `AnyScalar` scalar type represents an arbitrary JSON-like value (required)
-            value_kind: What type of value this is. Required: it decides which column the value is stored in and which measurement term it is recorded under, and nothing infers it. Two callers may declare the same key differently — a float `confidence` and a category-label `confidence` are two terms, and both are recorded.
-            confidence: How sure you are, 0 to 1. Left unset, the claim carries no number — which is neither 1.0 nor 0.0: a category rule with a CONFIDENCE condition admits only claims that carry one.
-            confidence_type: What kind of number `confidence` is — a method's own score, a p-value. Measurement-only
-            unit: The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
-            observed_at: When the world was observed. Defaults to when it was claimed.
-            derived_from: The claims this one came from — ids of instances, links, metrics or structures in your organization. Each is recorded as a DERIVED_FROM link under the same assertion as the claim itself, because "this, because of that" is one act (RFC 0017). Read back as `derivedFrom`; the cited claim lists it under `derivations`.
-            structure: The unique ID of the structure this metric is associated with
+            metrics: The values to record, at most 5000 in one act
             task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
 
         Returns:
-            AssertedMetric"""
+            AssertedMetricValues"""
         variables: dict[str, builtins.object] = {}
         _input: dict[str, builtins.object] = {}
-        _input["key"] = key
-        _input["value"] = value
-        _input["valueKind"] = value_kind
-        if confidence is not UNSET:
-            _input["confidence"] = confidence
-        if confidence_type is not UNSET:
-            _input["confidenceType"] = confidence_type
-        if unit is not UNSET:
-            _input["unit"] = unit
-        if observed_at is not UNSET:
-            _input["observedAt"] = observed_at
-        _input["derivedFrom"] = derived_from
-        _input["structure"] = structure
+        _input["metrics"] = metrics
         variables["input"] = _input
         return self.execute(
-            AssertMetricValueForStructureMutation, variables, task=task
-        ).assert_metric_value_for_structure
+            AssertMetricValuesMutation, variables, task=task
+        ).assert_metric_values
 
     async def asupersede_metric_value(
         self,
         key: str,
         value: Any,
         value_kind: PropertyType,
-        derived_from: Iterable[str],
         id: str,
         confidence: float | None | UnsetType = UNSET,
         confidence_type: str | None | UnsetType = UNSET,
         unit: str | None | UnsetType = UNSET,
         observed_at: datetime | None | UnsetType = UNSET,
+        derived_from: Iterable[str] | UnsetType = UNSET,
         task: TaskLike | None = None,
     ) -> AssertedMetric:
         """SupersedeMetricValue
@@ -9699,7 +9767,8 @@ class KraphApi:
             _input["unit"] = unit
         if observed_at is not UNSET:
             _input["observedAt"] = observed_at
-        _input["derivedFrom"] = derived_from
+        if derived_from is not UNSET:
+            _input["derivedFrom"] = derived_from
         _input["id"] = id
         variables["input"] = _input
         return (
@@ -9711,12 +9780,12 @@ class KraphApi:
         key: str,
         value: Any,
         value_kind: PropertyType,
-        derived_from: Iterable[str],
         id: str,
         confidence: float | None | UnsetType = UNSET,
         confidence_type: str | None | UnsetType = UNSET,
         unit: str | None | UnsetType = UNSET,
         observed_at: datetime | None | UnsetType = UNSET,
+        derived_from: Iterable[str] | UnsetType = UNSET,
         task: TaskLike | None = None,
     ) -> AssertedMetric:
         """SupersedeMetricValue
@@ -9749,7 +9818,8 @@ class KraphApi:
             _input["unit"] = unit
         if observed_at is not UNSET:
             _input["observedAt"] = observed_at
-        _input["derivedFrom"] = derived_from
+        if derived_from is not UNSET:
+            _input["derivedFrom"] = derived_from
         _input["id"] = id
         variables["input"] = _input
         return self.execute(
@@ -9760,11 +9830,11 @@ class KraphApi:
         self,
         source_id: str,
         target_id: str,
-        supporting_evidence: Iterable[StructureReferenceInput],
-        derived_from: Iterable[str],
         term: str,
+        supporting_evidence: Iterable[StructureReferenceInput] | UnsetType = UNSET,
         observed_at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
+        derived_from: Iterable[str] | UnsetType = UNSET,
         task: TaskLike | None = None,
     ) -> AssertedRelation:
         """AssertRelationExists
@@ -9786,12 +9856,14 @@ class KraphApi:
         _input: dict[str, builtins.object] = {}
         _input["sourceId"] = source_id
         _input["targetId"] = target_id
-        _input["supportingEvidence"] = supporting_evidence
+        if supporting_evidence is not UNSET:
+            _input["supportingEvidence"] = supporting_evidence
         if observed_at is not UNSET:
             _input["observedAt"] = observed_at
         if confidence is not UNSET:
             _input["confidence"] = confidence
-        _input["derivedFrom"] = derived_from
+        if derived_from is not UNSET:
+            _input["derivedFrom"] = derived_from
         _input["term"] = term
         variables["input"] = _input
         return (
@@ -9802,11 +9874,11 @@ class KraphApi:
         self,
         source_id: str,
         target_id: str,
-        supporting_evidence: Iterable[StructureReferenceInput],
-        derived_from: Iterable[str],
         term: str,
+        supporting_evidence: Iterable[StructureReferenceInput] | UnsetType = UNSET,
         observed_at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
+        derived_from: Iterable[str] | UnsetType = UNSET,
         task: TaskLike | None = None,
     ) -> AssertedRelation:
         """AssertRelationExists
@@ -9828,12 +9900,14 @@ class KraphApi:
         _input: dict[str, builtins.object] = {}
         _input["sourceId"] = source_id
         _input["targetId"] = target_id
-        _input["supportingEvidence"] = supporting_evidence
+        if supporting_evidence is not UNSET:
+            _input["supportingEvidence"] = supporting_evidence
         if observed_at is not UNSET:
             _input["observedAt"] = observed_at
         if confidence is not UNSET:
             _input["confidence"] = confidence
-        _input["derivedFrom"] = derived_from
+        if derived_from is not UNSET:
+            _input["derivedFrom"] = derived_from
         _input["term"] = term
         variables["input"] = _input
         return self.execute(
@@ -9844,11 +9918,11 @@ class KraphApi:
         self,
         source_id: str,
         target_id: str,
-        supporting_evidence: Iterable[StructureReferenceInput],
-        derived_from: Iterable[str],
         term: str,
+        supporting_evidence: Iterable[StructureReferenceInput] | UnsetType = UNSET,
         observed_at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
+        derived_from: Iterable[str] | UnsetType = UNSET,
         task: TaskLike | None = None,
     ) -> AssertedMeasurement:
         """AssertMeasurementExists
@@ -9871,12 +9945,14 @@ class KraphApi:
         _input: dict[str, builtins.object] = {}
         _input["sourceId"] = source_id
         _input["targetId"] = target_id
-        _input["supportingEvidence"] = supporting_evidence
+        if supporting_evidence is not UNSET:
+            _input["supportingEvidence"] = supporting_evidence
         if observed_at is not UNSET:
             _input["observedAt"] = observed_at
         if confidence is not UNSET:
             _input["confidence"] = confidence
-        _input["derivedFrom"] = derived_from
+        if derived_from is not UNSET:
+            _input["derivedFrom"] = derived_from
         _input["term"] = term
         variables["input"] = _input
         return (
@@ -9887,11 +9963,11 @@ class KraphApi:
         self,
         source_id: str,
         target_id: str,
-        supporting_evidence: Iterable[StructureReferenceInput],
-        derived_from: Iterable[str],
         term: str,
+        supporting_evidence: Iterable[StructureReferenceInput] | UnsetType = UNSET,
         observed_at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
+        derived_from: Iterable[str] | UnsetType = UNSET,
         task: TaskLike | None = None,
     ) -> AssertedMeasurement:
         """AssertMeasurementExists
@@ -9914,12 +9990,14 @@ class KraphApi:
         _input: dict[str, builtins.object] = {}
         _input["sourceId"] = source_id
         _input["targetId"] = target_id
-        _input["supportingEvidence"] = supporting_evidence
+        if supporting_evidence is not UNSET:
+            _input["supportingEvidence"] = supporting_evidence
         if observed_at is not UNSET:
             _input["observedAt"] = observed_at
         if confidence is not UNSET:
             _input["confidence"] = confidence
-        _input["derivedFrom"] = derived_from
+        if derived_from is not UNSET:
+            _input["derivedFrom"] = derived_from
         _input["term"] = term
         variables["input"] = _input
         return self.execute(
@@ -9930,11 +10008,11 @@ class KraphApi:
         self,
         source_id: str,
         target_id: str,
-        supporting_evidence: Iterable[StructureReferenceInput],
-        derived_from: Iterable[str],
         term: str,
+        supporting_evidence: Iterable[StructureReferenceInput] | UnsetType = UNSET,
         observed_at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
+        derived_from: Iterable[str] | UnsetType = UNSET,
         task: TaskLike | None = None,
     ) -> AssertedStructureRelation:
         """AssertStructureRelationExists
@@ -9957,12 +10035,14 @@ class KraphApi:
         _input: dict[str, builtins.object] = {}
         _input["sourceId"] = source_id
         _input["targetId"] = target_id
-        _input["supportingEvidence"] = supporting_evidence
+        if supporting_evidence is not UNSET:
+            _input["supportingEvidence"] = supporting_evidence
         if observed_at is not UNSET:
             _input["observedAt"] = observed_at
         if confidence is not UNSET:
             _input["confidence"] = confidence
-        _input["derivedFrom"] = derived_from
+        if derived_from is not UNSET:
+            _input["derivedFrom"] = derived_from
         _input["term"] = term
         variables["input"] = _input
         return (
@@ -9975,11 +10055,11 @@ class KraphApi:
         self,
         source_id: str,
         target_id: str,
-        supporting_evidence: Iterable[StructureReferenceInput],
-        derived_from: Iterable[str],
         term: str,
+        supporting_evidence: Iterable[StructureReferenceInput] | UnsetType = UNSET,
         observed_at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
+        derived_from: Iterable[str] | UnsetType = UNSET,
         task: TaskLike | None = None,
     ) -> AssertedStructureRelation:
         """AssertStructureRelationExists
@@ -10002,12 +10082,14 @@ class KraphApi:
         _input: dict[str, builtins.object] = {}
         _input["sourceId"] = source_id
         _input["targetId"] = target_id
-        _input["supportingEvidence"] = supporting_evidence
+        if supporting_evidence is not UNSET:
+            _input["supportingEvidence"] = supporting_evidence
         if observed_at is not UNSET:
             _input["observedAt"] = observed_at
         if confidence is not UNSET:
             _input["confidence"] = confidence
-        _input["derivedFrom"] = derived_from
+        if derived_from is not UNSET:
+            _input["derivedFrom"] = derived_from
         _input["term"] = term
         variables["input"] = _input
         return self.execute(
@@ -10019,10 +10101,10 @@ class KraphApi:
         event: str,
         entity: str,
         role: str,
-        is_input: bool,
-        derived_from: Iterable[str],
+        is_input: bool | UnsetType = UNSET,
         observed_at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
+        derived_from: Iterable[str] | UnsetType = UNSET,
         task: TaskLike | None = None,
     ) -> AssertedParticipation:
         """AssertParticipation
@@ -10046,12 +10128,14 @@ class KraphApi:
         _input["event"] = event
         _input["entity"] = entity
         _input["role"] = role
-        _input["isInput"] = is_input
+        if is_input is not UNSET:
+            _input["isInput"] = is_input
         if observed_at is not UNSET:
             _input["observedAt"] = observed_at
         if confidence is not UNSET:
             _input["confidence"] = confidence
-        _input["derivedFrom"] = derived_from
+        if derived_from is not UNSET:
+            _input["derivedFrom"] = derived_from
         variables["input"] = _input
         return (
             await self.aexecute(AssertParticipationMutation, variables, task=task)
@@ -10062,10 +10146,10 @@ class KraphApi:
         event: str,
         entity: str,
         role: str,
-        is_input: bool,
-        derived_from: Iterable[str],
+        is_input: bool | UnsetType = UNSET,
         observed_at: datetime | None | UnsetType = UNSET,
         confidence: float | None | UnsetType = UNSET,
+        derived_from: Iterable[str] | UnsetType = UNSET,
         task: TaskLike | None = None,
     ) -> AssertedParticipation:
         """AssertParticipation
@@ -10089,12 +10173,14 @@ class KraphApi:
         _input["event"] = event
         _input["entity"] = entity
         _input["role"] = role
-        _input["isInput"] = is_input
+        if is_input is not UNSET:
+            _input["isInput"] = is_input
         if observed_at is not UNSET:
             _input["observedAt"] = observed_at
         if confidence is not UNSET:
             _input["confidence"] = confidence
-        _input["derivedFrom"] = derived_from
+        if derived_from is not UNSET:
+            _input["derivedFrom"] = derived_from
         variables["input"] = _input
         return self.execute(
             AssertParticipationMutation, variables, task=task
@@ -10217,10 +10303,10 @@ class KraphApi:
     async def acreate_graph(
         self,
         name: str,
-        backfill: bool,
         description: str | None | UnsetType = UNSET,
         definition: GraphDefinitionInput | None | UnsetType = UNSET,
         sameness_rule: SamenessRuleInput | None | UnsetType = UNSET,
+        backfill: bool | UnsetType = UNSET,
         task: TaskLike | None = None,
     ) -> Graph:
         """CreateGraph
@@ -10247,7 +10333,8 @@ class KraphApi:
             _input["definition"] = definition
         if sameness_rule is not UNSET:
             _input["samenessRule"] = sameness_rule
-        _input["backfill"] = backfill
+        if backfill is not UNSET:
+            _input["backfill"] = backfill
         variables["input"] = _input
         return (
             await self.aexecute(CreateGraphMutation, variables, task=task)
@@ -10256,10 +10343,10 @@ class KraphApi:
     def create_graph(
         self,
         name: str,
-        backfill: bool,
         description: str | None | UnsetType = UNSET,
         definition: GraphDefinitionInput | None | UnsetType = UNSET,
         sameness_rule: SamenessRuleInput | None | UnsetType = UNSET,
+        backfill: bool | UnsetType = UNSET,
         task: TaskLike | None = None,
     ) -> Graph:
         """CreateGraph
@@ -10286,7 +10373,8 @@ class KraphApi:
             _input["definition"] = definition
         if sameness_rule is not UNSET:
             _input["samenessRule"] = sameness_rule
-        _input["backfill"] = backfill
+        if backfill is not UNSET:
+            _input["backfill"] = backfill
         variables["input"] = _input
         return self.execute(CreateGraphMutation, variables, task=task).create_graph
 
@@ -10377,7 +10465,7 @@ class KraphApi:
     async def aupdate_graph_visual(
         self,
         id: str,
-        node_positions: Iterable[CategoryNodePositionInput],
+        node_positions: Iterable[CategoryNodePositionInput] | UnsetType = UNSET,
         task: TaskLike | None = None,
     ) -> Graph:
         """UpdateGraphVisual
@@ -10394,7 +10482,8 @@ class KraphApi:
         variables: dict[str, builtins.object] = {}
         _input: dict[str, builtins.object] = {}
         _input["id"] = id
-        _input["nodePositions"] = node_positions
+        if node_positions is not UNSET:
+            _input["nodePositions"] = node_positions
         variables["input"] = _input
         return (
             await self.aexecute(UpdateGraphVisualMutation, variables, task=task)
@@ -10403,7 +10492,7 @@ class KraphApi:
     def update_graph_visual(
         self,
         id: str,
-        node_positions: Iterable[CategoryNodePositionInput],
+        node_positions: Iterable[CategoryNodePositionInput] | UnsetType = UNSET,
         task: TaskLike | None = None,
     ) -> Graph:
         """UpdateGraphVisual
@@ -10420,7 +10509,8 @@ class KraphApi:
         variables: dict[str, builtins.object] = {}
         _input: dict[str, builtins.object] = {}
         _input["id"] = id
-        _input["nodePositions"] = node_positions
+        if node_positions is not UNSET:
+            _input["nodePositions"] = node_positions
         variables["input"] = _input
         return self.execute(
             UpdateGraphVisualMutation, variables, task=task
@@ -14180,6 +14270,7 @@ class KraphApi:
 
 AssertEntityExistsInput.model_rebuild()
 AssertMeasurementExistsInput.model_rebuild()
+AssertMetricValuesInput.model_rebuild()
 AssertNaturalEventExistsInput.model_rebuild()
 AssertParticipationsInput.model_rebuild()
 AssertProtocolEventExistsInput.model_rebuild()

@@ -1,6 +1,6 @@
 """Custom scalars the kraph schema names.
 
-The evidence-log schema declares eight scalars, of which only these need Python behaviour;
+The evidence-log schema declares nine scalars, of which only these need Python behaviour;
 ``AnyScalar``, ``JSON``, ``UnixMilliseconds`` and ``_Any`` map to plain builtins in
 ``graphql.config.yaml``, and ``DateTime`` is a turms built-in.
 
@@ -10,6 +10,7 @@ it, and the job of turning a Python object into that pair belongs to
 :func:`kraph.refs.as_structure_ref`, not to a scalar validator.
 """
 
+import uuid
 from typing import Any, Type
 
 from pydantic import BaseModel, GetCoreSchemaHandler
@@ -23,6 +24,27 @@ StructureObjectCoercible = str
 
 CypherLiteralCoercible = str
 """What may be passed where a CypherLiteral is wanted."""
+
+UUIDCoercible = str | uuid.UUID
+"""What may be passed where a UUID is wanted."""
+
+
+class UUID(str):
+    """A uuid, held as its text so that a request's variables can be sent as JSON."""
+
+    @classmethod
+    def __get_pydantic_core_schema__(
+        cls,
+        source_type: Any,  # noqa: ANN401
+        handler: GetCoreSchemaHandler,  # noqa: ANN401
+    ) -> CoreSchema:
+        """Get the pydantic core schema for the validator function"""
+        return core_schema.no_info_before_validator_function(cls.validate, handler(str))
+
+    @classmethod
+    def validate(cls: Type["UUID"], v: UUIDCoercible, *info: Any) -> "UUID":
+        """Accept a uuid or its text, and refuse anything else."""
+        return cls(str(uuid.UUID(str(v))))
 
 
 class StructureIdentifier(str):

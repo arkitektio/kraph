@@ -30,6 +30,10 @@ authentikate:
       client_app: test
       client_release: v0.0.1
       client_device: test
+      # kraph asks every root field for a scope and every write for a role.
+      scope: openid kraph_all
+      roles:
+        - kraph_admin
 lok:
   issuer: lok
   key_type: RS256

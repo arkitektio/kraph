@@ -32,8 +32,10 @@ mutation AssertMetricValue($input: AssertMetricValueInput!) {
   assertMetricValue(input: $input) { ...AssertedMetric }
 }
 
-mutation AssertMetricValueForStructure($input: AssertMetricValueForStructureInput!) {
-  assertMetricValueForStructure(input: $input) { ...AssertedMetric }
+# Many values about any number of data, as one act. A metric that names a uuid already on the
+# record is reported, not recorded again; a batch of only those has no assertion.
+mutation AssertMetricValues($input: AssertMetricValuesInput!) {
+  assertMetricValues(input: $input) { ...AssertedMetricValues }
 }
 
 # Retracting Standing + the new Metric under ONE assertion. Returns a metric with a NEW id.

@@ -56,6 +56,7 @@ projects:
               - kraph.kraph.Kraph
             coercible_scalars:
               ID: rath.scalars.IDCoercible
+              UUID: kraph.scalars.UUIDCoercible
               CypherLiteral: kraph.scalars.CypherLiteralCoercible
               StructureIdentifier: kraph.scalars.StructureIdentifierCoercible
               StructureObject: kraph.scalars.StructureObjectCoercible
@@ -65,6 +66,7 @@ projects:
           - type: turms.processors.black.BlackProcessor
         scalar_definitions:
           ID: rath.scalars.ID
+          UUID: kraph.scalars.UUID
           AnyScalar: typing.Any
           JSON: typing.Any
           CypherLiteral: kraph.scalars.CypherLiteral
