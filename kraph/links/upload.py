@@ -21,7 +21,6 @@ The class is kept — rather than deleted — because ``KraphLinkComposition.upl
 field and ``tests/conftest.py`` imports the name. It passes operations through untouched.
 """
 
-from typing import Optional
 
 from pydantic import ConfigDict, Field
 from rath.links.parsing import ParsingLink
@@ -36,7 +35,7 @@ class UploadLink(ParsingLink):
     See the module docstring for what this used to do and what replacing it requires.
     """
 
-    datalayer: Optional[DataLayer] = Field(default=None, exclude=True)
+    datalayer: DataLayer | None = Field(default=None, exclude=True)
 
     async def aparse(self, operation: Operation) -> Operation:
         """Return the operation untouched — there is nothing to rewrite."""

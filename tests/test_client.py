@@ -5,7 +5,8 @@ client is passed (or an object remembers the one that fetched it).
 """
 
 from types import SimpleNamespace
-from typing import Any, AsyncIterator, Optional
+from typing import Any
+from collections.abc import AsyncIterator
 
 import pytest
 from koil import Koil
@@ -64,7 +65,7 @@ class GetStore(BaseModel):
 
     class Arguments(BaseModel):
         id: str
-        note: Optional[str] = None
+        note: str | None = None
 
     class Meta:
         document = "query GetStore($id: ID!) { store(id: $id) { id key } }"

@@ -23,7 +23,7 @@ table-query surface.
 """
 
 import os
-from typing import Annotated, Optional
+from typing import Annotated
 
 from fakts import Alias, Require, TokenLoader
 from fakts.contrib.rath.auth import FaktsAuthLink
@@ -91,7 +91,7 @@ def kraph(
         Require("live.arkitekt.kraph", "Where the knowledge graph relating entities lives"),
     ],
     datalayer: Annotated[
-        Optional[Alias],
+        Alias | None,
         Require("live.arkitekt.s3", "Where the graph's files are stored", optional=True),
     ],
     tokens: TokenLoader,

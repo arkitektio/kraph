@@ -22,7 +22,7 @@ Two consequences worth stating, because both were bugs in the previous design:
   organization owns, and a view that declares no category for that word simply will not draw it.
 """
 
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Any
 
 from koil import unkoil
 from pydantic import BaseModel
@@ -87,7 +87,7 @@ class HasDrawings(BaseModel):
         """
         return bool(get_attributes_or_error(self, "drawings"))
 
-    def drawn_in(self, graph: Any) -> Optional[Any]:
+    def drawn_in(self, graph: Any) -> Any | None:
         """This view's account of the claim, or ``None`` if this view does not draw it."""
         wanted = graph if isinstance(graph, str) else get_attributes_or_error(graph, "id")
         for drawing in get_attributes_or_error(self, "drawings"):
@@ -268,7 +268,7 @@ class GraphTrait(ContextBound):
         *,
         timeout: float = 30.0,
         poll: float = 0.5,
-        kraph: Optional["Kraph"] = None,
+        kraph: "Kraph | None" = None,
     ) -> Any:
         """Block until this view has drawn everything up to ``seq``.
 

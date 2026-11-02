@@ -11,7 +11,7 @@ it, and the job of turning a Python object into that pair belongs to
 """
 
 import uuid
-from typing import Any, Type
+from typing import Any
 
 from pydantic import BaseModel, GetCoreSchemaHandler
 from pydantic_core import CoreSchema, core_schema
@@ -42,7 +42,7 @@ class UUID(str):
         return core_schema.no_info_before_validator_function(cls.validate, handler(str))
 
     @classmethod
-    def validate(cls: Type["UUID"], v: UUIDCoercible, *info: Any) -> "UUID":
+    def validate(cls: type["UUID"], v: UUIDCoercible, *info: Any) -> "UUID":
         """Accept a uuid or its text, and refuse anything else."""
         return cls(str(uuid.UUID(str(v))))
 
@@ -65,7 +65,7 @@ class StructureIdentifier(str):
 
     @classmethod
     def validate(
-        cls: Type["StructureIdentifier"], v: StructureIdentifierCoercible, *info: Any
+        cls: type["StructureIdentifier"], v: StructureIdentifierCoercible, *info: Any
     ) -> "StructureIdentifier":
         if isinstance(v, BaseModel) or isinstance(v, type) and issubclass(v, BaseModel):
             from kraph.refs import identifier_for_cls
@@ -96,7 +96,7 @@ class StructureObject(str):
 
     @classmethod
     def validate(
-        cls: Type["StructureObject"], v: StructureObjectCoercible, *info: Any
+        cls: type["StructureObject"], v: StructureObjectCoercible, *info: Any
     ) -> "StructureObject":
         if isinstance(v, BaseModel):
             from rath.turms.utils import get_attributes_or_error

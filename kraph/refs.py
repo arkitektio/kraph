@@ -11,15 +11,15 @@ lives here, once. A bare object maps to its identifier only through a structure 
 passing explicit pairs needs none.
 """
 
-from typing import Any, Union
+from typing import Any
 
 from pydantic import BaseModel
 from rath.turms.utils import get_attributes_or_error
 
 from kraph.errors import UnregisteredStructure
 
-StructureRef = Union[str, tuple, BaseModel]
-NodeRef = Union[str, BaseModel]
+StructureRef = str | tuple | BaseModel
+NodeRef = str | BaseModel
 
 
 def identifier_for_cls(cls: type, registry: Any = None) -> str:  # noqa: ANN401
