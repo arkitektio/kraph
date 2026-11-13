@@ -1,0 +1,35 @@
+mutation CreateGraphPairsQuery($input: CreateGraphPairsQueryInput!) {
+  createGraphPairsQuery(input: $input) {
+    ...GraphPairsQuery
+  }
+}
+
+mutation UpdateGraphPairsQuery($input: UpdateGraphPairsQueryInput!) {
+  updateGraphPairsQuery(input: $input) {
+    ...GraphPairsQuery
+  }
+}
+
+mutation DeleteGraphPairsQuery($input: DeleteGraphTableQueryInput!) {
+  deleteGraphPairsQuery(input: $input)
+}
+
+mutation RunPairsQuery($input: RunPairsQueryInput!) {
+  runPairsQuery(input: $input) {
+    ...PairsQueryRun
+  }
+}
+
+mutation DeletePairsQueryRun($input: DeletePairsQueryRunInput!) {
+  deletePairsQueryRun(input: $input)
+}
+
+mutation CreateModel($input: CreateModelInput!) {
+  createModel(input: $input) {
+    ...Model
+  }
+}
+
+mutation DeleteModel($input: DeleteModelInput!) {
+  deleteModel(input: $input)
+}

@@ -27,6 +27,8 @@ class FakeRath:
     def __init__(self) -> None:
         self.sent: list[dict[str, Any]] = []
         self.headers: list[Any] = []
+        # `KraphRath.middlewares`: what the variables go through before they are sent (uploads).
+        self.middlewares: list[Any] = []
 
     def _answer(self, variables: dict[str, Any], headers: Any) -> Any:
         self.sent.append(variables)

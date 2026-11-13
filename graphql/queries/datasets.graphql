@@ -1,0 +1,71 @@
+query GetGraphPairsQuery($id: ID!) {
+  graphPairsQuery(id: $id) {
+    ...GraphPairsQuery
+  }
+}
+
+query ListGraphPairsQueries($filters: GraphPairsQueryFilter, $pagination: OffsetPaginationInput) {
+  graphPairsQueries(filters: $filters, pagination: $pagination) {
+    ...GraphPairsQuery
+  }
+}
+
+query SearchGraphPairsQueries($search: String, $values: [ID!], $requires: [DescriptorConstraintInput!]) {
+  options: graphPairsQueries(filters: {search: $search, ids: $values, requires: $requires}, pagination: {limit: 10}) {
+    value: id
+    label: label
+  }
+}
+
+query RenderGraphPairs($id: ID!, $pagination: OffsetPaginationInput) {
+  renderGraphPairs(id: $id, pagination: $pagination) {
+    ...PairsQueryRow
+  }
+}
+
+query GetPairsQueryRun($id: ID!) {
+  pairsQueryRun(id: $id) {
+    ...PairsQueryRun
+  }
+}
+
+query ListPairsQueryRuns($filters: PairsQueryRunFilter, $pagination: OffsetPaginationInput) {
+  pairsQueryRuns(filters: $filters, pagination: $pagination) {
+    ...PairsQueryRun
+  }
+}
+
+query GetRunEntries($id: ID!, $pagination: OffsetPaginationInput) {
+  pairsQueryRun(id: $id) {
+    id
+    page: entries(pagination: $pagination) {
+      ...PairsQueryRunEntry
+    }
+  }
+}
+
+query SearchPairsQueryRuns($search: String, $values: [ID!], $requires: [DescriptorConstraintInput!]) {
+  options: pairsQueryRuns(filters: {search: $search, ids: $values, requires: $requires}, pagination: {limit: 10}) {
+    value: id
+    label: name
+  }
+}
+
+query GetModel($id: ID!) {
+  model(id: $id) {
+    ...Model
+  }
+}
+
+query ListModels($filters: ModelFilter, $pagination: OffsetPaginationInput) {
+  models(filters: $filters, pagination: $pagination) {
+    ...Model
+  }
+}
+
+query SearchModels($search: String, $values: [ID!], $requires: [DescriptorConstraintInput!]) {
+  options: models(filters: {search: $search, ids: $values, requires: $requires}, pagination: {limit: 10}) {
+    value: id
+    label: name
+  }
+}

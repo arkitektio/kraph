@@ -52,6 +52,13 @@ class Kraph(Composition, KraphApi):
         # exclude_none, not exclude_unset: see the module docstring.
         return operation.Arguments(**variables).model_dump(by_alias=True, exclude_none=True)
 
+    async def _aprepare(self, operation: type[TOperation], variables: dict[str, Any]) -> dict[str, Any]:
+        """Serialize the variables, then run the rath's middlewares over them (uploads, in order)."""
+        serialized = self._serialize(operation, variables)
+        for middleware in self.rath.middlewares:
+            serialized = await middleware.aprocess_variables(serialized, operation, self.rath)
+        return serialized
+
     def _origin(self) -> dict[str, Any]:
         """What the objects of a result should remember: the client that fetched them."""
         return origin_context(client=self, rath=self.rath, datalayer=self.datalayer)
@@ -89,7 +96,7 @@ class Kraph(Composition, KraphApi):
         """Executes a query or mutation in a non-blocking way."""
         x = await self.rath.aquery(
             operation.Meta.document,
-            self._serialize(operation, variables),
+            await self._aprepare(operation, variables),
             headers=self._headers(task),
         )
         return operation.model_validate(x.data, context=self._origin())
@@ -117,7 +124,7 @@ class Kraph(Composition, KraphApi):
         """Subscribes to an operation in a non-blocking way."""
         async for event in self.rath.asubscribe(
             operation.Meta.document,
-            self._serialize(operation, variables),
+            await self._aprepare(operation, variables),
             headers=self._headers(task),
         ):
             yield operation.model_validate(event.data, context=self._origin())

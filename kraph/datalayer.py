@@ -80,6 +80,12 @@ class DataLayer(KoiledModel):
         Returns:
             The datalayer, ready to use.
         """
+        # kraph reads and writes big files through obstore (rustls), which takes its roots only
+        # from SSL_CERT_FILE: a pinned store's hub certificate is added there, as in elektro.
+        if alias.is_pinned():
+            from arkitekt_spec.declare import tls
+
+            tls.trust_natively(alias.certificates)
         return cls(
             endpoint_url=alias.to_http_path(),
             proxy=alias.proxy,

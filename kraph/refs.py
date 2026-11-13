@@ -97,6 +97,12 @@ def as_structure_ref(x: StructureRef) -> tuple[str, str]:
     if identifier is not None:
         return str(identifier), str(get_attributes_or_error(x, "object"))
 
+    # A class stamped with the structure it travels as (mikro's generated models carry
+    # `__identifier__ = '@mikro/arraylens'`) names itself: no registry needed.
+    stamped = getattr(type(x), "__identifier__", None)
+    if isinstance(stamped, str):
+        return stamped, str(get_attributes_or_error(x, "id"))
+
     if isinstance(x, BaseModel):
         return (
             identifier_for_cls(type(x)),

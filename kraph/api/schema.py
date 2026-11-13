@@ -2,6 +2,8 @@ import builtins
 from datetime import datetime
 from enum import Enum
 from kraph.scalars import (
+    BigFile,
+    BigFileLikeCoercible,
     StructureIdentifier,
     StructureIdentifierCoercible,
     StructureObject,
@@ -11,9 +13,11 @@ from kraph.scalars import (
 from kraph.traits import (
     AssertedTrait,
     AssertionTrait,
+    BigFileStoreTrait,
     CategoryTrait,
     EntityCategoryTrait,
     EntityTrait,
+    GraphPairsQueryTrait,
     GraphTrait,
     HasDrawings,
     InstanceTrait,
@@ -21,12 +25,15 @@ from kraph.traits import (
     MeasurementCategoryTrait,
     MetricKindTrait,
     MetricTrait,
+    ModelTrait,
     NaturalEventCategoryTrait,
     NodeTrait,
+    PairsQueryRunTrait,
     ProjectionTrait,
     ProtocolEventCategoryTrait,
     RelationCategoryTrait,
     StandingTrait,
+    StructureCategoryTrait,
     StructureKindTrait,
     StructureRelationCategoryTrait,
     StructureTrait,
@@ -138,6 +145,21 @@ class DescendantKind(str, Enum):
     __str__ = str.__str__
 
 
+class DescriptorOperator(str, Enum):
+    """No documentation"""
+
+    EQUALS = "EQUALS"
+    MATCHES = "MATCHES"
+    NOT_EQUALS = "NOT_EQUALS"
+    GTE = "GTE"
+    LTE = "LTE"
+    EXISTS = "EXISTS"
+    CONTAINS = "CONTAINS"
+    IN = "IN"
+    NOT_IN = "NOT_IN"
+    __str__ = str.__str__
+
+
 class EventKind(str, Enum):
     """No documentation"""
 
@@ -213,6 +235,7 @@ class TermKind(str, Enum):
     MEASUREMENT = "MEASUREMENT"
     RELATION = "RELATION"
     STRUCTURE_RELATION = "STRUCTURE_RELATION"
+    STRUCTURE = "STRUCTURE"
     __str__ = str.__str__
 
 
@@ -1062,6 +1085,25 @@ class CreateGraphInput(BaseModel):
     )
 
 
+class CreateGraphPairsQueryInput(BaseModel):
+    """Input for saving a pairs query: an insight over one view whose runs are training sets"""
+
+    graph: str = Field(description="The graph id this pairs query will belong to")
+    key: str = Field(description="Unique key for this query within its graph")
+    name: str | None = Field(
+        default=None, description="Human-readable name (defaults to `key`)"
+    )
+    description: str | None = Field(
+        default=None, description="Description of this query"
+    )
+    plan: "PairsQueryPlanInput" = Field(
+        description="What the query means: the match and its two ends"
+    )
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
 class CreateMeasurementCategoryInput(BaseModel):
     """Input for creating a new measurement definition in the graph schema"""
 
@@ -1109,6 +1151,37 @@ class CreateMeasurementCategoryInput(BaseModel):
     )
     graph: str = Field(
         description="The graph id this measurement category will belong to"
+    )
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class CreateModelInput(BaseModel):
+    """Input for registering a trained model: its weights (a finished big-file upload) and what it was trained on, a run or a pairs query the server runs"""
+
+    name: str = Field(description="What the model is called")
+    framework: str = Field(
+        description="What the weights are for, e.g. 'care' or 'cellpose'"
+    )
+    store: BigFile = Field(
+        description="The finished big-file upload holding the weights"
+    )
+    trained_on: ID | None = Field(
+        validation_alias=AliasChoices("trained_on", "trainedOn"),
+        serialization_alias="trainedOn",
+        default=None,
+        description="The pairs query run it was trained on; give this or `trained_on_query`, or neither for weights from elsewhere",
+    )
+    trained_on_query: ID | None = Field(
+        validation_alias=AliasChoices("trained_on_query", "trainedOnQuery"),
+        serialization_alias="trainedOnQuery",
+        default=None,
+        description="The pairs query it was trained on, when nobody kept a run: the server runs it for the model",
+    )
+    description: str | None = Field(default=None, description="What the model does")
+    parameters: Any | None = Field(
+        default=None, description="How it was trained, as the trainer reports it"
     )
     model_config = ConfigDict(
         frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
@@ -1299,6 +1372,46 @@ class CreateRelationCategoryInput(BaseModel):
     )
 
 
+class CreateStructureCategoryInput(BaseModel):
+    """Input for mounting a structure kind into a graph: the vertex label its data are drawn under (RFC 0027)"""
+
+    key: str = Field(description="The label of the node participating in the event")
+    description: str | None = Field(
+        default=None, description="Description of this node role"
+    )
+    ontology_references: Annotated[
+        tuple["OntologyReferenceInput", ...] | None, GraphQLDefault("[]")
+    ] = Field(
+        validation_alias=AliasChoices("ontology_references", "ontologyReferences"),
+        serialization_alias="ontologyReferences",
+        default=None,
+        description="Ontology references for this event",
+    )
+    "Ontology references for this event\nDefault: []"
+    color: tuple[int, ...] | None = Field(
+        default=None,
+        description="Optional RGBA color for this node role (e.g. [255, 0, 0, 128])",
+    )
+    image: str | None = Field(
+        default=None,
+        description="Optional media store ID for an image representing this node role",
+    )
+    label: str | None = Field(
+        default=None,
+        description="Optional human-readable label for this node role (defaults to 'key' if not provided)",
+    )
+    pin: bool | None = Field(
+        default=None, description="Whether to pin this node role in the UI"
+    )
+    identifier: str = Field(
+        description="The structure identifier mounted (e.g. '@mikro/arraylens')"
+    )
+    graph: str = Field(description="The graph id the structure kind is mounted into")
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
 class CreateStructureRelationCategoryInput(BaseModel):
     """Input for creating a new structure relation definition in the graph schema"""
 
@@ -1392,6 +1505,15 @@ class DeleteGraphInput(BaseModel):
     )
 
 
+class DeleteGraphTableQueryInput(BaseModel):
+    """Input for deleting a graph table query"""
+
+    id: ID = Field(description="The ID of the graph query to delete")
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
 class DeleteMeasurementCategoryInput(BaseModel):
     """Input for deleting an existing measurement definition in the graph schema"""
 
@@ -1410,10 +1532,28 @@ class DeleteMetricKindInput(BaseModel):
     )
 
 
+class DeleteModelInput(BaseModel):
+    """Input for deleting a trained model; its weights are flagged orphaned for the datalayer's purge"""
+
+    id: ID = Field(description="The model to delete")
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
 class DeleteNaturalEventCategoryInput(BaseModel):
     """Input for deleting an existing natural event definition in the graph schema"""
 
     id: str = Field(description="The ID of the event category to delete")
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class DeletePairsQueryRunInput(BaseModel):
+    """Input for deleting a run. A run a model was trained on stays"""
+
+    id: ID = Field(description="The run to delete")
     model_config = ConfigDict(
         frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
     )
@@ -1432,6 +1572,15 @@ class DeleteRelationCategoryInput(BaseModel):
     """Input for deleting an existing relation definition in the graph schema"""
 
     id: str = Field(description="The ID of the relation category to delete")
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class DeleteStructureCategoryInput(BaseModel):
+    """Input for unmounting a structure kind"""
+
+    id: str = Field(description="The ID of the structure category to unmount")
     model_config = ConfigDict(
         frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
     )
@@ -1519,6 +1668,22 @@ class DescendantInput(BaseModel):
         description="The mentioned subject id — `Assertion.subject`'s vocabulary. Named `user` for shape-compatibility with lok's tree",
     )
     size: str | None = Field(default=None, description="The size of a paragraph")
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class DescriptorConstraintInput(BaseModel):
+    """One constraint on an external datum's descriptors, in the shape a rekuest port states its `requires` in"""
+
+    key: str = Field(description="The descriptor key, e.g. '@mikro/n_space_axes'")
+    operator: DescriptorOperator = Field(
+        description="How the datum's value is compared with `value`. MATCHES is equality, as EQUALS is"
+    )
+    value: Any | None = Field(
+        default=None,
+        description="What is compared against: a number for GTE/LTE, a list for IN/NOT_IN, true or false for EXISTS, the member looked for with CONTAINS",
+    )
     model_config = ConfigDict(
         frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
     )
@@ -1721,6 +1886,20 @@ class EventRoleInput(BaseModel):
     )
 
 
+class FinishBigFileUploadInput(BaseModel):
+    """No documentation"""
+
+    store_id: str = Field(
+        validation_alias=AliasChoices("store_id", "storeId"),
+        serialization_alias="storeId",
+    )
+    valid: Annotated[bool | None, GraphQLDefault("True")] = None
+    "Default: True"
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
 class GraphDefinitionInput(BaseModel):
     """A complete graph schema definition"""
 
@@ -1742,6 +1921,13 @@ class GraphDefinitionInput(BaseModel):
 class GraphExtensionsInput(BaseModel):
     """The categories a graph schema declares"""
 
+    structures: Annotated[
+        tuple["StructureDefinitionInput", ...] | None, GraphQLDefault("[]")
+    ] = Field(
+        default=None,
+        description="Structure kinds the view mounts (RFC 0027): the vertex labels structure relations draw their ends under",
+    )
+    "Structure kinds the view mounts (RFC 0027): the vertex labels structure relations draw their ends under\nDefault: []"
     entities: Annotated[
         tuple[EntityDefinitionInput, ...] | None, GraphQLDefault("[]")
     ] = Field(default=None, description="Entity definitions")
@@ -1808,6 +1994,80 @@ class GraphFilter(BaseModel):
         serialization_alias="isArchived",
         default=None,
         description="Only archived graphs, or only live ones. Omitted shows both",
+    )
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class GraphPairsQueryFilter(BaseModel):
+    """No documentation"""
+
+    and_: "GraphPairsQueryFilter | None" = Field(
+        validation_alias=AliasChoices("and_", "AND"),
+        serialization_alias="AND",
+        default=None,
+    )
+    or_: "GraphPairsQueryFilter | None" = Field(
+        validation_alias=AliasChoices("or_", "OR"),
+        serialization_alias="OR",
+        default=None,
+    )
+    not_: "GraphPairsQueryFilter | None" = Field(
+        validation_alias=AliasChoices("not_", "NOT"),
+        serialization_alias="NOT",
+        default=None,
+    )
+    distinct: bool | None = Field(
+        validation_alias=AliasChoices("distinct", "DISTINCT"),
+        serialization_alias="DISTINCT",
+        default=None,
+    )
+    ids: tuple[ID, ...] | None = Field(
+        default=None, description="Filter by list of IDs"
+    )
+    search: str | None = Field(
+        default=None, description="Full-text search over label and description"
+    )
+    archived: bool | None = Field(
+        default=None,
+        description="Only archived queries, or only live ones. Omitted shows both",
+    )
+    requires: tuple[DescriptorConstraintInput, ...] | None = Field(
+        default=None,
+        description="Filter to the pairs queries satisfying every one of these descriptor constraints: the `requires` of a port, handed on unchanged, so a picker offers what the port accepts (e.g. `@kraph/source_identifier` EQUALS `@mikro/arraylens`). Answered in SQL from the descriptors stored on every pairs query. A key a pairs query does not declare is refused rather than ignored",
+    )
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class MatchPathInput(BaseModel):
+    """Input for a graph match path"""
+
+    nodes: tuple[str, ...] = Field(description="List of node IDs to match")
+    relations: tuple[str, ...] = Field(
+        description="List of node IDs representing the path"
+    )
+    optional: Annotated[bool | None, GraphQLDefault("False")] = Field(
+        default=None, description="Whether the path match is optional"
+    )
+    "Whether the path match is optional\nDefault: False"
+    title: str | None = Field(default=None, description="Title for the matched path")
+    color: tuple[float, ...] | None = Field(
+        default=None, description="Color for the matched path as RGB values"
+    )
+    relation_directions: tuple[bool, ...] | None = Field(
+        validation_alias=AliasChoices("relation_directions", "relationDirections"),
+        serialization_alias="relationDirections",
+        default=None,
+        description="List of booleans indicating the direction of each relationship in the path (True for outgoing, False for incoming)",
+    )
+    node_categories: tuple[str | None, ...] | None = Field(
+        validation_alias=AliasChoices("node_categories", "nodeCategories"),
+        serialization_alias="nodeCategories",
+        default=None,
+        description="Optional category key per node (parallel to `nodes`), constraining that node of the pattern to a category; null leaves it unconstrained",
     )
     model_config = ConfigDict(
         frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
@@ -2051,6 +2311,54 @@ class MetricValueInput(BaseModel):
     )
 
 
+class ModelFilter(BaseModel):
+    """No documentation"""
+
+    id: ID | None = None
+    and_: "ModelFilter | None" = Field(
+        validation_alias=AliasChoices("and_", "AND"),
+        serialization_alias="AND",
+        default=None,
+    )
+    or_: "ModelFilter | None" = Field(
+        validation_alias=AliasChoices("or_", "OR"),
+        serialization_alias="OR",
+        default=None,
+    )
+    not_: "ModelFilter | None" = Field(
+        validation_alias=AliasChoices("not_", "NOT"),
+        serialization_alias="NOT",
+        default=None,
+    )
+    distinct: bool | None = Field(
+        validation_alias=AliasChoices("distinct", "DISTINCT"),
+        serialization_alias="DISTINCT",
+        default=None,
+    )
+    ids: tuple[ID, ...] | None = Field(
+        default=None, description="Filter by list of IDs"
+    )
+    framework: str | None = Field(
+        default=None, description="The models of one framework, e.g. 'care'"
+    )
+    trained_on: ID | None = Field(
+        validation_alias=AliasChoices("trained_on", "trainedOn"),
+        serialization_alias="trainedOn",
+        default=None,
+        description="The models trained on one run",
+    )
+    search: str | None = Field(
+        default=None, description="Search the name and description"
+    )
+    requires: tuple[DescriptorConstraintInput, ...] | None = Field(
+        default=None,
+        description="Filter to the models satisfying every one of these descriptor constraints: the `requires` of a port, handed on unchanged (e.g. `@kraph/framework` EQUALS `care`). Answered in SQL from the descriptors stored on every model. A key a model does not declare is refused rather than ignored",
+    )
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
 class NaturalEventCategoryFilter(BaseModel):
     """No documentation"""
 
@@ -2161,6 +2469,82 @@ class OntologyReferenceInput(BaseModel):
         description="The ontology prefix (e.g. 'OBI'). Must be defined in graph prefixes."
     )
     uri: str = Field(description="The full URI for the ontology term")
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class PairEndInput(BaseModel):
+    """Which matched node is one end of a pair: a node of one path"""
+
+    path: str = Field(
+        description="The path the node is matched in: its `title`, or `path_<i>` for the i-th path"
+    )
+    node: str = Field(description="The node's name within that path")
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class PairsQueryPlanInput(BaseModel):
+    """What a pairs query means: a match over the view's drawing, and which two of its nodes are the pair"""
+
+    matches: tuple[MatchPathInput, ...] = Field(
+        description="The paths to match, as a table query's are"
+    )
+    wheres: Annotated[
+        tuple["WhereClauseInput", ...] | None, GraphQLDefault("[]")
+    ] = Field(default=None, description="Predicates over matched nodes' properties")
+    "Predicates over matched nodes' properties\nDefault: []"
+    source: PairEndInput = Field(description="The node every pair starts from")
+    target: PairEndInput = Field(description="The node every pair ends at")
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class PairsQueryRunFilter(BaseModel):
+    """No documentation"""
+
+    id: ID | None = None
+    and_: "PairsQueryRunFilter | None" = Field(
+        validation_alias=AliasChoices("and_", "AND"),
+        serialization_alias="AND",
+        default=None,
+    )
+    or_: "PairsQueryRunFilter | None" = Field(
+        validation_alias=AliasChoices("or_", "OR"),
+        serialization_alias="OR",
+        default=None,
+    )
+    not_: "PairsQueryRunFilter | None" = Field(
+        validation_alias=AliasChoices("not_", "NOT"),
+        serialization_alias="NOT",
+        default=None,
+    )
+    distinct: bool | None = Field(
+        validation_alias=AliasChoices("distinct", "DISTINCT"),
+        serialization_alias="DISTINCT",
+        default=None,
+    )
+    ids: tuple[ID, ...] | None = Field(
+        default=None, description="Filter by list of IDs"
+    )
+    query: ID | None = Field(default=None, description="The runs of one pairs query")
+    graph: ID | None = Field(
+        default=None, description="The runs against one graph (view)"
+    )
+    auto: bool | None = Field(
+        default=None,
+        description="Runs the server made for a model registered against a query (true), or ones somebody ran (false)",
+    )
+    search: str | None = Field(
+        default=None, description="Search the name and description"
+    )
+    requires: tuple[DescriptorConstraintInput, ...] | None = Field(
+        default=None,
+        description="Filter to the runs satisfying every one of these descriptor constraints: the `requires` of a port, handed on unchanged, so a picker offers what the port accepts (e.g. `@kraph/source_identifier` EQUALS `@mikro/arraylens`). Answered in SQL from the descriptors stored on every run. A key a run does not declare is refused rather than ignored",
+    )
     model_config = ConfigDict(
         frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
     )
@@ -2287,6 +2671,18 @@ class ProtocolEventCategoryFilter(BaseModel):
     )
 
 
+class RefreshUploadInput(BaseModel):
+    """No documentation"""
+
+    store_id: str = Field(
+        validation_alias=AliasChoices("store_id", "storeId"),
+        serialization_alias="storeId",
+    )
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
 class RelationCategoryFilter(BaseModel):
     """No documentation"""
 
@@ -2367,6 +2763,39 @@ class RelationDefinitionInput(BaseModel):
     definition: CategoryDefinitionInput | None = Field(
         default=None,
         description="This relation category's complete rule (RFC 0009): which relation claims draw its edges — by word, annotator, app and window — and whose standings count for them. Omitted means primitive: any claim naming its word draws",
+    )
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class RequestBigFileAccessInput(BaseModel):
+    """No documentation"""
+
+    store_id: str = Field(
+        validation_alias=AliasChoices("store_id", "storeId"),
+        serialization_alias="storeId",
+    )
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class RequestBigFileUploadInput(BaseModel):
+    """No documentation"""
+
+    original_file_name: str = Field(
+        validation_alias=AliasChoices("original_file_name", "originalFileName"),
+        serialization_alias="originalFileName",
+    )
+    file_size: int = Field(
+        validation_alias=AliasChoices("file_size", "fileSize"),
+        serialization_alias="fileSize",
+    )
+    content_type: str | None = Field(
+        validation_alias=AliasChoices("content_type", "contentType"),
+        serialization_alias="contentType",
+        default=None,
     )
     model_config = ConfigDict(
         frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
@@ -2603,6 +3032,17 @@ class RoleMappingInput(BaseModel):
     )
 
 
+class RunPairsQueryInput(BaseModel):
+    """Input for running a pairs query: its answer from the view's drawing, stored with where the drawing stood"""
+
+    query: ID = Field(description="The pairs query to run")
+    name: str = Field(description="What the run is called")
+    description: str | None = Field(default=None, description="What the run is for")
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
 class SamenessRuleInput(BaseModel):
     """A view's sameness rule: whose SAME_AS / DIFFERENT_FROM claims it counts when folding nodes into individuals (RFC 0024). No rules means everyone"""
 
@@ -2611,6 +3051,85 @@ class SamenessRuleInput(BaseModel):
         description="A sameness claim counts when any rule matches; no rules means every claim counts",
     )
     "A sameness claim counts when any rule matches; no rules means every claim counts\nDefault: []"
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class StructureCategoryFilter(BaseModel):
+    """No documentation"""
+
+    graph: GraphFilter | None = None
+    id: ID | None = None
+    label: str | None = None
+    and_: "StructureCategoryFilter | None" = Field(
+        validation_alias=AliasChoices("and_", "AND"),
+        serialization_alias="AND",
+        default=None,
+    )
+    or_: "StructureCategoryFilter | None" = Field(
+        validation_alias=AliasChoices("or_", "OR"),
+        serialization_alias="OR",
+        default=None,
+    )
+    not_: "StructureCategoryFilter | None" = Field(
+        validation_alias=AliasChoices("not_", "NOT"),
+        serialization_alias="NOT",
+        default=None,
+    )
+    distinct: bool | None = Field(
+        validation_alias=AliasChoices("distinct", "DISTINCT"),
+        serialization_alias="DISTINCT",
+        default=None,
+    )
+    ids: tuple[ID, ...] | None = Field(
+        default=None, description="Filter by list of IDs"
+    )
+    pinned: bool | None = Field(default=None, description="Filter by list of IDs")
+    search: str | None = Field(default=None, description="Filter by list of IDs")
+    identifiers: tuple[str, ...] | None = Field(
+        default=None,
+        description="The categories mounting one of these structure identifiers",
+    )
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
+class StructureDefinitionInput(BaseModel):
+    """Definition of a structure type in the graph schema"""
+
+    key: str = Field(description="The label of the node participating in the event")
+    description: str | None = Field(
+        default=None, description="Description of this node role"
+    )
+    ontology_references: Annotated[
+        tuple[OntologyReferenceInput, ...] | None, GraphQLDefault("[]")
+    ] = Field(
+        validation_alias=AliasChoices("ontology_references", "ontologyReferences"),
+        serialization_alias="ontologyReferences",
+        default=None,
+        description="Ontology references for this event",
+    )
+    "Ontology references for this event\nDefault: []"
+    color: tuple[int, ...] | None = Field(
+        default=None,
+        description="Optional RGBA color for this node role (e.g. [255, 0, 0, 128])",
+    )
+    image: str | None = Field(
+        default=None,
+        description="Optional media store ID for an image representing this node role",
+    )
+    label: str | None = Field(
+        default=None,
+        description="Optional human-readable label for this node role (defaults to 'key' if not provided)",
+    )
+    pin: bool | None = Field(
+        default=None, description="Whether to pin this node role in the UI"
+    )
+    identifier: str = Field(
+        description="The structure identifier mounted (e.g. '@mikro/arraylens')"
+    )
     model_config = ConfigDict(
         frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
     )
@@ -2628,6 +3147,10 @@ class StructureDescriptorInput(BaseModel):
     identifiers: tuple[str, ...] | None = Field(
         default=None,
         description="Structure identifiers to filter by (e.g. '@mikro/roi')",
+    )
+    requires: tuple[DescriptorConstraintInput, ...] | None = Field(
+        default=None,
+        description="Descriptor constraints this end of the relation pins (e.g. '@mikro/n_space_axes' EQUALS 3): what a datum must be for a claim under this word to make sense here. Stored and served; checked by the client against the datum's own service before it asserts a pair",
     )
     model_config = ConfigDict(
         frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
@@ -3012,6 +3535,25 @@ class UpdateGraphInput(BaseModel):
     )
 
 
+class UpdateGraphPairsQueryInput(BaseModel):
+    """Input for changing a pairs query. Runs keep the plan they were run with"""
+
+    id: str = Field(description="The ID of the pairs query to update")
+    key: str | None = Field(
+        default=None, description="Unique key for this query within its graph"
+    )
+    name: str | None = Field(default=None, description="Human-readable name")
+    description: str | None = Field(
+        default=None, description="Description of this query"
+    )
+    plan: PairsQueryPlanInput | None = Field(
+        default=None, description="A new plan; omitted means unchanged"
+    )
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
 class UpdateGraphVisualInput(BaseModel):
     """Input for updating the visual properties of a graph element"""
 
@@ -3258,6 +3800,42 @@ class UpdateRelationCategoryInput(BaseModel):
     )
 
 
+class UpdateStructureCategoryInput(BaseModel):
+    """Input for changing a mounted structure kind"""
+
+    id: str = Field(description="The ID of the definition to update")
+    key: str | None = Field(
+        default=None, description="The label of the node participating in the event"
+    )
+    description: str | None = Field(
+        default=None, description="Description of this node role"
+    )
+    ontology_references: tuple[OntologyReferenceInput, ...] | None = Field(
+        validation_alias=AliasChoices("ontology_references", "ontologyReferences"),
+        serialization_alias="ontologyReferences",
+        default=None,
+        description="Ontology references for this event",
+    )
+    color: tuple[int, ...] | None = Field(
+        default=None,
+        description="Optional RGBA color for this node role (e.g. [255, 0, 0, 128])",
+    )
+    image: str | None = Field(
+        default=None,
+        description="Optional media store ID for an image representing this node role",
+    )
+    label: str | None = Field(
+        default=None,
+        description="Optional human-readable label for this node role (defaults to 'key' if not provided)",
+    )
+    pin: bool | None = Field(
+        default=None, description="Whether to pin this node role in the UI"
+    )
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
 class UpdateStructureKindInput(BaseModel):
     """Input for updating an existing structure definition in the graph schema"""
 
@@ -3386,6 +3964,21 @@ class VocabularyPaginationInput(BaseModel):
     )
 
 
+class WhereClauseInput(BaseModel):
+    """Input for a where clause in a graph table query builder"""
+
+    path: str
+    node: str | None = None
+    property: str = Field(description="The property name to filter on")
+    operator: WhereOperator = Field(description="The operator to use for filtering")
+    value: Any = Field(
+        description="The value to compare against. A typed value bound as a parameter, never a Cypher literal"
+    )
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", populate_by_name=True, use_enum_values=True
+    )
+
+
 class CategoryRefBase(CategoryTrait, BaseModel):
     """Base interface for structure categories"""
 
@@ -3460,6 +4053,14 @@ class CategoryRefRelationCategory(CategoryRefBase, RelationCategoryTrait, BaseMo
     )
 
 
+class CategoryRefStructureCategory(CategoryRefBase, StructureCategoryTrait, BaseModel):
+    """A structure kind mounted into a view (RFC 0027): the vertex label its data are drawn under wherever a structure relation the view admits touches them"""
+
+    typename: Literal["StructureCategory"] = Field(
+        alias="__typename", default="StructureCategory", exclude=True
+    )
+
+
 class CategoryRefStructureRelationCategory(
     CategoryRefBase, StructureRelationCategoryTrait, BaseModel
 ):
@@ -3523,22 +4124,26 @@ class EntityDescriptor(BaseModel):
         type = "EntityDescriptor"
 
 
-class StructureDescriptor(BaseModel):
-    """Input type for creating a new graph query"""
+class DescriptorConstraint(BaseModel):
+    """One constraint on an external datum's descriptors, in the shape a rekuest port states its `requires` in"""
 
-    typename: Literal["StructureDescriptor"] = Field(
-        alias="__typename", default="StructureDescriptor", exclude=True
+    typename: Literal["DescriptorConstraint"] = Field(
+        alias="__typename", default="DescriptorConstraint", exclude=True
     )
-    default_category_key: str | None = Field(default=None, alias="defaultCategoryKey")
-    "Default category to link to if no entities match the filters"
+    key: str
+    "The descriptor key, e.g. '@mikro/n_space_axes'"
+    operator: DescriptorOperator
+    "How the datum's value is compared with `value`. MATCHES is equality, as EQUALS is"
+    value: Any | None = Field(default=None)
+    "What is compared against: a number for GTE/LTE, a list for IN/NOT_IN, true or false for EXISTS, the member looked for with CONTAINS"
     model_config = ConfigDict(frozen=True)
 
     class Meta:
-        """Meta class for StructureDescriptor"""
+        """Meta class for DescriptorConstraint"""
 
-        document = "fragment StructureDescriptor on StructureDescriptor {\n  defaultCategoryKey\n  __typename\n}"
-        name = "StructureDescriptor"
-        type = "StructureDescriptor"
+        document = "fragment DescriptorConstraint on DescriptorConstraint {\n  key\n  operator\n  value\n  __typename\n}"
+        name = "DescriptorConstraint"
+        type = "DescriptorConstraint"
 
 
 class LinkRef(LinkTrait, BaseModel):
@@ -3766,6 +4371,188 @@ class MediaStore(BaseModel):
         document = "fragment MediaStore on MediaStore {\n  id\n  key\n  __typename\n}"
         name = "MediaStore"
         type = "MediaStore"
+
+
+class BigFileUploadGrant(BaseModel):
+    """Temporary S3 credentials for uploading a big file."""
+
+    typename: Literal["BigFileUploadGrant"] = Field(
+        alias="__typename", default="BigFileUploadGrant", exclude=True
+    )
+    access_key: str = Field(alias="accessKey")
+    secret_key: str = Field(alias="secretKey")
+    session_token: str = Field(alias="sessionToken")
+    path: str
+    key: str
+    bucket: str
+    expires_in: int = Field(alias="expiresIn")
+    store: str
+    model_config = ConfigDict(frozen=True)
+
+    class Meta:
+        """Meta class for BigFileUploadGrant"""
+
+        document = "fragment BigFileUploadGrant on BigFileUploadGrant {\n  accessKey\n  secretKey\n  sessionToken\n  path\n  key\n  bucket\n  expiresIn\n  store\n  __typename\n}"
+        name = "BigFileUploadGrant"
+        type = "BigFileUploadGrant"
+
+
+class BigFileAccessGrant(BaseModel):
+    """Temporary S3 credentials for reading a big file."""
+
+    typename: Literal["BigFileAccessGrant"] = Field(
+        alias="__typename", default="BigFileAccessGrant", exclude=True
+    )
+    access_key: str = Field(alias="accessKey")
+    secret_key: str = Field(alias="secretKey")
+    session_token: str = Field(alias="sessionToken")
+    expires_in: int = Field(alias="expiresIn")
+    path: str
+    key: str
+    bucket: str
+    model_config = ConfigDict(frozen=True)
+
+    class Meta:
+        """Meta class for BigFileAccessGrant"""
+
+        document = "fragment BigFileAccessGrant on BigFileAccessGrant {\n  accessKey\n  secretKey\n  sessionToken\n  expiresIn\n  path\n  key\n  bucket\n  __typename\n}"
+        name = "BigFileAccessGrant"
+        type = "BigFileAccessGrant"
+
+
+class BigFileStore(BigFileStoreTrait, BaseModel):
+    """A BigFileStore represents a large object stored behind the S3 datalayer."""
+
+    typename: Literal["BigFileStore"] = Field(
+        alias="__typename", default="BigFileStore", exclude=True
+    )
+    id: ID
+    key: str
+    bucket: str
+    path: str
+    original_file_name: str | None = Field(default=None, alias="originalFileName")
+    size_bytes: int | None = Field(default=None, alias="sizeBytes")
+    "How many bytes this store actually holds, measured when its upload was finished. Null while unfinished, or for stores written before this was recorded"
+    model_config = ConfigDict(frozen=True)
+
+    class Meta:
+        """Meta class for BigFileStore"""
+
+        document = "fragment BigFileStore on BigFileStore {\n  id\n  key\n  bucket\n  path\n  originalFileName\n  sizeBytes\n  __typename\n}"
+        name = "BigFileStore"
+        type = "BigFileStore"
+
+
+class PairEnd(BaseModel):
+    """Which matched node is one end of a pair: a node of one path"""
+
+    typename: Literal["PairEnd"] = Field(
+        alias="__typename", default="PairEnd", exclude=True
+    )
+    path: str
+    "The path the node is matched in: its `title`, or `path_<i>` for the i-th path"
+    node: str
+    "The node's name within that path"
+    model_config = ConfigDict(frozen=True)
+
+    class Meta:
+        """Meta class for PairEnd"""
+
+        document = "fragment PairEnd on PairEnd {\n  path\n  node\n  __typename\n}"
+        name = "PairEnd"
+        type = "PairEnd"
+
+
+class PairsQueryRow(BaseModel):
+    """One pair a pairs query answers now, from the view's drawing: two data, as (identifier, object). A drawn instance travels as @kraph/entity"""
+
+    typename: Literal["PairsQueryRow"] = Field(
+        alias="__typename", default="PairsQueryRow", exclude=True
+    )
+    source_identifier: str = Field(alias="sourceIdentifier")
+    "The source's structure identifier, e.g. @mikro/arraylens"
+    source_object: ID = Field(alias="sourceObject")
+    "The source's id within its structure"
+    target_identifier: str = Field(alias="targetIdentifier")
+    "The target's structure identifier"
+    target_object: ID = Field(alias="targetObject")
+    "The target's id within its structure"
+    model_config = ConfigDict(frozen=True)
+
+    class Meta:
+        """Meta class for PairsQueryRow"""
+
+        document = "fragment PairsQueryRow on PairsQueryRow {\n  sourceIdentifier\n  sourceObject\n  targetIdentifier\n  targetObject\n  __typename\n}"
+        name = "PairsQueryRow"
+        type = "PairsQueryRow"
+
+
+class PairsQueryRunEntry(BaseModel):
+    """One pair a run answered: a source datum and a target datum"""
+
+    typename: Literal["PairsQueryRunEntry"] = Field(
+        alias="__typename", default="PairsQueryRunEntry", exclude=True
+    )
+    position: int
+    "Its place in the run, 0 first"
+    source_identifier: str = Field(alias="sourceIdentifier")
+    "The source datum's structure identifier, e.g. @mikro/arraylens (@kraph/entity for a drawn instance)"
+    source_object: ID = Field(alias="sourceObject")
+    "The source datum's id within its structure"
+    target_identifier: str = Field(alias="targetIdentifier")
+    "The target datum's structure identifier"
+    target_object: ID = Field(alias="targetObject")
+    "The target datum's id within its structure"
+    model_config = ConfigDict(frozen=True)
+
+    class Meta:
+        """Meta class for PairsQueryRunEntry"""
+
+        document = "fragment PairsQueryRunEntry on PairsQueryRunEntry {\n  position\n  sourceIdentifier\n  sourceObject\n  targetIdentifier\n  targetObject\n  __typename\n}"
+        name = "PairsQueryRunEntry"
+        type = "PairsQueryRunEntry"
+
+
+class PairsQueryRun(PairsQueryRunTrait, BaseModel):
+    """A pairs query's answer, stored with where the drawing stood: the exact pairs a model learned from"""
+
+    typename: Literal["PairsQueryRun"] = Field(
+        alias="__typename", default="PairsQueryRun", exclude=True
+    )
+    id: ID
+    "Database ID of the run"
+    name: str
+    "What the run is called"
+    description: str | None = Field(default=None)
+    "What the run is for"
+    auto: bool
+    "Run by the server for a model registered against the query"
+    as_of_seq: int = Field(alias="asOfSeq")
+    "Where the drawing stood: everything the log committed at or below it was drawn"
+    n_pairs: int = Field(alias="nPairs")
+    "How many pairs it holds"
+    schema_hash: str | None = Field(default=None, alias="schemaHash")
+    "The view's schema hash when it was run"
+    source_identifier: str | None = Field(default=None, alias="sourceIdentifier")
+    "The structure identifier every source shares; null when they differ"
+    target_identifier: str | None = Field(default=None, alias="targetIdentifier")
+    "The structure identifier every target shares; null when they differ"
+    query_id: ID = Field(alias="queryId")
+    "The id of the pairs query that was run"
+    graph_id: ID = Field(alias="graphId")
+    "The id of the graph (view) the run read"
+    descriptors: Any
+    "What the run says about itself, for a port's `requires`: its view and query, size, position, and the identifiers every pair shares (null when mixed)"
+    created_at: datetime = Field(alias="createdAt")
+    "When the run was made"
+    model_config = ConfigDict(frozen=True)
+
+    class Meta:
+        """Meta class for PairsQueryRun"""
+
+        document = "fragment PairsQueryRun on PairsQueryRun {\n  id\n  name\n  description\n  auto\n  asOfSeq\n  nPairs\n  schemaHash\n  sourceIdentifier\n  targetIdentifier\n  queryId\n  graphId\n  descriptors\n  createdAt\n  __typename\n}"
+        name = "PairsQueryRun"
+        type = "PairsQueryRun"
 
 
 class NodeRefBase(NodeTrait, BaseModel):
@@ -4009,6 +4796,19 @@ class EdgeDrawingCategoryBaseRelationCategory(
     )
 
 
+class EdgeDrawingCategoryBaseStructureCategory(
+    CategoryRefStructureCategory,
+    EdgeDrawingCategoryBase,
+    StructureCategoryTrait,
+    BaseModel,
+):
+    """A structure kind mounted into a view (RFC 0027): the vertex label its data are drawn under wherever a structure relation the view admits touches them"""
+
+    typename: Literal["StructureCategory"] = Field(
+        alias="__typename", default="StructureCategory", exclude=True
+    )
+
+
 class EdgeDrawingCategoryBaseStructureRelationCategory(
     CategoryRefStructureRelationCategory,
     EdgeDrawingCategoryBase,
@@ -4042,6 +4842,7 @@ class EdgeDrawing(BaseModel):
         | EdgeDrawingCategoryBaseNaturalEventCategory
         | EdgeDrawingCategoryBaseProtocolEventCategory
         | EdgeDrawingCategoryBaseRelationCategory
+        | EdgeDrawingCategoryBaseStructureCategory
         | EdgeDrawingCategoryBaseStructureRelationCategory,
         Field(discriminator="typename"),
     ] | EdgeDrawingCategoryBaseCatchAll
@@ -4076,6 +4877,28 @@ class EventRole(BaseModel):
         document = "fragment EntityDescriptor on EntityDescriptor {\n  keys\n  ontologyTerms\n  defaultCategoryKey\n  __typename\n}\n\nfragment EventRole on EventRole {\n  key\n  role\n  descriptor {\n    ...EntityDescriptor\n    __typename\n  }\n  __typename\n}"
         name = "EventRole"
         type = "EventRole"
+
+
+class StructureDescriptor(BaseModel):
+    """Input type for creating a new graph query"""
+
+    typename: Literal["StructureDescriptor"] = Field(
+        alias="__typename", default="StructureDescriptor", exclude=True
+    )
+    default_category_key: str | None = Field(default=None, alias="defaultCategoryKey")
+    "Default category to link to if no entities match the filters"
+    identifiers: tuple[str, ...] | None = Field(default=None)
+    "Structure identifiers to filter by (e.g. '@mikro/roi')"
+    requires: tuple[DescriptorConstraint, ...] | None = Field(default=None)
+    "Descriptor constraints this end of the relation pins (e.g. '@mikro/n_space_axes' EQUALS 3): what a datum must be for a claim under this word to make sense here. Stored and served; checked by the client against the datum's own service before it asserts a pair"
+    model_config = ConfigDict(frozen=True)
+
+    class Meta:
+        """Meta class for StructureDescriptor"""
+
+        document = "fragment DescriptorConstraint on DescriptorConstraint {\n  key\n  operator\n  value\n  __typename\n}\n\nfragment StructureDescriptor on StructureDescriptor {\n  defaultCategoryKey\n  identifiers\n  requires {\n    ...DescriptorConstraint\n    __typename\n  }\n  __typename\n}"
+        name = "StructureDescriptor"
+        type = "StructureDescriptor"
 
 
 class StructureWithMetrics(Structure, StructureTrait, BaseModel):
@@ -4387,6 +5210,16 @@ class CategoryBaseRelationCategory(
     )
 
 
+class CategoryBaseStructureCategory(
+    CategoryRefStructureCategory, CategoryBaseBase, StructureCategoryTrait, BaseModel
+):
+    """A structure kind mounted into a view (RFC 0027): the vertex label its data are drawn under wherever a structure relation the view admits touches them"""
+
+    typename: Literal["StructureCategory"] = Field(
+        alias="__typename", default="StructureCategory", exclude=True
+    )
+
+
 class CategoryBaseStructureRelationCategory(
     CategoryRefStructureRelationCategory,
     CategoryBaseBase,
@@ -4398,6 +5231,96 @@ class CategoryBaseStructureRelationCategory(
     typename: Literal["StructureRelationCategory"] = Field(
         alias="__typename", default="StructureRelationCategory", exclude=True
     )
+
+
+class GraphPairsQueryGraph(GraphTrait, BaseModel):
+    """One view over the organization's evidence log"""
+
+    typename: Literal["Graph"] = Field(
+        alias="__typename", default="Graph", exclude=True
+    )
+    id: ID
+    "Database ID of the graph"
+    name: str
+    "Name of the graph"
+    model_config = ConfigDict(frozen=True)
+
+
+class GraphPairsQueryPairsPlan(BaseModel):
+    """What a pairs query means: a match over the view's drawing, and which two of its nodes are the pair"""
+
+    typename: Literal["PairsQueryPlan"] = Field(
+        alias="__typename", default="PairsQueryPlan", exclude=True
+    )
+    source: PairEnd
+    "The node every pair starts from"
+    target: PairEnd
+    "The node every pair ends at"
+    model_config = ConfigDict(frozen=True)
+
+
+class GraphPairsQuery(GraphPairsQueryTrait, BaseModel):
+    """An insight that selects pairs from a view's drawing (an image and its ground truth). Run (`runPairsQuery`), its answer is stored: a training set"""
+
+    typename: Literal["GraphPairsQuery"] = Field(
+        alias="__typename", default="GraphPairsQuery", exclude=True
+    )
+    id: ID
+    "Database ID of this saved query"
+    key: str
+    "The key this query is referenced and pinned by, unique within its graph"
+    label: str
+    "Human-readable name for this query"
+    description: str | None = Field(default=None)
+    "Description of this query"
+    descriptors: Any
+    "What the query says about itself, for a port's `requires`: its view, and the identifier each end is constrained to (null when it is not)"
+    graph: GraphPairsQueryGraph
+    "The graph this query belongs to"
+    pairs_plan: GraphPairsQueryPairsPlan | None = Field(default=None, alias="pairsPlan")
+    "The match and its two ends"
+    model_config = ConfigDict(frozen=True)
+
+    class Meta:
+        """Meta class for GraphPairsQuery"""
+
+        document = "fragment PairEnd on PairEnd {\n  path\n  node\n  __typename\n}\n\nfragment GraphPairsQuery on GraphPairsQuery {\n  id\n  key\n  label\n  description\n  descriptors\n  graph {\n    id\n    name\n    __typename\n  }\n  pairsPlan {\n    source {\n      ...PairEnd\n      __typename\n    }\n    target {\n      ...PairEnd\n      __typename\n    }\n    __typename\n  }\n  __typename\n}"
+        name = "GraphPairsQuery"
+        type = "GraphPairsQuery"
+
+
+class Model(ModelTrait, BaseModel):
+    """A trained model: its weights, and the pairs query run it learned from"""
+
+    typename: Literal["Model"] = Field(
+        alias="__typename", default="Model", exclude=True
+    )
+    id: ID
+    "Database ID of the model"
+    name: str
+    "What the model is called"
+    description: str | None = Field(default=None)
+    "What the model does"
+    framework: str
+    "What the weights are for, e.g. 'care' or 'cellpose'"
+    parameters: Any | None = Field(default=None)
+    "How it was trained, as the trainer reported it"
+    descriptors: Any
+    "What the model says about itself, for a port's `requires`: its framework and what it was trained on (run, query, position, and the identifiers its pairs share; null where none)"
+    created_at: datetime = Field(alias="createdAt")
+    "When the model was registered"
+    trained_on: PairsQueryRun | None = Field(default=None, alias="trainedOn")
+    "The pairs query run it was trained on; null for weights from elsewhere"
+    store: BigFileStore
+    "The big file holding the weights"
+    model_config = ConfigDict(frozen=True)
+
+    class Meta:
+        """Meta class for Model"""
+
+        document = "fragment BigFileStore on BigFileStore {\n  id\n  key\n  bucket\n  path\n  originalFileName\n  sizeBytes\n  __typename\n}\n\nfragment PairsQueryRun on PairsQueryRun {\n  id\n  name\n  description\n  auto\n  asOfSeq\n  nPairs\n  schemaHash\n  sourceIdentifier\n  targetIdentifier\n  queryId\n  graphId\n  descriptors\n  createdAt\n  __typename\n}\n\nfragment Model on Model {\n  id\n  name\n  description\n  framework\n  parameters\n  descriptors\n  createdAt\n  trainedOn {\n    ...PairsQueryRun\n    __typename\n  }\n  store {\n    ...BigFileStore\n    __typename\n  }\n  __typename\n}"
+        name = "Model"
+        type = "Model"
 
 
 class NodeDrawingGraph(GraphTrait, BaseModel):
@@ -4481,6 +5404,19 @@ class NodeDrawingCategoryBaseRelationCategory(
     )
 
 
+class NodeDrawingCategoryBaseStructureCategory(
+    CategoryRefStructureCategory,
+    NodeDrawingCategoryBase,
+    StructureCategoryTrait,
+    BaseModel,
+):
+    """A structure kind mounted into a view (RFC 0027): the vertex label its data are drawn under wherever a structure relation the view admits touches them"""
+
+    typename: Literal["StructureCategory"] = Field(
+        alias="__typename", default="StructureCategory", exclude=True
+    )
+
+
 class NodeDrawingCategoryBaseStructureRelationCategory(
     CategoryRefStructureRelationCategory,
     NodeDrawingCategoryBase,
@@ -4556,6 +5492,7 @@ class NodeDrawing(BaseModel):
         | NodeDrawingCategoryBaseNaturalEventCategory
         | NodeDrawingCategoryBaseProtocolEventCategory
         | NodeDrawingCategoryBaseRelationCategory
+        | NodeDrawingCategoryBaseStructureCategory
         | NodeDrawingCategoryBaseStructureRelationCategory,
         Field(discriminator="typename"),
     ] | NodeDrawingCategoryBaseCatchAll
@@ -4840,9 +5777,29 @@ class MeasurementCategory(
     class Meta:
         """Meta class for MeasurementCategory"""
 
-        document = "fragment CategoryRef on Category {\n  id\n  key\n  label\n  ageName\n  __typename\n}\n\nfragment MediaStore on MediaStore {\n  id\n  key\n  __typename\n}\n\nfragment TermRef on Term {\n  id\n  key\n  kind\n  __typename\n}\n\nfragment CategoryBase on Category {\n  ...CategoryRef\n  description\n  purl\n  color\n  pinned\n  image {\n    ...MediaStore\n    __typename\n  }\n  graph {\n    id\n    name\n    __typename\n  }\n  term {\n    ...TermRef\n    __typename\n  }\n  __typename\n}\n\nfragment EntityDescriptor on EntityDescriptor {\n  keys\n  ontologyTerms\n  defaultCategoryKey\n  __typename\n}\n\nfragment PropertyDefinition on PropertyDefinition {\n  key\n  label\n  valueKind\n  unit\n  description\n  derivation\n  index\n  searchable\n  __typename\n}\n\nfragment StructureDescriptor on StructureDescriptor {\n  defaultCategoryKey\n  __typename\n}\n\nfragment MeasurementCategory on MeasurementCategory {\n  ...CategoryBase\n  sourceDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  targetDescriptor {\n    ...EntityDescriptor\n    __typename\n  }\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}"
+        document = "fragment CategoryRef on Category {\n  id\n  key\n  label\n  ageName\n  __typename\n}\n\nfragment DescriptorConstraint on DescriptorConstraint {\n  key\n  operator\n  value\n  __typename\n}\n\nfragment MediaStore on MediaStore {\n  id\n  key\n  __typename\n}\n\nfragment TermRef on Term {\n  id\n  key\n  kind\n  __typename\n}\n\nfragment CategoryBase on Category {\n  ...CategoryRef\n  description\n  purl\n  color\n  pinned\n  image {\n    ...MediaStore\n    __typename\n  }\n  graph {\n    id\n    name\n    __typename\n  }\n  term {\n    ...TermRef\n    __typename\n  }\n  __typename\n}\n\nfragment EntityDescriptor on EntityDescriptor {\n  keys\n  ontologyTerms\n  defaultCategoryKey\n  __typename\n}\n\nfragment PropertyDefinition on PropertyDefinition {\n  key\n  label\n  valueKind\n  unit\n  description\n  derivation\n  index\n  searchable\n  __typename\n}\n\nfragment StructureDescriptor on StructureDescriptor {\n  defaultCategoryKey\n  identifiers\n  requires {\n    ...DescriptorConstraint\n    __typename\n  }\n  __typename\n}\n\nfragment MeasurementCategory on MeasurementCategory {\n  ...CategoryBase\n  sourceDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  targetDescriptor {\n    ...EntityDescriptor\n    __typename\n  }\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}"
         name = "MeasurementCategory"
         type = "MeasurementCategory"
+
+
+class StructureCategory(
+    CategoryBaseStructureCategory, StructureCategoryTrait, BaseModel
+):
+    """A structure kind mounted into a view (RFC 0027): the vertex label its data are drawn under wherever a structure relation the view admits touches them"""
+
+    typename: Literal["StructureCategory"] = Field(
+        alias="__typename", default="StructureCategory", exclude=True
+    )
+    identifier: str
+    "The structure identifier this view mounts, e.g. @mikro/arraylens"
+    model_config = ConfigDict(frozen=True)
+
+    class Meta:
+        """Meta class for StructureCategory"""
+
+        document = "fragment CategoryRef on Category {\n  id\n  key\n  label\n  ageName\n  __typename\n}\n\nfragment MediaStore on MediaStore {\n  id\n  key\n  __typename\n}\n\nfragment TermRef on Term {\n  id\n  key\n  kind\n  __typename\n}\n\nfragment CategoryBase on Category {\n  ...CategoryRef\n  description\n  purl\n  color\n  pinned\n  image {\n    ...MediaStore\n    __typename\n  }\n  graph {\n    id\n    name\n    __typename\n  }\n  term {\n    ...TermRef\n    __typename\n  }\n  __typename\n}\n\nfragment StructureCategory on StructureCategory {\n  ...CategoryBase\n  identifier\n  __typename\n}"
+        name = "StructureCategory"
+        type = "StructureCategory"
 
 
 class StructureRelationCategory(
@@ -4866,7 +5823,7 @@ class StructureRelationCategory(
     class Meta:
         """Meta class for StructureRelationCategory"""
 
-        document = "fragment CategoryRef on Category {\n  id\n  key\n  label\n  ageName\n  __typename\n}\n\nfragment MediaStore on MediaStore {\n  id\n  key\n  __typename\n}\n\nfragment TermRef on Term {\n  id\n  key\n  kind\n  __typename\n}\n\nfragment CategoryBase on Category {\n  ...CategoryRef\n  description\n  purl\n  color\n  pinned\n  image {\n    ...MediaStore\n    __typename\n  }\n  graph {\n    id\n    name\n    __typename\n  }\n  term {\n    ...TermRef\n    __typename\n  }\n  __typename\n}\n\nfragment PropertyDefinition on PropertyDefinition {\n  key\n  label\n  valueKind\n  unit\n  description\n  derivation\n  index\n  searchable\n  __typename\n}\n\nfragment StructureDescriptor on StructureDescriptor {\n  defaultCategoryKey\n  __typename\n}\n\nfragment StructureRelationCategory on StructureRelationCategory {\n  ...CategoryBase\n  sourceDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  targetDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}"
+        document = "fragment CategoryRef on Category {\n  id\n  key\n  label\n  ageName\n  __typename\n}\n\nfragment DescriptorConstraint on DescriptorConstraint {\n  key\n  operator\n  value\n  __typename\n}\n\nfragment MediaStore on MediaStore {\n  id\n  key\n  __typename\n}\n\nfragment TermRef on Term {\n  id\n  key\n  kind\n  __typename\n}\n\nfragment CategoryBase on Category {\n  ...CategoryRef\n  description\n  purl\n  color\n  pinned\n  image {\n    ...MediaStore\n    __typename\n  }\n  graph {\n    id\n    name\n    __typename\n  }\n  term {\n    ...TermRef\n    __typename\n  }\n  __typename\n}\n\nfragment PropertyDefinition on PropertyDefinition {\n  key\n  label\n  valueKind\n  unit\n  description\n  derivation\n  index\n  searchable\n  __typename\n}\n\nfragment StructureDescriptor on StructureDescriptor {\n  defaultCategoryKey\n  identifiers\n  requires {\n    ...DescriptorConstraint\n    __typename\n  }\n  __typename\n}\n\nfragment StructureRelationCategory on StructureRelationCategory {\n  ...CategoryBase\n  sourceDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  targetDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}"
         name = "StructureRelationCategory"
         type = "StructureRelationCategory"
 
@@ -5056,7 +6013,7 @@ class Graph(ListGraph, GraphTrait, BaseModel):
     class Meta:
         """Meta class for Graph"""
 
-        document = "fragment CategoryRef on Category {\n  id\n  key\n  label\n  ageName\n  __typename\n}\n\nfragment MediaStore on MediaStore {\n  id\n  key\n  __typename\n}\n\nfragment TermRef on Term {\n  id\n  key\n  kind\n  __typename\n}\n\nfragment CategoryBase on Category {\n  ...CategoryRef\n  description\n  purl\n  color\n  pinned\n  image {\n    ...MediaStore\n    __typename\n  }\n  graph {\n    id\n    name\n    __typename\n  }\n  term {\n    ...TermRef\n    __typename\n  }\n  __typename\n}\n\nfragment EntityDescriptor on EntityDescriptor {\n  keys\n  ontologyTerms\n  defaultCategoryKey\n  __typename\n}\n\nfragment EventRole on EventRole {\n  key\n  role\n  descriptor {\n    ...EntityDescriptor\n    __typename\n  }\n  __typename\n}\n\nfragment PropertyDefinition on PropertyDefinition {\n  key\n  label\n  valueKind\n  unit\n  description\n  derivation\n  index\n  searchable\n  __typename\n}\n\nfragment StructureDescriptor on StructureDescriptor {\n  defaultCategoryKey\n  __typename\n}\n\nfragment EntityCategory on EntityCategory {\n  ...CategoryBase\n  instanceKind\n  positionX\n  positionY\n  width\n  height\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment GraphProjection on GraphProjection {\n  kind\n  status\n  projectedThroughSeq\n  derivedThroughSeq\n  lag\n  pending\n  schemaStale\n  schemaHash\n  derivedAt\n  rebuiltAt\n  __typename\n}\n\nfragment ListGraph on Graph {\n  id\n  name\n  description\n  ageName\n  isArchived\n  pinned\n  __typename\n}\n\nfragment MeasurementCategory on MeasurementCategory {\n  ...CategoryBase\n  sourceDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  targetDescriptor {\n    ...EntityDescriptor\n    __typename\n  }\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment NaturalEventCategory on NaturalEventCategory {\n  ...CategoryBase\n  positionX\n  positionY\n  width\n  height\n  inputs {\n    ...EventRole\n    __typename\n  }\n  outputs {\n    ...EventRole\n    __typename\n  }\n  __typename\n}\n\nfragment ProtocolEventCategory on ProtocolEventCategory {\n  ...CategoryBase\n  positionX\n  positionY\n  width\n  height\n  inputs {\n    ...EventRole\n    __typename\n  }\n  outputs {\n    ...EventRole\n    __typename\n  }\n  __typename\n}\n\nfragment RelationCategory on RelationCategory {\n  ...CategoryBase\n  sourceDescriptor {\n    ...EntityDescriptor\n    __typename\n  }\n  targetDescriptor {\n    ...EntityDescriptor\n    __typename\n  }\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment StructureRelationCategory on StructureRelationCategory {\n  ...CategoryBase\n  sourceDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  targetDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment Graph on Graph {\n  ...ListGraph\n  purl\n  projection {\n    ...GraphProjection\n    __typename\n  }\n  entityCategories {\n    ...EntityCategory\n    __typename\n  }\n  relationCategories {\n    ...RelationCategory\n    __typename\n  }\n  measurementCategories {\n    ...MeasurementCategory\n    __typename\n  }\n  structureRelationCategories {\n    ...StructureRelationCategory\n    __typename\n  }\n  naturalEventCategories {\n    ...NaturalEventCategory\n    __typename\n  }\n  protocolEventCategories {\n    ...ProtocolEventCategory\n    __typename\n  }\n  __typename\n}"
+        document = "fragment CategoryRef on Category {\n  id\n  key\n  label\n  ageName\n  __typename\n}\n\nfragment DescriptorConstraint on DescriptorConstraint {\n  key\n  operator\n  value\n  __typename\n}\n\nfragment MediaStore on MediaStore {\n  id\n  key\n  __typename\n}\n\nfragment TermRef on Term {\n  id\n  key\n  kind\n  __typename\n}\n\nfragment CategoryBase on Category {\n  ...CategoryRef\n  description\n  purl\n  color\n  pinned\n  image {\n    ...MediaStore\n    __typename\n  }\n  graph {\n    id\n    name\n    __typename\n  }\n  term {\n    ...TermRef\n    __typename\n  }\n  __typename\n}\n\nfragment EntityDescriptor on EntityDescriptor {\n  keys\n  ontologyTerms\n  defaultCategoryKey\n  __typename\n}\n\nfragment EventRole on EventRole {\n  key\n  role\n  descriptor {\n    ...EntityDescriptor\n    __typename\n  }\n  __typename\n}\n\nfragment PropertyDefinition on PropertyDefinition {\n  key\n  label\n  valueKind\n  unit\n  description\n  derivation\n  index\n  searchable\n  __typename\n}\n\nfragment StructureDescriptor on StructureDescriptor {\n  defaultCategoryKey\n  identifiers\n  requires {\n    ...DescriptorConstraint\n    __typename\n  }\n  __typename\n}\n\nfragment EntityCategory on EntityCategory {\n  ...CategoryBase\n  instanceKind\n  positionX\n  positionY\n  width\n  height\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment GraphProjection on GraphProjection {\n  kind\n  status\n  projectedThroughSeq\n  derivedThroughSeq\n  lag\n  pending\n  schemaStale\n  schemaHash\n  derivedAt\n  rebuiltAt\n  __typename\n}\n\nfragment ListGraph on Graph {\n  id\n  name\n  description\n  ageName\n  isArchived\n  pinned\n  __typename\n}\n\nfragment MeasurementCategory on MeasurementCategory {\n  ...CategoryBase\n  sourceDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  targetDescriptor {\n    ...EntityDescriptor\n    __typename\n  }\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment NaturalEventCategory on NaturalEventCategory {\n  ...CategoryBase\n  positionX\n  positionY\n  width\n  height\n  inputs {\n    ...EventRole\n    __typename\n  }\n  outputs {\n    ...EventRole\n    __typename\n  }\n  __typename\n}\n\nfragment ProtocolEventCategory on ProtocolEventCategory {\n  ...CategoryBase\n  positionX\n  positionY\n  width\n  height\n  inputs {\n    ...EventRole\n    __typename\n  }\n  outputs {\n    ...EventRole\n    __typename\n  }\n  __typename\n}\n\nfragment RelationCategory on RelationCategory {\n  ...CategoryBase\n  sourceDescriptor {\n    ...EntityDescriptor\n    __typename\n  }\n  targetDescriptor {\n    ...EntityDescriptor\n    __typename\n  }\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment StructureRelationCategory on StructureRelationCategory {\n  ...CategoryBase\n  sourceDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  targetDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment Graph on Graph {\n  ...ListGraph\n  purl\n  projection {\n    ...GraphProjection\n    __typename\n  }\n  entityCategories {\n    ...EntityCategory\n    __typename\n  }\n  relationCategories {\n    ...RelationCategory\n    __typename\n  }\n  measurementCategories {\n    ...MeasurementCategory\n    __typename\n  }\n  structureRelationCategories {\n    ...StructureRelationCategory\n    __typename\n  }\n  naturalEventCategories {\n    ...NaturalEventCategory\n    __typename\n  }\n  protocolEventCategories {\n    ...ProtocolEventCategory\n    __typename\n  }\n  __typename\n}"
         name = "Graph"
         type = "Graph"
 
@@ -5180,7 +6137,7 @@ class CreateMeasurementCategoryMutation(BaseModel):
     class Meta:
         """Meta class for CreateMeasurementCategory"""
 
-        document = "fragment CategoryRef on Category {\n  id\n  key\n  label\n  ageName\n  __typename\n}\n\nfragment MediaStore on MediaStore {\n  id\n  key\n  __typename\n}\n\nfragment TermRef on Term {\n  id\n  key\n  kind\n  __typename\n}\n\nfragment CategoryBase on Category {\n  ...CategoryRef\n  description\n  purl\n  color\n  pinned\n  image {\n    ...MediaStore\n    __typename\n  }\n  graph {\n    id\n    name\n    __typename\n  }\n  term {\n    ...TermRef\n    __typename\n  }\n  __typename\n}\n\nfragment EntityDescriptor on EntityDescriptor {\n  keys\n  ontologyTerms\n  defaultCategoryKey\n  __typename\n}\n\nfragment PropertyDefinition on PropertyDefinition {\n  key\n  label\n  valueKind\n  unit\n  description\n  derivation\n  index\n  searchable\n  __typename\n}\n\nfragment StructureDescriptor on StructureDescriptor {\n  defaultCategoryKey\n  __typename\n}\n\nfragment MeasurementCategory on MeasurementCategory {\n  ...CategoryBase\n  sourceDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  targetDescriptor {\n    ...EntityDescriptor\n    __typename\n  }\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nmutation CreateMeasurementCategory($input: CreateMeasurementCategoryInput!) {\n  createMeasurementCategory(input: $input) {\n    ...MeasurementCategory\n    __typename\n  }\n}"
+        document = "fragment CategoryRef on Category {\n  id\n  key\n  label\n  ageName\n  __typename\n}\n\nfragment DescriptorConstraint on DescriptorConstraint {\n  key\n  operator\n  value\n  __typename\n}\n\nfragment MediaStore on MediaStore {\n  id\n  key\n  __typename\n}\n\nfragment TermRef on Term {\n  id\n  key\n  kind\n  __typename\n}\n\nfragment CategoryBase on Category {\n  ...CategoryRef\n  description\n  purl\n  color\n  pinned\n  image {\n    ...MediaStore\n    __typename\n  }\n  graph {\n    id\n    name\n    __typename\n  }\n  term {\n    ...TermRef\n    __typename\n  }\n  __typename\n}\n\nfragment EntityDescriptor on EntityDescriptor {\n  keys\n  ontologyTerms\n  defaultCategoryKey\n  __typename\n}\n\nfragment PropertyDefinition on PropertyDefinition {\n  key\n  label\n  valueKind\n  unit\n  description\n  derivation\n  index\n  searchable\n  __typename\n}\n\nfragment StructureDescriptor on StructureDescriptor {\n  defaultCategoryKey\n  identifiers\n  requires {\n    ...DescriptorConstraint\n    __typename\n  }\n  __typename\n}\n\nfragment MeasurementCategory on MeasurementCategory {\n  ...CategoryBase\n  sourceDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  targetDescriptor {\n    ...EntityDescriptor\n    __typename\n  }\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nmutation CreateMeasurementCategory($input: CreateMeasurementCategoryInput!) {\n  createMeasurementCategory(input: $input) {\n    ...MeasurementCategory\n    __typename\n  }\n}"
 
 
 class UpdateMeasurementCategoryMutation(BaseModel):
@@ -5199,7 +6156,7 @@ class UpdateMeasurementCategoryMutation(BaseModel):
     class Meta:
         """Meta class for UpdateMeasurementCategory"""
 
-        document = "fragment CategoryRef on Category {\n  id\n  key\n  label\n  ageName\n  __typename\n}\n\nfragment MediaStore on MediaStore {\n  id\n  key\n  __typename\n}\n\nfragment TermRef on Term {\n  id\n  key\n  kind\n  __typename\n}\n\nfragment CategoryBase on Category {\n  ...CategoryRef\n  description\n  purl\n  color\n  pinned\n  image {\n    ...MediaStore\n    __typename\n  }\n  graph {\n    id\n    name\n    __typename\n  }\n  term {\n    ...TermRef\n    __typename\n  }\n  __typename\n}\n\nfragment EntityDescriptor on EntityDescriptor {\n  keys\n  ontologyTerms\n  defaultCategoryKey\n  __typename\n}\n\nfragment PropertyDefinition on PropertyDefinition {\n  key\n  label\n  valueKind\n  unit\n  description\n  derivation\n  index\n  searchable\n  __typename\n}\n\nfragment StructureDescriptor on StructureDescriptor {\n  defaultCategoryKey\n  __typename\n}\n\nfragment MeasurementCategory on MeasurementCategory {\n  ...CategoryBase\n  sourceDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  targetDescriptor {\n    ...EntityDescriptor\n    __typename\n  }\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nmutation UpdateMeasurementCategory($input: UpdateMeasurementCategoryInput!) {\n  updateMeasurementCategory(input: $input) {\n    ...MeasurementCategory\n    __typename\n  }\n}"
+        document = "fragment CategoryRef on Category {\n  id\n  key\n  label\n  ageName\n  __typename\n}\n\nfragment DescriptorConstraint on DescriptorConstraint {\n  key\n  operator\n  value\n  __typename\n}\n\nfragment MediaStore on MediaStore {\n  id\n  key\n  __typename\n}\n\nfragment TermRef on Term {\n  id\n  key\n  kind\n  __typename\n}\n\nfragment CategoryBase on Category {\n  ...CategoryRef\n  description\n  purl\n  color\n  pinned\n  image {\n    ...MediaStore\n    __typename\n  }\n  graph {\n    id\n    name\n    __typename\n  }\n  term {\n    ...TermRef\n    __typename\n  }\n  __typename\n}\n\nfragment EntityDescriptor on EntityDescriptor {\n  keys\n  ontologyTerms\n  defaultCategoryKey\n  __typename\n}\n\nfragment PropertyDefinition on PropertyDefinition {\n  key\n  label\n  valueKind\n  unit\n  description\n  derivation\n  index\n  searchable\n  __typename\n}\n\nfragment StructureDescriptor on StructureDescriptor {\n  defaultCategoryKey\n  identifiers\n  requires {\n    ...DescriptorConstraint\n    __typename\n  }\n  __typename\n}\n\nfragment MeasurementCategory on MeasurementCategory {\n  ...CategoryBase\n  sourceDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  targetDescriptor {\n    ...EntityDescriptor\n    __typename\n  }\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nmutation UpdateMeasurementCategory($input: UpdateMeasurementCategoryInput!) {\n  updateMeasurementCategory(input: $input) {\n    ...MeasurementCategory\n    __typename\n  }\n}"
 
 
 class DeleteMeasurementCategoryMutation(BaseModel):
@@ -5219,6 +6176,61 @@ class DeleteMeasurementCategoryMutation(BaseModel):
         document = "mutation DeleteMeasurementCategory($input: DeleteMeasurementCategoryInput!) {\n  deleteMeasurementCategory(input: $input)\n}"
 
 
+class CreateStructureCategoryMutation(BaseModel):
+    """No documentation found for this operation."""
+
+    create_structure_category: StructureCategory = Field(
+        alias="createStructureCategory"
+    )
+    "Mount a structure kind into a graph: the vertex label its data are drawn under wherever a structure relation the graph admits touches them (RFC 0027)"
+
+    class Arguments(BaseModel):
+        """Arguments for CreateStructureCategory"""
+
+        input: CreateStructureCategoryInput
+
+    class Meta:
+        """Meta class for CreateStructureCategory"""
+
+        document = "fragment CategoryRef on Category {\n  id\n  key\n  label\n  ageName\n  __typename\n}\n\nfragment MediaStore on MediaStore {\n  id\n  key\n  __typename\n}\n\nfragment TermRef on Term {\n  id\n  key\n  kind\n  __typename\n}\n\nfragment CategoryBase on Category {\n  ...CategoryRef\n  description\n  purl\n  color\n  pinned\n  image {\n    ...MediaStore\n    __typename\n  }\n  graph {\n    id\n    name\n    __typename\n  }\n  term {\n    ...TermRef\n    __typename\n  }\n  __typename\n}\n\nfragment StructureCategory on StructureCategory {\n  ...CategoryBase\n  identifier\n  __typename\n}\n\nmutation CreateStructureCategory($input: CreateStructureCategoryInput!) {\n  createStructureCategory(input: $input) {\n    ...StructureCategory\n    __typename\n  }\n}"
+
+
+class UpdateStructureCategoryMutation(BaseModel):
+    """No documentation found for this operation."""
+
+    update_structure_category: StructureCategory = Field(
+        alias="updateStructureCategory"
+    )
+    "Change a mounted structure kind's label, description, colour, image or pin"
+
+    class Arguments(BaseModel):
+        """Arguments for UpdateStructureCategory"""
+
+        input: UpdateStructureCategoryInput
+
+    class Meta:
+        """Meta class for UpdateStructureCategory"""
+
+        document = "fragment CategoryRef on Category {\n  id\n  key\n  label\n  ageName\n  __typename\n}\n\nfragment MediaStore on MediaStore {\n  id\n  key\n  __typename\n}\n\nfragment TermRef on Term {\n  id\n  key\n  kind\n  __typename\n}\n\nfragment CategoryBase on Category {\n  ...CategoryRef\n  description\n  purl\n  color\n  pinned\n  image {\n    ...MediaStore\n    __typename\n  }\n  graph {\n    id\n    name\n    __typename\n  }\n  term {\n    ...TermRef\n    __typename\n  }\n  __typename\n}\n\nfragment StructureCategory on StructureCategory {\n  ...CategoryBase\n  identifier\n  __typename\n}\n\nmutation UpdateStructureCategory($input: UpdateStructureCategoryInput!) {\n  updateStructureCategory(input: $input) {\n    ...StructureCategory\n    __typename\n  }\n}"
+
+
+class DeleteStructureCategoryMutation(BaseModel):
+    """No documentation found for this operation."""
+
+    delete_structure_category: ID = Field(alias="deleteStructureCategory")
+    "Unmount a structure kind, refused while a structure-relation category of the graph names it"
+
+    class Arguments(BaseModel):
+        """Arguments for DeleteStructureCategory"""
+
+        input: DeleteStructureCategoryInput
+
+    class Meta:
+        """Meta class for DeleteStructureCategory"""
+
+        document = "mutation DeleteStructureCategory($input: DeleteStructureCategoryInput!) {\n  deleteStructureCategory(input: $input)\n}"
+
+
 class CreateStructureRelationCategoryMutation(BaseModel):
     """No documentation found for this operation."""
 
@@ -5235,7 +6247,7 @@ class CreateStructureRelationCategoryMutation(BaseModel):
     class Meta:
         """Meta class for CreateStructureRelationCategory"""
 
-        document = "fragment CategoryRef on Category {\n  id\n  key\n  label\n  ageName\n  __typename\n}\n\nfragment MediaStore on MediaStore {\n  id\n  key\n  __typename\n}\n\nfragment TermRef on Term {\n  id\n  key\n  kind\n  __typename\n}\n\nfragment CategoryBase on Category {\n  ...CategoryRef\n  description\n  purl\n  color\n  pinned\n  image {\n    ...MediaStore\n    __typename\n  }\n  graph {\n    id\n    name\n    __typename\n  }\n  term {\n    ...TermRef\n    __typename\n  }\n  __typename\n}\n\nfragment PropertyDefinition on PropertyDefinition {\n  key\n  label\n  valueKind\n  unit\n  description\n  derivation\n  index\n  searchable\n  __typename\n}\n\nfragment StructureDescriptor on StructureDescriptor {\n  defaultCategoryKey\n  __typename\n}\n\nfragment StructureRelationCategory on StructureRelationCategory {\n  ...CategoryBase\n  sourceDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  targetDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nmutation CreateStructureRelationCategory($input: CreateStructureRelationCategoryInput!) {\n  createStructureRelationCategory(input: $input) {\n    ...StructureRelationCategory\n    __typename\n  }\n}"
+        document = "fragment CategoryRef on Category {\n  id\n  key\n  label\n  ageName\n  __typename\n}\n\nfragment DescriptorConstraint on DescriptorConstraint {\n  key\n  operator\n  value\n  __typename\n}\n\nfragment MediaStore on MediaStore {\n  id\n  key\n  __typename\n}\n\nfragment TermRef on Term {\n  id\n  key\n  kind\n  __typename\n}\n\nfragment CategoryBase on Category {\n  ...CategoryRef\n  description\n  purl\n  color\n  pinned\n  image {\n    ...MediaStore\n    __typename\n  }\n  graph {\n    id\n    name\n    __typename\n  }\n  term {\n    ...TermRef\n    __typename\n  }\n  __typename\n}\n\nfragment PropertyDefinition on PropertyDefinition {\n  key\n  label\n  valueKind\n  unit\n  description\n  derivation\n  index\n  searchable\n  __typename\n}\n\nfragment StructureDescriptor on StructureDescriptor {\n  defaultCategoryKey\n  identifiers\n  requires {\n    ...DescriptorConstraint\n    __typename\n  }\n  __typename\n}\n\nfragment StructureRelationCategory on StructureRelationCategory {\n  ...CategoryBase\n  sourceDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  targetDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nmutation CreateStructureRelationCategory($input: CreateStructureRelationCategoryInput!) {\n  createStructureRelationCategory(input: $input) {\n    ...StructureRelationCategory\n    __typename\n  }\n}"
 
 
 class UpdateStructureRelationCategoryMutation(BaseModel):
@@ -5254,7 +6266,7 @@ class UpdateStructureRelationCategoryMutation(BaseModel):
     class Meta:
         """Meta class for UpdateStructureRelationCategory"""
 
-        document = "fragment CategoryRef on Category {\n  id\n  key\n  label\n  ageName\n  __typename\n}\n\nfragment MediaStore on MediaStore {\n  id\n  key\n  __typename\n}\n\nfragment TermRef on Term {\n  id\n  key\n  kind\n  __typename\n}\n\nfragment CategoryBase on Category {\n  ...CategoryRef\n  description\n  purl\n  color\n  pinned\n  image {\n    ...MediaStore\n    __typename\n  }\n  graph {\n    id\n    name\n    __typename\n  }\n  term {\n    ...TermRef\n    __typename\n  }\n  __typename\n}\n\nfragment PropertyDefinition on PropertyDefinition {\n  key\n  label\n  valueKind\n  unit\n  description\n  derivation\n  index\n  searchable\n  __typename\n}\n\nfragment StructureDescriptor on StructureDescriptor {\n  defaultCategoryKey\n  __typename\n}\n\nfragment StructureRelationCategory on StructureRelationCategory {\n  ...CategoryBase\n  sourceDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  targetDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nmutation UpdateStructureRelationCategory($input: UpdateStructureRelationCategoryInput!) {\n  updateStructureRelationCategory(input: $input) {\n    ...StructureRelationCategory\n    __typename\n  }\n}"
+        document = "fragment CategoryRef on Category {\n  id\n  key\n  label\n  ageName\n  __typename\n}\n\nfragment DescriptorConstraint on DescriptorConstraint {\n  key\n  operator\n  value\n  __typename\n}\n\nfragment MediaStore on MediaStore {\n  id\n  key\n  __typename\n}\n\nfragment TermRef on Term {\n  id\n  key\n  kind\n  __typename\n}\n\nfragment CategoryBase on Category {\n  ...CategoryRef\n  description\n  purl\n  color\n  pinned\n  image {\n    ...MediaStore\n    __typename\n  }\n  graph {\n    id\n    name\n    __typename\n  }\n  term {\n    ...TermRef\n    __typename\n  }\n  __typename\n}\n\nfragment PropertyDefinition on PropertyDefinition {\n  key\n  label\n  valueKind\n  unit\n  description\n  derivation\n  index\n  searchable\n  __typename\n}\n\nfragment StructureDescriptor on StructureDescriptor {\n  defaultCategoryKey\n  identifiers\n  requires {\n    ...DescriptorConstraint\n    __typename\n  }\n  __typename\n}\n\nfragment StructureRelationCategory on StructureRelationCategory {\n  ...CategoryBase\n  sourceDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  targetDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nmutation UpdateStructureRelationCategory($input: UpdateStructureRelationCategoryInput!) {\n  updateStructureRelationCategory(input: $input) {\n    ...StructureRelationCategory\n    __typename\n  }\n}"
 
 
 class DeleteStructureRelationCategoryMutation(BaseModel):
@@ -5384,6 +6396,195 @@ class DeleteProtocolEventCategoryMutation(BaseModel):
         """Meta class for DeleteProtocolEventCategory"""
 
         document = "mutation DeleteProtocolEventCategory($input: DeleteProtocolEventCategoryInput!) {\n  deleteProtocolEventCategory(input: $input)\n}"
+
+
+class RequestBigfileUploadMutation(BaseModel):
+    """No documentation found for this operation."""
+
+    request_bigfile_upload: BigFileUploadGrant = Field(alias="requestBigfileUpload")
+    "Request credentials to upload a big file (a trained model's weights) to the datalayer"
+
+    class Arguments(BaseModel):
+        """Arguments for RequestBigfileUpload"""
+
+        input: RequestBigFileUploadInput
+
+    class Meta:
+        """Meta class for RequestBigfileUpload"""
+
+        document = "fragment BigFileUploadGrant on BigFileUploadGrant {\n  accessKey\n  secretKey\n  sessionToken\n  path\n  key\n  bucket\n  expiresIn\n  store\n  __typename\n}\n\nmutation RequestBigfileUpload($input: RequestBigFileUploadInput!) {\n  requestBigfileUpload(input: $input) {\n    ...BigFileUploadGrant\n    __typename\n  }\n}"
+
+
+class FinishBigfileUploadMutation(BaseModel):
+    """No documentation found for this operation."""
+
+    finish_bigfile_upload: BigFileStore = Field(alias="finishBigfileUpload")
+    "Finalize a big-file upload after the client has written the object"
+
+    class Arguments(BaseModel):
+        """Arguments for FinishBigfileUpload"""
+
+        input: FinishBigFileUploadInput
+
+    class Meta:
+        """Meta class for FinishBigfileUpload"""
+
+        document = "fragment BigFileStore on BigFileStore {\n  id\n  key\n  bucket\n  path\n  originalFileName\n  sizeBytes\n  __typename\n}\n\nmutation FinishBigfileUpload($input: FinishBigFileUploadInput!) {\n  finishBigfileUpload(input: $input) {\n    ...BigFileStore\n    __typename\n  }\n}"
+
+
+class RequestBigfileAccessMutation(BaseModel):
+    """No documentation found for this operation."""
+
+    request_bigfile_access: BigFileAccessGrant = Field(alias="requestBigfileAccess")
+    "Request temporary S3 read credentials for a big file"
+
+    class Arguments(BaseModel):
+        """Arguments for RequestBigfileAccess"""
+
+        input: RequestBigFileAccessInput
+
+    class Meta:
+        """Meta class for RequestBigfileAccess"""
+
+        document = "fragment BigFileAccessGrant on BigFileAccessGrant {\n  accessKey\n  secretKey\n  sessionToken\n  expiresIn\n  path\n  key\n  bucket\n  __typename\n}\n\nmutation RequestBigfileAccess($input: RequestBigFileAccessInput!) {\n  requestBigfileAccess(input: $input) {\n    ...BigFileAccessGrant\n    __typename\n  }\n}"
+
+
+class RefreshBigfileUploadMutation(BaseModel):
+    """Reissues credentials for an upload still in flight, to the same key: a write that outlives its
+    credentials asks for this before they expire and carries on. Only the uploader may.
+    """
+
+    refresh_bigfile_upload: BigFileUploadGrant = Field(alias="refreshBigfileUpload")
+    "Reissue upload credentials for a big-file upload still in flight, to the same key, so a write that outlives its credentials carries on. Only the uploader may, never for a finished store, and never past the upload's time limit"
+
+    class Arguments(BaseModel):
+        """Arguments for RefreshBigfileUpload"""
+
+        input: RefreshUploadInput
+
+    class Meta:
+        """Meta class for RefreshBigfileUpload"""
+
+        document = "fragment BigFileUploadGrant on BigFileUploadGrant {\n  accessKey\n  secretKey\n  sessionToken\n  path\n  key\n  bucket\n  expiresIn\n  store\n  __typename\n}\n\nmutation RefreshBigfileUpload($input: RefreshUploadInput!) {\n  refreshBigfileUpload(input: $input) {\n    ...BigFileUploadGrant\n    __typename\n  }\n}"
+
+
+class CreateGraphPairsQueryMutation(BaseModel):
+    """No documentation found for this operation."""
+
+    create_graph_pairs_query: GraphPairsQuery = Field(alias="createGraphPairsQuery")
+    "Save a pairs query: a match over a view's drawing and which two of its nodes are the pair. Its runs are training sets"
+
+    class Arguments(BaseModel):
+        """Arguments for CreateGraphPairsQuery"""
+
+        input: CreateGraphPairsQueryInput
+
+    class Meta:
+        """Meta class for CreateGraphPairsQuery"""
+
+        document = "fragment PairEnd on PairEnd {\n  path\n  node\n  __typename\n}\n\nfragment GraphPairsQuery on GraphPairsQuery {\n  id\n  key\n  label\n  description\n  descriptors\n  graph {\n    id\n    name\n    __typename\n  }\n  pairsPlan {\n    source {\n      ...PairEnd\n      __typename\n    }\n    target {\n      ...PairEnd\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nmutation CreateGraphPairsQuery($input: CreateGraphPairsQueryInput!) {\n  createGraphPairsQuery(input: $input) {\n    ...GraphPairsQuery\n    __typename\n  }\n}"
+
+
+class UpdateGraphPairsQueryMutation(BaseModel):
+    """No documentation found for this operation."""
+
+    update_graph_pairs_query: GraphPairsQuery = Field(alias="updateGraphPairsQuery")
+    "Change a pairs query. Its runs keep the plan they were run with"
+
+    class Arguments(BaseModel):
+        """Arguments for UpdateGraphPairsQuery"""
+
+        input: UpdateGraphPairsQueryInput
+
+    class Meta:
+        """Meta class for UpdateGraphPairsQuery"""
+
+        document = "fragment PairEnd on PairEnd {\n  path\n  node\n  __typename\n}\n\nfragment GraphPairsQuery on GraphPairsQuery {\n  id\n  key\n  label\n  description\n  descriptors\n  graph {\n    id\n    name\n    __typename\n  }\n  pairsPlan {\n    source {\n      ...PairEnd\n      __typename\n    }\n    target {\n      ...PairEnd\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nmutation UpdateGraphPairsQuery($input: UpdateGraphPairsQueryInput!) {\n  updateGraphPairsQuery(input: $input) {\n    ...GraphPairsQuery\n    __typename\n  }\n}"
+
+
+class DeleteGraphPairsQueryMutation(BaseModel):
+    """No documentation found for this operation."""
+
+    delete_graph_pairs_query: ID = Field(alias="deleteGraphPairsQuery")
+    "Delete a pairs query, refused while it has runs"
+
+    class Arguments(BaseModel):
+        """Arguments for DeleteGraphPairsQuery"""
+
+        input: DeleteGraphTableQueryInput
+
+    class Meta:
+        """Meta class for DeleteGraphPairsQuery"""
+
+        document = "mutation DeleteGraphPairsQuery($input: DeleteGraphTableQueryInput!) {\n  deleteGraphPairsQuery(input: $input)\n}"
+
+
+class RunPairsQueryMutation(BaseModel):
+    """No documentation found for this operation."""
+
+    run_pairs_query: PairsQueryRun = Field(alias="runPairsQuery")
+    "Run a pairs query: its answer from the view's drawing, stored with where the drawing stood. What a model is trained on"
+
+    class Arguments(BaseModel):
+        """Arguments for RunPairsQuery"""
+
+        input: RunPairsQueryInput
+
+    class Meta:
+        """Meta class for RunPairsQuery"""
+
+        document = "fragment PairsQueryRun on PairsQueryRun {\n  id\n  name\n  description\n  auto\n  asOfSeq\n  nPairs\n  schemaHash\n  sourceIdentifier\n  targetIdentifier\n  queryId\n  graphId\n  descriptors\n  createdAt\n  __typename\n}\n\nmutation RunPairsQuery($input: RunPairsQueryInput!) {\n  runPairsQuery(input: $input) {\n    ...PairsQueryRun\n    __typename\n  }\n}"
+
+
+class DeletePairsQueryRunMutation(BaseModel):
+    """No documentation found for this operation."""
+
+    delete_pairs_query_run: ID = Field(alias="deletePairsQueryRun")
+    "Delete a run; a run a model was trained on cannot be deleted"
+
+    class Arguments(BaseModel):
+        """Arguments for DeletePairsQueryRun"""
+
+        input: DeletePairsQueryRunInput
+
+    class Meta:
+        """Meta class for DeletePairsQueryRun"""
+
+        document = "mutation DeletePairsQueryRun($input: DeletePairsQueryRunInput!) {\n  deletePairsQueryRun(input: $input)\n}"
+
+
+class CreateModelMutation(BaseModel):
+    """No documentation found for this operation."""
+
+    create_model: Model = Field(alias="createModel")
+    "Register a trained model: its weights, a finished big-file upload (a client passes the file and its upload middleware sends it), and what it was trained on: a run, or a pairs query the server runs"
+
+    class Arguments(BaseModel):
+        """Arguments for CreateModel"""
+
+        input: CreateModelInput
+
+    class Meta:
+        """Meta class for CreateModel"""
+
+        document = "fragment BigFileStore on BigFileStore {\n  id\n  key\n  bucket\n  path\n  originalFileName\n  sizeBytes\n  __typename\n}\n\nfragment PairsQueryRun on PairsQueryRun {\n  id\n  name\n  description\n  auto\n  asOfSeq\n  nPairs\n  schemaHash\n  sourceIdentifier\n  targetIdentifier\n  queryId\n  graphId\n  descriptors\n  createdAt\n  __typename\n}\n\nfragment Model on Model {\n  id\n  name\n  description\n  framework\n  parameters\n  descriptors\n  createdAt\n  trainedOn {\n    ...PairsQueryRun\n    __typename\n  }\n  store {\n    ...BigFileStore\n    __typename\n  }\n  __typename\n}\n\nmutation CreateModel($input: CreateModelInput!) {\n  createModel(input: $input) {\n    ...Model\n    __typename\n  }\n}"
+
+
+class DeleteModelMutation(BaseModel):
+    """No documentation found for this operation."""
+
+    delete_model: ID = Field(alias="deleteModel")
+    "Delete a trained model. Its weights are flagged orphaned for the datalayer's purge; the run it was trained on stays"
+
+    class Arguments(BaseModel):
+        """Arguments for DeleteModel"""
+
+        input: DeleteModelInput
+
+    class Meta:
+        """Meta class for DeleteModel"""
+
+        document = "mutation DeleteModel($input: DeleteModelInput!) {\n  deleteModel(input: $input)\n}"
 
 
 class AssertEntityExistsMutation(BaseModel):
@@ -5667,7 +6868,7 @@ class CreateGraphMutation(BaseModel):
     class Meta:
         """Meta class for CreateGraph"""
 
-        document = "fragment CategoryRef on Category {\n  id\n  key\n  label\n  ageName\n  __typename\n}\n\nfragment MediaStore on MediaStore {\n  id\n  key\n  __typename\n}\n\nfragment TermRef on Term {\n  id\n  key\n  kind\n  __typename\n}\n\nfragment CategoryBase on Category {\n  ...CategoryRef\n  description\n  purl\n  color\n  pinned\n  image {\n    ...MediaStore\n    __typename\n  }\n  graph {\n    id\n    name\n    __typename\n  }\n  term {\n    ...TermRef\n    __typename\n  }\n  __typename\n}\n\nfragment EntityDescriptor on EntityDescriptor {\n  keys\n  ontologyTerms\n  defaultCategoryKey\n  __typename\n}\n\nfragment EventRole on EventRole {\n  key\n  role\n  descriptor {\n    ...EntityDescriptor\n    __typename\n  }\n  __typename\n}\n\nfragment PropertyDefinition on PropertyDefinition {\n  key\n  label\n  valueKind\n  unit\n  description\n  derivation\n  index\n  searchable\n  __typename\n}\n\nfragment StructureDescriptor on StructureDescriptor {\n  defaultCategoryKey\n  __typename\n}\n\nfragment EntityCategory on EntityCategory {\n  ...CategoryBase\n  instanceKind\n  positionX\n  positionY\n  width\n  height\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment GraphProjection on GraphProjection {\n  kind\n  status\n  projectedThroughSeq\n  derivedThroughSeq\n  lag\n  pending\n  schemaStale\n  schemaHash\n  derivedAt\n  rebuiltAt\n  __typename\n}\n\nfragment ListGraph on Graph {\n  id\n  name\n  description\n  ageName\n  isArchived\n  pinned\n  __typename\n}\n\nfragment MeasurementCategory on MeasurementCategory {\n  ...CategoryBase\n  sourceDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  targetDescriptor {\n    ...EntityDescriptor\n    __typename\n  }\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment NaturalEventCategory on NaturalEventCategory {\n  ...CategoryBase\n  positionX\n  positionY\n  width\n  height\n  inputs {\n    ...EventRole\n    __typename\n  }\n  outputs {\n    ...EventRole\n    __typename\n  }\n  __typename\n}\n\nfragment ProtocolEventCategory on ProtocolEventCategory {\n  ...CategoryBase\n  positionX\n  positionY\n  width\n  height\n  inputs {\n    ...EventRole\n    __typename\n  }\n  outputs {\n    ...EventRole\n    __typename\n  }\n  __typename\n}\n\nfragment RelationCategory on RelationCategory {\n  ...CategoryBase\n  sourceDescriptor {\n    ...EntityDescriptor\n    __typename\n  }\n  targetDescriptor {\n    ...EntityDescriptor\n    __typename\n  }\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment StructureRelationCategory on StructureRelationCategory {\n  ...CategoryBase\n  sourceDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  targetDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment Graph on Graph {\n  ...ListGraph\n  purl\n  projection {\n    ...GraphProjection\n    __typename\n  }\n  entityCategories {\n    ...EntityCategory\n    __typename\n  }\n  relationCategories {\n    ...RelationCategory\n    __typename\n  }\n  measurementCategories {\n    ...MeasurementCategory\n    __typename\n  }\n  structureRelationCategories {\n    ...StructureRelationCategory\n    __typename\n  }\n  naturalEventCategories {\n    ...NaturalEventCategory\n    __typename\n  }\n  protocolEventCategories {\n    ...ProtocolEventCategory\n    __typename\n  }\n  __typename\n}\n\nmutation CreateGraph($input: CreateGraphInput!) {\n  createGraph(input: $input) {\n    ...Graph\n    __typename\n  }\n}"
+        document = "fragment CategoryRef on Category {\n  id\n  key\n  label\n  ageName\n  __typename\n}\n\nfragment DescriptorConstraint on DescriptorConstraint {\n  key\n  operator\n  value\n  __typename\n}\n\nfragment MediaStore on MediaStore {\n  id\n  key\n  __typename\n}\n\nfragment TermRef on Term {\n  id\n  key\n  kind\n  __typename\n}\n\nfragment CategoryBase on Category {\n  ...CategoryRef\n  description\n  purl\n  color\n  pinned\n  image {\n    ...MediaStore\n    __typename\n  }\n  graph {\n    id\n    name\n    __typename\n  }\n  term {\n    ...TermRef\n    __typename\n  }\n  __typename\n}\n\nfragment EntityDescriptor on EntityDescriptor {\n  keys\n  ontologyTerms\n  defaultCategoryKey\n  __typename\n}\n\nfragment EventRole on EventRole {\n  key\n  role\n  descriptor {\n    ...EntityDescriptor\n    __typename\n  }\n  __typename\n}\n\nfragment PropertyDefinition on PropertyDefinition {\n  key\n  label\n  valueKind\n  unit\n  description\n  derivation\n  index\n  searchable\n  __typename\n}\n\nfragment StructureDescriptor on StructureDescriptor {\n  defaultCategoryKey\n  identifiers\n  requires {\n    ...DescriptorConstraint\n    __typename\n  }\n  __typename\n}\n\nfragment EntityCategory on EntityCategory {\n  ...CategoryBase\n  instanceKind\n  positionX\n  positionY\n  width\n  height\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment GraphProjection on GraphProjection {\n  kind\n  status\n  projectedThroughSeq\n  derivedThroughSeq\n  lag\n  pending\n  schemaStale\n  schemaHash\n  derivedAt\n  rebuiltAt\n  __typename\n}\n\nfragment ListGraph on Graph {\n  id\n  name\n  description\n  ageName\n  isArchived\n  pinned\n  __typename\n}\n\nfragment MeasurementCategory on MeasurementCategory {\n  ...CategoryBase\n  sourceDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  targetDescriptor {\n    ...EntityDescriptor\n    __typename\n  }\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment NaturalEventCategory on NaturalEventCategory {\n  ...CategoryBase\n  positionX\n  positionY\n  width\n  height\n  inputs {\n    ...EventRole\n    __typename\n  }\n  outputs {\n    ...EventRole\n    __typename\n  }\n  __typename\n}\n\nfragment ProtocolEventCategory on ProtocolEventCategory {\n  ...CategoryBase\n  positionX\n  positionY\n  width\n  height\n  inputs {\n    ...EventRole\n    __typename\n  }\n  outputs {\n    ...EventRole\n    __typename\n  }\n  __typename\n}\n\nfragment RelationCategory on RelationCategory {\n  ...CategoryBase\n  sourceDescriptor {\n    ...EntityDescriptor\n    __typename\n  }\n  targetDescriptor {\n    ...EntityDescriptor\n    __typename\n  }\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment StructureRelationCategory on StructureRelationCategory {\n  ...CategoryBase\n  sourceDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  targetDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment Graph on Graph {\n  ...ListGraph\n  purl\n  projection {\n    ...GraphProjection\n    __typename\n  }\n  entityCategories {\n    ...EntityCategory\n    __typename\n  }\n  relationCategories {\n    ...RelationCategory\n    __typename\n  }\n  measurementCategories {\n    ...MeasurementCategory\n    __typename\n  }\n  structureRelationCategories {\n    ...StructureRelationCategory\n    __typename\n  }\n  naturalEventCategories {\n    ...NaturalEventCategory\n    __typename\n  }\n  protocolEventCategories {\n    ...ProtocolEventCategory\n    __typename\n  }\n  __typename\n}\n\nmutation CreateGraph($input: CreateGraphInput!) {\n  createGraph(input: $input) {\n    ...Graph\n    __typename\n  }\n}"
 
 
 class UpdateGraphMutation(BaseModel):
@@ -5684,7 +6885,7 @@ class UpdateGraphMutation(BaseModel):
     class Meta:
         """Meta class for UpdateGraph"""
 
-        document = "fragment CategoryRef on Category {\n  id\n  key\n  label\n  ageName\n  __typename\n}\n\nfragment MediaStore on MediaStore {\n  id\n  key\n  __typename\n}\n\nfragment TermRef on Term {\n  id\n  key\n  kind\n  __typename\n}\n\nfragment CategoryBase on Category {\n  ...CategoryRef\n  description\n  purl\n  color\n  pinned\n  image {\n    ...MediaStore\n    __typename\n  }\n  graph {\n    id\n    name\n    __typename\n  }\n  term {\n    ...TermRef\n    __typename\n  }\n  __typename\n}\n\nfragment EntityDescriptor on EntityDescriptor {\n  keys\n  ontologyTerms\n  defaultCategoryKey\n  __typename\n}\n\nfragment EventRole on EventRole {\n  key\n  role\n  descriptor {\n    ...EntityDescriptor\n    __typename\n  }\n  __typename\n}\n\nfragment PropertyDefinition on PropertyDefinition {\n  key\n  label\n  valueKind\n  unit\n  description\n  derivation\n  index\n  searchable\n  __typename\n}\n\nfragment StructureDescriptor on StructureDescriptor {\n  defaultCategoryKey\n  __typename\n}\n\nfragment EntityCategory on EntityCategory {\n  ...CategoryBase\n  instanceKind\n  positionX\n  positionY\n  width\n  height\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment GraphProjection on GraphProjection {\n  kind\n  status\n  projectedThroughSeq\n  derivedThroughSeq\n  lag\n  pending\n  schemaStale\n  schemaHash\n  derivedAt\n  rebuiltAt\n  __typename\n}\n\nfragment ListGraph on Graph {\n  id\n  name\n  description\n  ageName\n  isArchived\n  pinned\n  __typename\n}\n\nfragment MeasurementCategory on MeasurementCategory {\n  ...CategoryBase\n  sourceDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  targetDescriptor {\n    ...EntityDescriptor\n    __typename\n  }\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment NaturalEventCategory on NaturalEventCategory {\n  ...CategoryBase\n  positionX\n  positionY\n  width\n  height\n  inputs {\n    ...EventRole\n    __typename\n  }\n  outputs {\n    ...EventRole\n    __typename\n  }\n  __typename\n}\n\nfragment ProtocolEventCategory on ProtocolEventCategory {\n  ...CategoryBase\n  positionX\n  positionY\n  width\n  height\n  inputs {\n    ...EventRole\n    __typename\n  }\n  outputs {\n    ...EventRole\n    __typename\n  }\n  __typename\n}\n\nfragment RelationCategory on RelationCategory {\n  ...CategoryBase\n  sourceDescriptor {\n    ...EntityDescriptor\n    __typename\n  }\n  targetDescriptor {\n    ...EntityDescriptor\n    __typename\n  }\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment StructureRelationCategory on StructureRelationCategory {\n  ...CategoryBase\n  sourceDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  targetDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment Graph on Graph {\n  ...ListGraph\n  purl\n  projection {\n    ...GraphProjection\n    __typename\n  }\n  entityCategories {\n    ...EntityCategory\n    __typename\n  }\n  relationCategories {\n    ...RelationCategory\n    __typename\n  }\n  measurementCategories {\n    ...MeasurementCategory\n    __typename\n  }\n  structureRelationCategories {\n    ...StructureRelationCategory\n    __typename\n  }\n  naturalEventCategories {\n    ...NaturalEventCategory\n    __typename\n  }\n  protocolEventCategories {\n    ...ProtocolEventCategory\n    __typename\n  }\n  __typename\n}\n\nmutation UpdateGraph($input: UpdateGraphInput!) {\n  updateGraph(input: $input) {\n    ...Graph\n    __typename\n  }\n}"
+        document = "fragment CategoryRef on Category {\n  id\n  key\n  label\n  ageName\n  __typename\n}\n\nfragment DescriptorConstraint on DescriptorConstraint {\n  key\n  operator\n  value\n  __typename\n}\n\nfragment MediaStore on MediaStore {\n  id\n  key\n  __typename\n}\n\nfragment TermRef on Term {\n  id\n  key\n  kind\n  __typename\n}\n\nfragment CategoryBase on Category {\n  ...CategoryRef\n  description\n  purl\n  color\n  pinned\n  image {\n    ...MediaStore\n    __typename\n  }\n  graph {\n    id\n    name\n    __typename\n  }\n  term {\n    ...TermRef\n    __typename\n  }\n  __typename\n}\n\nfragment EntityDescriptor on EntityDescriptor {\n  keys\n  ontologyTerms\n  defaultCategoryKey\n  __typename\n}\n\nfragment EventRole on EventRole {\n  key\n  role\n  descriptor {\n    ...EntityDescriptor\n    __typename\n  }\n  __typename\n}\n\nfragment PropertyDefinition on PropertyDefinition {\n  key\n  label\n  valueKind\n  unit\n  description\n  derivation\n  index\n  searchable\n  __typename\n}\n\nfragment StructureDescriptor on StructureDescriptor {\n  defaultCategoryKey\n  identifiers\n  requires {\n    ...DescriptorConstraint\n    __typename\n  }\n  __typename\n}\n\nfragment EntityCategory on EntityCategory {\n  ...CategoryBase\n  instanceKind\n  positionX\n  positionY\n  width\n  height\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment GraphProjection on GraphProjection {\n  kind\n  status\n  projectedThroughSeq\n  derivedThroughSeq\n  lag\n  pending\n  schemaStale\n  schemaHash\n  derivedAt\n  rebuiltAt\n  __typename\n}\n\nfragment ListGraph on Graph {\n  id\n  name\n  description\n  ageName\n  isArchived\n  pinned\n  __typename\n}\n\nfragment MeasurementCategory on MeasurementCategory {\n  ...CategoryBase\n  sourceDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  targetDescriptor {\n    ...EntityDescriptor\n    __typename\n  }\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment NaturalEventCategory on NaturalEventCategory {\n  ...CategoryBase\n  positionX\n  positionY\n  width\n  height\n  inputs {\n    ...EventRole\n    __typename\n  }\n  outputs {\n    ...EventRole\n    __typename\n  }\n  __typename\n}\n\nfragment ProtocolEventCategory on ProtocolEventCategory {\n  ...CategoryBase\n  positionX\n  positionY\n  width\n  height\n  inputs {\n    ...EventRole\n    __typename\n  }\n  outputs {\n    ...EventRole\n    __typename\n  }\n  __typename\n}\n\nfragment RelationCategory on RelationCategory {\n  ...CategoryBase\n  sourceDescriptor {\n    ...EntityDescriptor\n    __typename\n  }\n  targetDescriptor {\n    ...EntityDescriptor\n    __typename\n  }\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment StructureRelationCategory on StructureRelationCategory {\n  ...CategoryBase\n  sourceDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  targetDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment Graph on Graph {\n  ...ListGraph\n  purl\n  projection {\n    ...GraphProjection\n    __typename\n  }\n  entityCategories {\n    ...EntityCategory\n    __typename\n  }\n  relationCategories {\n    ...RelationCategory\n    __typename\n  }\n  measurementCategories {\n    ...MeasurementCategory\n    __typename\n  }\n  structureRelationCategories {\n    ...StructureRelationCategory\n    __typename\n  }\n  naturalEventCategories {\n    ...NaturalEventCategory\n    __typename\n  }\n  protocolEventCategories {\n    ...ProtocolEventCategory\n    __typename\n  }\n  __typename\n}\n\nmutation UpdateGraph($input: UpdateGraphInput!) {\n  updateGraph(input: $input) {\n    ...Graph\n    __typename\n  }\n}"
 
 
 class UpdateGraphVisualMutation(BaseModel):
@@ -5701,7 +6902,7 @@ class UpdateGraphVisualMutation(BaseModel):
     class Meta:
         """Meta class for UpdateGraphVisual"""
 
-        document = "fragment CategoryRef on Category {\n  id\n  key\n  label\n  ageName\n  __typename\n}\n\nfragment MediaStore on MediaStore {\n  id\n  key\n  __typename\n}\n\nfragment TermRef on Term {\n  id\n  key\n  kind\n  __typename\n}\n\nfragment CategoryBase on Category {\n  ...CategoryRef\n  description\n  purl\n  color\n  pinned\n  image {\n    ...MediaStore\n    __typename\n  }\n  graph {\n    id\n    name\n    __typename\n  }\n  term {\n    ...TermRef\n    __typename\n  }\n  __typename\n}\n\nfragment EntityDescriptor on EntityDescriptor {\n  keys\n  ontologyTerms\n  defaultCategoryKey\n  __typename\n}\n\nfragment EventRole on EventRole {\n  key\n  role\n  descriptor {\n    ...EntityDescriptor\n    __typename\n  }\n  __typename\n}\n\nfragment PropertyDefinition on PropertyDefinition {\n  key\n  label\n  valueKind\n  unit\n  description\n  derivation\n  index\n  searchable\n  __typename\n}\n\nfragment StructureDescriptor on StructureDescriptor {\n  defaultCategoryKey\n  __typename\n}\n\nfragment EntityCategory on EntityCategory {\n  ...CategoryBase\n  instanceKind\n  positionX\n  positionY\n  width\n  height\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment GraphProjection on GraphProjection {\n  kind\n  status\n  projectedThroughSeq\n  derivedThroughSeq\n  lag\n  pending\n  schemaStale\n  schemaHash\n  derivedAt\n  rebuiltAt\n  __typename\n}\n\nfragment ListGraph on Graph {\n  id\n  name\n  description\n  ageName\n  isArchived\n  pinned\n  __typename\n}\n\nfragment MeasurementCategory on MeasurementCategory {\n  ...CategoryBase\n  sourceDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  targetDescriptor {\n    ...EntityDescriptor\n    __typename\n  }\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment NaturalEventCategory on NaturalEventCategory {\n  ...CategoryBase\n  positionX\n  positionY\n  width\n  height\n  inputs {\n    ...EventRole\n    __typename\n  }\n  outputs {\n    ...EventRole\n    __typename\n  }\n  __typename\n}\n\nfragment ProtocolEventCategory on ProtocolEventCategory {\n  ...CategoryBase\n  positionX\n  positionY\n  width\n  height\n  inputs {\n    ...EventRole\n    __typename\n  }\n  outputs {\n    ...EventRole\n    __typename\n  }\n  __typename\n}\n\nfragment RelationCategory on RelationCategory {\n  ...CategoryBase\n  sourceDescriptor {\n    ...EntityDescriptor\n    __typename\n  }\n  targetDescriptor {\n    ...EntityDescriptor\n    __typename\n  }\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment StructureRelationCategory on StructureRelationCategory {\n  ...CategoryBase\n  sourceDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  targetDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment Graph on Graph {\n  ...ListGraph\n  purl\n  projection {\n    ...GraphProjection\n    __typename\n  }\n  entityCategories {\n    ...EntityCategory\n    __typename\n  }\n  relationCategories {\n    ...RelationCategory\n    __typename\n  }\n  measurementCategories {\n    ...MeasurementCategory\n    __typename\n  }\n  structureRelationCategories {\n    ...StructureRelationCategory\n    __typename\n  }\n  naturalEventCategories {\n    ...NaturalEventCategory\n    __typename\n  }\n  protocolEventCategories {\n    ...ProtocolEventCategory\n    __typename\n  }\n  __typename\n}\n\nmutation UpdateGraphVisual($input: UpdateGraphVisualInput!) {\n  updateGraphVisual(input: $input) {\n    ...Graph\n    __typename\n  }\n}"
+        document = "fragment CategoryRef on Category {\n  id\n  key\n  label\n  ageName\n  __typename\n}\n\nfragment DescriptorConstraint on DescriptorConstraint {\n  key\n  operator\n  value\n  __typename\n}\n\nfragment MediaStore on MediaStore {\n  id\n  key\n  __typename\n}\n\nfragment TermRef on Term {\n  id\n  key\n  kind\n  __typename\n}\n\nfragment CategoryBase on Category {\n  ...CategoryRef\n  description\n  purl\n  color\n  pinned\n  image {\n    ...MediaStore\n    __typename\n  }\n  graph {\n    id\n    name\n    __typename\n  }\n  term {\n    ...TermRef\n    __typename\n  }\n  __typename\n}\n\nfragment EntityDescriptor on EntityDescriptor {\n  keys\n  ontologyTerms\n  defaultCategoryKey\n  __typename\n}\n\nfragment EventRole on EventRole {\n  key\n  role\n  descriptor {\n    ...EntityDescriptor\n    __typename\n  }\n  __typename\n}\n\nfragment PropertyDefinition on PropertyDefinition {\n  key\n  label\n  valueKind\n  unit\n  description\n  derivation\n  index\n  searchable\n  __typename\n}\n\nfragment StructureDescriptor on StructureDescriptor {\n  defaultCategoryKey\n  identifiers\n  requires {\n    ...DescriptorConstraint\n    __typename\n  }\n  __typename\n}\n\nfragment EntityCategory on EntityCategory {\n  ...CategoryBase\n  instanceKind\n  positionX\n  positionY\n  width\n  height\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment GraphProjection on GraphProjection {\n  kind\n  status\n  projectedThroughSeq\n  derivedThroughSeq\n  lag\n  pending\n  schemaStale\n  schemaHash\n  derivedAt\n  rebuiltAt\n  __typename\n}\n\nfragment ListGraph on Graph {\n  id\n  name\n  description\n  ageName\n  isArchived\n  pinned\n  __typename\n}\n\nfragment MeasurementCategory on MeasurementCategory {\n  ...CategoryBase\n  sourceDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  targetDescriptor {\n    ...EntityDescriptor\n    __typename\n  }\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment NaturalEventCategory on NaturalEventCategory {\n  ...CategoryBase\n  positionX\n  positionY\n  width\n  height\n  inputs {\n    ...EventRole\n    __typename\n  }\n  outputs {\n    ...EventRole\n    __typename\n  }\n  __typename\n}\n\nfragment ProtocolEventCategory on ProtocolEventCategory {\n  ...CategoryBase\n  positionX\n  positionY\n  width\n  height\n  inputs {\n    ...EventRole\n    __typename\n  }\n  outputs {\n    ...EventRole\n    __typename\n  }\n  __typename\n}\n\nfragment RelationCategory on RelationCategory {\n  ...CategoryBase\n  sourceDescriptor {\n    ...EntityDescriptor\n    __typename\n  }\n  targetDescriptor {\n    ...EntityDescriptor\n    __typename\n  }\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment StructureRelationCategory on StructureRelationCategory {\n  ...CategoryBase\n  sourceDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  targetDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment Graph on Graph {\n  ...ListGraph\n  purl\n  projection {\n    ...GraphProjection\n    __typename\n  }\n  entityCategories {\n    ...EntityCategory\n    __typename\n  }\n  relationCategories {\n    ...RelationCategory\n    __typename\n  }\n  measurementCategories {\n    ...MeasurementCategory\n    __typename\n  }\n  structureRelationCategories {\n    ...StructureRelationCategory\n    __typename\n  }\n  naturalEventCategories {\n    ...NaturalEventCategory\n    __typename\n  }\n  protocolEventCategories {\n    ...ProtocolEventCategory\n    __typename\n  }\n  __typename\n}\n\nmutation UpdateGraphVisual($input: UpdateGraphVisualInput!) {\n  updateGraphVisual(input: $input) {\n    ...Graph\n    __typename\n  }\n}"
 
 
 class ArchiveGraphMutation(BaseModel):
@@ -5718,7 +6919,7 @@ class ArchiveGraphMutation(BaseModel):
     class Meta:
         """Meta class for ArchiveGraph"""
 
-        document = "fragment CategoryRef on Category {\n  id\n  key\n  label\n  ageName\n  __typename\n}\n\nfragment MediaStore on MediaStore {\n  id\n  key\n  __typename\n}\n\nfragment TermRef on Term {\n  id\n  key\n  kind\n  __typename\n}\n\nfragment CategoryBase on Category {\n  ...CategoryRef\n  description\n  purl\n  color\n  pinned\n  image {\n    ...MediaStore\n    __typename\n  }\n  graph {\n    id\n    name\n    __typename\n  }\n  term {\n    ...TermRef\n    __typename\n  }\n  __typename\n}\n\nfragment EntityDescriptor on EntityDescriptor {\n  keys\n  ontologyTerms\n  defaultCategoryKey\n  __typename\n}\n\nfragment EventRole on EventRole {\n  key\n  role\n  descriptor {\n    ...EntityDescriptor\n    __typename\n  }\n  __typename\n}\n\nfragment PropertyDefinition on PropertyDefinition {\n  key\n  label\n  valueKind\n  unit\n  description\n  derivation\n  index\n  searchable\n  __typename\n}\n\nfragment StructureDescriptor on StructureDescriptor {\n  defaultCategoryKey\n  __typename\n}\n\nfragment EntityCategory on EntityCategory {\n  ...CategoryBase\n  instanceKind\n  positionX\n  positionY\n  width\n  height\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment GraphProjection on GraphProjection {\n  kind\n  status\n  projectedThroughSeq\n  derivedThroughSeq\n  lag\n  pending\n  schemaStale\n  schemaHash\n  derivedAt\n  rebuiltAt\n  __typename\n}\n\nfragment ListGraph on Graph {\n  id\n  name\n  description\n  ageName\n  isArchived\n  pinned\n  __typename\n}\n\nfragment MeasurementCategory on MeasurementCategory {\n  ...CategoryBase\n  sourceDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  targetDescriptor {\n    ...EntityDescriptor\n    __typename\n  }\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment NaturalEventCategory on NaturalEventCategory {\n  ...CategoryBase\n  positionX\n  positionY\n  width\n  height\n  inputs {\n    ...EventRole\n    __typename\n  }\n  outputs {\n    ...EventRole\n    __typename\n  }\n  __typename\n}\n\nfragment ProtocolEventCategory on ProtocolEventCategory {\n  ...CategoryBase\n  positionX\n  positionY\n  width\n  height\n  inputs {\n    ...EventRole\n    __typename\n  }\n  outputs {\n    ...EventRole\n    __typename\n  }\n  __typename\n}\n\nfragment RelationCategory on RelationCategory {\n  ...CategoryBase\n  sourceDescriptor {\n    ...EntityDescriptor\n    __typename\n  }\n  targetDescriptor {\n    ...EntityDescriptor\n    __typename\n  }\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment StructureRelationCategory on StructureRelationCategory {\n  ...CategoryBase\n  sourceDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  targetDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment Graph on Graph {\n  ...ListGraph\n  purl\n  projection {\n    ...GraphProjection\n    __typename\n  }\n  entityCategories {\n    ...EntityCategory\n    __typename\n  }\n  relationCategories {\n    ...RelationCategory\n    __typename\n  }\n  measurementCategories {\n    ...MeasurementCategory\n    __typename\n  }\n  structureRelationCategories {\n    ...StructureRelationCategory\n    __typename\n  }\n  naturalEventCategories {\n    ...NaturalEventCategory\n    __typename\n  }\n  protocolEventCategories {\n    ...ProtocolEventCategory\n    __typename\n  }\n  __typename\n}\n\nmutation ArchiveGraph($input: ArchiveGraphInput!) {\n  archiveGraph(input: $input) {\n    ...Graph\n    __typename\n  }\n}"
+        document = "fragment CategoryRef on Category {\n  id\n  key\n  label\n  ageName\n  __typename\n}\n\nfragment DescriptorConstraint on DescriptorConstraint {\n  key\n  operator\n  value\n  __typename\n}\n\nfragment MediaStore on MediaStore {\n  id\n  key\n  __typename\n}\n\nfragment TermRef on Term {\n  id\n  key\n  kind\n  __typename\n}\n\nfragment CategoryBase on Category {\n  ...CategoryRef\n  description\n  purl\n  color\n  pinned\n  image {\n    ...MediaStore\n    __typename\n  }\n  graph {\n    id\n    name\n    __typename\n  }\n  term {\n    ...TermRef\n    __typename\n  }\n  __typename\n}\n\nfragment EntityDescriptor on EntityDescriptor {\n  keys\n  ontologyTerms\n  defaultCategoryKey\n  __typename\n}\n\nfragment EventRole on EventRole {\n  key\n  role\n  descriptor {\n    ...EntityDescriptor\n    __typename\n  }\n  __typename\n}\n\nfragment PropertyDefinition on PropertyDefinition {\n  key\n  label\n  valueKind\n  unit\n  description\n  derivation\n  index\n  searchable\n  __typename\n}\n\nfragment StructureDescriptor on StructureDescriptor {\n  defaultCategoryKey\n  identifiers\n  requires {\n    ...DescriptorConstraint\n    __typename\n  }\n  __typename\n}\n\nfragment EntityCategory on EntityCategory {\n  ...CategoryBase\n  instanceKind\n  positionX\n  positionY\n  width\n  height\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment GraphProjection on GraphProjection {\n  kind\n  status\n  projectedThroughSeq\n  derivedThroughSeq\n  lag\n  pending\n  schemaStale\n  schemaHash\n  derivedAt\n  rebuiltAt\n  __typename\n}\n\nfragment ListGraph on Graph {\n  id\n  name\n  description\n  ageName\n  isArchived\n  pinned\n  __typename\n}\n\nfragment MeasurementCategory on MeasurementCategory {\n  ...CategoryBase\n  sourceDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  targetDescriptor {\n    ...EntityDescriptor\n    __typename\n  }\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment NaturalEventCategory on NaturalEventCategory {\n  ...CategoryBase\n  positionX\n  positionY\n  width\n  height\n  inputs {\n    ...EventRole\n    __typename\n  }\n  outputs {\n    ...EventRole\n    __typename\n  }\n  __typename\n}\n\nfragment ProtocolEventCategory on ProtocolEventCategory {\n  ...CategoryBase\n  positionX\n  positionY\n  width\n  height\n  inputs {\n    ...EventRole\n    __typename\n  }\n  outputs {\n    ...EventRole\n    __typename\n  }\n  __typename\n}\n\nfragment RelationCategory on RelationCategory {\n  ...CategoryBase\n  sourceDescriptor {\n    ...EntityDescriptor\n    __typename\n  }\n  targetDescriptor {\n    ...EntityDescriptor\n    __typename\n  }\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment StructureRelationCategory on StructureRelationCategory {\n  ...CategoryBase\n  sourceDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  targetDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment Graph on Graph {\n  ...ListGraph\n  purl\n  projection {\n    ...GraphProjection\n    __typename\n  }\n  entityCategories {\n    ...EntityCategory\n    __typename\n  }\n  relationCategories {\n    ...RelationCategory\n    __typename\n  }\n  measurementCategories {\n    ...MeasurementCategory\n    __typename\n  }\n  structureRelationCategories {\n    ...StructureRelationCategory\n    __typename\n  }\n  naturalEventCategories {\n    ...NaturalEventCategory\n    __typename\n  }\n  protocolEventCategories {\n    ...ProtocolEventCategory\n    __typename\n  }\n  __typename\n}\n\nmutation ArchiveGraph($input: ArchiveGraphInput!) {\n  archiveGraph(input: $input) {\n    ...Graph\n    __typename\n  }\n}"
 
 
 class DeleteGraphMutation(BaseModel):
@@ -6321,7 +7522,7 @@ class GetMeasurementCategoryQuery(BaseModel):
     class Meta:
         """Meta class for GetMeasurementCategory"""
 
-        document = "fragment CategoryRef on Category {\n  id\n  key\n  label\n  ageName\n  __typename\n}\n\nfragment MediaStore on MediaStore {\n  id\n  key\n  __typename\n}\n\nfragment TermRef on Term {\n  id\n  key\n  kind\n  __typename\n}\n\nfragment CategoryBase on Category {\n  ...CategoryRef\n  description\n  purl\n  color\n  pinned\n  image {\n    ...MediaStore\n    __typename\n  }\n  graph {\n    id\n    name\n    __typename\n  }\n  term {\n    ...TermRef\n    __typename\n  }\n  __typename\n}\n\nfragment EntityDescriptor on EntityDescriptor {\n  keys\n  ontologyTerms\n  defaultCategoryKey\n  __typename\n}\n\nfragment PropertyDefinition on PropertyDefinition {\n  key\n  label\n  valueKind\n  unit\n  description\n  derivation\n  index\n  searchable\n  __typename\n}\n\nfragment StructureDescriptor on StructureDescriptor {\n  defaultCategoryKey\n  __typename\n}\n\nfragment MeasurementCategory on MeasurementCategory {\n  ...CategoryBase\n  sourceDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  targetDescriptor {\n    ...EntityDescriptor\n    __typename\n  }\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nquery GetMeasurementCategory($id: ID!) {\n  measurementCategory(id: $id) {\n    ...MeasurementCategory\n    __typename\n  }\n}"
+        document = "fragment CategoryRef on Category {\n  id\n  key\n  label\n  ageName\n  __typename\n}\n\nfragment DescriptorConstraint on DescriptorConstraint {\n  key\n  operator\n  value\n  __typename\n}\n\nfragment MediaStore on MediaStore {\n  id\n  key\n  __typename\n}\n\nfragment TermRef on Term {\n  id\n  key\n  kind\n  __typename\n}\n\nfragment CategoryBase on Category {\n  ...CategoryRef\n  description\n  purl\n  color\n  pinned\n  image {\n    ...MediaStore\n    __typename\n  }\n  graph {\n    id\n    name\n    __typename\n  }\n  term {\n    ...TermRef\n    __typename\n  }\n  __typename\n}\n\nfragment EntityDescriptor on EntityDescriptor {\n  keys\n  ontologyTerms\n  defaultCategoryKey\n  __typename\n}\n\nfragment PropertyDefinition on PropertyDefinition {\n  key\n  label\n  valueKind\n  unit\n  description\n  derivation\n  index\n  searchable\n  __typename\n}\n\nfragment StructureDescriptor on StructureDescriptor {\n  defaultCategoryKey\n  identifiers\n  requires {\n    ...DescriptorConstraint\n    __typename\n  }\n  __typename\n}\n\nfragment MeasurementCategory on MeasurementCategory {\n  ...CategoryBase\n  sourceDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  targetDescriptor {\n    ...EntityDescriptor\n    __typename\n  }\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nquery GetMeasurementCategory($id: ID!) {\n  measurementCategory(id: $id) {\n    ...MeasurementCategory\n    __typename\n  }\n}"
 
 
 class ListMeasurementCategoriesQuery(BaseModel):
@@ -6341,7 +7542,7 @@ class ListMeasurementCategoriesQuery(BaseModel):
     class Meta:
         """Meta class for ListMeasurementCategories"""
 
-        document = "fragment CategoryRef on Category {\n  id\n  key\n  label\n  ageName\n  __typename\n}\n\nfragment MediaStore on MediaStore {\n  id\n  key\n  __typename\n}\n\nfragment TermRef on Term {\n  id\n  key\n  kind\n  __typename\n}\n\nfragment CategoryBase on Category {\n  ...CategoryRef\n  description\n  purl\n  color\n  pinned\n  image {\n    ...MediaStore\n    __typename\n  }\n  graph {\n    id\n    name\n    __typename\n  }\n  term {\n    ...TermRef\n    __typename\n  }\n  __typename\n}\n\nfragment EntityDescriptor on EntityDescriptor {\n  keys\n  ontologyTerms\n  defaultCategoryKey\n  __typename\n}\n\nfragment PropertyDefinition on PropertyDefinition {\n  key\n  label\n  valueKind\n  unit\n  description\n  derivation\n  index\n  searchable\n  __typename\n}\n\nfragment StructureDescriptor on StructureDescriptor {\n  defaultCategoryKey\n  __typename\n}\n\nfragment MeasurementCategory on MeasurementCategory {\n  ...CategoryBase\n  sourceDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  targetDescriptor {\n    ...EntityDescriptor\n    __typename\n  }\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nquery ListMeasurementCategories($filters: MeasurementCategoryFilter, $pagination: OffsetPaginationInput) {\n  measurementCategories(filters: $filters, pagination: $pagination) {\n    ...MeasurementCategory\n    __typename\n  }\n}"
+        document = "fragment CategoryRef on Category {\n  id\n  key\n  label\n  ageName\n  __typename\n}\n\nfragment DescriptorConstraint on DescriptorConstraint {\n  key\n  operator\n  value\n  __typename\n}\n\nfragment MediaStore on MediaStore {\n  id\n  key\n  __typename\n}\n\nfragment TermRef on Term {\n  id\n  key\n  kind\n  __typename\n}\n\nfragment CategoryBase on Category {\n  ...CategoryRef\n  description\n  purl\n  color\n  pinned\n  image {\n    ...MediaStore\n    __typename\n  }\n  graph {\n    id\n    name\n    __typename\n  }\n  term {\n    ...TermRef\n    __typename\n  }\n  __typename\n}\n\nfragment EntityDescriptor on EntityDescriptor {\n  keys\n  ontologyTerms\n  defaultCategoryKey\n  __typename\n}\n\nfragment PropertyDefinition on PropertyDefinition {\n  key\n  label\n  valueKind\n  unit\n  description\n  derivation\n  index\n  searchable\n  __typename\n}\n\nfragment StructureDescriptor on StructureDescriptor {\n  defaultCategoryKey\n  identifiers\n  requires {\n    ...DescriptorConstraint\n    __typename\n  }\n  __typename\n}\n\nfragment MeasurementCategory on MeasurementCategory {\n  ...CategoryBase\n  sourceDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  targetDescriptor {\n    ...EntityDescriptor\n    __typename\n  }\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nquery ListMeasurementCategories($filters: MeasurementCategoryFilter, $pagination: OffsetPaginationInput) {\n  measurementCategories(filters: $filters, pagination: $pagination) {\n    ...MeasurementCategory\n    __typename\n  }\n}"
 
 
 class SearchMeasurementCategoriesQueryOptions(MeasurementCategoryTrait, BaseModel):
@@ -6391,7 +7592,7 @@ class GetStructureRelationCategoryQuery(BaseModel):
     class Meta:
         """Meta class for GetStructureRelationCategory"""
 
-        document = "fragment CategoryRef on Category {\n  id\n  key\n  label\n  ageName\n  __typename\n}\n\nfragment MediaStore on MediaStore {\n  id\n  key\n  __typename\n}\n\nfragment TermRef on Term {\n  id\n  key\n  kind\n  __typename\n}\n\nfragment CategoryBase on Category {\n  ...CategoryRef\n  description\n  purl\n  color\n  pinned\n  image {\n    ...MediaStore\n    __typename\n  }\n  graph {\n    id\n    name\n    __typename\n  }\n  term {\n    ...TermRef\n    __typename\n  }\n  __typename\n}\n\nfragment PropertyDefinition on PropertyDefinition {\n  key\n  label\n  valueKind\n  unit\n  description\n  derivation\n  index\n  searchable\n  __typename\n}\n\nfragment StructureDescriptor on StructureDescriptor {\n  defaultCategoryKey\n  __typename\n}\n\nfragment StructureRelationCategory on StructureRelationCategory {\n  ...CategoryBase\n  sourceDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  targetDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nquery GetStructureRelationCategory($id: ID!) {\n  structureRelationCategory(id: $id) {\n    ...StructureRelationCategory\n    __typename\n  }\n}"
+        document = "fragment CategoryRef on Category {\n  id\n  key\n  label\n  ageName\n  __typename\n}\n\nfragment DescriptorConstraint on DescriptorConstraint {\n  key\n  operator\n  value\n  __typename\n}\n\nfragment MediaStore on MediaStore {\n  id\n  key\n  __typename\n}\n\nfragment TermRef on Term {\n  id\n  key\n  kind\n  __typename\n}\n\nfragment CategoryBase on Category {\n  ...CategoryRef\n  description\n  purl\n  color\n  pinned\n  image {\n    ...MediaStore\n    __typename\n  }\n  graph {\n    id\n    name\n    __typename\n  }\n  term {\n    ...TermRef\n    __typename\n  }\n  __typename\n}\n\nfragment PropertyDefinition on PropertyDefinition {\n  key\n  label\n  valueKind\n  unit\n  description\n  derivation\n  index\n  searchable\n  __typename\n}\n\nfragment StructureDescriptor on StructureDescriptor {\n  defaultCategoryKey\n  identifiers\n  requires {\n    ...DescriptorConstraint\n    __typename\n  }\n  __typename\n}\n\nfragment StructureRelationCategory on StructureRelationCategory {\n  ...CategoryBase\n  sourceDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  targetDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nquery GetStructureRelationCategory($id: ID!) {\n  structureRelationCategory(id: $id) {\n    ...StructureRelationCategory\n    __typename\n  }\n}"
 
 
 class ListStructureRelationCategoriesQuery(BaseModel):
@@ -6411,7 +7612,7 @@ class ListStructureRelationCategoriesQuery(BaseModel):
     class Meta:
         """Meta class for ListStructureRelationCategories"""
 
-        document = "fragment CategoryRef on Category {\n  id\n  key\n  label\n  ageName\n  __typename\n}\n\nfragment MediaStore on MediaStore {\n  id\n  key\n  __typename\n}\n\nfragment TermRef on Term {\n  id\n  key\n  kind\n  __typename\n}\n\nfragment CategoryBase on Category {\n  ...CategoryRef\n  description\n  purl\n  color\n  pinned\n  image {\n    ...MediaStore\n    __typename\n  }\n  graph {\n    id\n    name\n    __typename\n  }\n  term {\n    ...TermRef\n    __typename\n  }\n  __typename\n}\n\nfragment PropertyDefinition on PropertyDefinition {\n  key\n  label\n  valueKind\n  unit\n  description\n  derivation\n  index\n  searchable\n  __typename\n}\n\nfragment StructureDescriptor on StructureDescriptor {\n  defaultCategoryKey\n  __typename\n}\n\nfragment StructureRelationCategory on StructureRelationCategory {\n  ...CategoryBase\n  sourceDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  targetDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nquery ListStructureRelationCategories($filters: StructureRelationCategoryFilter, $pagination: OffsetPaginationInput) {\n  structureRelationCategories(filters: $filters, pagination: $pagination) {\n    ...StructureRelationCategory\n    __typename\n  }\n}"
+        document = "fragment CategoryRef on Category {\n  id\n  key\n  label\n  ageName\n  __typename\n}\n\nfragment DescriptorConstraint on DescriptorConstraint {\n  key\n  operator\n  value\n  __typename\n}\n\nfragment MediaStore on MediaStore {\n  id\n  key\n  __typename\n}\n\nfragment TermRef on Term {\n  id\n  key\n  kind\n  __typename\n}\n\nfragment CategoryBase on Category {\n  ...CategoryRef\n  description\n  purl\n  color\n  pinned\n  image {\n    ...MediaStore\n    __typename\n  }\n  graph {\n    id\n    name\n    __typename\n  }\n  term {\n    ...TermRef\n    __typename\n  }\n  __typename\n}\n\nfragment PropertyDefinition on PropertyDefinition {\n  key\n  label\n  valueKind\n  unit\n  description\n  derivation\n  index\n  searchable\n  __typename\n}\n\nfragment StructureDescriptor on StructureDescriptor {\n  defaultCategoryKey\n  identifiers\n  requires {\n    ...DescriptorConstraint\n    __typename\n  }\n  __typename\n}\n\nfragment StructureRelationCategory on StructureRelationCategory {\n  ...CategoryBase\n  sourceDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  targetDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nquery ListStructureRelationCategories($filters: StructureRelationCategoryFilter, $pagination: OffsetPaginationInput) {\n  structureRelationCategories(filters: $filters, pagination: $pagination) {\n    ...StructureRelationCategory\n    __typename\n  }\n}"
 
 
 class SearchStructureRelationCategoriesQueryOptions(
@@ -6445,6 +7646,43 @@ class SearchStructureRelationCategoriesQuery(BaseModel):
         """Meta class for SearchStructureRelationCategories"""
 
         document = "query SearchStructureRelationCategories($search: String, $values: [ID!]) {\n  options: structureRelationCategories(\n    filters: {search: $search, ids: $values}\n    pagination: {limit: 10}\n  ) {\n    value: id\n    label: label\n    __typename\n  }\n}"
+
+
+class GetStructureCategoryQuery(BaseModel):
+    """No documentation found for this operation."""
+
+    structure_category: StructureCategory = Field(alias="structureCategory")
+    "Get a single mounted structure kind by ID"
+
+    class Arguments(BaseModel):
+        """Arguments for GetStructureCategory"""
+
+        id: ID
+
+    class Meta:
+        """Meta class for GetStructureCategory"""
+
+        document = "fragment CategoryRef on Category {\n  id\n  key\n  label\n  ageName\n  __typename\n}\n\nfragment MediaStore on MediaStore {\n  id\n  key\n  __typename\n}\n\nfragment TermRef on Term {\n  id\n  key\n  kind\n  __typename\n}\n\nfragment CategoryBase on Category {\n  ...CategoryRef\n  description\n  purl\n  color\n  pinned\n  image {\n    ...MediaStore\n    __typename\n  }\n  graph {\n    id\n    name\n    __typename\n  }\n  term {\n    ...TermRef\n    __typename\n  }\n  __typename\n}\n\nfragment StructureCategory on StructureCategory {\n  ...CategoryBase\n  identifier\n  __typename\n}\n\nquery GetStructureCategory($id: ID!) {\n  structureCategory(id: $id) {\n    ...StructureCategory\n    __typename\n  }\n}"
+
+
+class ListStructureCategoriesQuery(BaseModel):
+    """No documentation found for this operation."""
+
+    structure_categories: tuple[StructureCategory, ...] = Field(
+        alias="structureCategories"
+    )
+    "List the structure kinds graphs mount (RFC 0027)"
+
+    class Arguments(BaseModel):
+        """Arguments for ListStructureCategories"""
+
+        filters: StructureCategoryFilter | None = Field(default=None)
+        pagination: OffsetPaginationInput | None = Field(default=None)
+
+    class Meta:
+        """Meta class for ListStructureCategories"""
+
+        document = "fragment CategoryRef on Category {\n  id\n  key\n  label\n  ageName\n  __typename\n}\n\nfragment MediaStore on MediaStore {\n  id\n  key\n  __typename\n}\n\nfragment TermRef on Term {\n  id\n  key\n  kind\n  __typename\n}\n\nfragment CategoryBase on Category {\n  ...CategoryRef\n  description\n  purl\n  color\n  pinned\n  image {\n    ...MediaStore\n    __typename\n  }\n  graph {\n    id\n    name\n    __typename\n  }\n  term {\n    ...TermRef\n    __typename\n  }\n  __typename\n}\n\nfragment StructureCategory on StructureCategory {\n  ...CategoryBase\n  identifier\n  __typename\n}\n\nquery ListStructureCategories($filters: StructureCategoryFilter, $pagination: OffsetPaginationInput) {\n  structureCategories(filters: $filters, pagination: $pagination) {\n    ...StructureCategory\n    __typename\n  }\n}"
 
 
 class GetNaturalEventCategoryQuery(BaseModel):
@@ -6585,6 +7823,256 @@ class SearchProtocolEventCategoriesQuery(BaseModel):
         document = "query SearchProtocolEventCategories($search: String, $values: [ID!]) {\n  options: protocolEventCategories(\n    filters: {search: $search, ids: $values}\n    pagination: {limit: 10}\n  ) {\n    value: id\n    label: label\n    __typename\n  }\n}"
 
 
+class GetGraphPairsQueryQuery(BaseModel):
+    """No documentation found for this operation."""
+
+    graph_pairs_query: GraphPairsQuery = Field(alias="graphPairsQuery")
+    "One saved pairs query by ID"
+
+    class Arguments(BaseModel):
+        """Arguments for GetGraphPairsQuery"""
+
+        id: ID
+
+    class Meta:
+        """Meta class for GetGraphPairsQuery"""
+
+        document = "fragment PairEnd on PairEnd {\n  path\n  node\n  __typename\n}\n\nfragment GraphPairsQuery on GraphPairsQuery {\n  id\n  key\n  label\n  description\n  descriptors\n  graph {\n    id\n    name\n    __typename\n  }\n  pairsPlan {\n    source {\n      ...PairEnd\n      __typename\n    }\n    target {\n      ...PairEnd\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nquery GetGraphPairsQuery($id: ID!) {\n  graphPairsQuery(id: $id) {\n    ...GraphPairsQuery\n    __typename\n  }\n}"
+
+
+class ListGraphPairsQueriesQuery(BaseModel):
+    """No documentation found for this operation."""
+
+    graph_pairs_queries: tuple[GraphPairsQuery, ...] = Field(alias="graphPairsQueries")
+    "The saved pairs queries: insights whose runs are training sets; `requires` narrows to the ones a port accepts"
+
+    class Arguments(BaseModel):
+        """Arguments for ListGraphPairsQueries"""
+
+        filters: GraphPairsQueryFilter | None = Field(default=None)
+        pagination: OffsetPaginationInput | None = Field(default=None)
+
+    class Meta:
+        """Meta class for ListGraphPairsQueries"""
+
+        document = "fragment PairEnd on PairEnd {\n  path\n  node\n  __typename\n}\n\nfragment GraphPairsQuery on GraphPairsQuery {\n  id\n  key\n  label\n  description\n  descriptors\n  graph {\n    id\n    name\n    __typename\n  }\n  pairsPlan {\n    source {\n      ...PairEnd\n      __typename\n    }\n    target {\n      ...PairEnd\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nquery ListGraphPairsQueries($filters: GraphPairsQueryFilter, $pagination: OffsetPaginationInput) {\n  graphPairsQueries(filters: $filters, pagination: $pagination) {\n    ...GraphPairsQuery\n    __typename\n  }\n}"
+
+
+class SearchGraphPairsQueriesQueryOptions(GraphPairsQueryTrait, BaseModel):
+    """An insight that selects pairs from a view's drawing (an image and its ground truth). Run (`runPairsQuery`), its answer is stored: a training set"""
+
+    typename: Literal["GraphPairsQuery"] = Field(
+        alias="__typename", default="GraphPairsQuery", exclude=True
+    )
+    value: ID
+    "Database ID of this saved query"
+    label: str
+    "Human-readable name for this query"
+    model_config = ConfigDict(frozen=True)
+
+
+class SearchGraphPairsQueriesQuery(BaseModel):
+    """No documentation found for this operation."""
+
+    options: tuple[SearchGraphPairsQueriesQueryOptions, ...]
+    "The saved pairs queries: insights whose runs are training sets; `requires` narrows to the ones a port accepts"
+
+    class Arguments(BaseModel):
+        """Arguments for SearchGraphPairsQueries"""
+
+        search: str | None = Field(default=None)
+        values: list[ID] | None = Field(default=None)
+        requires: list[DescriptorConstraintInput] | None = Field(default=None)
+
+    class Meta:
+        """Meta class for SearchGraphPairsQueries"""
+
+        document = "query SearchGraphPairsQueries($search: String, $values: [ID!], $requires: [DescriptorConstraintInput!]) {\n  options: graphPairsQueries(\n    filters: {search: $search, ids: $values, requires: $requires}\n    pagination: {limit: 10}\n  ) {\n    value: id\n    label: label\n    __typename\n  }\n}"
+
+
+class RenderGraphPairsQuery(BaseModel):
+    """No documentation found for this operation."""
+
+    render_graph_pairs: tuple[PairsQueryRow, ...] = Field(alias="renderGraphPairs")
+    "The pairs a saved pairs query answers now, from the view's drawing: a preview. A run (`runPairsQuery`) stores the same answer with where the drawing stood"
+
+    class Arguments(BaseModel):
+        """Arguments for RenderGraphPairs"""
+
+        id: ID
+        pagination: OffsetPaginationInput | None = Field(default=None)
+
+    class Meta:
+        """Meta class for RenderGraphPairs"""
+
+        document = "fragment PairsQueryRow on PairsQueryRow {\n  sourceIdentifier\n  sourceObject\n  targetIdentifier\n  targetObject\n  __typename\n}\n\nquery RenderGraphPairs($id: ID!, $pagination: OffsetPaginationInput) {\n  renderGraphPairs(id: $id, pagination: $pagination) {\n    ...PairsQueryRow\n    __typename\n  }\n}"
+
+
+class GetPairsQueryRunQuery(BaseModel):
+    """No documentation found for this operation."""
+
+    pairs_query_run: PairsQueryRun = Field(alias="pairsQueryRun")
+    "One run by ID"
+
+    class Arguments(BaseModel):
+        """Arguments for GetPairsQueryRun"""
+
+        id: ID
+
+    class Meta:
+        """Meta class for GetPairsQueryRun"""
+
+        document = "fragment PairsQueryRun on PairsQueryRun {\n  id\n  name\n  description\n  auto\n  asOfSeq\n  nPairs\n  schemaHash\n  sourceIdentifier\n  targetIdentifier\n  queryId\n  graphId\n  descriptors\n  createdAt\n  __typename\n}\n\nquery GetPairsQueryRun($id: ID!) {\n  pairsQueryRun(id: $id) {\n    ...PairsQueryRun\n    __typename\n  }\n}"
+
+
+class ListPairsQueryRunsQuery(BaseModel):
+    """No documentation found for this operation."""
+
+    pairs_query_runs: tuple[PairsQueryRun, ...] = Field(alias="pairsQueryRuns")
+    "The runs of pairs queries: stored training sets; `requires` narrows to the ones a port accepts, `auto: false` hides the ones made for models"
+
+    class Arguments(BaseModel):
+        """Arguments for ListPairsQueryRuns"""
+
+        filters: PairsQueryRunFilter | None = Field(default=None)
+        pagination: OffsetPaginationInput | None = Field(default=None)
+
+    class Meta:
+        """Meta class for ListPairsQueryRuns"""
+
+        document = "fragment PairsQueryRun on PairsQueryRun {\n  id\n  name\n  description\n  auto\n  asOfSeq\n  nPairs\n  schemaHash\n  sourceIdentifier\n  targetIdentifier\n  queryId\n  graphId\n  descriptors\n  createdAt\n  __typename\n}\n\nquery ListPairsQueryRuns($filters: PairsQueryRunFilter, $pagination: OffsetPaginationInput) {\n  pairsQueryRuns(filters: $filters, pagination: $pagination) {\n    ...PairsQueryRun\n    __typename\n  }\n}"
+
+
+class GetRunEntriesQueryPairsQueryRun(PairsQueryRunTrait, BaseModel):
+    """A pairs query's answer, stored with where the drawing stood: the exact pairs a model learned from"""
+
+    typename: Literal["PairsQueryRun"] = Field(
+        alias="__typename", default="PairsQueryRun", exclude=True
+    )
+    id: ID
+    "Database ID of the run"
+    page: tuple[PairsQueryRunEntry, ...]
+    "The pairs, in the run's order"
+    model_config = ConfigDict(frozen=True)
+
+
+class GetRunEntriesQuery(BaseModel):
+    """No documentation found for this operation."""
+
+    pairs_query_run: GetRunEntriesQueryPairsQueryRun = Field(alias="pairsQueryRun")
+    "One run by ID"
+
+    class Arguments(BaseModel):
+        """Arguments for GetRunEntries"""
+
+        id: ID
+        pagination: OffsetPaginationInput | None = Field(default=None)
+
+    class Meta:
+        """Meta class for GetRunEntries"""
+
+        document = "fragment PairsQueryRunEntry on PairsQueryRunEntry {\n  position\n  sourceIdentifier\n  sourceObject\n  targetIdentifier\n  targetObject\n  __typename\n}\n\nquery GetRunEntries($id: ID!, $pagination: OffsetPaginationInput) {\n  pairsQueryRun(id: $id) {\n    id\n    page: entries(pagination: $pagination) {\n      ...PairsQueryRunEntry\n      __typename\n    }\n    __typename\n  }\n}"
+
+
+class SearchPairsQueryRunsQueryOptions(PairsQueryRunTrait, BaseModel):
+    """A pairs query's answer, stored with where the drawing stood: the exact pairs a model learned from"""
+
+    typename: Literal["PairsQueryRun"] = Field(
+        alias="__typename", default="PairsQueryRun", exclude=True
+    )
+    value: ID
+    "Database ID of the run"
+    label: str
+    "What the run is called"
+    model_config = ConfigDict(frozen=True)
+
+
+class SearchPairsQueryRunsQuery(BaseModel):
+    """No documentation found for this operation."""
+
+    options: tuple[SearchPairsQueryRunsQueryOptions, ...]
+    "The runs of pairs queries: stored training sets; `requires` narrows to the ones a port accepts, `auto: false` hides the ones made for models"
+
+    class Arguments(BaseModel):
+        """Arguments for SearchPairsQueryRuns"""
+
+        search: str | None = Field(default=None)
+        values: list[ID] | None = Field(default=None)
+        requires: list[DescriptorConstraintInput] | None = Field(default=None)
+
+    class Meta:
+        """Meta class for SearchPairsQueryRuns"""
+
+        document = "query SearchPairsQueryRuns($search: String, $values: [ID!], $requires: [DescriptorConstraintInput!]) {\n  options: pairsQueryRuns(\n    filters: {search: $search, ids: $values, requires: $requires}\n    pagination: {limit: 10}\n  ) {\n    value: id\n    label: name\n    __typename\n  }\n}"
+
+
+class GetModelQuery(BaseModel):
+    """No documentation found for this operation."""
+
+    model: Model
+    "One trained model by ID"
+
+    class Arguments(BaseModel):
+        """Arguments for GetModel"""
+
+        id: ID
+
+    class Meta:
+        """Meta class for GetModel"""
+
+        document = "fragment BigFileStore on BigFileStore {\n  id\n  key\n  bucket\n  path\n  originalFileName\n  sizeBytes\n  __typename\n}\n\nfragment PairsQueryRun on PairsQueryRun {\n  id\n  name\n  description\n  auto\n  asOfSeq\n  nPairs\n  schemaHash\n  sourceIdentifier\n  targetIdentifier\n  queryId\n  graphId\n  descriptors\n  createdAt\n  __typename\n}\n\nfragment Model on Model {\n  id\n  name\n  description\n  framework\n  parameters\n  descriptors\n  createdAt\n  trainedOn {\n    ...PairsQueryRun\n    __typename\n  }\n  store {\n    ...BigFileStore\n    __typename\n  }\n  __typename\n}\n\nquery GetModel($id: ID!) {\n  model(id: $id) {\n    ...Model\n    __typename\n  }\n}"
+
+
+class ListModelsQuery(BaseModel):
+    """No documentation found for this operation."""
+
+    models: tuple[Model, ...]
+    "The organization's trained models; `requires` narrows to the ones a port accepts"
+
+    class Arguments(BaseModel):
+        """Arguments for ListModels"""
+
+        filters: ModelFilter | None = Field(default=None)
+        pagination: OffsetPaginationInput | None = Field(default=None)
+
+    class Meta:
+        """Meta class for ListModels"""
+
+        document = "fragment BigFileStore on BigFileStore {\n  id\n  key\n  bucket\n  path\n  originalFileName\n  sizeBytes\n  __typename\n}\n\nfragment PairsQueryRun on PairsQueryRun {\n  id\n  name\n  description\n  auto\n  asOfSeq\n  nPairs\n  schemaHash\n  sourceIdentifier\n  targetIdentifier\n  queryId\n  graphId\n  descriptors\n  createdAt\n  __typename\n}\n\nfragment Model on Model {\n  id\n  name\n  description\n  framework\n  parameters\n  descriptors\n  createdAt\n  trainedOn {\n    ...PairsQueryRun\n    __typename\n  }\n  store {\n    ...BigFileStore\n    __typename\n  }\n  __typename\n}\n\nquery ListModels($filters: ModelFilter, $pagination: OffsetPaginationInput) {\n  models(filters: $filters, pagination: $pagination) {\n    ...Model\n    __typename\n  }\n}"
+
+
+class SearchModelsQueryOptions(ModelTrait, BaseModel):
+    """A trained model: its weights, and the pairs query run it learned from"""
+
+    typename: Literal["Model"] = Field(
+        alias="__typename", default="Model", exclude=True
+    )
+    value: ID
+    "Database ID of the model"
+    label: str
+    "What the model is called"
+    model_config = ConfigDict(frozen=True)
+
+
+class SearchModelsQuery(BaseModel):
+    """No documentation found for this operation."""
+
+    options: tuple[SearchModelsQueryOptions, ...]
+    "The organization's trained models; `requires` narrows to the ones a port accepts"
+
+    class Arguments(BaseModel):
+        """Arguments for SearchModels"""
+
+        search: str | None = Field(default=None)
+        values: list[ID] | None = Field(default=None)
+        requires: list[DescriptorConstraintInput] | None = Field(default=None)
+
+    class Meta:
+        """Meta class for SearchModels"""
+
+        document = "query SearchModels($search: String, $values: [ID!], $requires: [DescriptorConstraintInput!]) {\n  options: models(\n    filters: {search: $search, ids: $values, requires: $requires}\n    pagination: {limit: 10}\n  ) {\n    value: id\n    label: name\n    __typename\n  }\n}"
+
+
 class GetInstanceQuery(BaseModel):
     """Claim-grain reads: organization scope, addressed by a bare uuid, no graph argument.
     `instance(id:)` is the fallback reader for a node no view draws."""
@@ -6659,7 +8147,7 @@ class GetStructureByIdentifierQuery(BaseModel):
     """No documentation found for this operation."""
 
     structure_by_identifier: StructureWithMetrics = Field(alias="structureByIdentifier")
-    "Get a structure by identifier and object. No graph: a structure belongs to the organization and has no vertex in any projection"
+    "Get a structure by identifier and object. No graph: a structure belongs to the organization; a view draws it only where it mounts its kind (RFC 0027)"
 
     class Arguments(BaseModel):
         """Arguments for GetStructureByIdentifier"""
@@ -6835,7 +8323,7 @@ class GetGraphQuery(BaseModel):
     class Meta:
         """Meta class for GetGraph"""
 
-        document = "fragment CategoryRef on Category {\n  id\n  key\n  label\n  ageName\n  __typename\n}\n\nfragment MediaStore on MediaStore {\n  id\n  key\n  __typename\n}\n\nfragment TermRef on Term {\n  id\n  key\n  kind\n  __typename\n}\n\nfragment CategoryBase on Category {\n  ...CategoryRef\n  description\n  purl\n  color\n  pinned\n  image {\n    ...MediaStore\n    __typename\n  }\n  graph {\n    id\n    name\n    __typename\n  }\n  term {\n    ...TermRef\n    __typename\n  }\n  __typename\n}\n\nfragment EntityDescriptor on EntityDescriptor {\n  keys\n  ontologyTerms\n  defaultCategoryKey\n  __typename\n}\n\nfragment EventRole on EventRole {\n  key\n  role\n  descriptor {\n    ...EntityDescriptor\n    __typename\n  }\n  __typename\n}\n\nfragment PropertyDefinition on PropertyDefinition {\n  key\n  label\n  valueKind\n  unit\n  description\n  derivation\n  index\n  searchable\n  __typename\n}\n\nfragment StructureDescriptor on StructureDescriptor {\n  defaultCategoryKey\n  __typename\n}\n\nfragment EntityCategory on EntityCategory {\n  ...CategoryBase\n  instanceKind\n  positionX\n  positionY\n  width\n  height\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment GraphProjection on GraphProjection {\n  kind\n  status\n  projectedThroughSeq\n  derivedThroughSeq\n  lag\n  pending\n  schemaStale\n  schemaHash\n  derivedAt\n  rebuiltAt\n  __typename\n}\n\nfragment ListGraph on Graph {\n  id\n  name\n  description\n  ageName\n  isArchived\n  pinned\n  __typename\n}\n\nfragment MeasurementCategory on MeasurementCategory {\n  ...CategoryBase\n  sourceDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  targetDescriptor {\n    ...EntityDescriptor\n    __typename\n  }\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment NaturalEventCategory on NaturalEventCategory {\n  ...CategoryBase\n  positionX\n  positionY\n  width\n  height\n  inputs {\n    ...EventRole\n    __typename\n  }\n  outputs {\n    ...EventRole\n    __typename\n  }\n  __typename\n}\n\nfragment ProtocolEventCategory on ProtocolEventCategory {\n  ...CategoryBase\n  positionX\n  positionY\n  width\n  height\n  inputs {\n    ...EventRole\n    __typename\n  }\n  outputs {\n    ...EventRole\n    __typename\n  }\n  __typename\n}\n\nfragment RelationCategory on RelationCategory {\n  ...CategoryBase\n  sourceDescriptor {\n    ...EntityDescriptor\n    __typename\n  }\n  targetDescriptor {\n    ...EntityDescriptor\n    __typename\n  }\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment StructureRelationCategory on StructureRelationCategory {\n  ...CategoryBase\n  sourceDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  targetDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment Graph on Graph {\n  ...ListGraph\n  purl\n  projection {\n    ...GraphProjection\n    __typename\n  }\n  entityCategories {\n    ...EntityCategory\n    __typename\n  }\n  relationCategories {\n    ...RelationCategory\n    __typename\n  }\n  measurementCategories {\n    ...MeasurementCategory\n    __typename\n  }\n  structureRelationCategories {\n    ...StructureRelationCategory\n    __typename\n  }\n  naturalEventCategories {\n    ...NaturalEventCategory\n    __typename\n  }\n  protocolEventCategories {\n    ...ProtocolEventCategory\n    __typename\n  }\n  __typename\n}\n\nquery GetGraph($id: ID!) {\n  graph(id: $id) {\n    ...Graph\n    __typename\n  }\n}"
+        document = "fragment CategoryRef on Category {\n  id\n  key\n  label\n  ageName\n  __typename\n}\n\nfragment DescriptorConstraint on DescriptorConstraint {\n  key\n  operator\n  value\n  __typename\n}\n\nfragment MediaStore on MediaStore {\n  id\n  key\n  __typename\n}\n\nfragment TermRef on Term {\n  id\n  key\n  kind\n  __typename\n}\n\nfragment CategoryBase on Category {\n  ...CategoryRef\n  description\n  purl\n  color\n  pinned\n  image {\n    ...MediaStore\n    __typename\n  }\n  graph {\n    id\n    name\n    __typename\n  }\n  term {\n    ...TermRef\n    __typename\n  }\n  __typename\n}\n\nfragment EntityDescriptor on EntityDescriptor {\n  keys\n  ontologyTerms\n  defaultCategoryKey\n  __typename\n}\n\nfragment EventRole on EventRole {\n  key\n  role\n  descriptor {\n    ...EntityDescriptor\n    __typename\n  }\n  __typename\n}\n\nfragment PropertyDefinition on PropertyDefinition {\n  key\n  label\n  valueKind\n  unit\n  description\n  derivation\n  index\n  searchable\n  __typename\n}\n\nfragment StructureDescriptor on StructureDescriptor {\n  defaultCategoryKey\n  identifiers\n  requires {\n    ...DescriptorConstraint\n    __typename\n  }\n  __typename\n}\n\nfragment EntityCategory on EntityCategory {\n  ...CategoryBase\n  instanceKind\n  positionX\n  positionY\n  width\n  height\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment GraphProjection on GraphProjection {\n  kind\n  status\n  projectedThroughSeq\n  derivedThroughSeq\n  lag\n  pending\n  schemaStale\n  schemaHash\n  derivedAt\n  rebuiltAt\n  __typename\n}\n\nfragment ListGraph on Graph {\n  id\n  name\n  description\n  ageName\n  isArchived\n  pinned\n  __typename\n}\n\nfragment MeasurementCategory on MeasurementCategory {\n  ...CategoryBase\n  sourceDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  targetDescriptor {\n    ...EntityDescriptor\n    __typename\n  }\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment NaturalEventCategory on NaturalEventCategory {\n  ...CategoryBase\n  positionX\n  positionY\n  width\n  height\n  inputs {\n    ...EventRole\n    __typename\n  }\n  outputs {\n    ...EventRole\n    __typename\n  }\n  __typename\n}\n\nfragment ProtocolEventCategory on ProtocolEventCategory {\n  ...CategoryBase\n  positionX\n  positionY\n  width\n  height\n  inputs {\n    ...EventRole\n    __typename\n  }\n  outputs {\n    ...EventRole\n    __typename\n  }\n  __typename\n}\n\nfragment RelationCategory on RelationCategory {\n  ...CategoryBase\n  sourceDescriptor {\n    ...EntityDescriptor\n    __typename\n  }\n  targetDescriptor {\n    ...EntityDescriptor\n    __typename\n  }\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment StructureRelationCategory on StructureRelationCategory {\n  ...CategoryBase\n  sourceDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  targetDescriptor {\n    ...StructureDescriptor\n    __typename\n  }\n  propertyDefinitions {\n    ...PropertyDefinition\n    __typename\n  }\n  __typename\n}\n\nfragment Graph on Graph {\n  ...ListGraph\n  purl\n  projection {\n    ...GraphProjection\n    __typename\n  }\n  entityCategories {\n    ...EntityCategory\n    __typename\n  }\n  relationCategories {\n    ...RelationCategory\n    __typename\n  }\n  measurementCategories {\n    ...MeasurementCategory\n    __typename\n  }\n  structureRelationCategories {\n    ...StructureRelationCategory\n    __typename\n  }\n  naturalEventCategories {\n    ...NaturalEventCategory\n    __typename\n  }\n  protocolEventCategories {\n    ...ProtocolEventCategory\n    __typename\n  }\n  __typename\n}\n\nquery GetGraph($id: ID!) {\n  graph(id: $id) {\n    ...Graph\n    __typename\n  }\n}"
 
 
 class ListGraphsQuery(BaseModel):
@@ -8160,6 +9648,258 @@ class KraphApi:
             DeleteMeasurementCategoryMutation, variables, task=task
         ).delete_measurement_category
 
+    async def acreate_structure_category(
+        self,
+        key: str,
+        identifier: str,
+        graph: str,
+        description: str | None | UnsetType = UNSET,
+        ontology_references: Iterable[OntologyReferenceInput] | UnsetType = UNSET,
+        color: Iterable[int] | None | UnsetType = UNSET,
+        image: str | None | UnsetType = UNSET,
+        label: str | None | UnsetType = UNSET,
+        pin: bool | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
+    ) -> StructureCategory:
+        """CreateStructureCategory
+
+        Mount a structure kind into a graph: the vertex label its data are drawn under wherever a structure relation the graph admits touches them (RFC 0027)
+
+        Args:
+            key: The label of the node participating in the event
+            description: Description of this node role
+            ontology_references: Ontology references for this event
+            color: Optional RGBA color for this node role (e.g. [255, 0, 0, 128])
+            image: Optional media store ID for an image representing this node role
+            label: Optional human-readable label for this node role (defaults to 'key' if not provided)
+            pin: Whether to pin this node role in the UI
+            identifier: The structure identifier mounted (e.g. '@mikro/arraylens')
+            graph: The graph id the structure kind is mounted into
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
+
+        Returns:
+            StructureCategory"""
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
+        _input["key"] = key
+        if description is not UNSET:
+            _input["description"] = description
+        if ontology_references is not UNSET:
+            _input["ontologyReferences"] = ontology_references
+        if color is not UNSET:
+            _input["color"] = color
+        if image is not UNSET:
+            _input["image"] = image
+        if label is not UNSET:
+            _input["label"] = label
+        if pin is not UNSET:
+            _input["pin"] = pin
+        _input["identifier"] = identifier
+        _input["graph"] = graph
+        variables["input"] = _input
+        return (
+            await self.aexecute(CreateStructureCategoryMutation, variables, task=task)
+        ).create_structure_category
+
+    def create_structure_category(
+        self,
+        key: str,
+        identifier: str,
+        graph: str,
+        description: str | None | UnsetType = UNSET,
+        ontology_references: Iterable[OntologyReferenceInput] | UnsetType = UNSET,
+        color: Iterable[int] | None | UnsetType = UNSET,
+        image: str | None | UnsetType = UNSET,
+        label: str | None | UnsetType = UNSET,
+        pin: bool | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
+    ) -> StructureCategory:
+        """CreateStructureCategory
+
+        Mount a structure kind into a graph: the vertex label its data are drawn under wherever a structure relation the graph admits touches them (RFC 0027)
+
+        Args:
+            key: The label of the node participating in the event
+            description: Description of this node role
+            ontology_references: Ontology references for this event
+            color: Optional RGBA color for this node role (e.g. [255, 0, 0, 128])
+            image: Optional media store ID for an image representing this node role
+            label: Optional human-readable label for this node role (defaults to 'key' if not provided)
+            pin: Whether to pin this node role in the UI
+            identifier: The structure identifier mounted (e.g. '@mikro/arraylens')
+            graph: The graph id the structure kind is mounted into
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
+
+        Returns:
+            StructureCategory"""
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
+        _input["key"] = key
+        if description is not UNSET:
+            _input["description"] = description
+        if ontology_references is not UNSET:
+            _input["ontologyReferences"] = ontology_references
+        if color is not UNSET:
+            _input["color"] = color
+        if image is not UNSET:
+            _input["image"] = image
+        if label is not UNSET:
+            _input["label"] = label
+        if pin is not UNSET:
+            _input["pin"] = pin
+        _input["identifier"] = identifier
+        _input["graph"] = graph
+        variables["input"] = _input
+        return self.execute(
+            CreateStructureCategoryMutation, variables, task=task
+        ).create_structure_category
+
+    async def aupdate_structure_category(
+        self,
+        id: str,
+        key: str | None | UnsetType = UNSET,
+        description: str | None | UnsetType = UNSET,
+        ontology_references: Iterable[OntologyReferenceInput]
+        | None
+        | UnsetType = UNSET,
+        color: Iterable[int] | None | UnsetType = UNSET,
+        image: str | None | UnsetType = UNSET,
+        label: str | None | UnsetType = UNSET,
+        pin: bool | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
+    ) -> StructureCategory:
+        """UpdateStructureCategory
+
+        Change a mounted structure kind's label, description, colour, image or pin
+
+        Args:
+            id: The ID of the definition to update
+            key: The label of the node participating in the event
+            description: Description of this node role
+            ontology_references: Ontology references for this event
+            color: Optional RGBA color for this node role (e.g. [255, 0, 0, 128])
+            image: Optional media store ID for an image representing this node role
+            label: Optional human-readable label for this node role (defaults to 'key' if not provided)
+            pin: Whether to pin this node role in the UI
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
+
+        Returns:
+            StructureCategory"""
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
+        _input["id"] = id
+        if key is not UNSET:
+            _input["key"] = key
+        if description is not UNSET:
+            _input["description"] = description
+        if ontology_references is not UNSET:
+            _input["ontologyReferences"] = ontology_references
+        if color is not UNSET:
+            _input["color"] = color
+        if image is not UNSET:
+            _input["image"] = image
+        if label is not UNSET:
+            _input["label"] = label
+        if pin is not UNSET:
+            _input["pin"] = pin
+        variables["input"] = _input
+        return (
+            await self.aexecute(UpdateStructureCategoryMutation, variables, task=task)
+        ).update_structure_category
+
+    def update_structure_category(
+        self,
+        id: str,
+        key: str | None | UnsetType = UNSET,
+        description: str | None | UnsetType = UNSET,
+        ontology_references: Iterable[OntologyReferenceInput]
+        | None
+        | UnsetType = UNSET,
+        color: Iterable[int] | None | UnsetType = UNSET,
+        image: str | None | UnsetType = UNSET,
+        label: str | None | UnsetType = UNSET,
+        pin: bool | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
+    ) -> StructureCategory:
+        """UpdateStructureCategory
+
+        Change a mounted structure kind's label, description, colour, image or pin
+
+        Args:
+            id: The ID of the definition to update
+            key: The label of the node participating in the event
+            description: Description of this node role
+            ontology_references: Ontology references for this event
+            color: Optional RGBA color for this node role (e.g. [255, 0, 0, 128])
+            image: Optional media store ID for an image representing this node role
+            label: Optional human-readable label for this node role (defaults to 'key' if not provided)
+            pin: Whether to pin this node role in the UI
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
+
+        Returns:
+            StructureCategory"""
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
+        _input["id"] = id
+        if key is not UNSET:
+            _input["key"] = key
+        if description is not UNSET:
+            _input["description"] = description
+        if ontology_references is not UNSET:
+            _input["ontologyReferences"] = ontology_references
+        if color is not UNSET:
+            _input["color"] = color
+        if image is not UNSET:
+            _input["image"] = image
+        if label is not UNSET:
+            _input["label"] = label
+        if pin is not UNSET:
+            _input["pin"] = pin
+        variables["input"] = _input
+        return self.execute(
+            UpdateStructureCategoryMutation, variables, task=task
+        ).update_structure_category
+
+    async def adelete_structure_category(
+        self, id: str, task: TaskLike | None = None
+    ) -> ID:
+        """DeleteStructureCategory
+
+        Unmount a structure kind, refused while a structure-relation category of the graph names it
+
+        Args:
+            id: The ID of the structure category to unmount
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
+
+        Returns:
+            ID"""
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
+        _input["id"] = id
+        variables["input"] = _input
+        return (
+            await self.aexecute(DeleteStructureCategoryMutation, variables, task=task)
+        ).delete_structure_category
+
+    def delete_structure_category(self, id: str, task: TaskLike | None = None) -> ID:
+        """DeleteStructureCategory
+
+        Unmount a structure kind, refused while a structure-relation category of the graph names it
+
+        Args:
+            id: The ID of the structure category to unmount
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
+
+        Returns:
+            ID"""
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
+        _input["id"] = id
+        variables["input"] = _input
+        return self.execute(
+            DeleteStructureCategoryMutation, variables, task=task
+        ).delete_structure_category
+
     async def acreate_structure_relation_category(
         self,
         key: str,
@@ -9103,6 +10843,622 @@ class KraphApi:
         return self.execute(
             DeleteProtocolEventCategoryMutation, variables, task=task
         ).delete_protocol_event_category
+
+    async def arequest_bigfile_upload(
+        self,
+        original_file_name: str,
+        file_size: int,
+        content_type: str | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
+    ) -> BigFileUploadGrant:
+        """RequestBigfileUpload
+
+        Request credentials to upload a big file (a trained model's weights) to the datalayer
+
+        Args:
+            original_file_name: The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text. (required)
+            file_size: A number of bytes. 64-bit, unlike Int: serialized as a JSON number, and accepted as a number or a numeric string. (required)
+            content_type: The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
+
+        Returns:
+            BigFileUploadGrant"""
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
+        _input["originalFileName"] = original_file_name
+        _input["fileSize"] = file_size
+        if content_type is not UNSET:
+            _input["contentType"] = content_type
+        variables["input"] = _input
+        return (
+            await self.aexecute(RequestBigfileUploadMutation, variables, task=task)
+        ).request_bigfile_upload
+
+    def request_bigfile_upload(
+        self,
+        original_file_name: str,
+        file_size: int,
+        content_type: str | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
+    ) -> BigFileUploadGrant:
+        """RequestBigfileUpload
+
+        Request credentials to upload a big file (a trained model's weights) to the datalayer
+
+        Args:
+            original_file_name: The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text. (required)
+            file_size: A number of bytes. 64-bit, unlike Int: serialized as a JSON number, and accepted as a number or a numeric string. (required)
+            content_type: The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
+
+        Returns:
+            BigFileUploadGrant"""
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
+        _input["originalFileName"] = original_file_name
+        _input["fileSize"] = file_size
+        if content_type is not UNSET:
+            _input["contentType"] = content_type
+        variables["input"] = _input
+        return self.execute(
+            RequestBigfileUploadMutation, variables, task=task
+        ).request_bigfile_upload
+
+    async def afinish_bigfile_upload(
+        self,
+        store_id: str,
+        valid: bool | UnsetType = UNSET,
+        task: TaskLike | None = None,
+    ) -> BigFileStore:
+        """FinishBigfileUpload
+
+        Finalize a big-file upload after the client has written the object
+
+        Args:
+            store_id: The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text. (required)
+            valid: The `Boolean` scalar type represents `true` or `false`. (required)
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
+
+        Returns:
+            BigFileStore"""
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
+        _input["storeId"] = store_id
+        if valid is not UNSET:
+            _input["valid"] = valid
+        variables["input"] = _input
+        return (
+            await self.aexecute(FinishBigfileUploadMutation, variables, task=task)
+        ).finish_bigfile_upload
+
+    def finish_bigfile_upload(
+        self,
+        store_id: str,
+        valid: bool | UnsetType = UNSET,
+        task: TaskLike | None = None,
+    ) -> BigFileStore:
+        """FinishBigfileUpload
+
+        Finalize a big-file upload after the client has written the object
+
+        Args:
+            store_id: The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text. (required)
+            valid: The `Boolean` scalar type represents `true` or `false`. (required)
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
+
+        Returns:
+            BigFileStore"""
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
+        _input["storeId"] = store_id
+        if valid is not UNSET:
+            _input["valid"] = valid
+        variables["input"] = _input
+        return self.execute(
+            FinishBigfileUploadMutation, variables, task=task
+        ).finish_bigfile_upload
+
+    async def arequest_bigfile_access(
+        self, store_id: str, task: TaskLike | None = None
+    ) -> BigFileAccessGrant:
+        """RequestBigfileAccess
+
+        Request temporary S3 read credentials for a big file
+
+        Args:
+            store_id: The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text. (required)
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
+
+        Returns:
+            BigFileAccessGrant"""
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
+        _input["storeId"] = store_id
+        variables["input"] = _input
+        return (
+            await self.aexecute(RequestBigfileAccessMutation, variables, task=task)
+        ).request_bigfile_access
+
+    def request_bigfile_access(
+        self, store_id: str, task: TaskLike | None = None
+    ) -> BigFileAccessGrant:
+        """RequestBigfileAccess
+
+        Request temporary S3 read credentials for a big file
+
+        Args:
+            store_id: The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text. (required)
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
+
+        Returns:
+            BigFileAccessGrant"""
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
+        _input["storeId"] = store_id
+        variables["input"] = _input
+        return self.execute(
+            RequestBigfileAccessMutation, variables, task=task
+        ).request_bigfile_access
+
+    async def arefresh_bigfile_upload(
+        self, store_id: str, task: TaskLike | None = None
+    ) -> BigFileUploadGrant:
+        """RefreshBigfileUpload
+         Reissues credentials for an upload still in flight, to the same key: a write that outlives its
+         credentials asks for this before they expire and carries on. Only the uploader may.
+
+        Args:
+            store_id: The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text. (required)
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
+
+        Returns:
+            BigFileUploadGrant"""
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
+        _input["storeId"] = store_id
+        variables["input"] = _input
+        return (
+            await self.aexecute(RefreshBigfileUploadMutation, variables, task=task)
+        ).refresh_bigfile_upload
+
+    def refresh_bigfile_upload(
+        self, store_id: str, task: TaskLike | None = None
+    ) -> BigFileUploadGrant:
+        """RefreshBigfileUpload
+         Reissues credentials for an upload still in flight, to the same key: a write that outlives its
+         credentials asks for this before they expire and carries on. Only the uploader may.
+
+        Args:
+            store_id: The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text. (required)
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
+
+        Returns:
+            BigFileUploadGrant"""
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
+        _input["storeId"] = store_id
+        variables["input"] = _input
+        return self.execute(
+            RefreshBigfileUploadMutation, variables, task=task
+        ).refresh_bigfile_upload
+
+    async def acreate_graph_pairs_query(
+        self,
+        graph: str,
+        key: str,
+        plan: PairsQueryPlanInput,
+        name: str | None | UnsetType = UNSET,
+        description: str | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
+    ) -> GraphPairsQuery:
+        """CreateGraphPairsQuery
+
+        Save a pairs query: a match over a view's drawing and which two of its nodes are the pair. Its runs are training sets
+
+        Args:
+            graph: The graph id this pairs query will belong to
+            key: Unique key for this query within its graph
+            name: Human-readable name (defaults to `key`)
+            description: Description of this query
+            plan: What the query means: the match and its two ends
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
+
+        Returns:
+            GraphPairsQuery"""
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
+        _input["graph"] = graph
+        _input["key"] = key
+        if name is not UNSET:
+            _input["name"] = name
+        if description is not UNSET:
+            _input["description"] = description
+        _input["plan"] = plan
+        variables["input"] = _input
+        return (
+            await self.aexecute(CreateGraphPairsQueryMutation, variables, task=task)
+        ).create_graph_pairs_query
+
+    def create_graph_pairs_query(
+        self,
+        graph: str,
+        key: str,
+        plan: PairsQueryPlanInput,
+        name: str | None | UnsetType = UNSET,
+        description: str | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
+    ) -> GraphPairsQuery:
+        """CreateGraphPairsQuery
+
+        Save a pairs query: a match over a view's drawing and which two of its nodes are the pair. Its runs are training sets
+
+        Args:
+            graph: The graph id this pairs query will belong to
+            key: Unique key for this query within its graph
+            name: Human-readable name (defaults to `key`)
+            description: Description of this query
+            plan: What the query means: the match and its two ends
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
+
+        Returns:
+            GraphPairsQuery"""
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
+        _input["graph"] = graph
+        _input["key"] = key
+        if name is not UNSET:
+            _input["name"] = name
+        if description is not UNSET:
+            _input["description"] = description
+        _input["plan"] = plan
+        variables["input"] = _input
+        return self.execute(
+            CreateGraphPairsQueryMutation, variables, task=task
+        ).create_graph_pairs_query
+
+    async def aupdate_graph_pairs_query(
+        self,
+        id: str,
+        key: str | None | UnsetType = UNSET,
+        name: str | None | UnsetType = UNSET,
+        description: str | None | UnsetType = UNSET,
+        plan: PairsQueryPlanInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
+    ) -> GraphPairsQuery:
+        """UpdateGraphPairsQuery
+
+        Change a pairs query. Its runs keep the plan they were run with
+
+        Args:
+            id: The ID of the pairs query to update
+            key: Unique key for this query within its graph
+            name: Human-readable name
+            description: Description of this query
+            plan: A new plan; omitted means unchanged
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
+
+        Returns:
+            GraphPairsQuery"""
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
+        _input["id"] = id
+        if key is not UNSET:
+            _input["key"] = key
+        if name is not UNSET:
+            _input["name"] = name
+        if description is not UNSET:
+            _input["description"] = description
+        if plan is not UNSET:
+            _input["plan"] = plan
+        variables["input"] = _input
+        return (
+            await self.aexecute(UpdateGraphPairsQueryMutation, variables, task=task)
+        ).update_graph_pairs_query
+
+    def update_graph_pairs_query(
+        self,
+        id: str,
+        key: str | None | UnsetType = UNSET,
+        name: str | None | UnsetType = UNSET,
+        description: str | None | UnsetType = UNSET,
+        plan: PairsQueryPlanInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
+    ) -> GraphPairsQuery:
+        """UpdateGraphPairsQuery
+
+        Change a pairs query. Its runs keep the plan they were run with
+
+        Args:
+            id: The ID of the pairs query to update
+            key: Unique key for this query within its graph
+            name: Human-readable name
+            description: Description of this query
+            plan: A new plan; omitted means unchanged
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
+
+        Returns:
+            GraphPairsQuery"""
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
+        _input["id"] = id
+        if key is not UNSET:
+            _input["key"] = key
+        if name is not UNSET:
+            _input["name"] = name
+        if description is not UNSET:
+            _input["description"] = description
+        if plan is not UNSET:
+            _input["plan"] = plan
+        variables["input"] = _input
+        return self.execute(
+            UpdateGraphPairsQueryMutation, variables, task=task
+        ).update_graph_pairs_query
+
+    async def adelete_graph_pairs_query(
+        self, id: IDCoercible, task: TaskLike | None = None
+    ) -> ID:
+        """DeleteGraphPairsQuery
+
+        Delete a pairs query, refused while it has runs
+
+        Args:
+            id: The ID of the graph query to delete
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
+
+        Returns:
+            ID"""
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
+        _input["id"] = id
+        variables["input"] = _input
+        return (
+            await self.aexecute(DeleteGraphPairsQueryMutation, variables, task=task)
+        ).delete_graph_pairs_query
+
+    def delete_graph_pairs_query(
+        self, id: IDCoercible, task: TaskLike | None = None
+    ) -> ID:
+        """DeleteGraphPairsQuery
+
+        Delete a pairs query, refused while it has runs
+
+        Args:
+            id: The ID of the graph query to delete
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
+
+        Returns:
+            ID"""
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
+        _input["id"] = id
+        variables["input"] = _input
+        return self.execute(
+            DeleteGraphPairsQueryMutation, variables, task=task
+        ).delete_graph_pairs_query
+
+    async def arun_pairs_query(
+        self,
+        query: IDCoercible,
+        name: str,
+        description: str | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
+    ) -> PairsQueryRun:
+        """RunPairsQuery
+
+        Run a pairs query: its answer from the view's drawing, stored with where the drawing stood. What a model is trained on
+
+        Args:
+            query: The pairs query to run
+            name: What the run is called
+            description: What the run is for
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
+
+        Returns:
+            PairsQueryRun"""
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
+        _input["query"] = query
+        _input["name"] = name
+        if description is not UNSET:
+            _input["description"] = description
+        variables["input"] = _input
+        return (
+            await self.aexecute(RunPairsQueryMutation, variables, task=task)
+        ).run_pairs_query
+
+    def run_pairs_query(
+        self,
+        query: IDCoercible,
+        name: str,
+        description: str | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
+    ) -> PairsQueryRun:
+        """RunPairsQuery
+
+        Run a pairs query: its answer from the view's drawing, stored with where the drawing stood. What a model is trained on
+
+        Args:
+            query: The pairs query to run
+            name: What the run is called
+            description: What the run is for
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
+
+        Returns:
+            PairsQueryRun"""
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
+        _input["query"] = query
+        _input["name"] = name
+        if description is not UNSET:
+            _input["description"] = description
+        variables["input"] = _input
+        return self.execute(RunPairsQueryMutation, variables, task=task).run_pairs_query
+
+    async def adelete_pairs_query_run(
+        self, id: IDCoercible, task: TaskLike | None = None
+    ) -> ID:
+        """DeletePairsQueryRun
+
+        Delete a run; a run a model was trained on cannot be deleted
+
+        Args:
+            id: The run to delete
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
+
+        Returns:
+            ID"""
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
+        _input["id"] = id
+        variables["input"] = _input
+        return (
+            await self.aexecute(DeletePairsQueryRunMutation, variables, task=task)
+        ).delete_pairs_query_run
+
+    def delete_pairs_query_run(
+        self, id: IDCoercible, task: TaskLike | None = None
+    ) -> ID:
+        """DeletePairsQueryRun
+
+        Delete a run; a run a model was trained on cannot be deleted
+
+        Args:
+            id: The run to delete
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
+
+        Returns:
+            ID"""
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
+        _input["id"] = id
+        variables["input"] = _input
+        return self.execute(
+            DeletePairsQueryRunMutation, variables, task=task
+        ).delete_pairs_query_run
+
+    async def acreate_model(
+        self,
+        name: str,
+        framework: str,
+        store: BigFileLikeCoercible,
+        trained_on: IDCoercible | None | UnsetType = UNSET,
+        trained_on_query: IDCoercible | None | UnsetType = UNSET,
+        description: str | None | UnsetType = UNSET,
+        parameters: Any | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
+    ) -> Model:
+        """CreateModel
+
+        Register a trained model: its weights, a finished big-file upload (a client passes the file and its upload middleware sends it), and what it was trained on: a run, or a pairs query the server runs
+
+        Args:
+            name: What the model is called
+            framework: What the weights are for, e.g. 'care' or 'cellpose'
+            store: The finished big-file upload holding the weights
+            trained_on: The pairs query run it was trained on; give this or `trained_on_query`, or neither for weights from elsewhere
+            trained_on_query: The pairs query it was trained on, when nobody kept a run: the server runs it for the model
+            description: What the model does
+            parameters: How it was trained, as the trainer reports it
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
+
+        Returns:
+            Model"""
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
+        _input["name"] = name
+        _input["framework"] = framework
+        _input["store"] = store
+        if trained_on is not UNSET:
+            _input["trainedOn"] = trained_on
+        if trained_on_query is not UNSET:
+            _input["trainedOnQuery"] = trained_on_query
+        if description is not UNSET:
+            _input["description"] = description
+        if parameters is not UNSET:
+            _input["parameters"] = parameters
+        variables["input"] = _input
+        return (
+            await self.aexecute(CreateModelMutation, variables, task=task)
+        ).create_model
+
+    def create_model(
+        self,
+        name: str,
+        framework: str,
+        store: BigFileLikeCoercible,
+        trained_on: IDCoercible | None | UnsetType = UNSET,
+        trained_on_query: IDCoercible | None | UnsetType = UNSET,
+        description: str | None | UnsetType = UNSET,
+        parameters: Any | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
+    ) -> Model:
+        """CreateModel
+
+        Register a trained model: its weights, a finished big-file upload (a client passes the file and its upload middleware sends it), and what it was trained on: a run, or a pairs query the server runs
+
+        Args:
+            name: What the model is called
+            framework: What the weights are for, e.g. 'care' or 'cellpose'
+            store: The finished big-file upload holding the weights
+            trained_on: The pairs query run it was trained on; give this or `trained_on_query`, or neither for weights from elsewhere
+            trained_on_query: The pairs query it was trained on, when nobody kept a run: the server runs it for the model
+            description: What the model does
+            parameters: How it was trained, as the trainer reports it
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
+
+        Returns:
+            Model"""
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
+        _input["name"] = name
+        _input["framework"] = framework
+        _input["store"] = store
+        if trained_on is not UNSET:
+            _input["trainedOn"] = trained_on
+        if trained_on_query is not UNSET:
+            _input["trainedOnQuery"] = trained_on_query
+        if description is not UNSET:
+            _input["description"] = description
+        if parameters is not UNSET:
+            _input["parameters"] = parameters
+        variables["input"] = _input
+        return self.execute(CreateModelMutation, variables, task=task).create_model
+
+    async def adelete_model(self, id: IDCoercible, task: TaskLike | None = None) -> ID:
+        """DeleteModel
+
+        Delete a trained model. Its weights are flagged orphaned for the datalayer's purge; the run it was trained on stays
+
+        Args:
+            id: The model to delete
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
+
+        Returns:
+            ID"""
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
+        _input["id"] = id
+        variables["input"] = _input
+        return (
+            await self.aexecute(DeleteModelMutation, variables, task=task)
+        ).delete_model
+
+    def delete_model(self, id: IDCoercible, task: TaskLike | None = None) -> ID:
+        """DeleteModel
+
+        Delete a trained model. Its weights are flagged orphaned for the datalayer's purge; the run it was trained on stays
+
+        Args:
+            id: The model to delete
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
+
+        Returns:
+            ID"""
+        variables: dict[str, builtins.object] = {}
+        _input: dict[str, builtins.object] = {}
+        _input["id"] = id
+        variables["input"] = _input
+        return self.execute(DeleteModelMutation, variables, task=task).delete_model
 
     async def aassert_entity_exists(
         self,
@@ -12812,6 +15168,96 @@ class KraphApi:
             SearchStructureRelationCategoriesQuery, variables, task=task
         ).options
 
+    async def aget_structure_category(
+        self, id: IDCoercible, task: TaskLike | None = None
+    ) -> StructureCategory:
+        """GetStructureCategory
+
+        Get a single mounted structure kind by ID
+
+        Args:
+            id (ID): No description
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
+
+        Returns:
+            StructureCategory"""
+        variables: dict[str, builtins.object] = {}
+        variables["id"] = id
+        return (
+            await self.aexecute(GetStructureCategoryQuery, variables, task=task)
+        ).structure_category
+
+    def get_structure_category(
+        self, id: IDCoercible, task: TaskLike | None = None
+    ) -> StructureCategory:
+        """GetStructureCategory
+
+        Get a single mounted structure kind by ID
+
+        Args:
+            id (ID): No description
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
+
+        Returns:
+            StructureCategory"""
+        variables: dict[str, builtins.object] = {}
+        variables["id"] = id
+        return self.execute(
+            GetStructureCategoryQuery, variables, task=task
+        ).structure_category
+
+    async def alist_structure_categories(
+        self,
+        filters: StructureCategoryFilter | None | UnsetType = UNSET,
+        pagination: OffsetPaginationInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
+    ) -> tuple[StructureCategory, ...]:
+        """ListStructureCategories
+
+        List the structure kinds graphs mount (RFC 0027)
+
+        Args:
+            filters (StructureCategoryFilter | None, optional): No description.
+            pagination (OffsetPaginationInput | None, optional): No description.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
+
+        Returns:
+            list[StructureCategory]"""
+        variables: dict[str, builtins.object] = {}
+        if filters is not UNSET:
+            variables["filters"] = filters
+        if pagination is not UNSET:
+            variables["pagination"] = pagination
+        return (
+            await self.aexecute(ListStructureCategoriesQuery, variables, task=task)
+        ).structure_categories
+
+    def list_structure_categories(
+        self,
+        filters: StructureCategoryFilter | None | UnsetType = UNSET,
+        pagination: OffsetPaginationInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
+    ) -> tuple[StructureCategory, ...]:
+        """ListStructureCategories
+
+        List the structure kinds graphs mount (RFC 0027)
+
+        Args:
+            filters (StructureCategoryFilter | None, optional): No description.
+            pagination (OffsetPaginationInput | None, optional): No description.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
+
+        Returns:
+            list[StructureCategory]"""
+        variables: dict[str, builtins.object] = {}
+        if filters is not UNSET:
+            variables["filters"] = filters
+        if pagination is not UNSET:
+            variables["pagination"] = pagination
+        return self.execute(
+            ListStructureCategoriesQuery, variables, task=task
+        ).structure_categories
+
     async def aget_natural_event_category(
         self, id: IDCoercible, task: TaskLike | None = None
     ) -> NaturalEventCategory:
@@ -13098,6 +15544,532 @@ class KraphApi:
             SearchProtocolEventCategoriesQuery, variables, task=task
         ).options
 
+    async def aget_graph_pairs_query(
+        self, id: IDCoercible, task: TaskLike | None = None
+    ) -> GraphPairsQuery:
+        """GetGraphPairsQuery
+
+        One saved pairs query by ID
+
+        Args:
+            id (ID): No description
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
+
+        Returns:
+            GraphPairsQuery"""
+        variables: dict[str, builtins.object] = {}
+        variables["id"] = id
+        return (
+            await self.aexecute(GetGraphPairsQueryQuery, variables, task=task)
+        ).graph_pairs_query
+
+    def get_graph_pairs_query(
+        self, id: IDCoercible, task: TaskLike | None = None
+    ) -> GraphPairsQuery:
+        """GetGraphPairsQuery
+
+        One saved pairs query by ID
+
+        Args:
+            id (ID): No description
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
+
+        Returns:
+            GraphPairsQuery"""
+        variables: dict[str, builtins.object] = {}
+        variables["id"] = id
+        return self.execute(
+            GetGraphPairsQueryQuery, variables, task=task
+        ).graph_pairs_query
+
+    async def alist_graph_pairs_queries(
+        self,
+        filters: GraphPairsQueryFilter | None | UnsetType = UNSET,
+        pagination: OffsetPaginationInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
+    ) -> tuple[GraphPairsQuery, ...]:
+        """ListGraphPairsQueries
+
+        The saved pairs queries: insights whose runs are training sets; `requires` narrows to the ones a port accepts
+
+        Args:
+            filters (GraphPairsQueryFilter | None, optional): No description.
+            pagination (OffsetPaginationInput | None, optional): No description.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
+
+        Returns:
+            list[GraphPairsQuery]"""
+        variables: dict[str, builtins.object] = {}
+        if filters is not UNSET:
+            variables["filters"] = filters
+        if pagination is not UNSET:
+            variables["pagination"] = pagination
+        return (
+            await self.aexecute(ListGraphPairsQueriesQuery, variables, task=task)
+        ).graph_pairs_queries
+
+    def list_graph_pairs_queries(
+        self,
+        filters: GraphPairsQueryFilter | None | UnsetType = UNSET,
+        pagination: OffsetPaginationInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
+    ) -> tuple[GraphPairsQuery, ...]:
+        """ListGraphPairsQueries
+
+        The saved pairs queries: insights whose runs are training sets; `requires` narrows to the ones a port accepts
+
+        Args:
+            filters (GraphPairsQueryFilter | None, optional): No description.
+            pagination (OffsetPaginationInput | None, optional): No description.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
+
+        Returns:
+            list[GraphPairsQuery]"""
+        variables: dict[str, builtins.object] = {}
+        if filters is not UNSET:
+            variables["filters"] = filters
+        if pagination is not UNSET:
+            variables["pagination"] = pagination
+        return self.execute(
+            ListGraphPairsQueriesQuery, variables, task=task
+        ).graph_pairs_queries
+
+    async def asearch_graph_pairs_queries(
+        self,
+        search: str | None | UnsetType = UNSET,
+        values: list[IDCoercible] | None | UnsetType = UNSET,
+        requires: list[DescriptorConstraintInput] | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
+    ) -> tuple[SearchGraphPairsQueriesQueryOptions, ...]:
+        """SearchGraphPairsQueries
+
+        The saved pairs queries: insights whose runs are training sets; `requires` narrows to the ones a port accepts
+
+        Args:
+            search (str | None, optional): No description.
+            values (list[ID] | None, optional): No description.
+            requires (list[DescriptorConstraintInput] | None, optional): No description.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
+
+        Returns:
+            list[SearchGraphPairsQueriesQueryGraphPairsQueries]"""
+        variables: dict[str, builtins.object] = {}
+        if search is not UNSET:
+            variables["search"] = search
+        if values is not UNSET:
+            variables["values"] = values
+        if requires is not UNSET:
+            variables["requires"] = requires
+        return (
+            await self.aexecute(SearchGraphPairsQueriesQuery, variables, task=task)
+        ).options
+
+    def search_graph_pairs_queries(
+        self,
+        search: str | None | UnsetType = UNSET,
+        values: list[IDCoercible] | None | UnsetType = UNSET,
+        requires: list[DescriptorConstraintInput] | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
+    ) -> tuple[SearchGraphPairsQueriesQueryOptions, ...]:
+        """SearchGraphPairsQueries
+
+        The saved pairs queries: insights whose runs are training sets; `requires` narrows to the ones a port accepts
+
+        Args:
+            search (str | None, optional): No description.
+            values (list[ID] | None, optional): No description.
+            requires (list[DescriptorConstraintInput] | None, optional): No description.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
+
+        Returns:
+            list[SearchGraphPairsQueriesQueryGraphPairsQueries]"""
+        variables: dict[str, builtins.object] = {}
+        if search is not UNSET:
+            variables["search"] = search
+        if values is not UNSET:
+            variables["values"] = values
+        if requires is not UNSET:
+            variables["requires"] = requires
+        return self.execute(SearchGraphPairsQueriesQuery, variables, task=task).options
+
+    async def arender_graph_pairs(
+        self,
+        id: IDCoercible,
+        pagination: OffsetPaginationInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
+    ) -> tuple[PairsQueryRow, ...]:
+        """RenderGraphPairs
+
+        The pairs a saved pairs query answers now, from the view's drawing: a preview. A run (`runPairsQuery`) stores the same answer with where the drawing stood
+
+        Args:
+            id (ID): No description
+            pagination (OffsetPaginationInput | None, optional): No description.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
+
+        Returns:
+            list[PairsQueryRow]"""
+        variables: dict[str, builtins.object] = {}
+        variables["id"] = id
+        if pagination is not UNSET:
+            variables["pagination"] = pagination
+        return (
+            await self.aexecute(RenderGraphPairsQuery, variables, task=task)
+        ).render_graph_pairs
+
+    def render_graph_pairs(
+        self,
+        id: IDCoercible,
+        pagination: OffsetPaginationInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
+    ) -> tuple[PairsQueryRow, ...]:
+        """RenderGraphPairs
+
+        The pairs a saved pairs query answers now, from the view's drawing: a preview. A run (`runPairsQuery`) stores the same answer with where the drawing stood
+
+        Args:
+            id (ID): No description
+            pagination (OffsetPaginationInput | None, optional): No description.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
+
+        Returns:
+            list[PairsQueryRow]"""
+        variables: dict[str, builtins.object] = {}
+        variables["id"] = id
+        if pagination is not UNSET:
+            variables["pagination"] = pagination
+        return self.execute(
+            RenderGraphPairsQuery, variables, task=task
+        ).render_graph_pairs
+
+    async def aget_pairs_query_run(
+        self, id: IDCoercible, task: TaskLike | None = None
+    ) -> PairsQueryRun:
+        """GetPairsQueryRun
+
+        One run by ID
+
+        Args:
+            id (ID): No description
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
+
+        Returns:
+            PairsQueryRun"""
+        variables: dict[str, builtins.object] = {}
+        variables["id"] = id
+        return (
+            await self.aexecute(GetPairsQueryRunQuery, variables, task=task)
+        ).pairs_query_run
+
+    def get_pairs_query_run(
+        self, id: IDCoercible, task: TaskLike | None = None
+    ) -> PairsQueryRun:
+        """GetPairsQueryRun
+
+        One run by ID
+
+        Args:
+            id (ID): No description
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
+
+        Returns:
+            PairsQueryRun"""
+        variables: dict[str, builtins.object] = {}
+        variables["id"] = id
+        return self.execute(GetPairsQueryRunQuery, variables, task=task).pairs_query_run
+
+    async def alist_pairs_query_runs(
+        self,
+        filters: PairsQueryRunFilter | None | UnsetType = UNSET,
+        pagination: OffsetPaginationInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
+    ) -> tuple[PairsQueryRun, ...]:
+        """ListPairsQueryRuns
+
+        The runs of pairs queries: stored training sets; `requires` narrows to the ones a port accepts, `auto: false` hides the ones made for models
+
+        Args:
+            filters (PairsQueryRunFilter | None, optional): No description.
+            pagination (OffsetPaginationInput | None, optional): No description.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
+
+        Returns:
+            list[PairsQueryRun]"""
+        variables: dict[str, builtins.object] = {}
+        if filters is not UNSET:
+            variables["filters"] = filters
+        if pagination is not UNSET:
+            variables["pagination"] = pagination
+        return (
+            await self.aexecute(ListPairsQueryRunsQuery, variables, task=task)
+        ).pairs_query_runs
+
+    def list_pairs_query_runs(
+        self,
+        filters: PairsQueryRunFilter | None | UnsetType = UNSET,
+        pagination: OffsetPaginationInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
+    ) -> tuple[PairsQueryRun, ...]:
+        """ListPairsQueryRuns
+
+        The runs of pairs queries: stored training sets; `requires` narrows to the ones a port accepts, `auto: false` hides the ones made for models
+
+        Args:
+            filters (PairsQueryRunFilter | None, optional): No description.
+            pagination (OffsetPaginationInput | None, optional): No description.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
+
+        Returns:
+            list[PairsQueryRun]"""
+        variables: dict[str, builtins.object] = {}
+        if filters is not UNSET:
+            variables["filters"] = filters
+        if pagination is not UNSET:
+            variables["pagination"] = pagination
+        return self.execute(
+            ListPairsQueryRunsQuery, variables, task=task
+        ).pairs_query_runs
+
+    async def aget_run_entries(
+        self,
+        id: IDCoercible,
+        pagination: OffsetPaginationInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
+    ) -> GetRunEntriesQueryPairsQueryRun:
+        """GetRunEntries
+
+        One run by ID
+
+        Args:
+            id (ID): No description
+            pagination (OffsetPaginationInput | None, optional): No description.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
+
+        Returns:
+            GetRunEntriesQueryPairsQueryRun"""
+        variables: dict[str, builtins.object] = {}
+        variables["id"] = id
+        if pagination is not UNSET:
+            variables["pagination"] = pagination
+        return (
+            await self.aexecute(GetRunEntriesQuery, variables, task=task)
+        ).pairs_query_run
+
+    def get_run_entries(
+        self,
+        id: IDCoercible,
+        pagination: OffsetPaginationInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
+    ) -> GetRunEntriesQueryPairsQueryRun:
+        """GetRunEntries
+
+        One run by ID
+
+        Args:
+            id (ID): No description
+            pagination (OffsetPaginationInput | None, optional): No description.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
+
+        Returns:
+            GetRunEntriesQueryPairsQueryRun"""
+        variables: dict[str, builtins.object] = {}
+        variables["id"] = id
+        if pagination is not UNSET:
+            variables["pagination"] = pagination
+        return self.execute(GetRunEntriesQuery, variables, task=task).pairs_query_run
+
+    async def asearch_pairs_query_runs(
+        self,
+        search: str | None | UnsetType = UNSET,
+        values: list[IDCoercible] | None | UnsetType = UNSET,
+        requires: list[DescriptorConstraintInput] | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
+    ) -> tuple[SearchPairsQueryRunsQueryOptions, ...]:
+        """SearchPairsQueryRuns
+
+        The runs of pairs queries: stored training sets; `requires` narrows to the ones a port accepts, `auto: false` hides the ones made for models
+
+        Args:
+            search (str | None, optional): No description.
+            values (list[ID] | None, optional): No description.
+            requires (list[DescriptorConstraintInput] | None, optional): No description.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
+
+        Returns:
+            list[SearchPairsQueryRunsQueryPairsQueryRuns]"""
+        variables: dict[str, builtins.object] = {}
+        if search is not UNSET:
+            variables["search"] = search
+        if values is not UNSET:
+            variables["values"] = values
+        if requires is not UNSET:
+            variables["requires"] = requires
+        return (
+            await self.aexecute(SearchPairsQueryRunsQuery, variables, task=task)
+        ).options
+
+    def search_pairs_query_runs(
+        self,
+        search: str | None | UnsetType = UNSET,
+        values: list[IDCoercible] | None | UnsetType = UNSET,
+        requires: list[DescriptorConstraintInput] | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
+    ) -> tuple[SearchPairsQueryRunsQueryOptions, ...]:
+        """SearchPairsQueryRuns
+
+        The runs of pairs queries: stored training sets; `requires` narrows to the ones a port accepts, `auto: false` hides the ones made for models
+
+        Args:
+            search (str | None, optional): No description.
+            values (list[ID] | None, optional): No description.
+            requires (list[DescriptorConstraintInput] | None, optional): No description.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
+
+        Returns:
+            list[SearchPairsQueryRunsQueryPairsQueryRuns]"""
+        variables: dict[str, builtins.object] = {}
+        if search is not UNSET:
+            variables["search"] = search
+        if values is not UNSET:
+            variables["values"] = values
+        if requires is not UNSET:
+            variables["requires"] = requires
+        return self.execute(SearchPairsQueryRunsQuery, variables, task=task).options
+
+    async def aget_model(self, id: IDCoercible, task: TaskLike | None = None) -> Model:
+        """GetModel
+
+        One trained model by ID
+
+        Args:
+            id (ID): No description
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
+
+        Returns:
+            Model"""
+        variables: dict[str, builtins.object] = {}
+        variables["id"] = id
+        return (await self.aexecute(GetModelQuery, variables, task=task)).model
+
+    def get_model(self, id: IDCoercible, task: TaskLike | None = None) -> Model:
+        """GetModel
+
+        One trained model by ID
+
+        Args:
+            id (ID): No description
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
+
+        Returns:
+            Model"""
+        variables: dict[str, builtins.object] = {}
+        variables["id"] = id
+        return self.execute(GetModelQuery, variables, task=task).model
+
+    async def alist_models(
+        self,
+        filters: ModelFilter | None | UnsetType = UNSET,
+        pagination: OffsetPaginationInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
+    ) -> tuple[Model, ...]:
+        """ListModels
+
+        The organization's trained models; `requires` narrows to the ones a port accepts
+
+        Args:
+            filters (ModelFilter | None, optional): No description.
+            pagination (OffsetPaginationInput | None, optional): No description.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
+
+        Returns:
+            list[Model]"""
+        variables: dict[str, builtins.object] = {}
+        if filters is not UNSET:
+            variables["filters"] = filters
+        if pagination is not UNSET:
+            variables["pagination"] = pagination
+        return (await self.aexecute(ListModelsQuery, variables, task=task)).models
+
+    def list_models(
+        self,
+        filters: ModelFilter | None | UnsetType = UNSET,
+        pagination: OffsetPaginationInput | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
+    ) -> tuple[Model, ...]:
+        """ListModels
+
+        The organization's trained models; `requires` narrows to the ones a port accepts
+
+        Args:
+            filters (ModelFilter | None, optional): No description.
+            pagination (OffsetPaginationInput | None, optional): No description.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
+
+        Returns:
+            list[Model]"""
+        variables: dict[str, builtins.object] = {}
+        if filters is not UNSET:
+            variables["filters"] = filters
+        if pagination is not UNSET:
+            variables["pagination"] = pagination
+        return self.execute(ListModelsQuery, variables, task=task).models
+
+    async def asearch_models(
+        self,
+        search: str | None | UnsetType = UNSET,
+        values: list[IDCoercible] | None | UnsetType = UNSET,
+        requires: list[DescriptorConstraintInput] | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
+    ) -> tuple[SearchModelsQueryOptions, ...]:
+        """SearchModels
+
+        The organization's trained models; `requires` narrows to the ones a port accepts
+
+        Args:
+            search (str | None, optional): No description.
+            values (list[ID] | None, optional): No description.
+            requires (list[DescriptorConstraintInput] | None, optional): No description.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
+
+        Returns:
+            list[SearchModelsQueryModels]"""
+        variables: dict[str, builtins.object] = {}
+        if search is not UNSET:
+            variables["search"] = search
+        if values is not UNSET:
+            variables["values"] = values
+        if requires is not UNSET:
+            variables["requires"] = requires
+        return (await self.aexecute(SearchModelsQuery, variables, task=task)).options
+
+    def search_models(
+        self,
+        search: str | None | UnsetType = UNSET,
+        values: list[IDCoercible] | None | UnsetType = UNSET,
+        requires: list[DescriptorConstraintInput] | None | UnsetType = UNSET,
+        task: TaskLike | None = None,
+    ) -> tuple[SearchModelsQueryOptions, ...]:
+        """SearchModels
+
+        The organization's trained models; `requires` narrows to the ones a port accepts
+
+        Args:
+            search (str | None, optional): No description.
+            values (list[ID] | None, optional): No description.
+            requires (list[DescriptorConstraintInput] | None, optional): No description.
+            task (rath.task.TaskLike, optional): The task this call is made for; the ambient one by default.
+
+        Returns:
+            list[SearchModelsQueryModels]"""
+        variables: dict[str, builtins.object] = {}
+        if search is not UNSET:
+            variables["search"] = search
+        if values is not UNSET:
+            variables["values"] = values
+        if requires is not UNSET:
+            variables["requires"] = requires
+        return self.execute(SearchModelsQuery, variables, task=task).options
+
     async def aget_instance(
         self, id: IDCoercible, task: TaskLike | None = None
     ) -> Instance:
@@ -13236,7 +16208,7 @@ class KraphApi:
     ) -> StructureWithMetrics:
         """GetStructureByIdentifier
 
-        Get a structure by identifier and object. No graph: a structure belongs to the organization and has no vertex in any projection
+        Get a structure by identifier and object. No graph: a structure belongs to the organization; a view draws it only where it mounts its kind (RFC 0027)
 
         Args:
             identifier (StructureIdentifier): No description
@@ -13260,7 +16232,7 @@ class KraphApi:
     ) -> StructureWithMetrics:
         """GetStructureByIdentifier
 
-        Get a structure by identifier and object. No graph: a structure belongs to the organization and has no vertex in any projection
+        Get a structure by identifier and object. No graph: a structure belongs to the organization; a view draws it only where it mounts its kind (RFC 0027)
 
         Args:
             identifier (StructureIdentifier): No description
@@ -14282,10 +17254,12 @@ ClaimConditionGroupInput.model_rebuild()
 CommentOnStructureInput.model_rebuild()
 CreateEntityCategoryInput.model_rebuild()
 CreateGraphInput.model_rebuild()
+CreateGraphPairsQueryInput.model_rebuild()
 CreateMeasurementCategoryInput.model_rebuild()
 CreateNaturalEventCategoryInput.model_rebuild()
 CreateProtocolEventCategoryInput.model_rebuild()
 CreateRelationCategoryInput.model_rebuild()
+CreateStructureCategoryInput.model_rebuild()
 CreateStructureRelationCategoryInput.model_rebuild()
 DerivationRuleInput.model_rebuild()
 DescendantInput.model_rebuild()
@@ -14296,12 +17270,17 @@ EventRoleInput.model_rebuild()
 GraphDefinitionInput.model_rebuild()
 GraphExtensionsInput.model_rebuild()
 GraphFilter.model_rebuild()
+GraphPairsQueryFilter.model_rebuild()
 MeasurementCategoryFilter.model_rebuild()
 MeasurementDefinitionInput.model_rebuild()
 MetricKindFilter.model_rebuild()
+ModelFilter.model_rebuild()
 NaturalEventCategoryFilter.model_rebuild()
+PairsQueryPlanInput.model_rebuild()
+PairsQueryRunFilter.model_rebuild()
 ProtocolEventCategoryFilter.model_rebuild()
 RelationCategoryFilter.model_rebuild()
+StructureCategoryFilter.model_rebuild()
 StructureKindFilter.model_rebuild()
 StructureRelationCategoryFilter.model_rebuild()
 TermFilter.model_rebuild()

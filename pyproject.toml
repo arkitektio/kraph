@@ -16,6 +16,8 @@ dependencies = [
     "arkitekt-spec>=5.0",
     # The service wiring (Alias, Require, FaktsAuthLink); it came through rekuest before.
     "fakts>=6.1",
+    # The datalayer: big files (a model's weights) go to S3 through obstore, as in mikro and elektro.
+    "obstore>=0.10.0",
 ]
 
 [project.optional-dependencies]

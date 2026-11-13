@@ -45,8 +45,18 @@ fragment EntityDescriptor on EntityDescriptor {
 
 # NOTE: StructureDescriptorInput accepts `identifiers`, but the output type does not expose it.
 # The asymmetry is the server's, not a typo here.
+fragment DescriptorConstraint on DescriptorConstraint {
+  key
+  operator
+  value
+}
+
 fragment StructureDescriptor on StructureDescriptor {
   defaultCategoryKey
+  identifiers
+  requires {
+    ...DescriptorConstraint
+  }
 }
 
 fragment EventRole on EventRole {
@@ -93,6 +103,11 @@ fragment MeasurementCategory on MeasurementCategory {
   propertyDefinitions {
     ...PropertyDefinition
   }
+}
+
+fragment StructureCategory on StructureCategory {
+  ...CategoryBase
+  identifier
 }
 
 fragment StructureRelationCategory on StructureRelationCategory {

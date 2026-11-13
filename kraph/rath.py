@@ -1,6 +1,7 @@
 from types import TracebackType
 from pydantic import Field
 from kraph.links.upload import UploadLink
+from kraph.middleware.base import OperationMiddleware
 from rath import rath
 
 from rath.links.auth import AuthTokenLink
@@ -22,17 +23,22 @@ class KraphLinkComposition(TypedComposedLink):
 class KraphRath(rath.Rath):
     """Kraph Rath
 
-    Args:
-        rath (_type_): _description_
+    Attributes:
+        middlewares: What a request's serialized variables go through before they are sent,
+            in order: the upload middleware puts files in the datalayer and sends their store ids.
     """
 
+    middlewares: list[OperationMiddleware] = Field(default_factory=list)
+
     async def __aenter__(self):
-        """Enter the client.
+        """Enter the client and its middlewares.
 
         Entering does not make it "the current client", and kraph never looks one up: calls go
         through the :class:`kraph.kraph.Kraph` client that owns this rath.
         """
         await super().__aenter__()
+        for middleware in self.middlewares:
+            await middleware.aenter()
         return self
 
     async def __aexit__(
@@ -41,4 +47,6 @@ class KraphRath(rath.Rath):
         exc_val: BaseException | None,
         exc_tb: TracebackType | None,
     ) -> None:
+        for middleware in self.middlewares:
+            await middleware.aexit()
         await super().__aexit__(exc_type, exc_val, exc_tb)

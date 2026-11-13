@@ -32,3 +32,7 @@ class NotDrawn(KraphError):
     Raised only by an explicit request for a view's account of a claim. An empty ``drawings``
     list on a write result is *not* an error and never raises.
     """
+
+
+class UploadError(KraphError):
+    """Writing a file to kraph's datalayer failed; the upload is reported and abandoned."""

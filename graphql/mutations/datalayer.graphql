@@ -1,0 +1,28 @@
+mutation RequestBigfileUpload($input: RequestBigFileUploadInput!) {
+  requestBigfileUpload(input: $input) {
+    ...BigFileUploadGrant
+  }
+}
+
+
+mutation FinishBigfileUpload($input: FinishBigFileUploadInput!) {
+  finishBigfileUpload(input: $input) {
+      ...BigFileStore
+  }
+}
+
+
+mutation RequestBigfileAccess($input: RequestBigFileAccessInput!) {
+  requestBigfileAccess(input: $input) {
+    ...BigFileAccessGrant
+  }
+}
+
+
+# Reissues credentials for an upload still in flight, to the same key: a write that outlives its
+# credentials asks for this before they expire and carries on. Only the uploader may.
+mutation RefreshBigfileUpload($input: RefreshUploadInput!) {
+  refreshBigfileUpload(input: $input) {
+    ...BigFileUploadGrant
+  }
+}

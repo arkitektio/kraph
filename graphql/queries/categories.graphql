@@ -30,6 +30,11 @@ query SearchStructureRelationCategories($search: String, $values: [ID!]) {
   options: structureRelationCategories(filters: {search: $search, ids: $values}, pagination: {limit: 10}) { value: id  label: label }
 }
 
+query GetStructureCategory($id: ID!) { structureCategory(id: $id) { ...StructureCategory } }
+query ListStructureCategories($filters: StructureCategoryFilter, $pagination: OffsetPaginationInput) {
+  structureCategories(filters: $filters, pagination: $pagination) { ...StructureCategory }
+}
+
 query GetNaturalEventCategory($id: ID!) { naturalEventCategory(id: $id) { ...NaturalEventCategory } }
 query ListNaturalEventCategories($filters: NaturalEventCategoryFilter, $pagination: OffsetPaginationInput) {
   naturalEventCategories(filters: $filters, pagination: $pagination) { ...NaturalEventCategory }

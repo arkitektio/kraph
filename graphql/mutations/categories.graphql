@@ -31,6 +31,16 @@ mutation DeleteMeasurementCategory($input: DeleteMeasurementCategoryInput!) {
   deleteMeasurementCategory(input: $input)
 }
 
+mutation CreateStructureCategory($input: CreateStructureCategoryInput!) {
+  createStructureCategory(input: $input) { ...StructureCategory }
+}
+mutation UpdateStructureCategory($input: UpdateStructureCategoryInput!) {
+  updateStructureCategory(input: $input) { ...StructureCategory }
+}
+mutation DeleteStructureCategory($input: DeleteStructureCategoryInput!) {
+  deleteStructureCategory(input: $input)
+}
+
 mutation CreateStructureRelationCategory($input: CreateStructureRelationCategoryInput!) {
   createStructureRelationCategory(input: $input) { ...StructureRelationCategory }
 }

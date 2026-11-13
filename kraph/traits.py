@@ -224,7 +224,13 @@ class MeasurementCategoryTrait(BaseModel):
 
 
 class StructureRelationCategoryTrait(BaseModel):
-    """A view's declaration of a structure-relation word."""
+    """A view's declaration of a structure-relation word: a claim under it is drawn as an edge
+    between two structure vertices where the view mounts both ends (RFC 0027). Claim a pair
+    under it with :func:`kraph.pairs.pair`; select pairs with a pairs query."""
+
+
+class StructureCategoryTrait(BaseModel):
+    """A structure kind a view mounts: the vertex label its data are drawn under (RFC 0027)."""
 
 
 class NaturalEventCategoryTrait(BaseModel):
@@ -294,3 +300,154 @@ class GraphTrait(ContextBound):
         raise ProjectionTimeout(
             f"view {graph_id} did not draw seq {seq} within {timeout}s: {projection}"
         )
+
+
+#: The descriptor keys a paired dataset is required by, as kraph's server declares them.
+SOURCE_IDENTIFIER = "@kraph/source_identifier"
+TARGET_IDENTIFIER = "@kraph/target_identifier"
+
+
+def structure_identifier(end: Any) -> str:  # noqa: ANN401
+    """The structure identifier one end of a pair names: a string, or a class stamped with one.
+
+    mikro's generated models carry ``__identifier__`` (``ArrayLens`` is ``'@mikro/arraylens'``),
+    so ``PairsQueryRun[ArrayLens, ArrayLens]`` reads the same as the strings.
+    """
+    if isinstance(end, str):
+        return end
+    stamped = getattr(end, "__identifier__", None)
+    if isinstance(stamped, str):
+        return stamped
+    raise TypeError(f"A pair's end is a structure identifier ('@mikro/arraylens') or a class stamped with one, not {end!r}")
+
+
+def _typed_by_ends(cls: type, ends: Any, name: str) -> Any:  # noqa: ANN401
+    """``cls`` narrowed to the given ends: ``Annotated[cls, Requires(source), Requires(target)]``.
+
+    A plain ``Annotated`` (never a PEP 695 alias: rekuest drops markers on those) with two
+    ``Requires`` on the identifier descriptors a pairs query and its runs both carry. An end
+    constrained to no single identifier carries null, so it satisfies neither.
+    """
+    from typing import Annotated
+
+    from arkitekt_spec.actions import DescriptorOperator
+    from arkitekt_spec.declare.annotations.markers import Requires
+
+    if not isinstance(ends, tuple) or len(ends) != 2:
+        raise TypeError(f"{name} takes two ends, {name}[source, target]")
+    source, target = (structure_identifier(end) for end in ends)
+    return Annotated[
+        cls,
+        Requires(key=SOURCE_IDENTIFIER, operator=DescriptorOperator.EQUALS, value=source),
+        Requires(key=TARGET_IDENTIFIER, operator=DescriptorOperator.EQUALS, value=target),
+    ]
+
+
+def _read_pairs(fetch: Any, page: int) -> list[Any]:  # noqa: ANN401
+    """Every pair, page by page: ``fetch(pagination)`` returns one page."""
+    from kraph.api.schema import OffsetPaginationInput
+
+    found: list[Any] = []
+    while True:
+        chunk = list(fetch(OffsetPaginationInput(offset=len(found), limit=page)))
+        found.extend(chunk)
+        if len(chunk) < page:
+            return found
+
+
+def _expanded(registry: "StructureRegistry", pairs: list[Any]) -> list[tuple[Any, Any]]:
+    """Each pair as the objects themselves, expanded by their own services through ``registry``."""
+
+    def expand(identifier: str, object_id: str) -> Any:  # noqa: ANN401
+        return unkoil(registry.get_fullfilled_structure(identifier).expand, object_id)
+
+    return [(expand(pair.source_identifier, pair.source_object), expand(pair.target_identifier, pair.target_object)) for pair in pairs]
+
+
+class GraphPairsQueryTrait(ContextBound):
+    """A pairs query: an insight over a view that selects pairs from its drawing.
+
+    Typed in a port as ``GraphPairsQuery[source, target]``, it requires queries whose ends
+    are constrained to those identifiers, and the picker offers only those. :meth:`preview`
+    reads its pairs live; :meth:`run` stores them as a training set.
+    """
+
+    def __class_getitem__(cls, ends: Any) -> Any:  # noqa: ANN401
+        """``GraphPairsQuery["@mikro/arraylens", "@mikro/arraylens"]``: image-pair queries only."""
+        return _typed_by_ends(cls, ends, "GraphPairsQuery")
+
+    def preview(self, *, kraph: "Kraph | None" = None, page: int = 1000) -> list[Any]:
+        """Every pair the query answers now, from the view's drawing. Not a record: run it for one."""
+        client = client_of(self, kraph)
+        query_id = get_attributes_or_error(self, "id")
+        return _read_pairs(lambda pagination: client.render_graph_pairs(id=query_id, pagination=pagination), page)
+
+    def run(self, name: str, *, description: str | None = None, kraph: "Kraph | None" = None) -> Any:  # noqa: ANN401
+        """Run the query: its answer, stored with where the drawing stood. What a model cites."""
+        return client_of(self, kraph).run_pairs_query(query=get_attributes_or_error(self, "id"), name=name, description=description)
+
+
+class PairsQueryRunTrait(ContextBound):
+    """A pairs query's stored answer: the exact pairs a model learned from, with ``as_of_seq``.
+
+    Typed in a port as ``PairsQueryRun[source, target]``, it requires runs whose every pair has
+    those identifiers, and the picker offers only those. A run mixing kinds carries a null
+    identifier and satisfies no typed port.
+    """
+
+    def __class_getitem__(cls, ends: Any) -> Any:  # noqa: ANN401
+        """``PairsQueryRun["@mikro/arraylens", "@mikro/arraylens"]``: runs of image pairs only."""
+        return _typed_by_ends(cls, ends, "PairsQueryRun")
+
+    def read_entries(self, *, kraph: "Kraph | None" = None, page: int = 1000) -> list[Any]:
+        """Every stored pair, in the run's order, as ``(identifier, object)`` addresses."""
+        client = client_of(self, kraph)
+        run_id = get_attributes_or_error(self, "id")
+        return _read_pairs(lambda pagination: client.get_run_entries(id=run_id, pagination=pagination).page, page)
+
+    def pairs(self, registry: "StructureRegistry", *, kraph: "Kraph | None" = None) -> list[tuple[Any, Any]]:
+        """Every pair as the objects themselves: ``(source, target)``, each expanded by its own service.
+
+        ``registry`` is a structure registry bound to its clients (the one a running task
+        expands its arguments with), so an ``@mikro/arraylens`` end comes back as an
+        ``ArrayLens`` fetched through mikro, the way `StructureTrait.resolve` does it.
+        """
+        return _expanded(registry, self.read_entries(kraph=kraph))
+
+
+class BigFileStoreTrait(ContextBound):
+    """A big file in kraph's datalayer: read back through an access grant, never by its path."""
+
+    def download(self, file_name: str | None = None, *, kraph: "Kraph | None" = None) -> str:
+        """Stream the file to ``file_name`` (its uploaded name by default). Returns the path written."""
+        from kraph.io.download import download_bigfile, file_name_of
+
+        return download_bigfile(str(get_attributes_or_error(self, "id")), file_name_of(self, file_name), client_of(self, kraph))
+
+    async def adownload(self, file_name: str | None = None, *, kraph: "Kraph | None" = None) -> str:
+        """Stream the file to ``file_name`` (its uploaded name by default). Returns the path written."""
+        from kraph.io.download import adownload_bigfile, file_name_of
+
+        return await adownload_bigfile(str(get_attributes_or_error(self, "id")), file_name_of(self, file_name), client_of(self, kraph))
+
+
+class ModelTrait(ContextBound):
+    """A trained model: its weights in kraph's datalayer, and the pairs query run it learned from.
+
+    Registered with ``create_model(store=<path or open file>, ...)``: the upload middleware
+    sends the file and passes the finished store on, as every service's files are uploaded.
+    """
+
+    def download(self, file_name: str | None = None, *, kraph: "Kraph | None" = None) -> str:
+        """Stream the weights to ``file_name`` (their uploaded name by default). Returns the path written."""
+        from kraph.io.download import download_bigfile, file_name_of
+
+        store = get_attributes_or_error(self, "store")
+        return download_bigfile(str(get_attributes_or_error(store, "id")), file_name_of(store, file_name), client_of(self, kraph))
+
+    async def adownload(self, file_name: str | None = None, *, kraph: "Kraph | None" = None) -> str:
+        """Stream the weights to ``file_name`` (their uploaded name by default). Returns the path written."""
+        from kraph.io.download import adownload_bigfile, file_name_of
+
+        store = get_attributes_or_error(self, "store")
+        return await adownload_bigfile(str(get_attributes_or_error(store, "id")), file_name_of(store, file_name), client_of(self, kraph))

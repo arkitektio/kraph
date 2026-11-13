@@ -1,0 +1,71 @@
+fragment PairEnd on PairEnd {
+  path
+  node
+}
+
+fragment GraphPairsQuery on GraphPairsQuery {
+  id
+  key
+  label
+  description
+  descriptors
+  graph {
+    id
+    name
+  }
+  pairsPlan {
+    source {
+      ...PairEnd
+    }
+    target {
+      ...PairEnd
+    }
+  }
+}
+
+fragment PairsQueryRow on PairsQueryRow {
+  sourceIdentifier
+  sourceObject
+  targetIdentifier
+  targetObject
+}
+
+fragment PairsQueryRunEntry on PairsQueryRunEntry {
+  position
+  sourceIdentifier
+  sourceObject
+  targetIdentifier
+  targetObject
+}
+
+fragment PairsQueryRun on PairsQueryRun {
+  id
+  name
+  description
+  auto
+  asOfSeq
+  nPairs
+  schemaHash
+  sourceIdentifier
+  targetIdentifier
+  queryId
+  graphId
+  descriptors
+  createdAt
+}
+
+fragment Model on Model {
+  id
+  name
+  description
+  framework
+  parameters
+  descriptors
+  createdAt
+  trainedOn {
+    ...PairsQueryRun
+  }
+  store {
+    ...BigFileStore
+  }
+}

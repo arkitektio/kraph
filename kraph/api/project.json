@@ -29,7 +29,9 @@
                 "StructureIdentifier": "kraph.scalars.StructureIdentifier",
                 "StructureObject": "kraph.scalars.StructureObject",
                 "UnixMilliseconds": "int",
-                "_Any": "typing.Any"
+                "_Any": "typing.Any",
+                "ByteCount": "int",
+                "BigFileLike": "kraph.scalars.BigFile"
             },
             "coercible_scalars": {},
             "coercible_inputs": {},
@@ -93,6 +95,9 @@
                 "StructureRelationCategory": [
                     "kraph.traits.StructureRelationCategoryTrait"
                 ],
+                "StructureCategory": [
+                    "kraph.traits.StructureCategoryTrait"
+                ],
                 "NaturalEventCategory": [
                     "kraph.traits.NaturalEventCategoryTrait"
                 ],
@@ -113,6 +118,18 @@
                 ],
                 "Metric": [
                     "kraph.traits.MetricTrait"
+                ],
+                "GraphPairsQuery": [
+                    "kraph.traits.GraphPairsQueryTrait"
+                ],
+                "PairsQueryRun": [
+                    "kraph.traits.PairsQueryRunTrait"
+                ],
+                "Model": [
+                    "kraph.traits.ModelTrait"
+                ],
+                "BigFileStore": [
+                    "kraph.traits.BigFileStoreTrait"
                 ],
                 "Term": [
                     "kraph.traits.TermTrait"
@@ -226,6 +243,7 @@
                         "ID": "rath.scalars.IDCoercible",
                         "UUID": "kraph.scalars.UUIDCoercible",
                         "CypherLiteral": "kraph.scalars.CypherLiteralCoercible",
+                        "BigFileLike": "kraph.scalars.BigFileLikeCoercible",
                         "StructureIdentifier": "kraph.scalars.StructureIdentifierCoercible",
                         "StructureObject": "kraph.scalars.StructureObjectCoercible"
                     },

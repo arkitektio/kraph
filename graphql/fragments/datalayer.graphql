@@ -1,0 +1,29 @@
+fragment BigFileUploadGrant on BigFileUploadGrant {
+  accessKey
+  secretKey
+  sessionToken
+  path
+  key
+  bucket
+  expiresIn
+  store
+}
+
+fragment BigFileAccessGrant on BigFileAccessGrant {
+  accessKey
+  secretKey
+  sessionToken
+  expiresIn
+  path
+  key
+  bucket
+}
+
+fragment BigFileStore on BigFileStore {
+  id
+  key
+  bucket
+  path
+  originalFileName
+  sizeBytes
+}

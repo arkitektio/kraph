@@ -46,14 +46,20 @@ from kraph.api.schema import (
     MeasurementCategory,
     Metric,
     MetricKind,
+    Model,
     NaturalEventCategory,
+    GraphPairsQuery,
+    PairsQueryRun,
     ProtocolEventCategory,
     RelationCategory,
     SearchEntityCategoriesQuery,
     SearchGraphsQuery,
     SearchMeasurementCategoriesQuery,
     SearchMetricKindsQuery,
+    SearchModelsQuery,
     SearchNaturalEventCategoriesQuery,
+    SearchGraphPairsQueriesQuery,
+    SearchPairsQueryRunsQuery,
     SearchProtocolEventCategoriesQuery,
     SearchRelationCategoriesQuery,
     SearchStructureKindsQuery,
@@ -69,6 +75,7 @@ from kraph.api.schema import (
 from kraph.datalayer import DataLayer
 from kraph.kraph import Kraph
 from kraph.links.upload import UploadLink
+from kraph.middleware.upload import UploadMiddleware
 from kraph.rath import KraphRath
 
 
@@ -105,6 +112,8 @@ def kraph(
 
     return Kraph(
         rath=KraphRath(
+            # Files in a request (a model's weights) go to the datalayer first, as every service's do.
+            middlewares=[UploadMiddleware(datalayer=store)],
             link=compose(
                 ShrinkingLink(),
                 DictingLink(),
@@ -235,3 +244,51 @@ async def expand_structure_kind(id: str, kraph: Kraph) -> StructureKind:
 async def expand_metric_kind(id: str, kraph: Kraph) -> MetricKind:
     """A metric kind, by id -- it travels as `@kraph/metriccategory`."""
     return await kraph.aget_metric_kind(id)
+
+
+# --- derived datasets -------------------------------------------------------------
+
+
+def describe_pairs_query(query: GraphPairsQuery) -> dict:
+    """What a pairs query says about itself: the descriptors the server stored on it.
+
+    A port typed ``GraphPairsQuery["@mikro/arraylens", "@mikro/arraylens"]`` requires
+    ``@kraph/source_identifier`` and ``@kraph/target_identifier``; the runtime tests them
+    against this when it expands the argument.
+    """
+    return dict(query.descriptors or {})
+
+
+# The search widgets forward a port's `requires` ($requires), so a picker for a typed port
+# offers only the queries and runs that port accepts.
+@registry.structure("@kraph/pairsquery", widget=_search(SearchGraphPairsQueriesQuery), describe=describe_pairs_query)
+async def expand_pairs_query(id: str, kraph: Kraph) -> GraphPairsQuery:
+    """A pairs query, by id: an insight over a view that selects pairs from its drawing."""
+    return await kraph.aget_graph_pairs_query(id)
+
+
+def describe_pairs_run(run: PairsQueryRun) -> dict:
+    """What a run says about itself: its query, size, position, and the identifiers every pair shares."""
+    return dict(run.descriptors or {})
+
+
+@registry.structure("@kraph/pairsrun", widget=_search(SearchPairsQueryRunsQuery), describe=describe_pairs_run)
+async def expand_pairs_run(id: str, kraph: Kraph) -> PairsQueryRun:
+    """A run, by id: a pairs query's answer stored with where the drawing stood."""
+    return await kraph.aget_pairs_query_run(id)
+
+
+def describe_model(model: Model) -> dict:
+    """What a trained model says about itself: the descriptors the server stored on it.
+
+    Its framework and what it was trained on, so a prediction port can require, say,
+    ``@kraph/framework`` EQUALS ``care`` and ``@kraph/source_identifier`` EQUALS
+    ``@mikro/arraylens``; the runtime tests them against this when it expands the argument.
+    """
+    return dict(model.descriptors or {})
+
+
+@registry.structure("@kraph/model", widget=_search(SearchModelsQuery), describe=describe_model)
+async def expand_model(id: str, kraph: Kraph) -> Model:
+    """A trained model, by id: its weights and the pairs query run it learned from."""
+    return await kraph.aget_model(id)
