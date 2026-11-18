@@ -53,6 +53,10 @@ datalayer:
   protocol: http
   media:
     bucket: media
+  # Required by the server since it stores trained models' weights: without it
+  # the settings do not validate and `kraph-migrate` exits before migrating.
+  bigfile:
+    bucket: bigfile
   zarr:
     bucket: zarr
   parquet:
