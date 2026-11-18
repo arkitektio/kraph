@@ -26,12 +26,13 @@ def test_create_graph(kraph: Kraph) -> None:
 
 @pytest.mark.integration
 def test_create_structure_relation_category(kraph: Kraph) -> None:
-    """Structure kinds are referenced by identifier, not created.
+    """A structure relation joins structure kinds the graph has mounted.
 
-    There is no ``createStructureCategory`` any more: a ``StructureKind`` is minted by the first
-    write that names it, so a descriptor just points at the identifier.
+    A descriptor points at a structure by its identifier, and the server refuses a relation
+    over an identifier the view does not mount: the kind is mounted first.
     """
     graph = kraph.create_graph(name="Image Masking Example", backfill=False)
+    kraph.create_structure_category(key="Image", identifier="@mikro/image", graph=graph.id)
 
     images = StructureDescriptorInput(identifiers=["@mikro/image"])
     category = kraph.create_structure_relation_category(
