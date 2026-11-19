@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 def upload_bigfile(file: BigFile, credentials: "BigFileUploadGrant", datalayer: "DataLayer") -> str:
     """Write ``file`` to the object its grant names, synchronously. Returns the store id."""
-    store = create_s3_store(datalayer.endpoint_url, credentials, proxy=datalayer.proxy)
+    store = create_s3_store(datalayer.endpoint_url, credentials, proxy=datalayer.proxy, certificates=datalayer.certificates)
     try:
         obstore.put(store, credentials.key, file.value)
     except Exception as e:
@@ -35,7 +35,7 @@ def upload_bigfile(file: BigFile, credentials: "BigFileUploadGrant", datalayer: 
 async def aupload_bigfile(file: BigFile, credentials: "BigFileUploadGrant", datalayer: "DataLayer") -> str:
     """Write ``file`` to the object its grant names. Returns the store id."""
     endpoint_url = await datalayer.get_endpoint_url()
-    store = create_s3_store(endpoint_url, credentials, proxy=datalayer.proxy)
+    store = create_s3_store(endpoint_url, credentials, proxy=datalayer.proxy, certificates=datalayer.certificates)
     try:
         await obstore.put_async(store, credentials.key, file.value)
     except Exception as e:

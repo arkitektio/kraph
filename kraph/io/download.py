@@ -25,7 +25,7 @@ def download_bigfile(store_id: str, file_name: str, kraph: "Kraph") -> str:
     from kraph.api.schema import RequestBigFileAccessInput
 
     grant = kraph.request_bigfile_access(input=RequestBigFileAccessInput(store_id=store_id))
-    store = create_s3_store(kraph.datalayer.endpoint_url, grant, proxy=kraph.datalayer.proxy)
+    store = create_s3_store(kraph.datalayer.endpoint_url, grant, proxy=kraph.datalayer.proxy, certificates=kraph.datalayer.certificates)
     response = obstore.get(store, grant.key)
     with open(_target(file_name), "wb") as file:
         for chunk in response.stream():
@@ -38,7 +38,7 @@ async def adownload_bigfile(store_id: str, file_name: str, kraph: "Kraph") -> st
     from kraph.api.schema import RequestBigFileAccessInput
 
     grant = await kraph.arequest_bigfile_access(input=RequestBigFileAccessInput(store_id=store_id))
-    store = create_s3_store(await kraph.datalayer.get_endpoint_url(), grant, proxy=kraph.datalayer.proxy)
+    store = create_s3_store(await kraph.datalayer.get_endpoint_url(), grant, proxy=kraph.datalayer.proxy, certificates=kraph.datalayer.certificates)
     response = await obstore.get_async(store, grant.key)
     with open(_target(file_name), "wb") as file:
         async for chunk in response.stream():

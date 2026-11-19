@@ -94,6 +94,7 @@ def create_s3_store(
     prefix: str | None = None,
     *,
     proxy: str | None = None,
+    certificates: list[str] | None = None,
 ) -> S3Store:
     """Create an obstore S3 client from an kraph grant and endpoint.
 
@@ -104,12 +105,23 @@ def create_s3_store(
     ``proxy`` is the HTTP forward proxy the datalayer is only reachable through
     (see :attr:`DataLayer.proxy`). It is merged into the client options, never
     replacing them -- dropping ``allow_http`` would break every ``http://`` store.
+
+    ``certificates`` are a pinned store's hub certificates (:attr:`DataLayer.certificates`):
+    the store trusts them and nothing else, as ``Alias.ssl_context()`` does for aiohttp.
+    Not through ``SSL_CERT_FILE``: obstore >= 0.11 verifies with the platform's verifier,
+    which on macOS and Windows asks the OS trust store and never reads that variable.
+    With the system roots disabled, reqwest checks against these roots alone with rustls's
+    own verifier, so the OS's rules for server certificates (macOS: at most 825 days) do
+    not apply to the hub's long-lived certificate either.
     """
     normalized_client_options: dict[str, object] = dict(client_options or {})
     if endpoint_url.startswith("http://"):
         normalized_client_options.setdefault("allow_http", True)
     if proxy:
         normalized_client_options["proxy_url"] = proxy
+    if certificates:
+        normalized_client_options["root_certificate"] = "\n".join(pem.strip() for pem in certificates)
+        normalized_client_options["disable_system_certificates"] = True
 
     store_kwargs: dict[str, object] = {
         "endpoint": endpoint_url,

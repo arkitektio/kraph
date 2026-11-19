@@ -605,7 +605,7 @@ requires-dist = [
     { name = "arkitekt-spec", specifier = ">=5.0" },
     { name = "dokker", specifier = ">=2.8" },
     { name = "fakts", specifier = ">=6.1" },
-    { name = "obstore", specifier = ">=0.10.0" },
+    { name = "obstore", specifier = ">=0.11.0" },
     { name = "rath", specifier = ">=4.1.1" },
     { name = "websockets", specifier = ">=15.0.1" },
 ]
