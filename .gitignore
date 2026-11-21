@@ -145,3 +145,6 @@ media
 export
 static_collected
 data
+
+# The server version the integration tests ran against, stamped into a release.
+kraph/_tested.json

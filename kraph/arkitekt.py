@@ -36,6 +36,7 @@ from rath.links.shrink import ShrinkingLink
 from rath.links.split import SplitLink
 
 from arkitekt_spec.declare.app import AppRegistry
+from arkitekt_spec.declare.tested import tested_against
 from arkitekt_spec.declare.widgets import SearchWidget
 
 from kraph.api.schema import (
@@ -88,6 +89,10 @@ registry = AppRegistry()
 """What kraph brings to an app: its service, and the types it can send by id."""
 
 
+TESTED = tested_against("kraph")
+"""The kraph server this release wants: the one its release job tested it against."""
+
+
 @registry.service(
     schema=build_relative_path("api", "schema.graphql"),
     turms=build_relative_path("api", "project.json"),
@@ -95,7 +100,7 @@ registry = AppRegistry()
 def kraph(
     kraph: Annotated[
         Alias,
-        Require("live.arkitekt.kraph", "Where the knowledge graph relating entities lives"),
+        Require("live.arkitekt.kraph", "Where the knowledge graph relating entities lives", version=TESTED),
     ],
     datalayer: Annotated[
         Alias | None,

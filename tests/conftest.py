@@ -1,3 +1,4 @@
+from arkitekt_spec.declare.tested import record_tested
 import pytest
 from dokker import Deployment, testing
 from dokker.log_watcher import LogWatcher
@@ -139,6 +140,8 @@ def deployed_app(integration_ports: dict[str, int]) -> Generator[DeployedKraph, 
         setup.up()
 
         setup.check_health()
+        # What a release of this client then says it was tested against.
+        record_tested("kraph", http_url.rsplit("/graphql", 1)[0] + "/ht")
 
         with kraph as kraph:
             deployed = DeployedKraph(
