@@ -1,15 +1,15 @@
 from types import TracebackType
+
 from pydantic import Field
-from kraph.links.upload import UploadLink
-from kraph.middleware.base import OperationMiddleware
 from rath import rath
-
 from rath.links.auth import AuthTokenLink
-
 from rath.links.compose import TypedComposedLink
 from rath.links.dictinglink import DictingLink
 from rath.links.shrink import ShrinkingLink
 from rath.links.split import SplitLink
+
+from kraph.links.upload import UploadLink
+from kraph.middleware.base import OperationMiddleware
 
 
 class KraphLinkComposition(TypedComposedLink):

@@ -4,9 +4,9 @@ No server: the rath is a fake returning canned data. Nothing is ever current: a
 client is passed (or an object remembers the one that fetched it).
 """
 
+from collections.abc import AsyncIterator
 from types import SimpleNamespace
 from typing import Any
-from collections.abc import AsyncIterator
 
 import pytest
 from koil import Koil
@@ -33,11 +33,11 @@ class FakeRath:
     def _answer(self, variables: dict[str, Any], headers: Any) -> Any:
         self.sent.append(variables)
         self.headers.append(headers)
-        return SimpleNamespace(
-            data={"store": {"id": "store-1", "key": "file.bin"}}
-        )
+        return SimpleNamespace(data={"store": {"id": "store-1", "key": "file.bin"}})
 
-    async def aquery(self, document: str, variables: dict[str, Any], headers: Any = None) -> Any:
+    async def aquery(
+        self, document: str, variables: dict[str, Any], headers: Any = None
+    ) -> Any:
         return self._answer(variables, headers)
 
     async def asubscribe(
@@ -114,9 +114,11 @@ async def test_none_arguments_are_omitted() -> None:
     await mine.aexecute(GetStore, {"id": "store-1"})
     await mine.aexecute(GetStore, {"id": "store-1", "note": None})
     await mine.aexecute(GetStore, {"id": "store-1", "note": "x"})
-    assert mine.rath.sent == [{"id": "store-1"}, {"id": "store-1"}, {"id": "store-1", "note": "x"}]
-
-
+    assert mine.rath.sent == [
+        {"id": "store-1"},
+        {"id": "store-1"},
+        {"id": "store-1", "note": "x"},
+    ]
 
 
 @pytest.mark.asyncio
@@ -157,7 +159,9 @@ async def test_a_task_named_at_the_call_beats_the_ambient_one() -> None:
 
 
 def real_client(name: str) -> Kraph:
-    return Kraph(rath=KraphRath(link=AsyncMockLink()), datalayer=DataLayer(endpoint_url=name))
+    return Kraph(
+        rath=KraphRath(link=AsyncMockLink()), datalayer=DataLayer(endpoint_url=name)
+    )
 
 
 def test_every_operation_is_a_method_of_the_client() -> None:
@@ -209,10 +213,14 @@ def test_graph_polls_its_projection_through_its_own_client() -> None:
     # whose method is swapped out; an explicit client may be anything shaped like one.
     a = real_client("a")
     object.__setattr__(a, "get_graph", fake("a").get_graph)
-    view = View.model_validate({"id": "1"}, context=origin_context(client=a, rath=a.rath))
+    view = View.model_validate(
+        {"id": "1"}, context=origin_context(client=a, rath=a.rath)
+    )
 
     assert view.wait_until_projected(7).projected_through_seq == 7
-    assert View(id="2").wait_until_projected(7, kraph=fake("b")).projected_through_seq == 7
+    assert (
+        View(id="2").wait_until_projected(7, kraph=fake("b")).projected_through_seq == 7
+    )
     assert asked == ["a", "b"]
     with pytest.raises(NoKraphFound):
         View(id="3").wait_until_projected(7)

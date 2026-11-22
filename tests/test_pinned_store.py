@@ -31,11 +31,20 @@ def test_a_pinned_datalayer_hands_its_store_the_hub_certificate_alone(
 ) -> None:
     """The store trusts the alias's certificate alone, and the environment is left alone."""
     monkeypatch.delenv("SSL_CERT_FILE", raising=False)
-    alias = Alias(id="s3", host="localhost", port=2577, ssl=True, certificates=[HUB_CERTIFICATE])
+    alias = Alias(
+        id="s3", host="localhost", port=2577, ssl=True, certificates=[HUB_CERTIFICATE]
+    )
     datalayer = DataLayer.from_alias(alias)
-    grant = SimpleNamespace(access_key="a", secret_key="s", session_token="", bucket="b", key="k")
+    grant = SimpleNamespace(
+        access_key="a", secret_key="s", session_token="", bucket="b", key="k"
+    )
 
-    store = create_s3_store(datalayer.endpoint_url, grant, proxy=datalayer.proxy, certificates=datalayer.certificates)
+    store = create_s3_store(
+        datalayer.endpoint_url,
+        grant,
+        proxy=datalayer.proxy,
+        certificates=datalayer.certificates,
+    )
 
     assert store.client_options["root_certificate"] == HUB_CERTIFICATE.strip().encode()
     assert str(store.client_options["disable_system_certificates"]).lower() == "true"

@@ -25,9 +25,11 @@ table-query surface.
 import os
 from typing import Annotated
 
+from arkitekt_spec.declare.app import AppRegistry
+from arkitekt_spec.declare.tested import tested_against
+from arkitekt_spec.declare.widgets import SearchWidget
 from fakts import Alias, Require, TokenLoader
 from fakts.contrib.rath.auth import FaktsAuthLink
-from graphql import OperationType
 from rath.links import compose
 from rath.links.aiohttp import AIOHttpLink
 from rath.links.dictinglink import DictingLink
@@ -35,13 +37,11 @@ from rath.links.graphql_ws import GraphQLWSLink
 from rath.links.shrink import ShrinkingLink
 from rath.links.split import SplitLink
 
-from arkitekt_spec.declare.app import AppRegistry
-from arkitekt_spec.declare.tested import tested_against
-from arkitekt_spec.declare.widgets import SearchWidget
-
+from graphql import OperationType
 from kraph.api.schema import (
     EntityCategory,
     Graph,
+    GraphPairsQuery,
     Instance,
     Link,
     MeasurementCategory,
@@ -49,17 +49,16 @@ from kraph.api.schema import (
     MetricKind,
     Model,
     NaturalEventCategory,
-    GraphPairsQuery,
     PairsQueryRun,
     ProtocolEventCategory,
     RelationCategory,
     SearchEntityCategoriesQuery,
+    SearchGraphPairsQueriesQuery,
     SearchGraphsQuery,
     SearchMeasurementCategoriesQuery,
     SearchMetricKindsQuery,
     SearchModelsQuery,
     SearchNaturalEventCategoriesQuery,
-    SearchGraphPairsQueriesQuery,
     SearchPairsQueryRunsQuery,
     SearchProtocolEventCategoriesQuery,
     SearchRelationCategoriesQuery,
@@ -72,7 +71,6 @@ from kraph.api.schema import (
     StructureRelationCategory,
     Term,
 )
-
 from kraph.datalayer import DataLayer
 from kraph.kraph import Kraph
 from kraph.links.upload import UploadLink
@@ -100,11 +98,17 @@ TESTED = tested_against("kraph")
 def kraph(
     kraph: Annotated[
         Alias,
-        Require("live.arkitekt.kraph", "Where the knowledge graph relating entities lives", version=TESTED),
+        Require(
+            "live.arkitekt.kraph",
+            "Where the knowledge graph relating entities lives",
+            version=TESTED,
+        ),
     ],
     datalayer: Annotated[
         Alias | None,
-        Require("live.arkitekt.s3", "Where the graph's files are stored", optional=True),
+        Require(
+            "live.arkitekt.s3", "Where the graph's files are stored", optional=True
+        ),
     ],
     tokens: TokenLoader,
 ) -> Kraph:
@@ -125,11 +129,19 @@ def kraph(
                 FaktsAuthLink(token_loader=tokens),
                 UploadLink(datalayer=store),
                 SplitLink(
-                    left=AIOHttpLink(endpoint_url=kraph.to_http_path("graphql"), proxy=kraph.proxy, ssl_context=kraph.ssl_context()),
-                    right=GraphQLWSLink(ws_endpoint_url=kraph.to_ws_path("graphql"), proxy=kraph.proxy, ssl_context=kraph.ssl_context()),
+                    left=AIOHttpLink(
+                        endpoint_url=kraph.to_http_path("graphql"),
+                        proxy=kraph.proxy,
+                        ssl_context=kraph.ssl_context(),
+                    ),
+                    right=GraphQLWSLink(
+                        ws_endpoint_url=kraph.to_ws_path("graphql"),
+                        proxy=kraph.proxy,
+                        ssl_context=kraph.ssl_context(),
+                    ),
                     split=lambda o: o.node.operation != OperationType.SUBSCRIPTION,
                 ),
-            )
+            ),
         ),
         datalayer=store,
     )
@@ -149,14 +161,16 @@ async def expand_graph(id: str, kraph: Kraph) -> Graph:
     return await kraph.aget_graph(id)
 
 
-@registry.structure("@kraph/entitycategory", widget=_search(SearchEntityCategoriesQuery)
+@registry.structure(
+    "@kraph/entitycategory", widget=_search(SearchEntityCategoriesQuery)
 )
 async def expand_entity_category(id: str, kraph: Kraph) -> EntityCategory:
     """An entity category, by id."""
     return await kraph.aget_entity_category(id)
 
 
-@registry.structure("@kraph/relationcategory",
+@registry.structure(
+    "@kraph/relationcategory",
     widget=_search(SearchRelationCategoriesQuery),
 )
 async def expand_relation_category(id: str, kraph: Kraph) -> RelationCategory:
@@ -164,7 +178,8 @@ async def expand_relation_category(id: str, kraph: Kraph) -> RelationCategory:
     return await kraph.aget_relation_category(id)
 
 
-@registry.structure("@kraph/measurementcategory",
+@registry.structure(
+    "@kraph/measurementcategory",
     widget=_search(SearchMeasurementCategoriesQuery),
 )
 async def expand_measurement_category(id: str, kraph: Kraph) -> MeasurementCategory:
@@ -172,7 +187,8 @@ async def expand_measurement_category(id: str, kraph: Kraph) -> MeasurementCateg
     return await kraph.aget_measurement_category(id)
 
 
-@registry.structure("@kraph/structurerelationcategory",
+@registry.structure(
+    "@kraph/structurerelationcategory",
     widget=_search(SearchStructureRelationCategoriesQuery),
 )
 async def expand_structure_relation_category(
@@ -182,7 +198,8 @@ async def expand_structure_relation_category(
     return await kraph.aget_structure_relation_category(id)
 
 
-@registry.structure("@kraph/naturaleventcategory",
+@registry.structure(
+    "@kraph/naturaleventcategory",
     widget=_search(SearchNaturalEventCategoriesQuery),
 )
 async def expand_natural_event_category(id: str, kraph: Kraph) -> NaturalEventCategory:
@@ -190,15 +207,19 @@ async def expand_natural_event_category(id: str, kraph: Kraph) -> NaturalEventCa
     return await kraph.aget_natural_event_category(id)
 
 
-@registry.structure("@kraph/protocoleventcategory",
+@registry.structure(
+    "@kraph/protocoleventcategory",
     widget=_search(SearchProtocolEventCategoriesQuery),
 )
-async def expand_protocol_event_category(id: str, kraph: Kraph) -> ProtocolEventCategory:
+async def expand_protocol_event_category(
+    id: str, kraph: Kraph
+) -> ProtocolEventCategory:
     """A protocol event category, by id."""
     return await kraph.aget_protocol_event_category(id)
 
 
 # --- claims ----------------------------------------------------------------------
+
 
 # `Instance` has no scalar label -- its name lives at `term { key }` -- so it gets no
 # search widget: a two-field `value`/`label` projection cannot reach it.
@@ -236,7 +257,8 @@ async def expand_term(id: str, kraph: Kraph) -> Term:
 
 
 # Identifier kept for wire compatibility; the type behind it is now StructureKind.
-@registry.structure("@kraph/structurecategory", widget=_search(SearchStructureKindsQuery)
+@registry.structure(
+    "@kraph/structurecategory", widget=_search(SearchStructureKindsQuery)
 )
 async def expand_structure_kind(id: str, kraph: Kraph) -> StructureKind:
     """A structure kind, by id -- it travels as `@kraph/structurecategory`."""
@@ -244,8 +266,7 @@ async def expand_structure_kind(id: str, kraph: Kraph) -> StructureKind:
 
 
 # Identifier kept for wire compatibility; the type behind it is now MetricKind.
-@registry.structure("@kraph/metriccategory", widget=_search(SearchMetricKindsQuery)
-)
+@registry.structure("@kraph/metriccategory", widget=_search(SearchMetricKindsQuery))
 async def expand_metric_kind(id: str, kraph: Kraph) -> MetricKind:
     """A metric kind, by id -- it travels as `@kraph/metriccategory`."""
     return await kraph.aget_metric_kind(id)
@@ -266,7 +287,11 @@ def describe_pairs_query(query: GraphPairsQuery) -> dict:
 
 # The search widgets forward a port's `requires` ($requires), so a picker for a typed port
 # offers only the queries and runs that port accepts.
-@registry.structure("@kraph/pairsquery", widget=_search(SearchGraphPairsQueriesQuery), describe=describe_pairs_query)
+@registry.structure(
+    "@kraph/pairsquery",
+    widget=_search(SearchGraphPairsQueriesQuery),
+    describe=describe_pairs_query,
+)
 async def expand_pairs_query(id: str, kraph: Kraph) -> GraphPairsQuery:
     """A pairs query, by id: an insight over a view that selects pairs from its drawing."""
     return await kraph.aget_graph_pairs_query(id)
@@ -277,7 +302,11 @@ def describe_pairs_run(run: PairsQueryRun) -> dict:
     return dict(run.descriptors or {})
 
 
-@registry.structure("@kraph/pairsrun", widget=_search(SearchPairsQueryRunsQuery), describe=describe_pairs_run)
+@registry.structure(
+    "@kraph/pairsrun",
+    widget=_search(SearchPairsQueryRunsQuery),
+    describe=describe_pairs_run,
+)
 async def expand_pairs_run(id: str, kraph: Kraph) -> PairsQueryRun:
     """A run, by id: a pairs query's answer stored with where the drawing stood."""
     return await kraph.aget_pairs_query_run(id)
@@ -293,7 +322,9 @@ def describe_model(model: Model) -> dict:
     return dict(model.descriptors or {})
 
 
-@registry.structure("@kraph/model", widget=_search(SearchModelsQuery), describe=describe_model)
+@registry.structure(
+    "@kraph/model", widget=_search(SearchModelsQuery), describe=describe_model
+)
 async def expand_model(id: str, kraph: Kraph) -> Model:
     """A trained model, by id: its weights and the pairs query run it learned from."""
     return await kraph.aget_model(id)

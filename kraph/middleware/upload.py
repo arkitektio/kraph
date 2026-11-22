@@ -48,7 +48,9 @@ async def _apply_async(func: Callable[[Any], Awaitable[Any]], obj: Any) -> Any: 
     if isinstance(obj, list):
         return list(await asyncio.gather(*[_apply_async(func, value) for value in obj]))
     if isinstance(obj, tuple):
-        return tuple(await asyncio.gather(*[_apply_async(func, value) for value in obj]))
+        return tuple(
+            await asyncio.gather(*[_apply_async(func, value) for value in obj])
+        )
     if isinstance(obj, BigFile):
         return await func(obj)
     return obj
@@ -102,11 +104,19 @@ class UploadMiddleware(OperationMiddleware):
 
     @staticmethod
     def _request(file: BigFile) -> dict[str, Any]:
-        return _variables(RequestBigfileUploadMutation, RequestBigFileUploadInput(original_file_name=file.file_name, file_size=_byte_size(file.value)))
+        return _variables(
+            RequestBigfileUploadMutation,
+            RequestBigFileUploadInput(
+                original_file_name=file.file_name, file_size=_byte_size(file.value)
+            ),
+        )
 
     @staticmethod
     def _finish(store_id: str, valid: bool) -> dict[str, Any]:
-        return _variables(FinishBigfileUploadMutation, FinishBigFileUploadInput(store_id=store_id, valid=valid))
+        return _variables(
+            FinishBigfileUploadMutation,
+            FinishBigFileUploadInput(store_id=store_id, valid=valid),
+        )
 
     def _refresher(self, rath: "KraphRath") -> Callable[[str], Any]:
         """How to renew the grant, callable from obstore's own worker threads.
@@ -118,52 +128,90 @@ class UploadMiddleware(OperationMiddleware):
         captured = contextvars.copy_context()
 
         def refresh(store_id: str) -> Any:  # noqa: ANN401
-            variables = _variables(RefreshBigfileUploadMutation, RefreshUploadInput(store_id=store_id))
-            result = captured.copy().run(rath.query, RefreshBigfileUploadMutation.Meta.document, variables)
+            variables = _variables(
+                RefreshBigfileUploadMutation, RefreshUploadInput(store_id=store_id)
+            )
+            result = captured.copy().run(
+                rath.query, RefreshBigfileUploadMutation.Meta.document, variables
+            )
             return RefreshBigfileUploadMutation(**result.data).refresh_bigfile_upload
 
         return refresh
 
     def _upload(self, rath: "KraphRath", file: BigFile) -> str:
         """Grant, write with self-renewing credentials, finish; or report the failure and re-raise."""
-        grant = RequestBigfileUploadMutation(**rath.query(RequestBigfileUploadMutation.Meta.document, self._request(file)).data).request_bigfile_upload
+        grant = RequestBigfileUploadMutation(
+            **rath.query(
+                RequestBigfileUploadMutation.Meta.document, self._request(file)
+            ).data
+        ).request_bigfile_upload
         token = upload_refresher.set(self._refresher(rath))
         try:
             store_id = upload_bigfile(file, grant, self.datalayer)
         except BaseException:
             try:
-                rath.query(FinishBigfileUploadMutation.Meta.document, self._finish(grant.store, valid=False))
+                rath.query(
+                    FinishBigfileUploadMutation.Meta.document,
+                    self._finish(grant.store, valid=False),
+                )
             except Exception:  # noqa: BLE001 - the write's own error is the one to raise
-                logger.warning("Could not report the failed upload of store %s; it is collected once its deadline passes.", grant.store, exc_info=True)
+                logger.warning(
+                    "Could not report the failed upload of store %s; it is collected once its deadline passes.",
+                    grant.store,
+                    exc_info=True,
+                )
             raise
         finally:
             upload_refresher.reset(token)
-        rath.query(FinishBigfileUploadMutation.Meta.document, self._finish(store_id, valid=True))
+        rath.query(
+            FinishBigfileUploadMutation.Meta.document,
+            self._finish(store_id, valid=True),
+        )
         return store_id
 
     async def _aupload(self, rath: "KraphRath", file: BigFile) -> str:
         """Grant, write with self-renewing credentials, finish; or report the failure and re-raise."""
-        grant = RequestBigfileUploadMutation(**(await rath.aquery(RequestBigfileUploadMutation.Meta.document, self._request(file))).data).request_bigfile_upload
+        grant = RequestBigfileUploadMutation(
+            **(
+                await rath.aquery(
+                    RequestBigfileUploadMutation.Meta.document, self._request(file)
+                )
+            ).data
+        ).request_bigfile_upload
         token = upload_refresher.set(self._refresher(rath))
         try:
             store_id = await aupload_bigfile(file, grant, self.datalayer)
         except BaseException:
             try:
-                await rath.aquery(FinishBigfileUploadMutation.Meta.document, self._finish(grant.store, valid=False))
+                await rath.aquery(
+                    FinishBigfileUploadMutation.Meta.document,
+                    self._finish(grant.store, valid=False),
+                )
             except Exception:  # noqa: BLE001 - the write's own error is the one to raise
-                logger.warning("Could not report the failed upload of store %s; it is collected once its deadline passes.", grant.store, exc_info=True)
+                logger.warning(
+                    "Could not report the failed upload of store %s; it is collected once its deadline passes.",
+                    grant.store,
+                    exc_info=True,
+                )
             raise
         finally:
             upload_refresher.reset(token)
-        await rath.aquery(FinishBigfileUploadMutation.Meta.document, self._finish(store_id, valid=True))
+        await rath.aquery(
+            FinishBigfileUploadMutation.Meta.document,
+            self._finish(store_id, valid=True),
+        )
         return store_id
 
     # --- the middleware ----------------------------------------------------------------
 
-    def process_variables(self, variables: dict[str, Any], operation: type[TOperation], rath: "KraphRath") -> dict[str, Any]:
+    def process_variables(
+        self, variables: dict[str, Any], operation: type[TOperation], rath: "KraphRath"
+    ) -> dict[str, Any]:
         """Upload every ``BigFile`` in ``variables`` and put its store id in its place."""
         return _apply_sync(partial(self._upload, rath), variables)
 
-    async def aprocess_variables(self, variables: dict[str, Any], operation: type[TOperation], rath: "KraphRath") -> dict[str, Any]:
+    async def aprocess_variables(
+        self, variables: dict[str, Any], operation: type[TOperation], rath: "KraphRath"
+    ) -> dict[str, Any]:
         """Upload every ``BigFile`` in ``variables`` and put its store id in its place."""
         return await _apply_async(partial(self._aupload, rath), variables)

@@ -17,8 +17,24 @@ from kraph.middleware import upload as upload_module
 from kraph.middleware.upload import UploadMiddleware
 from kraph.scalars import BigFile
 
-GRANT = {"accessKey": "a", "secretKey": "s", "sessionToken": "t", "path": "s3://b/k", "key": "k", "bucket": "b", "expiresIn": 3600, "store": "store-1"}
-STORE = {"id": "store-1", "key": "k", "bucket": "b", "path": "s3://b/k", "originalFileName": "weights.zip", "sizeBytes": 3}
+GRANT = {
+    "accessKey": "a",
+    "secretKey": "s",
+    "sessionToken": "t",
+    "path": "s3://b/k",
+    "key": "k",
+    "bucket": "b",
+    "expiresIn": 3600,
+    "store": "store-1",
+}
+STORE = {
+    "id": "store-1",
+    "key": "k",
+    "bucket": "b",
+    "path": "s3://b/k",
+    "originalFileName": "weights.zip",
+    "sizeBytes": 3,
+}
 
 
 class Rath:
@@ -32,7 +48,10 @@ class Rath:
         """Answer by the mutation's name, as the server would."""
         name = document.split("mutation ", 1)[1].split("(", 1)[0]
         self.asked.append((name, variables["input"]))
-        answer = {"RequestBigfileUpload": {"requestBigfileUpload": GRANT}, "FinishBigfileUpload": {"finishBigfileUpload": STORE}}[name]
+        answer = {
+            "RequestBigfileUpload": {"requestBigfileUpload": GRANT},
+            "FinishBigfileUpload": {"finishBigfileUpload": STORE},
+        }[name]
         return SimpleNamespace(data=answer)
 
 
@@ -40,18 +59,26 @@ def _run(middleware: UploadMiddleware, rath: Rath, variables: dict) -> dict:
     return asyncio.run(middleware.aprocess_variables(variables, None, rath))  # type: ignore[arg-type]
 
 
-def test_a_file_is_uploaded_finished_and_sent_as_its_store(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_a_file_is_uploaded_finished_and_sent_as_its_store(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     """Grant (declaring the size), write, finish: then the store id travels instead of the bytes."""
 
     async def write(file: BigFile, grant: Any, datalayer: DataLayer) -> str:  # noqa: ANN401
-        assert (grant.key, grant.bucket) == ("k", "b"), "the write goes where the grant says"
+        assert (grant.key, grant.bucket) == ("k", "b"), (
+            "the write goes where the grant says"
+        )
         return grant.store
 
     monkeypatch.setattr(upload_module, "aupload_bigfile", write)
     rath = Rath()
     weights = BigFile(io.BytesIO(b"abc"), file_name="weights.zip")
 
-    sent = _run(UploadMiddleware(datalayer=DataLayer()), rath, {"input": {"name": "care", "store": weights}})
+    sent = _run(
+        UploadMiddleware(datalayer=DataLayer()),
+        rath,
+        {"input": {"name": "care", "store": weights}},
+    )
 
     assert sent == {"input": {"name": "care", "store": "store-1"}}
     assert rath.asked == [
@@ -70,5 +97,12 @@ def test_a_failed_write_is_reported_and_raised(monkeypatch: pytest.MonkeyPatch) 
     rath = Rath()
 
     with pytest.raises(ConnectionError, match="went away"):
-        _run(UploadMiddleware(datalayer=DataLayer()), rath, {"input": {"store": BigFile(io.BytesIO(b"abc"), file_name="w.zip")}})
-    assert rath.asked[-1] == ("FinishBigfileUpload", {"storeId": "store-1", "valid": False})
+        _run(
+            UploadMiddleware(datalayer=DataLayer()),
+            rath,
+            {"input": {"store": BigFile(io.BytesIO(b"abc"), file_name="w.zip")}},
+        )
+    assert rath.asked[-1] == (
+        "FinishBigfileUpload",
+        {"storeId": "store-1", "valid": False},
+    )

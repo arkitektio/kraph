@@ -19,7 +19,13 @@ from kraph.api.schema import (
     ValueKind,
 )
 from kraph.kraph import Kraph
-from kraph.traits import AssertedTrait, GraphTrait, HasDrawings, InstanceTrait, StructureTrait
+from kraph.traits import (
+    AssertedTrait,
+    GraphTrait,
+    HasDrawings,
+    InstanceTrait,
+    StructureTrait,
+)
 
 
 def test_kraph_importable() -> None:
@@ -29,7 +35,11 @@ def test_kraph_importable() -> None:
 
 def test_instance_kind_values() -> None:
     """Instances are entities or one of the two event kinds — nothing else."""
-    assert {k.value for k in InstanceKind} == {"ENTITY", "NATURAL_EVENT", "PROTOCOL_EVENT"}
+    assert {k.value for k in InstanceKind} == {
+        "ENTITY",
+        "NATURAL_EVENT",
+        "PROTOCOL_EVENT",
+    }
 
 
 def test_link_kind_has_ten_members() -> None:
@@ -118,6 +128,11 @@ def test_write_surface_is_assertion_shaped() -> None:
         "link_structure_to_entity",
     ):
         assert not hasattr(schema.KraphApi, gone), gone
-    for present in ("assert_entity_exists", "retract_entity", "attest_entity", "attest_structure"):
+    for present in (
+        "assert_entity_exists",
+        "retract_entity",
+        "attest_entity",
+        "attest_structure",
+    ):
         assert hasattr(schema.KraphApi, present), present
         assert not hasattr(schema, present), present

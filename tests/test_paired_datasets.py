@@ -5,8 +5,8 @@ descriptors answer, and `pair` refuses a datum the word's pins do not fit before
 anything: the server stores pins but cannot evaluate them.
 """
 
-from types import SimpleNamespace
 from collections.abc import Sequence
+from types import SimpleNamespace
 from typing import Annotated, Any, get_args, get_origin
 
 import pytest
@@ -39,17 +39,30 @@ def test_a_port_typed_for_image_pairs_requires_both_identifiers() -> None:
     """Strings and stamped classes compile to the same two `Requires` on the identifier descriptors."""
     by_name = PairsQueryRun[IMAGE, IMAGE]
     assert get_args(by_name)[0] is PairsQueryRun
-    assert _requires(by_name) == [("@kraph/source_identifier", "EQUALS", IMAGE), ("@kraph/target_identifier", "EQUALS", IMAGE)]
-    assert _requires(PairsQueryRun[ArrayLens, ArrayLens]) == _requires(by_name), "a stamped class names itself"
-    assert _requires(GraphPairsQuery[IMAGE, IMAGE]) == _requires(by_name), "a query is typed the way its runs are"
+    assert _requires(by_name) == [
+        ("@kraph/source_identifier", "EQUALS", IMAGE),
+        ("@kraph/target_identifier", "EQUALS", IMAGE),
+    ]
+    assert _requires(PairsQueryRun[ArrayLens, ArrayLens]) == _requires(by_name), (
+        "a stamped class names itself"
+    )
+    assert _requires(GraphPairsQuery[IMAGE, IMAGE]) == _requires(by_name), (
+        "a query is typed the way its runs are"
+    )
     assert get_args(GraphPairsQuery[IMAGE, IMAGE])[0] is GraphPairsQuery
 
     # The runtime's check skips a key the object lacks, so a mixed dataset carries the key as null.
     from arkitekt_spec.declare.descriptors import unfulfilled
 
     markers = get_args(by_name)[1:]
-    mixed = {"@kraph/source_identifier": IMAGE, "@kraph/target_identifier": None, "@kraph/n_pairs": 2}
-    assert unfulfilled(markers, mixed), "a dataset pairing images with tables fails an image-pair port"
+    mixed = {
+        "@kraph/source_identifier": IMAGE,
+        "@kraph/target_identifier": None,
+        "@kraph/n_pairs": 2,
+    }
+    assert unfulfilled(markers, mixed), (
+        "a dataset pairing images with tables fails an image-pair port"
+    )
     assert not unfulfilled(markers, {**mixed, "@kraph/target_identifier": IMAGE})
 
 
@@ -60,7 +73,9 @@ def test_a_pair_is_held_to_its_words_pins_before_anything_is_written() -> None:
     class Kraph:
         def assert_structure_exists(self, **kwargs: Any) -> SimpleNamespace:  # noqa: ANN401
             written.append(("structure", kwargs))
-            return SimpleNamespace(structure=SimpleNamespace(id=f"s-{kwargs['object']}"))
+            return SimpleNamespace(
+                structure=SimpleNamespace(id=f"s-{kwargs['object']}")
+            )
 
         def assert_structure_relation_exists(self, **kwargs: Any) -> dict:  # noqa: ANN401
             written.append(("relation", kwargs))
@@ -68,7 +83,9 @@ def test_a_pair_is_held_to_its_words_pins_before_anything_is_written() -> None:
 
     pin = SimpleNamespace(key="@mikro/n_space_axes", operator="EQUALS", value=3)
     end = SimpleNamespace(identifiers=[IMAGE], requires=[pin])
-    category = SimpleNamespace(key="GROUND_TRUTH_OF", source_descriptor=end, target_descriptor=end)
+    category = SimpleNamespace(
+        key="GROUND_TRUTH_OF", source_descriptor=end, target_descriptor=end
+    )
     volumes = {"noisy", "clean"}
 
     def check(datum: tuple[str, str], requires: Sequence[Any]) -> bool:
@@ -77,13 +94,38 @@ def test_a_pair_is_held_to_its_words_pins_before_anything_is_written() -> None:
     with pytest.raises(PinRefused, match="pass check="):
         pair(ArrayLens("noisy"), ArrayLens("clean"), category, kraph=Kraph())
     with pytest.raises(PinRefused, match="does not satisfy"):
-        pair(ArrayLens("noisy"), ArrayLens("a-plane"), category, kraph=Kraph(), check=check)
+        pair(
+            ArrayLens("noisy"),
+            ArrayLens("a-plane"),
+            category,
+            kraph=Kraph(),
+            check=check,
+        )
     with pytest.raises(PinRefused, match="pairs @mikro/arraylens"):
-        pair(ArrayLens("noisy"), ("@mikro/table", "t1"), category, kraph=Kraph(), check=check)
+        pair(
+            ArrayLens("noisy"),
+            ("@mikro/table", "t1"),
+            category,
+            kraph=Kraph(),
+            check=check,
+        )
     assert written == [], "a refused pair writes nothing"
 
-    claim = pair(ArrayLens("noisy"), ArrayLens("clean"), category, kraph=Kraph(), check=check, confidence=0.9)
-    assert claim == {"source_id": "s-noisy", "target_id": "s-clean", "term": "GROUND_TRUTH_OF", "confidence": 0.9, "observed_at": None}
+    claim = pair(
+        ArrayLens("noisy"),
+        ArrayLens("clean"),
+        category,
+        kraph=Kraph(),
+        check=check,
+        confidence=0.9,
+    )
+    assert claim == {
+        "source_id": "s-noisy",
+        "target_id": "s-clean",
+        "term": "GROUND_TRUTH_OF",
+        "confidence": 0.9,
+        "observed_at": None,
+    }
 
 
 def test_what_a_client_fetches_reaches_that_client() -> None:
@@ -122,10 +164,21 @@ def test_what_a_client_fetches_reaches_that_client() -> None:
             "descriptors": {},
             "createdAt": "2026-11-08T00:00:00Z",
         },
-        "store": {"id": "s1", "key": "k", "bucket": "b", "path": "s3://b/k", "originalFileName": "w.zip", "sizeBytes": 3},
+        "store": {
+            "id": "s1",
+            "key": "k",
+            "bucket": "b",
+            "path": "s3://b/k",
+            "originalFileName": "w.zip",
+            "sizeBytes": 3,
+        },
     }
     model = Model.model_validate(payload, context=origin_context(client=client))
 
     assert client_of(model) is client
-    assert client_of(model.store) is client, "the nested store downloads through the same client"
-    assert client_of(model.trained_on) is client, "the run it cites reads its entries through the same client"
+    assert client_of(model.store) is client, (
+        "the nested store downloads through the same client"
+    )
+    assert client_of(model.trained_on) is client, (
+        "the run it cites reads its entries through the same client"
+    )

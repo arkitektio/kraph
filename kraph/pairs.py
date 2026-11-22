@@ -43,20 +43,36 @@ def _end(descriptor: Any) -> tuple[list[str], list[Any]]:  # noqa: ANN401
     """The identifiers and the pinned constraints of one end of a category."""
     if descriptor is None:
         return [], []
-    return list(getattr(descriptor, "identifiers", None) or []), list(getattr(descriptor, "requires", None) or [])
+    return list(getattr(descriptor, "identifiers", None) or []), list(
+        getattr(descriptor, "requires", None) or []
+    )
 
 
-def _hold(name: str, end: tuple[str, str], descriptor: Any, check: Check | None) -> None:  # noqa: ANN401
+def _hold(
+    name: str,
+    end: tuple[str, str],
+    descriptor: Any,  # noqa: ANN401
+    check: Check | None,
+) -> None:
     identifiers, requires = _end(descriptor)
     if identifiers and end[0] not in identifiers:
-        raise PinRefused(f"The {name} is a {end[0]}, but this word pairs {', '.join(identifiers)} there")
+        raise PinRefused(
+            f"The {name} is a {end[0]}, but this word pairs {', '.join(identifiers)} there"
+        )
     if not requires:
         return
     if check is None:
-        raise PinRefused(f"This word pins {len(requires)} descriptor(s) on its {name}, and only the datum's own service can say whether they hold: pass check=")
+        raise PinRefused(
+            f"This word pins {len(requires)} descriptor(s) on its {name}, and only the datum's own service can say whether they hold: pass check="
+        )
     if not check(end, requires):
-        pinned = ", ".join(f"{c.key} {getattr(c.operator, 'value', c.operator)} {c.value!r}" for c in requires)
-        raise PinRefused(f"The {name} {end[0]}:{end[1]} does not satisfy what this word pins there: {pinned}")
+        pinned = ", ".join(
+            f"{c.key} {getattr(c.operator, 'value', c.operator)} {c.value!r}"
+            for c in requires
+        )
+        raise PinRefused(
+            f"The {name} {end[0]}:{end[1]} does not satisfy what this word pins there: {pinned}"
+        )
 
 
 def _word(category: Any) -> str:  # noqa: ANN401
@@ -92,7 +108,9 @@ def pair(
     _hold("target", target_end, getattr(category, "target_descriptor", None), check)
 
     structures = [
-        client.assert_structure_exists(identifier=identifier, object=object_id).structure
+        client.assert_structure_exists(
+            identifier=identifier, object=object_id
+        ).structure
         for identifier, object_id in (source_end, target_end)
     ]
     return client.assert_structure_relation_exists(

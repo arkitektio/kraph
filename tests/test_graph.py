@@ -9,7 +9,12 @@ import uuid
 
 import pytest
 
-from kraph.api.schema import Cardinality, MetricValueInput, StructureDescriptorInput, ValueKind
+from kraph.api.schema import (
+    Cardinality,
+    MetricValueInput,
+    StructureDescriptorInput,
+    ValueKind,
+)
 from kraph.kraph import Kraph
 
 
@@ -32,7 +37,9 @@ def test_create_structure_relation_category(kraph: Kraph) -> None:
     over an identifier the view does not mount: the kind is mounted first.
     """
     graph = kraph.create_graph(name="Image Masking Example", backfill=False)
-    kraph.create_structure_category(key="Image", identifier="@mikro/image", graph=graph.id)
+    kraph.create_structure_category(
+        key="Image", identifier="@mikro/image", graph=graph.id
+    )
 
     images = StructureDescriptorInput(identifiers=["@mikro/image"])
     category = kraph.create_structure_relation_category(
@@ -101,14 +108,25 @@ def test_retraction_records_a_position_rather_than_deleting(
     assert standings[0].stands is False
 
 
-def _value(object: str, value: float, *, source: uuid.UUID | None = None) -> MetricValueInput:
-    return MetricValueInput(identifier="@mikro/annotation", object=object, key="area", value=value, value_kind=ValueKind.FLOAT, uuid=source)
+def _value(
+    object: str, value: float, *, source: uuid.UUID | None = None
+) -> MetricValueInput:
+    return MetricValueInput(
+        identifier="@mikro/annotation",
+        object=object,
+        key="area",
+        value=value,
+        value_kind=ValueKind.FLOAT,
+        uuid=source,
+    )
 
 
 @pytest.mark.integration
 def test_many_values_about_many_data_are_one_act(kraph: Kraph) -> None:
     """One assertion covers the batch; the structures are created by the write that needed them."""
-    asserted = kraph.assert_metric_values(metrics=[_value("batch-1", 2.0), _value("batch-2", 3.0)])
+    asserted = kraph.assert_metric_values(
+        metrics=[_value("batch-1", 2.0), _value("batch-2", 3.0)]
+    )
 
     assert asserted.recorded == 2
     assert asserted.assertion is not None and asserted.assertion.seq > 0

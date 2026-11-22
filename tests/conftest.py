@@ -1,24 +1,26 @@
-from arkitekt_spec.declare.tested import record_tested
-import pytest
-from dokker import Deployment, testing
-from dokker.log_watcher import LogWatcher
 import os
 import socket
 from collections.abc import Generator
-from kraph.kraph import Kraph
-from rath.links.auth import ComposedAuthLink
+from dataclasses import dataclass
+
+import pytest
+from arkitekt_spec.declare.tested import record_tested
+from dokker import Deployment, testing
+from dokker.log_watcher import LogWatcher
 from rath.links.aiohttp import AIOHttpLink
+from rath.links.auth import ComposedAuthLink
+from rath.links.compose import compose
 from rath.links.graphql_ws import GraphQLWSLink
 from rath.links.timeout import TimeoutLink
-from rath.links.compose import compose
+
+from graphql import OperationType
+from kraph.datalayer import DataLayer
+from kraph.kraph import Kraph
 from kraph.rath import (
     KraphRath,
-    UploadLink,
     SplitLink,
+    UploadLink,
 )
-from kraph.datalayer import DataLayer
-from graphql import OperationType
-from dataclasses import dataclass
 
 project_path = os.path.join(os.path.dirname(__file__), "integration")
 docker_compose_file = os.path.join(project_path, "docker-compose.yml")
@@ -84,14 +86,18 @@ class DeployedKraph:
 
 
 @pytest.fixture(scope="session")
-def deployed_app(integration_ports: dict[str, int]) -> Generator[DeployedKraph, None, None]:
+def deployed_app(
+    integration_ports: dict[str, int],
+) -> Generator[DeployedKraph, None, None]:
     """Fixture to deploy the Kraph application using Docker Compose."""
     # testing(): a per-run `dokker-test-<hash>` project that is torn down on
     # exit, so concurrent or crashed runs (and sibling repos, which all name
     # their stack `integration`) never share containers.
     setup = testing(docker_compose_file)
     setup.add_health_check(
-        url=lambda spec: f"http://localhost:{spec.find_service('kraph').get_port_for_internal(80).published}/graphql",
+        url=lambda spec: (
+            f"http://localhost:{spec.find_service('kraph').get_port_for_internal(80).published}/graphql"
+        ),
         service="kraph",
         timeout=5,
         # dokker sleeps `timeout` seconds between attempts: 20 x 5 s covers a
@@ -122,7 +128,9 @@ def deployed_app(integration_ports: dict[str, int]) -> Generator[DeployedKraph, 
         y = KraphRath(
             link=compose(
                 TimeoutLink(timeout=12),
-                ComposedAuthLink(token_loader=token_loader, token_refresher=token_loader),
+                ComposedAuthLink(
+                    token_loader=token_loader, token_refresher=token_loader
+                ),
                 UploadLink(datalayer=datalayer),
                 SplitLink(
                     left=AIOHttpLink(endpoint_url=http_url),

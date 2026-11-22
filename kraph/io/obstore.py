@@ -40,7 +40,9 @@ class S3UploadGrantLike(Protocol):
 #: Called with the store id; returns a new grant for the *same* key. A context variable rather
 #: than a parameter because the store is built several calls down, in every writer the
 #: middleware drives, and the refresher is the middleware's to know about.
-upload_refresher: ContextVar["Callable[[str], S3UploadGrantLike] | None"] = ContextVar("upload_refresher", default=None)
+upload_refresher: ContextVar["Callable[[str], S3UploadGrantLike] | None"] = ContextVar(
+    "upload_refresher", default=None
+)
 
 #: How long before a grant runs out a fresh one is asked for. obstore asks its credential
 #: provider again shortly before the expiry it reported; refreshing a little earlier than that
@@ -60,7 +62,9 @@ class RefreshingUploadCredentials:
     refreshes would mint two sessions for nothing.
     """
 
-    def __init__(self, grant: "S3UploadGrantLike", refresh: "Callable[[], S3UploadGrantLike]") -> None:
+    def __init__(
+        self, grant: "S3UploadGrantLike", refresh: "Callable[[], S3UploadGrantLike]"
+    ) -> None:
         """Wrap the grant an upload started with, and how to renew it."""
         self._refresh = refresh
         self._lock = threading.Lock()
@@ -69,13 +73,19 @@ class RefreshingUploadCredentials:
     def _install(self, grant: "S3UploadGrantLike") -> None:
         self._grant = grant
         expires_in = getattr(grant, "expires_in", None)
-        self._expires_at = datetime.datetime.now(datetime.UTC) + datetime.timedelta(seconds=expires_in) if expires_in else None
+        self._expires_at = (
+            datetime.datetime.now(datetime.UTC) + datetime.timedelta(seconds=expires_in)
+            if expires_in
+            else None
+        )
 
     def __call__(self) -> "S3Credential":
         """The credentials to sign the next request with."""
         with self._lock:
             if self._expires_at is not None:
-                remaining = (self._expires_at - datetime.datetime.now(datetime.UTC)).total_seconds()
+                remaining = (
+                    self._expires_at - datetime.datetime.now(datetime.UTC)
+                ).total_seconds()
                 if remaining < UPLOAD_REFRESH_MARGIN_SECONDS:
                     self._install(self._refresh())
             return {
@@ -120,7 +130,9 @@ def create_s3_store(
     if proxy:
         normalized_client_options["proxy_url"] = proxy
     if certificates:
-        normalized_client_options["root_certificate"] = "\n".join(pem.strip() for pem in certificates)
+        normalized_client_options["root_certificate"] = "\n".join(
+            pem.strip() for pem in certificates
+        )
         normalized_client_options["disable_system_certificates"] = True
 
     store_kwargs: dict[str, object] = {
@@ -133,7 +145,9 @@ def create_s3_store(
     store_id = getattr(grant, "store", None)
     if refresh is not None and store_id:
         # Inside an upload: credentials that renew themselves against the same store.
-        store_kwargs["credential_provider"] = RefreshingUploadCredentials(grant, lambda: refresh(store_id))
+        store_kwargs["credential_provider"] = RefreshingUploadCredentials(
+            grant, lambda: refresh(store_id)
+        )
     else:
         store_kwargs["access_key_id"] = grant.access_key
         store_kwargs["secret_access_key"] = grant.secret_key

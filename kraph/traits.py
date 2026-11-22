@@ -58,7 +58,15 @@ class AssertedTrait(BaseModel):
     @property
     def claim(self) -> Any:
         """The thing this write recorded, whichever field the payload carries it in."""
-        for field in ("instance", "instances", "link", "links", "structure", "metric", "comment"):
+        for field in (
+            "instance",
+            "instances",
+            "link",
+            "links",
+            "structure",
+            "metric",
+            "comment",
+        ):
             value = getattr(self, field, None)
             if value is not None:
                 return value
@@ -89,7 +97,9 @@ class HasDrawings(BaseModel):
 
     def drawn_in(self, graph: Any) -> Any | None:
         """This view's account of the claim, or ``None`` if this view does not draw it."""
-        wanted = graph if isinstance(graph, str) else get_attributes_or_error(graph, "id")
+        wanted = (
+            graph if isinstance(graph, str) else get_attributes_or_error(graph, "id")
+        )
         for drawing in get_attributes_or_error(self, "drawings"):
             if str(drawing.graph.id) == str(wanted):
                 return drawing
@@ -318,7 +328,9 @@ def structure_identifier(end: Any) -> str:  # noqa: ANN401
     stamped = getattr(end, "__identifier__", None)
     if isinstance(stamped, str):
         return stamped
-    raise TypeError(f"A pair's end is a structure identifier ('@mikro/arraylens') or a class stamped with one, not {end!r}")
+    raise TypeError(
+        f"A pair's end is a structure identifier ('@mikro/arraylens') or a class stamped with one, not {end!r}"
+    )
 
 
 def _typed_by_ends(cls: type, ends: Any, name: str) -> Any:  # noqa: ANN401
@@ -338,8 +350,12 @@ def _typed_by_ends(cls: type, ends: Any, name: str) -> Any:  # noqa: ANN401
     source, target = (structure_identifier(end) for end in ends)
     return Annotated[
         cls,
-        Requires(key=SOURCE_IDENTIFIER, operator=DescriptorOperator.EQUALS, value=source),
-        Requires(key=TARGET_IDENTIFIER, operator=DescriptorOperator.EQUALS, value=target),
+        Requires(
+            key=SOURCE_IDENTIFIER, operator=DescriptorOperator.EQUALS, value=source
+        ),
+        Requires(
+            key=TARGET_IDENTIFIER, operator=DescriptorOperator.EQUALS, value=target
+        ),
     ]
 
 
@@ -361,7 +377,13 @@ def _expanded(registry: "StructureRegistry", pairs: list[Any]) -> list[tuple[Any
     def expand(identifier: str, object_id: str) -> Any:  # noqa: ANN401
         return unkoil(registry.get_fullfilled_structure(identifier).expand, object_id)
 
-    return [(expand(pair.source_identifier, pair.source_object), expand(pair.target_identifier, pair.target_object)) for pair in pairs]
+    return [
+        (
+            expand(pair.source_identifier, pair.source_object),
+            expand(pair.target_identifier, pair.target_object),
+        )
+        for pair in pairs
+    ]
 
 
 class GraphPairsQueryTrait(ContextBound):
@@ -380,11 +402,22 @@ class GraphPairsQueryTrait(ContextBound):
         """Every pair the query answers now, from the view's drawing. Not a record: run it for one."""
         client = client_of(self, kraph)
         query_id = get_attributes_or_error(self, "id")
-        return _read_pairs(lambda pagination: client.render_graph_pairs(id=query_id, pagination=pagination), page)
+        return _read_pairs(
+            lambda pagination: client.render_graph_pairs(
+                id=query_id, pagination=pagination
+            ),
+            page,
+        )
 
-    def run(self, name: str, *, description: str | None = None, kraph: "Kraph | None" = None) -> Any:  # noqa: ANN401
+    def run(
+        self, name: str, *, description: str | None = None, kraph: "Kraph | None" = None
+    ) -> Any:  # noqa: ANN401
         """Run the query: its answer, stored with where the drawing stood. What a model cites."""
-        return client_of(self, kraph).run_pairs_query(query=get_attributes_or_error(self, "id"), name=name, description=description)
+        return client_of(self, kraph).run_pairs_query(
+            query=get_attributes_or_error(self, "id"),
+            name=name,
+            description=description,
+        )
 
 
 class PairsQueryRunTrait(ContextBound):
@@ -399,13 +432,22 @@ class PairsQueryRunTrait(ContextBound):
         """``PairsQueryRun["@mikro/arraylens", "@mikro/arraylens"]``: runs of image pairs only."""
         return _typed_by_ends(cls, ends, "PairsQueryRun")
 
-    def read_entries(self, *, kraph: "Kraph | None" = None, page: int = 1000) -> list[Any]:
+    def read_entries(
+        self, *, kraph: "Kraph | None" = None, page: int = 1000
+    ) -> list[Any]:
         """Every stored pair, in the run's order, as ``(identifier, object)`` addresses."""
         client = client_of(self, kraph)
         run_id = get_attributes_or_error(self, "id")
-        return _read_pairs(lambda pagination: client.get_run_entries(id=run_id, pagination=pagination).page, page)
+        return _read_pairs(
+            lambda pagination: (
+                client.get_run_entries(id=run_id, pagination=pagination).page
+            ),
+            page,
+        )
 
-    def pairs(self, registry: "StructureRegistry", *, kraph: "Kraph | None" = None) -> list[tuple[Any, Any]]:
+    def pairs(
+        self, registry: "StructureRegistry", *, kraph: "Kraph | None" = None
+    ) -> list[tuple[Any, Any]]:
         """Every pair as the objects themselves: ``(source, target)``, each expanded by its own service.
 
         ``registry`` is a structure registry bound to its clients (the one a running task
@@ -418,17 +460,29 @@ class PairsQueryRunTrait(ContextBound):
 class BigFileStoreTrait(ContextBound):
     """A big file in kraph's datalayer: read back through an access grant, never by its path."""
 
-    def download(self, file_name: str | None = None, *, kraph: "Kraph | None" = None) -> str:
+    def download(
+        self, file_name: str | None = None, *, kraph: "Kraph | None" = None
+    ) -> str:
         """Stream the file to ``file_name`` (its uploaded name by default). Returns the path written."""
         from kraph.io.download import download_bigfile, file_name_of
 
-        return download_bigfile(str(get_attributes_or_error(self, "id")), file_name_of(self, file_name), client_of(self, kraph))
+        return download_bigfile(
+            str(get_attributes_or_error(self, "id")),
+            file_name_of(self, file_name),
+            client_of(self, kraph),
+        )
 
-    async def adownload(self, file_name: str | None = None, *, kraph: "Kraph | None" = None) -> str:
+    async def adownload(
+        self, file_name: str | None = None, *, kraph: "Kraph | None" = None
+    ) -> str:
         """Stream the file to ``file_name`` (its uploaded name by default). Returns the path written."""
         from kraph.io.download import adownload_bigfile, file_name_of
 
-        return await adownload_bigfile(str(get_attributes_or_error(self, "id")), file_name_of(self, file_name), client_of(self, kraph))
+        return await adownload_bigfile(
+            str(get_attributes_or_error(self, "id")),
+            file_name_of(self, file_name),
+            client_of(self, kraph),
+        )
 
 
 class ModelTrait(ContextBound):
@@ -438,16 +492,28 @@ class ModelTrait(ContextBound):
     sends the file and passes the finished store on, as every service's files are uploaded.
     """
 
-    def download(self, file_name: str | None = None, *, kraph: "Kraph | None" = None) -> str:
+    def download(
+        self, file_name: str | None = None, *, kraph: "Kraph | None" = None
+    ) -> str:
         """Stream the weights to ``file_name`` (their uploaded name by default). Returns the path written."""
         from kraph.io.download import download_bigfile, file_name_of
 
         store = get_attributes_or_error(self, "store")
-        return download_bigfile(str(get_attributes_or_error(store, "id")), file_name_of(store, file_name), client_of(self, kraph))
+        return download_bigfile(
+            str(get_attributes_or_error(store, "id")),
+            file_name_of(store, file_name),
+            client_of(self, kraph),
+        )
 
-    async def adownload(self, file_name: str | None = None, *, kraph: "Kraph | None" = None) -> str:
+    async def adownload(
+        self, file_name: str | None = None, *, kraph: "Kraph | None" = None
+    ) -> str:
         """Stream the weights to ``file_name`` (their uploaded name by default). Returns the path written."""
         from kraph.io.download import adownload_bigfile, file_name_of
 
         store = get_attributes_or_error(self, "store")
-        return await adownload_bigfile(str(get_attributes_or_error(store, "id")), file_name_of(store, file_name), client_of(self, kraph))
+        return await adownload_bigfile(
+            str(get_attributes_or_error(store, "id")),
+            file_name_of(store, file_name),
+            client_of(self, kraph),
+        )

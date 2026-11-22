@@ -74,7 +74,10 @@ def test_kraph_imports_and_builds_a_client_with_arkitekt_unavailable() -> None:
         "print('ok')\n"
     )
     result = subprocess.run(
-        [sys.executable, "-c", script], capture_output=True, text=True, cwd=PACKAGE.parent
+        [sys.executable, "-c", script],
+        capture_output=True,
+        text=True,
+        cwd=PACKAGE.parent,
     )
 
     assert result.returncode == 0, result.stderr
@@ -89,7 +92,13 @@ def test_nothing_looks_a_client_up() -> None:
         if "api" in path.relative_to(PACKAGE).parts:
             continue
         text = path.read_text()
-        for needle in ("kraph.vars", "resolve_rath", "find_rath", "KontextLike", "kontext."):
+        for needle in (
+            "kraph.vars",
+            "resolve_rath",
+            "find_rath",
+            "KontextLike",
+            "kontext.",
+        ):
             if needle in text:
                 offenders.append(f"{path.relative_to(PACKAGE)}: {needle}")
     assert offenders == []

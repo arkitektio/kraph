@@ -76,7 +76,9 @@ class StructureIdentifier(str):
             return cls(identifier_for_cls(target))
 
         if isinstance(v, str):
-            assert "@" in v, f"{v!r} is not a valid structure identifier (expected '@ns/name')"
+            assert "@" in v, (
+                f"{v!r} is not a valid structure identifier (expected '@ns/name')"
+            )
             return cls(v)
 
         raise TypeError(
@@ -106,7 +108,9 @@ class StructureObject(str):
             return cls(str(get_attributes_or_error(v, "id")))
         if isinstance(v, (str, int)):
             return cls(str(v))
-        raise TypeError("A structure object must be a string, an int, or a model with an id")
+        raise TypeError(
+            "A structure object must be a string, an int, or a model with an id"
+        )
 
 
 class CypherLiteral(str):
@@ -153,7 +157,9 @@ class BigFile:
         handler: GetCoreSchemaHandler,
     ) -> CoreSchema:
         """Validate with :meth:`validate`; the instance travels to the middleware as itself."""
-        return core_schema.no_info_after_validator_function(cls.validate, handler(object))
+        return core_schema.no_info_after_validator_function(
+            cls.validate, handler(object)
+        )
 
     @classmethod
     def validate(cls, v: "BigFileLikeCoercible | BigFile") -> "BigFile":
@@ -163,7 +169,9 @@ class BigFile:
         if isinstance(v, (str, os.PathLike)):
             return cls(open(v, "rb"), file_name=os.path.basename(os.fspath(v)))  # noqa: SIM115 - read by the upload, closed with it
         if not isinstance(v, io.IOBase):
-            raise ValueError(f"A big file is a path or an open binary file, not {type(v).__name__}")
+            raise ValueError(
+                f"A big file is a path or an open binary file, not {type(v).__name__}"
+            )
         return cls(v)
 
     def __repr__(self) -> str:

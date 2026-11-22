@@ -21,24 +21,46 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-def upload_bigfile(file: BigFile, credentials: "BigFileUploadGrant", datalayer: "DataLayer") -> str:
+def upload_bigfile(
+    file: BigFile, credentials: "BigFileUploadGrant", datalayer: "DataLayer"
+) -> str:
     """Write ``file`` to the object its grant names, synchronously. Returns the store id."""
-    store = create_s3_store(datalayer.endpoint_url, credentials, proxy=datalayer.proxy, certificates=datalayer.certificates)
+    store = create_s3_store(
+        datalayer.endpoint_url,
+        credentials,
+        proxy=datalayer.proxy,
+        certificates=datalayer.certificates,
+    )
     try:
         obstore.put(store, credentials.key, file.value)
     except Exception as e:
-        raise UploadError(f"Error while uploading to s3://{credentials.bucket}/{credentials.key} on {datalayer.endpoint_url}") from e
-    logger.info("Uploaded %s to s3://%s/%s", file.file_name, credentials.bucket, credentials.key)
+        raise UploadError(
+            f"Error while uploading to s3://{credentials.bucket}/{credentials.key} on {datalayer.endpoint_url}"
+        ) from e
+    logger.info(
+        "Uploaded %s to s3://%s/%s", file.file_name, credentials.bucket, credentials.key
+    )
     return credentials.store
 
 
-async def aupload_bigfile(file: BigFile, credentials: "BigFileUploadGrant", datalayer: "DataLayer") -> str:
+async def aupload_bigfile(
+    file: BigFile, credentials: "BigFileUploadGrant", datalayer: "DataLayer"
+) -> str:
     """Write ``file`` to the object its grant names. Returns the store id."""
     endpoint_url = await datalayer.get_endpoint_url()
-    store = create_s3_store(endpoint_url, credentials, proxy=datalayer.proxy, certificates=datalayer.certificates)
+    store = create_s3_store(
+        endpoint_url,
+        credentials,
+        proxy=datalayer.proxy,
+        certificates=datalayer.certificates,
+    )
     try:
         await obstore.put_async(store, credentials.key, file.value)
     except Exception as e:
-        raise UploadError(f"Error while uploading to s3://{credentials.bucket}/{credentials.key} on {endpoint_url}") from e
-    logger.info("Uploaded %s to s3://%s/%s", file.file_name, credentials.bucket, credentials.key)
+        raise UploadError(
+            f"Error while uploading to s3://{credentials.bucket}/{credentials.key} on {endpoint_url}"
+        ) from e
+    logger.info(
+        "Uploaded %s to s3://%s/%s", file.file_name, credentials.bucket, credentials.key
+    )
     return credentials.store

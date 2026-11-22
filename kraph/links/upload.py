@@ -21,7 +21,6 @@ The class is kept — rather than deleted — because ``KraphLinkComposition.upl
 field and ``tests/conftest.py`` imports the name. It passes operations through untouched.
 """
 
-
 from pydantic import ConfigDict, Field
 from rath.links.parsing import ParsingLink
 from rath.operation import Operation

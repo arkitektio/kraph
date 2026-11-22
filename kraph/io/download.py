@@ -24,8 +24,15 @@ def download_bigfile(store_id: str, file_name: str, kraph: "Kraph") -> str:
     """Stream the big file in ``store_id`` to ``file_name``. Returns the path written."""
     from kraph.api.schema import RequestBigFileAccessInput
 
-    grant = kraph.request_bigfile_access(input=RequestBigFileAccessInput(store_id=store_id))
-    store = create_s3_store(kraph.datalayer.endpoint_url, grant, proxy=kraph.datalayer.proxy, certificates=kraph.datalayer.certificates)
+    grant = kraph.request_bigfile_access(
+        input=RequestBigFileAccessInput(store_id=store_id)
+    )
+    store = create_s3_store(
+        kraph.datalayer.endpoint_url,
+        grant,
+        proxy=kraph.datalayer.proxy,
+        certificates=kraph.datalayer.certificates,
+    )
     response = obstore.get(store, grant.key)
     with open(_target(file_name), "wb") as file:
         for chunk in response.stream():
@@ -37,8 +44,15 @@ async def adownload_bigfile(store_id: str, file_name: str, kraph: "Kraph") -> st
     """Stream the big file in ``store_id`` to ``file_name``. Returns the path written."""
     from kraph.api.schema import RequestBigFileAccessInput
 
-    grant = await kraph.arequest_bigfile_access(input=RequestBigFileAccessInput(store_id=store_id))
-    store = create_s3_store(await kraph.datalayer.get_endpoint_url(), grant, proxy=kraph.datalayer.proxy, certificates=kraph.datalayer.certificates)
+    grant = await kraph.arequest_bigfile_access(
+        input=RequestBigFileAccessInput(store_id=store_id)
+    )
+    store = create_s3_store(
+        await kraph.datalayer.get_endpoint_url(),
+        grant,
+        proxy=kraph.datalayer.proxy,
+        certificates=kraph.datalayer.certificates,
+    )
     response = await obstore.get_async(store, grant.key)
     with open(_target(file_name), "wb") as file:
         async for chunk in response.stream():
@@ -48,4 +62,8 @@ async def adownload_bigfile(store_id: str, file_name: str, kraph: "Kraph") -> st
 
 def file_name_of(store: Any, file_name: str | None) -> str:  # noqa: ANN401
     """Where a download lands: the name asked for, else the uploaded file's own name, else its key's last part."""
-    return file_name or getattr(store, "original_file_name", None) or str(store.key).rsplit("/", 1)[-1]
+    return (
+        file_name
+        or getattr(store, "original_file_name", None)
+        or str(store.key).rsplit("/", 1)[-1]
+    )
