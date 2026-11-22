@@ -33,9 +33,12 @@ Example:
 
 import ssl
 from types import TracebackType
+from typing import TypeVar
 
 from fakts import Alias
 from koil.composition import KoiledModel
+
+_DataLayer = TypeVar("_DataLayer", bound="DataLayer")
 
 
 class DataLayer(KoiledModel):
@@ -92,10 +95,10 @@ class DataLayer(KoiledModel):
             certificates=list(alias.certificates) if alias.is_pinned() else [],
         )
 
-    async def get_endpoint_url(self):
+    async def get_endpoint_url(self) -> str:
         return self.endpoint_url
 
-    async def __aenter__(self):
+    async def __aenter__(self: _DataLayer) -> _DataLayer:
         """Enter the DataLayer context.
 
         Entering does not make it "the current datalayer", and kraph never looks one up: downloads go

@@ -1,4 +1,5 @@
 from types import TracebackType
+from typing import TypeVar
 
 from pydantic import Field
 from rath import rath
@@ -20,6 +21,9 @@ class KraphLinkComposition(TypedComposedLink):
     split: SplitLink
 
 
+_KraphRath = TypeVar("_KraphRath", bound="KraphRath")
+
+
 class KraphRath(rath.Rath):
     """Kraph Rath
 
@@ -30,7 +34,7 @@ class KraphRath(rath.Rath):
 
     middlewares: list[OperationMiddleware] = Field(default_factory=list)
 
-    async def __aenter__(self):
+    async def __aenter__(self: _KraphRath) -> _KraphRath:
         """Enter the client and its middlewares.
 
         Entering does not make it "the current client", and kraph never looks one up: calls go

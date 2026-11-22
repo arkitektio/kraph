@@ -17,6 +17,7 @@ from rath.origin import ContextBound, get_origin, origin_context
 from kraph.datalayer import DataLayer
 from kraph.errors import NoKraphFound
 from kraph.kraph import TASK_HEADER, Kraph
+from kraph.middleware.base import OperationMiddleware
 from kraph.rath import KraphRath
 from kraph.traits import GraphTrait, StructureTrait
 
@@ -26,23 +27,31 @@ class FakeRath:
 
     def __init__(self) -> None:
         self.sent: list[dict[str, Any]] = []
-        self.headers: list[Any] = []
+        self.headers: list[dict[str, Any] | None] = []
         # `KraphRath.middlewares`: what the variables go through before they are sent (uploads).
-        self.middlewares: list[Any] = []
+        self.middlewares: list[OperationMiddleware] = []
 
-    def _answer(self, variables: dict[str, Any], headers: Any) -> Any:
+    def _answer(
+        self, variables: dict[str, Any], headers: dict[str, Any] | None
+    ) -> SimpleNamespace:
         self.sent.append(variables)
         self.headers.append(headers)
         return SimpleNamespace(data={"store": {"id": "store-1", "key": "file.bin"}})
 
     async def aquery(
-        self, document: str, variables: dict[str, Any], headers: Any = None
-    ) -> Any:
+        self,
+        document: str,
+        variables: dict[str, Any],
+        headers: dict[str, Any] | None = None,
+    ) -> SimpleNamespace:
         return self._answer(variables, headers)
 
     async def asubscribe(
-        self, document: str, variables: dict[str, Any], headers: Any = None
-    ) -> AsyncIterator[Any]:
+        self,
+        document: str,
+        variables: dict[str, Any],
+        headers: dict[str, Any] | None = None,
+    ) -> AsyncIterator[SimpleNamespace]:
         yield self._answer(variables, headers)
 
 
@@ -175,11 +184,14 @@ def test_every_operation_is_a_method_of_the_client() -> None:
 async def test_a_generated_method_calls_through_its_own_client(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    seen: list[Any] = []
+    seen: list[Kraph] = []
 
     async def fake_aexecute(
-        self: Any, operation: Any, variables: Any, task: Any = None
-    ) -> Any:
+        self: Kraph,
+        operation: type[BaseModel],
+        variables: dict[str, object],
+        task: object = None,
+    ) -> SimpleNamespace:
         # Every generated method forwards `task=`, so the delegate takes it.
         seen.append(self)
         return SimpleNamespace(graph="the graph")
@@ -199,8 +211,8 @@ async def test_a_generated_method_calls_through_its_own_client(
 def test_graph_polls_its_projection_through_its_own_client() -> None:
     asked: list[str] = []
 
-    def fake(name: str) -> Any:
-        def get_graph(id: str) -> Any:
+    def fake(name: str) -> SimpleNamespace:
+        def get_graph(id: str) -> SimpleNamespace:
             asked.append(name)
             return SimpleNamespace(projection=SimpleNamespace(projected_through_seq=7))
 

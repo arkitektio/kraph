@@ -4,6 +4,7 @@ Both clients are the ones the object was fetched with (``client_of``): the kraph
 for the grant, and its datalayer, which says where the store is. Nothing is looked up.
 """
 
+import asyncio
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -54,7 +55,9 @@ async def adownload_bigfile(store_id: str, file_name: str, kraph: "Kraph") -> st
         certificates=kraph.datalayer.certificates,
     )
     response = await obstore.get_async(store, grant.key)
-    with open(_target(file_name), "wb") as file:
+    # Opened off the loop; the writes are of chunks already in memory.
+    file = await asyncio.to_thread(open, _target(file_name), "wb")
+    with file:
         async for chunk in response.stream():
             file.write(chunk)
     return file_name

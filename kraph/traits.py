@@ -27,6 +27,7 @@ from typing import TYPE_CHECKING, Any
 from koil import unkoil
 from pydantic import BaseModel
 from rath.origin import ContextBound
+from rath.scalars import WithId
 from rath.turms.utils import get_attributes_or_error
 
 from kraph.client import client_of
@@ -34,6 +35,7 @@ from kraph.client import client_of
 if TYPE_CHECKING:
     from arkitekt_spec.declare.structures.registry import StructureRegistry
 
+    from kraph.api.schema import GraphProjection
     from kraph.kraph import Kraph
 
 
@@ -56,7 +58,7 @@ class AssertedTrait(BaseModel):
         return get_attributes_or_error(self, "assertion").seq
 
     @property
-    def claim(self) -> Any:
+    def claim(self) -> object:
         """The thing this write recorded, whichever field the payload carries it in."""
         for field in (
             "instance",
@@ -95,7 +97,7 @@ class HasDrawings(BaseModel):
         """
         return bool(get_attributes_or_error(self, "drawings"))
 
-    def drawn_in(self, graph: Any) -> Any | None:
+    def drawn_in(self, graph: str | WithId) -> object | None:
         """This view's account of the claim, or ``None`` if this view does not draw it."""
         wanted = (
             graph if isinstance(graph, str) else get_attributes_or_error(graph, "id")
@@ -189,7 +191,7 @@ class StructureTrait(BaseModel):
         """The ``(identifier, object)`` pair that addresses this datum."""
         return get_attributes_or_error(self, "identifier", "object")
 
-    def resolve(self, registry: "StructureRegistry") -> Any:
+    def resolve(self, registry: "StructureRegistry") -> object:
         """Expand this structure back into the concrete Python object it points at.
 
         Uses ``registry``, a structure registry bound to its clients (the one a running task
@@ -275,7 +277,7 @@ class GraphTrait(ContextBound):
     """
 
     @property
-    def projection_state(self) -> Any:
+    def projection_state(self) -> "ProjectionTrait":
         return get_attributes_or_error(self, "projection")
 
     def wait_until_projected(
@@ -285,7 +287,7 @@ class GraphTrait(ContextBound):
         timeout: float = 30.0,
         poll: float = 0.5,
         kraph: "Kraph | None" = None,
-    ) -> Any:
+    ) -> "GraphProjection":
         """Block until this view has drawn everything up to ``seq``.
 
         Never implicit: a backfill or a category edit redraws in-request and is unbounded in the

@@ -112,7 +112,7 @@ def as_structure_ref(x: StructureRef) -> tuple[str, str]:
     raise TypeError(f"Cannot read a structure reference out of {type(x).__name__}")
 
 
-def as_term(x: Any) -> str:
+def as_term(x: object) -> str:
     """The word a claim is stated in — a ``Term.key``, never a category id."""
     if isinstance(x, str):
         return x
