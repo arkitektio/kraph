@@ -31,16 +31,16 @@ the client, so follow-ups from a result go through the same client.
 
 ### In an arkitekt app
 
-Add the service to your app and ask for `kraph: Kraph`; the client is injected by annotation.
+Ask for `kraph: Kraph`; the client is injected by annotation.
 Graphs, categories, structures, metrics, terms and more travel between actions by id
 (`@kraph/graph`, `@kraph/entitycategory`, `@kraph/structure`, `@kraph/term`, …), so an action can
 take and return them directly:
 
 ```python
 from arkitekt import App, run
-from kraph import Kraph, kraph_service
+from kraph import Kraph
 
-app = App("neuron-claims", "0.1.0", services=[kraph_service])
+app = App("neuron-claims", "0.1.0")
 
 
 @app.action
@@ -62,10 +62,10 @@ if __name__ == "__main__":
 ### From a script
 
 ```python
-from arkitekt import easy
-from kraph import kraph_service
+from arkitekt import connect
+from kraph import Kraph
 
-with easy("my-script", kraph_service) as kraph:
+with connect(Kraph) as kraph:
     graph = kraph.create_graph(name="Neurons", backfill=False)
     kraph.create_entity_category(
         key="Neuron",

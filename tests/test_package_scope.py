@@ -1,8 +1,8 @@
 """kraph must stay importable, and correct, without arkitekt.
 
 arkitekt is an optional integration. Two places may know about it: the integration
-module ``kraph/arkitekt.py``, and ``kraph/__init__.py``, which imports that module
-last and behind ``try/except ImportError``. Everything else is handed its client
+module ``kraph/structures.py``, and ``kraph/__init__.py``, which imports that module
+last. Everything else is handed its client
 explicitly (a ``Kraph``) instead of importing or looking one up.
 """
 
@@ -14,7 +14,7 @@ from pathlib import Path
 import kraph
 
 PACKAGE = Path(kraph.__file__).parent
-MAY_KNOW_ARKITEKT = {PACKAGE / "arkitekt.py", PACKAGE / "__init__.py"}
+MAY_KNOW_ARKITEKT = {PACKAGE / "structures.py", PACKAGE / "__init__.py"}
 
 
 def _module_scope_imports(tree: ast.Module) -> list[str]:

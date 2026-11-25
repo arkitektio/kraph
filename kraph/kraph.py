@@ -16,9 +16,13 @@ nullable field in this schema already defaults to null, so omitting and sending 
 same thing.
 """
 
+import os
 from collections.abc import AsyncGenerator, Generator
-from typing import Any
+from typing import Annotated, Any, Self
 
+from arkitekt_spec.declare.client import client
+from arkitekt_spec.declare.tested import tested_against
+from arkitekt_spec.declare.wiring import Alias, Require, TokenLoader
 from koil import unkoil, unkoil_gen
 from koil.composition import Composition
 from rath.origin import origin_context
@@ -29,7 +33,22 @@ from kraph.api.schema import KraphApi
 from kraph.datalayer import DataLayer
 from kraph.rath import KraphRath
 
+TESTED = tested_against("kraph")
+"""The kraph server this release wants: the one its release job tested it against."""
 
+_API = os.path.join(os.path.dirname(__file__), "api")
+KRAPH = Require(
+    "live.arkitekt.kraph",
+    "Where the knowledge graph relating entities lives",
+    version=TESTED,
+)
+S3 = Require("live.arkitekt.s3", "Where the graph's files are stored", optional=True)
+
+
+@client(
+    schema=os.path.join(_API, "schema.graphql"),
+    turms=os.path.join(_API, "project.json"),
+)
 class Kraph(Composition, KraphApi):
     """The kraph client.
 
@@ -42,6 +61,24 @@ class Kraph(Composition, KraphApi):
 
     rath: KraphRath
     datalayer: DataLayer
+
+    @classmethod
+    def from_fakts(
+        cls,
+        kraph: Annotated[Alias, KRAPH],
+        datalayer: Annotated[Alias | None, S3],
+        tokens: TokenLoader,
+    ) -> Self:
+        """Kraph over the resolved deployment.
+
+        Without a store the client still works; only uploads do not.
+        """
+        from kraph.connect import kraph_rath
+
+        store = (
+            DataLayer.from_alias(datalayer) if datalayer is not None else DataLayer()
+        )
+        return cls(rath=kraph_rath(kraph, store, tokens), datalayer=store)
 
     @staticmethod
     def _serialize(

@@ -1,5 +1,6 @@
-# The service is declared with arkitekt-spec, a core dependency: it is always there.
-from .arkitekt import kraph as kraph_service
 from .kraph import Kraph
 
-__all__ = ["Kraph", "kraph_service"]
+__all__ = ["Kraph"]
+
+# Marks every type kraph sends by id, so an app using `Kraph` finds them.
+from . import structures as _structures  # noqa: E402, F401
