@@ -19,6 +19,7 @@ resolves to — visible now in the expander itself rather than in a separate map
 table-query surface.
 """
 
+from arkitekt_spec.actions import AssignWidgetInput
 from arkitekt_spec.declare.structures.declare import structure
 from arkitekt_spec.declare.widgets import SearchWidget
 
@@ -58,7 +59,7 @@ from kraph.api.schema import (
 from kraph.kraph import Kraph
 
 
-def _search(query: object) -> SearchWidget:
+def _search(query: object) -> AssignWidgetInput:
     """The widget that picks one of these out of the deployment."""
     return SearchWidget(query=query.Meta.document, ward="kraph")  # type: ignore[attr-defined]
 
