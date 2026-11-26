@@ -5,8 +5,10 @@ Requesting the grant and finishing the upload are the middleware's
 says, through a store whose credentials renew themselves while it runs.
 """
 
+import io
 import logging
-from typing import TYPE_CHECKING
+import os
+from typing import TYPE_CHECKING, cast
 
 import obstore
 
@@ -21,6 +23,35 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
+#: Sent with every request and part of a big-file upload, so the object store verifies it.
+BIGFILE_CHECKSUM = "SHA256"
+
+
+def part_size_for(size: int) -> int:
+    """The part size the server's digest of a ``size``-byte file is cut at (``arkitekt_datalayer.digest``).
+
+    8 MiB, doubled until the parts fit S3's 10,000. Computed here, not read off the grant, so
+    an upload to a hub that does not advertise it still has its digest verified on arrival.
+    """
+    part = 8 * 1024 * 1024
+    while size > part * 10_000:
+        part *= 2
+    return part
+
+
+def _remaining_bytes(value: object) -> int:
+    """How many bytes a write will send: a buffer's length, a path's size, or a file object's rest, left where it was."""
+    if isinstance(value, (bytes, bytearray, memoryview)):
+        return len(value)
+    if isinstance(value, (str, os.PathLike)):
+        return os.path.getsize(value)
+    stream = cast("io.IOBase", value)
+    position = stream.tell()
+    end = stream.seek(0, io.SEEK_END)
+    stream.seek(position)
+    return end - position
+
+
 def upload_bigfile(
     file: BigFile, credentials: "BigFileUploadGrant", datalayer: "DataLayer"
 ) -> str:
@@ -30,9 +61,15 @@ def upload_bigfile(
         credentials,
         proxy=datalayer.proxy,
         certificates=datalayer.certificates,
+        checksum_algorithm=BIGFILE_CHECKSUM,
     )
     try:
-        obstore.put(store, credentials.key, file.value)
+        obstore.put(
+            store,
+            credentials.key,
+            file.value,
+            chunk_size=part_size_for(_remaining_bytes(file.value)),
+        )
     except Exception as e:
         raise UploadError(
             f"Error while uploading to s3://{credentials.bucket}/{credentials.key} on {datalayer.endpoint_url}"
@@ -53,9 +90,15 @@ async def aupload_bigfile(
         credentials,
         proxy=datalayer.proxy,
         certificates=datalayer.certificates,
+        checksum_algorithm=BIGFILE_CHECKSUM,
     )
     try:
-        await obstore.put_async(store, credentials.key, file.value)
+        await obstore.put_async(
+            store,
+            credentials.key,
+            file.value,
+            chunk_size=part_size_for(_remaining_bytes(file.value)),
+        )
     except Exception as e:
         raise UploadError(
             f"Error while uploading to s3://{credentials.bucket}/{credentials.key} on {endpoint_url}"
